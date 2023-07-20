@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Sections>
+  <Section name="Brigance-TA" Skill="Social Skills">
+    <SubSections>
+      <SubSection name="Citizenship"   Code="B2" ContainsQuestions="True">
+        <Questions>
+          <Question name ="test" Code="Q1" Box="2"></Question>
+          <Question name ="test" Code="Q2" Box="2"></Question>
+          <Question name ="test" Code="Q3" Box="2"></Question>
+          <Question name ="test" Code="Q4" Box="2"></Question>
+          <Question name ="test" Code="Q5" Box="2"></Question>
+          <Question name ="test" Code="Q6" Box="2"></Question>
+          <Question name ="test" Code="Q7" Box="2"></Question>
+          <Question name ="test" Code="Q8" Box="2"></Question>
+          <Question name ="test" Code="Q9" Box="2"></Question>
+          <Question name ="test" Code="Q10" Box="2"></Question>
+        </Questions>
+      </SubSection>
+
+      <SubSection name="Community_Signs"   Code="B2" ContainsQuestions="True">
+        <Questions>
+          <Question name ="test" Code="Q1" Box="2"></Question>
+          <Question name ="test" Code="Q2" Box="2"></Question>
+          <Question name ="test" Code="Q3" Box="2"></Question>
+          <Question name ="test" Code="Q4" Box="2"></Question>
+          <Question name ="test" Code="Q5" Box="2"></Question>
+          <Question name ="test" Code="Q6" Box="2"></Question>
+          <Question name ="test" Code="Q7" Box="2"></Question>
+          <Question name ="test" Code="Q8" Box="2"></Question>
+          <Question name ="test" Code="Q9" Box="2"></Question>
+          <Question name ="test" Code="Q10" Box="2"></Question>
+        </Questions>
+      </SubSection>
+
+      <SubSection name="Food"   Code="B2" ContainsQuestions="True">
+        <Questions>
+          <Question name ="test" Code="Q1" Box="2"></Question>
+          <Question name ="test" Code="Q2" Box="2"></Question>
+          <Question name ="test" Code="Q3" Box="2"></Question>
+          <Question name ="test" Code="Q4" Box="2"></Question>
+          <Question name ="test" Code="Q5" Box="2"></Question>
+          <Question name ="test" Code="Q6" Box="2"></Question>
+          <Question name ="test" Code="Q7" Box="2"></Question>
+          <Question name ="test" Code="Q8" Box="2"></Question>
+          <Question name ="test" Code="Q9" Box="2"></Question>
+          <Question name ="test" Code="Q10" Box="2"></Question>
+        </Questions>
+      </SubSection>
+
+      <SubSection name="Health"   Code="B2" ContainsQuestions="True">
+        <Questions>
+          <Question name ="test" Code="Q1" Box="2"></Question>
+          <Question name ="test" Code="Q2" Box="2"></Question>
+          <Question name ="test" Code="Q3" Box="2"></Question>
+          <Question name ="test" Code="Q4" Box="2"></Question>
+          <Question name ="test" Code="Q5" Box="2"></Question>
+          <Question name ="test" Code="Q6" Box="2"></Question>
+          <Question name ="test" Code="Q7" Box="2"></Question>
+          <Question name ="test" Code="Q8" Box="2"></Question>
+          <Question name ="test" Code="Q9" Box="2"></Question>
+          <Question name ="test" Code="Q10" Box="2"></Question>
+        </Questions>
+      </SubSection>
+
+      <SubSection name="Math_skills"   Code="B2" ContainsQuestions="True">
+        <Questions>
+          <Question name ="test" Code="Q1" Box="2"></Question>
+          <Question name ="test" Code="Q2" Box="2"></Question>
+          <Question name ="test" Code="Q3" Box="2"></Question>
+          <Question name ="test" Code="Q4" Box="2"></Question>
+          <Question name ="test" Code="Q5" Box="2"></Question>
+          <Question name ="test" Code="Q6" Box="2"></Question>
+          <Question name ="test" Code="Q7" Box="2"></Question>
+          <Question name ="test" Code="Q8" Box="2"></Question>
+          <Question name ="test" Code="Q9" Box="2"></Question>
+          <Question name ="test" Code="Q10" Box="2"></Question>
+        </Questions>
+      </SubSection>
+
+      <SubSection name="Money_and_finance"   Code="B2" ContainsQuestions="True">
+        <Questions>
+          <Question name ="test" Code="Q1" Box="2"></Question>
+          <Question name ="test" Code="Q2" Box="2"></Question>
+          <Question name ="test" Code="Q3" Box="2"></Question>
+          <Question name ="test" Code="Q4" Box="2"></Question>
+          <Question name ="test" Code="Q5" Box="2"></Question>
+          <Question name ="test" Code="Q6" Box="2"></Question>
+          <Question name ="test" Code="Q7" Box="2"></Question>
+          <Question name ="test" Code="Q8" Box="2"></Question>
+          <Question name ="test" Code="Q9" Box="2"></Question>
+          <Question name ="test" Code="Q10" Box="2"></Question>
+        </Questions>
+      </SubSection>
+
+      <SubSection name="Reading_grade"   Code="B2" ContainsQuestions="True">
+        <Questions>
+          <Question name ="test" Code="Q1" Box="2"></Question>
+          <Question name ="test" Code="Q2" Box="2"></Question>
+          <Question name ="test" Code="Q3" Box="2"></Question>
+          <Question name ="test" Code="Q4" Box="2"></Question>
+          <Question name ="test" Code="Q5" Box="2"></Question>
+          <Question name ="test" Code="Q6" Box="2"></Question>
+          <Question name ="test" Code="Q7" Box="2"></Question>
+          <Question name ="test" Code="Q8" Box="2"></Question>
+          <Question name ="test" Code="Q9" Box="2"></Question>
+          <Question name ="test" Code="Q10" Box="2"></Question>
+        </Questions>
+      </SubSection>
+
+  
+    </SubSections>
+  </Section>
+</Sections>

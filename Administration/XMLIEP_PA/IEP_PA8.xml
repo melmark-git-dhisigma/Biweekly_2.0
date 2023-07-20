@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+
+      <Mapping Column="IEP8PSSAReading" PlaceHolder="plcPASAReading"/>
+      <Mapping Column="IEP8PSSAappropriate" PlaceHolder="plcPASAAppropriate"/>
+      
+      <Mapping Column="IEP8AsmtNotAdministred" PlaceHolder="abcdefgh"/>
+     
+      
+      <Mapping Column="IEP8ReadPartcptPSSAWithoutAcmdtn" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP8ReadPartcptPSSAWithFollowingAcmdtn" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP8ReadPartcptPSSAModiWithoutAcmdtn" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP8ReadPartcptPSSAModiWithFollowingAcmdtn" PlaceHolder="abcdefgh"/>
+      
+      <Mapping Column="IEP8MathPartcptPSSAWithoutAcmdtn" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP8MathPartcptPSSAWithFollowingAcmdtn" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP8MathPartcptPSSAModiWithoutAcmdtn" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP8MathPartcptPSSAModiWithFollowingAcmdtn" PlaceHolder="abcdefgh"/>
+
+      <Mapping Column="IEP8SciencePartcptPSSAWithoutAcmdtn" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP8SciencePartcptPSSAWithFollowingAcmdtn" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP8SciencePartcptPSSAModiWithoutAcmdtn" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP8SciencePartcptPSSAModiWithFollowingAcmdtn" PlaceHolder="abcdefgh"/>
+      
+      <Mapping Column="IEP8WritePartcptPSSAWithoutAcmdtn" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP8WritePartcptPSSAWithFollowingAcmdtn" PlaceHolder="abcdefgh"/>
+      
+      <Mapping Column="IEP8Videotape" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP8WrittenNarrative" PlaceHolder="abcdefgh"/>
+      
+  
+      <Mapping Column="IEP8PSSAParticipate" PlaceHolder="abcdefgh"/>
+
+
+    </Mapping>
+
+  </State>
+</States>
+

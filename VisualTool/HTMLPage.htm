@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+    <script src="jquery-1.4.3.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+debugger
+function getDiv(divName, butName) {
+    cn = document.getElementById(divName).childNodes;
+    var valid = true;
+    for (var i = 0; i < cn.length; i++) {
+
+
+        if (cn[i].type == 'text') {
+            var id = cn[i].id;
+            if (cn[i].value == "") {
+                $('#' + id).css('background-color', 'Red');
+                alert(id + ':empty');
+                valid = false;
+
+            }
+        }
+
+
+    }
+
+    return valid;
+    
+}
+
+</script>
+<script>
+    $(document).ready(function () {
+        $('#but1').click(function () {
+            var result = getDiv('myDiv1', 'but1');
+
+            if (result) {
+
+                alert('done');
+               
+            }
+        });
+    });
+</script>
+</head>
+<body>
+<div id="myDiv1" name="myDiv1">
+<input type="text" id="txt1" />
+<input type="text" id="txt2" />
+<input type="text" id="txt3" />
+
+<input id="but1" type="button"/>
+</div>
+<div id="myDiv2" name="myDiv2">
+<input type="text" id="txt4" />
+<input type="text" id="txt5" />
+<input type="text" id="txt6" />
+
+<input id="but2" type="button" onclick="getDiv('myDiv2','but2');" />
+</div>
+
+
+</body>
+
+</html>

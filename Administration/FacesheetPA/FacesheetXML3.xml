@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="PA">
+    <Mapping>
+
+
+      <Mapping Column="AdaptiveEquipmentItem1" PlaceHolder="plcAAdptEquipItem"/>
+      <Mapping Column="AdaptiveEquipmentSchedule1" PlaceHolder="plcAAdptEquipSchedule"/>
+      <Mapping Column="AdaptiveEquipmentStorage1" PlaceHolder="plcAAdptEquipStorage"/>
+      <Mapping Column="AdaptiveEquipmentCleaning1" PlaceHolder="plcAAdptEquipCleaning"/>
+      
+      <Mapping Column="AdaptiveEquipmentItem2" PlaceHolder="plcBAdptEquipItem"/>
+      <Mapping Column="AdaptiveEquipmentSchedule2" PlaceHolder="plcBAdptEquipSchedule"/>
+      <Mapping Column="AdaptiveEquipmentStorage2" PlaceHolder="plcBAdptEquipStorage"/>
+      <Mapping Column="AdaptiveEquipmentCleaning2" PlaceHolder="plcBAdptEquipCleaning"/>
+      
+      <Mapping Column="AdaptiveEquipmentItem3" PlaceHolder="plcCAdptEquipItem"/>
+      <Mapping Column="AdaptiveEquipmentSchedule3" PlaceHolder="plcCAdptEquipSchedule"/>
+      <Mapping Column="AdaptiveEquipmentStorage3" PlaceHolder="plcCAdptEquipStorage"/>
+      <Mapping Column="AdaptiveEquipmentCleaning3" PlaceHolder="plcCAdptEquipCleaning"/>
+
+      <Mapping Column="BasicBehaviourInfoTarget1" PlaceHolder="plcABehvTrgt"/>
+      <Mapping Column="BasicBehaviourInfoDefinition1" PlaceHolder="plcABehvDef"/>
+      <Mapping Column="BasicBehaviourInfoResponseAntecedent1" PlaceHolder="plcABehvAnt"/>
+      <Mapping Column="BasicBehaviourInfoResponseFCT1" PlaceHolder="plcABehvFCT"/>
+      <Mapping Column="BasicBehaviourInfoResponseConsequence1" PlaceHolder="plcABehvConsequence"/>
+      
+      
+      <Mapping Column="BasicBehaviourInfoTarget2" PlaceHolder="plcBBehvTrgt"/>
+      <Mapping Column="BasicBehaviourInfoDefinition2" PlaceHolder="plcBBehvDef"/>
+      <Mapping Column="BasicBehaviourInfoResponseAntecedent2" PlaceHolder="plcBBehvAnt"/>
+      <Mapping Column="BasicBehaviourInfoResponseFCT2" PlaceHolder="plcBBehvFCT"/>
+      <Mapping Column="BasicBehaviourInfoResponseConsequence2" PlaceHolder="plcBBehvConsequence"/>
+      
+      <Mapping Column="BasicBehaviourInfoTarget3" PlaceHolder="plcCBehvTrgt"/>
+      <Mapping Column="BasicBehaviourInfoDefinition3" PlaceHolder="plcCBehvDef"/>
+      <Mapping Column="BasicBehaviourInfoResponseAntecedent3" PlaceHolder="plcCBehvAnt"/>
+      <Mapping Column="BasicBehaviourInfoResponseFCT3" PlaceHolder="plcCBehvFCT"/>
+      <Mapping Column="BasicBehaviourInfoResponseConsequence3" PlaceHolder="plcCBehvConsequence"/>
+    </Mapping>
+  </State>
+</States>

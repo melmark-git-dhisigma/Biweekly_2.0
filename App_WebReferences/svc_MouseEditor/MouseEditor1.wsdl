@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="MouseEditor" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import schemaLocation="http://localhost:59736/visual tool webservice/MouseEditor.svc?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://localhost:59736/visual tool webservice/MouseEditor.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://localhost:59736/visual tool webservice/MouseEditor.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/" />
+      <xsd:import schemaLocation="http://localhost:59736/visual tool webservice/MouseEditor.svc?xsd=xsd3" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IMouseEditor_SaveMouseData_InputMessage">
+    <wsdl:part name="parameters" element="tns:SaveMouseData" />
+  </wsdl:message>
+  <wsdl:message name="IMouseEditor_SaveMouseData_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SaveMouseDataResponse" />
+  </wsdl:message>
+  <wsdl:message name="IMouseEditor_GetLessonVal_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetLessonVal" />
+  </wsdl:message>
+  <wsdl:message name="IMouseEditor_GetLessonVal_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetLessonValResponse" />
+  </wsdl:message>
+  <wsdl:message name="IMouseEditor_getElementTable_InputMessage">
+    <wsdl:part name="parameters" element="tns:getElementTable" />
+  </wsdl:message>
+  <wsdl:message name="IMouseEditor_getElementTable_OutputMessage">
+    <wsdl:part name="parameters" element="tns:getElementTableResponse" />
+  </wsdl:message>
+  <wsdl:message name="IMouseEditor_GetLessonValForPreview_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetLessonValForPreview" />
+  </wsdl:message>
+  <wsdl:message name="IMouseEditor_GetLessonValForPreview_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetLessonValForPreviewResponse" />
+  </wsdl:message>
+  <wsdl:message name="IMouseEditor_getImageTime_InputMessage">
+    <wsdl:part name="parameters" element="tns:getImageTime" />
+  </wsdl:message>
+  <wsdl:message name="IMouseEditor_getImageTime_OutputMessage">
+    <wsdl:part name="parameters" element="tns:getImageTimeResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IMouseEditor">
+    <wsdl:operation name="SaveMouseData">
+      <wsdl:input wsaw:Action="http://tempuri.org/IMouseEditor/SaveMouseData" message="tns:IMouseEditor_SaveMouseData_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IMouseEditor/SaveMouseDataResponse" message="tns:IMouseEditor_SaveMouseData_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetLessonVal">
+      <wsdl:input wsaw:Action="http://tempuri.org/IMouseEditor/GetLessonVal" message="tns:IMouseEditor_GetLessonVal_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IMouseEditor/GetLessonValResponse" message="tns:IMouseEditor_GetLessonVal_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="getElementTable">
+      <wsdl:input wsaw:Action="http://tempuri.org/IMouseEditor/getElementTable" message="tns:IMouseEditor_getElementTable_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IMouseEditor/getElementTableResponse" message="tns:IMouseEditor_getElementTable_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetLessonValForPreview">
+      <wsdl:input wsaw:Action="http://tempuri.org/IMouseEditor/GetLessonValForPreview" message="tns:IMouseEditor_GetLessonValForPreview_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IMouseEditor/GetLessonValForPreviewResponse" message="tns:IMouseEditor_GetLessonValForPreview_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="getImageTime">
+      <wsdl:input wsaw:Action="http://tempuri.org/IMouseEditor/getImageTime" message="tns:IMouseEditor_getImageTime_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IMouseEditor/getImageTimeResponse" message="tns:IMouseEditor_getImageTime_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_IMouseEditor" type="tns:IMouseEditor">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="SaveMouseData">
+      <soap:operation soapAction="http://tempuri.org/IMouseEditor/SaveMouseData" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetLessonVal">
+      <soap:operation soapAction="http://tempuri.org/IMouseEditor/GetLessonVal" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getElementTable">
+      <soap:operation soapAction="http://tempuri.org/IMouseEditor/getElementTable" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetLessonValForPreview">
+      <soap:operation soapAction="http://tempuri.org/IMouseEditor/GetLessonValForPreview" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getImageTime">
+      <soap:operation soapAction="http://tempuri.org/IMouseEditor/getImageTime" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="MouseEditor">
+    <wsdl:port name="BasicHttpBinding_IMouseEditor" binding="tns:BasicHttpBinding_IMouseEditor">
+      <soap:address location="http://localhost:59736/visual%20tool%20webservice/MouseEditor.svc" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

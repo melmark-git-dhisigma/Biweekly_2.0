@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:59736/visual tool webservice/timeEditor.svc?xsd=xsd3" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <xs:complexType name="classRequestTime">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="IsDigits" nillable="true" type="xs:string" />
+      <xs:element xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="arrData" nillable="true" type="q1:ArrayOfstring" />
+      <xs:element minOccurs="0" name="clockURL" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="contentsItem" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="itemType" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="lessonDetailId" type="xs:int" />
+      <xs:element minOccurs="0" name="lessonId" type="xs:int" />
+      <xs:element minOccurs="0" name="loginId" type="xs:int" />
+      <xs:element minOccurs="0" name="numberObjects" type="xs:int" />
+      <xs:element minOccurs="0" name="setNumber" type="xs:int" />
+      <xs:element minOccurs="0" name="speedValue" type="xs:int" />
+      <xs:element minOccurs="0" name="stepNumber" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="classRequestTime" nillable="true" type="tns:classRequestTime" />
+  <xs:complexType name="ResponseResultTime">
+    <xs:sequence>
+      <xs:element xmlns:q2="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="arryList" nillable="true" type="q2:ArrayOfstring" />
+      <xs:element minOccurs="0" name="outInt" type="xs:int" />
+      <xs:element minOccurs="0" name="outList" nillable="true" type="tns:ArrayOfoutValue" />
+      <xs:element minOccurs="0" name="outString" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="responseList" nillable="true" type="tns:ArrayOfMediaValue" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ResponseResultTime" nillable="true" type="tns:ResponseResultTime" />
+  <xs:complexType name="ArrayOfoutValue">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="outValue" nillable="true" type="tns:outValue" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfoutValue" nillable="true" type="tns:ArrayOfoutValue" />
+  <xs:complexType name="outValue">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="imgList" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="lessnId" type="xs:int" />
+      <xs:element minOccurs="0" name="objctNum" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="outValue" nillable="true" type="tns:outValue" />
+  <xs:complexType name="ArrayOfMediaValue">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="MediaValue" nillable="true" type="tns:MediaValue" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfMediaValue" nillable="true" type="tns:ArrayOfMediaValue" />
+  <xs:complexType name="MediaValue">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Description" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Duration" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Keyword" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="MediaId" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Path" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Size" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Thumbnail" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Type" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="contentData" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="idVal" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="MediaValue" nillable="true" type="tns:MediaValue" />
+</xs:schema>

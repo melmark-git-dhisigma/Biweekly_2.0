@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+          
+      <Mapping Column="ParentName" PlaceHolder="plcParentPN"/>
+      <Mapping Column="ParentSing" PlaceHolder="plcParentSig"/>
+      
+      <Mapping Column="StudentName" PlaceHolder="plcStudentPN"/>
+      <Mapping Column="StudentSign" PlaceHolder="plcStudentSig"/>
+      
+      <Mapping Column="RegEduTeacherName" PlaceHolder="plcRETPN"/>
+      <Mapping Column="regEduTeacherSign" PlaceHolder="plcRETSig"/>
+
+      <Mapping Column="SpclEduTeacherName" PlaceHolder="plcSETPN"/>
+      <Mapping Column="SpclEduTeacherSign" PlaceHolder="plcSETSig"/>
+
+      <Mapping Column="LocalEdAgencyName" PlaceHolder="Plc1LEAPN"/>
+      <Mapping Column="localEdAgencySign" PlaceHolder="Plc1LEASig"/>
+
+      <Mapping Column="CareerEdRepName" PlaceHolder="plcCareerPN"/>
+      <Mapping Column="careerEdRepSign" PlaceHolder="plcCareerSig"/>
+
+      <Mapping Column="CommunityAgencyName" PlaceHolder="plcCommunityAPN"/>
+      <Mapping Column="CommunityAgencySign" PlaceHolder="plcCommunityASig"/>
+
+      <Mapping Column="TeacherGiftedName" PlaceHolder="plcTGPN"/>
+      <Mapping Column="TeacherGiftedSign" PlaceHolder="plcTGSig"/>
+      <Mapping Column="WritenMembers" PlaceHolder="plcWritenMembers"/>
+
+    </Mapping>
+
+  </State>
+</States>

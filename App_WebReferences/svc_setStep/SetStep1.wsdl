@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="SetStep" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import schemaLocation="http://localhost:59736/visual tool webservice/SetStep.svc?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://localhost:59736/visual tool webservice/SetStep.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://localhost:59736/visual tool webservice/SetStep.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="ISetStep_AddSet_InputMessage">
+    <wsdl:part name="parameters" element="tns:AddSet" />
+  </wsdl:message>
+  <wsdl:message name="ISetStep_AddSet_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AddSetResponse" />
+  </wsdl:message>
+  <wsdl:message name="ISetStep_AddStep_InputMessage">
+    <wsdl:part name="parameters" element="tns:AddStep" />
+  </wsdl:message>
+  <wsdl:message name="ISetStep_AddStep_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AddStepResponse" />
+  </wsdl:message>
+  <wsdl:message name="ISetStep_DeleteSet_InputMessage">
+    <wsdl:part name="parameters" element="tns:DeleteSet" />
+  </wsdl:message>
+  <wsdl:message name="ISetStep_DeleteSet_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DeleteSetResponse" />
+  </wsdl:message>
+  <wsdl:message name="ISetStep_DelelteStep_InputMessage">
+    <wsdl:part name="parameters" element="tns:DelelteStep" />
+  </wsdl:message>
+  <wsdl:message name="ISetStep_DelelteStep_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DelelteStepResponse" />
+  </wsdl:message>
+  <wsdl:message name="ISetStep_ReorderSet_InputMessage">
+    <wsdl:part name="parameters" element="tns:ReorderSet" />
+  </wsdl:message>
+  <wsdl:message name="ISetStep_ReorderSet_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ReorderSetResponse" />
+  </wsdl:message>
+  <wsdl:message name="ISetStep_ReorderStep_InputMessage">
+    <wsdl:part name="parameters" element="tns:ReorderStep" />
+  </wsdl:message>
+  <wsdl:message name="ISetStep_ReorderStep_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ReorderStepResponse" />
+  </wsdl:message>
+  <wsdl:message name="ISetStep_GetSets_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetSets" />
+  </wsdl:message>
+  <wsdl:message name="ISetStep_GetSets_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetSetsResponse" />
+  </wsdl:message>
+  <wsdl:message name="ISetStep_GetSteps_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetSteps" />
+  </wsdl:message>
+  <wsdl:message name="ISetStep_GetSteps_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetStepsResponse" />
+  </wsdl:message>
+  <wsdl:message name="ISetStep_getLeDetId_InputMessage">
+    <wsdl:part name="parameters" element="tns:getLeDetId" />
+  </wsdl:message>
+  <wsdl:message name="ISetStep_getLeDetId_OutputMessage">
+    <wsdl:part name="parameters" element="tns:getLeDetIdResponse" />
+  </wsdl:message>
+  <wsdl:message name="ISetStep_rename_InputMessage">
+    <wsdl:part name="parameters" element="tns:rename" />
+  </wsdl:message>
+  <wsdl:message name="ISetStep_rename_OutputMessage">
+    <wsdl:part name="parameters" element="tns:renameResponse" />
+  </wsdl:message>
+  <wsdl:message name="ISetStep_ReturnSetStep_InputMessage">
+    <wsdl:part name="parameters" element="tns:ReturnSetStep" />
+  </wsdl:message>
+  <wsdl:message name="ISetStep_ReturnSetStep_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ReturnSetStepResponse" />
+  </wsdl:message>
+  <wsdl:portType name="ISetStep">
+    <wsdl:operation name="AddSet">
+      <wsdl:input wsaw:Action="http://tempuri.org/ISetStep/AddSet" message="tns:ISetStep_AddSet_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ISetStep/AddSetResponse" message="tns:ISetStep_AddSet_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="AddStep">
+      <wsdl:input wsaw:Action="http://tempuri.org/ISetStep/AddStep" message="tns:ISetStep_AddStep_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ISetStep/AddStepResponse" message="tns:ISetStep_AddStep_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="DeleteSet">
+      <wsdl:input wsaw:Action="http://tempuri.org/ISetStep/DeleteSet" message="tns:ISetStep_DeleteSet_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ISetStep/DeleteSetResponse" message="tns:ISetStep_DeleteSet_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="DelelteStep">
+      <wsdl:input wsaw:Action="http://tempuri.org/ISetStep/DelelteStep" message="tns:ISetStep_DelelteStep_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ISetStep/DelelteStepResponse" message="tns:ISetStep_DelelteStep_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ReorderSet">
+      <wsdl:input wsaw:Action="http://tempuri.org/ISetStep/ReorderSet" message="tns:ISetStep_ReorderSet_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ISetStep/ReorderSetResponse" message="tns:ISetStep_ReorderSet_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ReorderStep">
+      <wsdl:input wsaw:Action="http://tempuri.org/ISetStep/ReorderStep" message="tns:ISetStep_ReorderStep_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ISetStep/ReorderStepResponse" message="tns:ISetStep_ReorderStep_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSets">
+      <wsdl:input wsaw:Action="http://tempuri.org/ISetStep/GetSets" message="tns:ISetStep_GetSets_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ISetStep/GetSetsResponse" message="tns:ISetStep_GetSets_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSteps">
+      <wsdl:input wsaw:Action="http://tempuri.org/ISetStep/GetSteps" message="tns:ISetStep_GetSteps_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ISetStep/GetStepsResponse" message="tns:ISetStep_GetSteps_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="getLeDetId">
+      <wsdl:input wsaw:Action="http://tempuri.org/ISetStep/getLeDetId" message="tns:ISetStep_getLeDetId_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ISetStep/getLeDetIdResponse" message="tns:ISetStep_getLeDetId_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="rename">
+      <wsdl:input wsaw:Action="http://tempuri.org/ISetStep/rename" message="tns:ISetStep_rename_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ISetStep/renameResponse" message="tns:ISetStep_rename_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnSetStep">
+      <wsdl:input wsaw:Action="http://tempuri.org/ISetStep/ReturnSetStep" message="tns:ISetStep_ReturnSetStep_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ISetStep/ReturnSetStepResponse" message="tns:ISetStep_ReturnSetStep_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_ISetStep" type="tns:ISetStep">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="AddSet">
+      <soap:operation soapAction="http://tempuri.org/ISetStep/AddSet" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddStep">
+      <soap:operation soapAction="http://tempuri.org/ISetStep/AddStep" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteSet">
+      <soap:operation soapAction="http://tempuri.org/ISetStep/DeleteSet" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DelelteStep">
+      <soap:operation soapAction="http://tempuri.org/ISetStep/DelelteStep" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReorderSet">
+      <soap:operation soapAction="http://tempuri.org/ISetStep/ReorderSet" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReorderStep">
+      <soap:operation soapAction="http://tempuri.org/ISetStep/ReorderStep" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSets">
+      <soap:operation soapAction="http://tempuri.org/ISetStep/GetSets" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSteps">
+      <soap:operation soapAction="http://tempuri.org/ISetStep/GetSteps" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getLeDetId">
+      <soap:operation soapAction="http://tempuri.org/ISetStep/getLeDetId" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="rename">
+      <soap:operation soapAction="http://tempuri.org/ISetStep/rename" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnSetStep">
+      <soap:operation soapAction="http://tempuri.org/ISetStep/ReturnSetStep" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="SetStep">
+    <wsdl:port name="BasicHttpBinding_ISetStep" binding="tns:BasicHttpBinding_ISetStep">
+      <soap:address location="http://localhost:59736/visual%20tool%20webservice/SetStep.svc" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

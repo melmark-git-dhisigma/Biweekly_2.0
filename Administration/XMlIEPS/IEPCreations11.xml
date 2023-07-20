@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+      <Mapping Column="AttendanceDate" PlaceHolder="plcAttendanceDate"/>
+      <Mapping Column="StudentName" PlaceHolder="plcAttendanceName"/>
+      <Mapping Column="AttendanceDoB" PlaceHolder="plcAttendanceDOB"/>
+      <Mapping Column="AttendanceId" PlaceHolder="plcAttendanceID"/>
+      <Mapping Column="AttendanceOther" PlaceHolder="plcAttendanceOther"/>
+      <Mapping Column="EligibilityDeterminationInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEPDevelopmentInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlacementInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="InitialEvaluationInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="InitialInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="ReevaluationInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="AnnualReviewInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="OtherInd" PlaceHolder="abcdefgh"/>
+      
+      
+      <Mapping Column="Attendance" PlaceHolder="plc1"/>
+      <Mapping Column="Attendance" PlaceHolder="plc2"/>
+      <Mapping Column="Attendance" PlaceHolder="plc3"/>
+      <Mapping Column="Attendance" PlaceHolder="plc4"/>
+      <Mapping Column="Attendance" PlaceHolder="plc5"/>
+      <Mapping Column="Attendance" PlaceHolder="plc6"/>
+      <Mapping Column="Attendance" PlaceHolder="plc7"/>
+      <Mapping Column="Attendance" PlaceHolder="plc8"/>
+      <Mapping Column="Attendance" PlaceHolder="plc9"/>
+      <Mapping Column="Attendance" PlaceHolder="plca"/>
+      
+      <Mapping Column="Attendance" PlaceHolder="plcb"/>
+      <Mapping Column="Attendance" PlaceHolder="plcc"/>
+      <Mapping Column="Attendance" PlaceHolder="plcd"/>
+      <Mapping Column="Attendance" PlaceHolder="plce"/>
+      <Mapping Column="Attendance" PlaceHolder="plcf"/>
+      <Mapping Column="Attendance" PlaceHolder="plcg"/>
+      <Mapping Column="Attendance" PlaceHolder="plch"/>
+      <Mapping Column="Attendance" PlaceHolder="plci"/>
+      <Mapping Column="Attendance" PlaceHolder="plcj"/>
+      <Mapping Column="Attendance" PlaceHolder="plck"/>
+      
+      <Mapping Column="Attendance" PlaceHolder="plcl"/>
+      <Mapping Column="Attendance" PlaceHolder="plcm"/>
+      <Mapping Column="Attendance" PlaceHolder="plcn"/>
+      <Mapping Column="Attendance" PlaceHolder="plco"/>
+      <Mapping Column="Attendance" PlaceHolder="plcp"/>
+      <Mapping Column="Attendance" PlaceHolder="plcq"/>
+      <Mapping Column="Attendance" PlaceHolder="plcr"/>
+      <Mapping Column="Attendance" PlaceHolder="plcs"/>
+      <Mapping Column="Attendance" PlaceHolder="plct"/>
+      <Mapping Column="Attendance" PlaceHolder="plcu"/>
+      
+      <Mapping Column="Attendance" PlaceHolder="plcv"/>
+      <Mapping Column="Attendance" PlaceHolder="plcw"/>
+      <Mapping Column="Attendance" PlaceHolder="plcx"/>
+      <Mapping Column="Attendance" PlaceHolder="plcy"/>
+      <Mapping Column="Attendance" PlaceHolder="plcz"/>
+      <Mapping Column="Attendance" PlaceHolder="plc0"/>
+      <Mapping Column="Attendance" PlaceHolder="plcA1"/>
+      <Mapping Column="Attendance" PlaceHolder="plcB1"/>
+      <Mapping Column="Attendance" PlaceHolder="plcC1"/>
+      <Mapping Column="Attendance" PlaceHolder="plcD1"/>
+      
+      <Mapping Column="Attendance" PlaceHolder="plcE1"/>
+      <Mapping Column="Attendance" PlaceHolder="plcF1"/>
+      <Mapping Column="Attendance" PlaceHolder="plcG1"/>
+      <Mapping Column="Attendance" PlaceHolder="plcH1"/>
+      <Mapping Column="Attendance" PlaceHolder="plcI1"/>
+      <Mapping Column="Attendance" PlaceHolder="plcJ1"/>
+      <Mapping Column="Attendance" PlaceHolder="plcK1"/>
+      <Mapping Column="Attendance" PlaceHolder="plcL1"/>
+    </Mapping>
+  </State>
+</States>

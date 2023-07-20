@@ -1,0 +1,370 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Sections>
+  <Section name="Independent functioning" Skill="Activities of Daily Living">
+    <SubSections>
+      <SubSection name="Eating" ContainsQuestions="True">
+        <Questions>
+          <Question name="Item1" Code="Item1" Box="6"  ContainsQuestions="False">
+          </Question>
+          <Question name="Item2" Code="Item2" Box="3" ContainsQuestions="False">
+          </Question>
+          <Question name="Item3" Code="Item3" Box="3" ContainsQuestions="False">
+          </Question>
+          <Question name="Item4" Code="Item4" Box="1" ContainsQuestions="False">
+          </Question>
+        </Questions>
+      </SubSection>
+      <SubSection name="Toilet use" ContainsQuestions="True">
+        <Questions>
+          <Question name="Item5" Code="Item5" Box="4"  ContainsQuestions="False">
+          </Question>
+          <Question name="Item6" Code="Item6" Box="1" ContainsQuestions="False">
+          </Question>
+
+        </Questions>
+      </SubSection>
+      <SubSection name="Cleanliness" ContainsQuestions="True">
+        <Questions>
+          <Question name="Item7" Code="Item7" Box="1"  ContainsQuestions="False">
+          </Question>
+          <Question name="Item8" Code="Item8" Box="6" ContainsQuestions="False">
+          </Question>
+          <Question name="Item9" Code="Item9" Box="1" ContainsQuestions="False">
+          </Question>
+          <Question name="Item10" Code="Item10" Box="6" ContainsQuestions="False">
+          </Question>
+        </Questions>
+      </SubSection>
+      <SubSection name="Appearance" ContainsQuestions="True">
+        <Questions>
+          <Question name="Item11" Code="Item11" Box="1"  ContainsQuestions="False">
+          </Question>
+          <Question name="Item12" Code="Item12" Box="1" ContainsQuestions="False">
+          </Question>
+        </Questions>
+      </SubSection>
+      <SubSection name="Care of clothing" ContainsQuestions="True">
+        <Questions>
+          <Question name="Item13" Code="Item13" Box="1"  ContainsQuestions="False">
+          </Question>
+          <Question name="Item14" Code="Item14" Box="3" ContainsQuestions="False">
+          </Question>
+
+        </Questions>
+      </SubSection>
+      <SubSection name="Dressing and Undressing" ContainsQuestions="True">
+        <Questions>
+          <Question name="Item15" Code="Item15" Box="5"  ContainsQuestions="False">
+          </Question>
+          <Question name="Item16" Code="Item16" Box="5"  ContainsQuestions="False">
+          </Question>
+          <Question name="Item17" Code="Item17" Box="1"  ContainsQuestions="False">
+          </Question>
+        </Questions>
+      </SubSection>
+      <SubSection name="Travel" ContainsQuestions="True">
+        <Questions>
+          <Question name="Item18" Code="Item18" Box="3"  ContainsQuestions="False">
+          </Question>
+          <Question name="Item19" Code="Item19" Box="1"  ContainsQuestions="False">
+          </Question>
+          <Question name="Item20" Code="Item20" Box="1"  ContainsQuestions="False">
+          </Question>
+          <Question name="Item21" Code="Item21" Box="3"  ContainsQuestions="False">
+          </Question>
+        </Questions>
+      </SubSection>
+      <SubSection name="Other independent functioning" ContainsQuestions="True">
+        <Questions>
+          <Question name="Item22" Code="Item22" Box="1"  ContainsQuestions="False">
+          </Question>
+          <Question name="Item23" Code="Item23" Box="1"  ContainsQuestions="False">
+          </Question>
+          <Question name="Item24" Code="Item24" Box="3"  ContainsQuestions="False">
+          </Question>
+        </Questions>
+      </SubSection>
+
+    </SubSections>
+  </Section>
+
+  <Section name="Physical" Skill="Gross Motor Skills">
+
+    <SubSections>
+      <SubSection name="Item25" Code="Item25" Box="3"  ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item26" Code="Item26" Box="3"  ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item27" Code="Item27" Box="5"  ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item28" Code="Item28" Box="1"  ContainsQuestions="False">
+      </SubSection> 
+    </SubSections>
+  </Section>
+  <Section name="Economic activity" Skill="Activities of Daily Living">
+
+    <SubSections>
+
+      <SubSection name="Money handling and budgeting" ContainsQuestions="True">
+        <Questions>
+          <Question name="Item31" Code="Item31" Box="4"  ContainsQuestions="False">
+          </Question>
+          <Question name="Item32" Code="Item32" Box="1" ContainsQuestions="False">
+          </Question>
+          <Question name="Item33" Code="Item33" Box="1" ContainsQuestions="False">
+          </Question>
+        </Questions>
+      </SubSection>
+      <SubSection name="Shopping skills" ContainsQuestions="True">
+        <Questions>
+          <Question name="Item34" Code="Item34" Box="4"  ContainsQuestions="False">
+          </Question>
+          <Question name="Item35" Code="Item35" Box="5" ContainsQuestions="False">
+          </Question>
+          <Question name="Item36" Code="Item36" Box="1" ContainsQuestions="False">
+          </Question>
+        </Questions>
+      </SubSection>
+    </SubSections>
+  </Section>
+  <Section name="Language Development" Skill="Language Skills">
+
+    <SubSections>
+      <SubSection name="Expression" ContainsQuestions="True">
+        <Questions>
+          <Question name="Item37" Code="Item37" Box="5"  ContainsQuestions="False">
+          </Question>
+          <Question name="Item39" Code="Item39" Box="1" ContainsQuestions="False">
+          </Question>
+          <Question name="Item40" Code="Item40" Box="1" ContainsQuestions="False">
+          </Question>
+          <Question name="Item41" Code="Item41" Box="3" ContainsQuestions="False">
+          </Question>
+          <Question name="Item42" Code="Item42" Box="4" ContainsQuestions="False">
+          </Question>
+        </Questions>
+      </SubSection>
+
+      <SubSection name="Verbal comprehension " ContainsQuestions="True">
+        <Questions>
+          <Question name="Item43" Code="Item43" Box="5"  ContainsQuestions="False">
+          </Question>
+          <Question name="Item44" Code="Item44" Box="4" ContainsQuestions="False">
+          </Question>
+        </Questions>
+      </SubSection>
+        <SubSection name="Social language development" ContainsQuestions="True">
+          <Questions>
+            <Question name="Item45" Code="Item45" Box="1" ContainsQuestions="False">
+            </Question>
+            <Question name="Item46" Code="Item46" Box="1" ContainsQuestions="False">
+            </Question>
+          </Questions>
+        </SubSection>
+    </SubSections>
+  </Section>
+  <Section name="Numbers And time" Skill="Academic Skills">
+
+    <SubSections>
+      <SubSection name="Item47" Code="Item47" Box="6" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item48" Code="Item48" Box="1" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item49" Code="Item49" Box="1" ContainsQuestions="False">
+      </SubSection>
+    </SubSections>
+  </Section>
+  
+  <Section name="Prevocational skills" Skill="Community Living">
+
+    <SubSections>
+      <SubSection name="Item50" Code="Item50" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item51" Code="Item51" Box="1" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item52" Code="Item52" Box="1" ContainsQuestions="False">
+      </SubSection>
+    </SubSections>
+  </Section>
+  <Section name="Self Direction" Skill="Community Living">
+
+    <SubSections>
+      <SubSection name="Initiative and Perseverance" ContainsQuestions="True">
+        <Questions>
+          <Question name="Item53" Code="Item53" Box="3"  ContainsQuestions="False">
+          </Question>
+          <Question name="Item54" Code="Item54" Box="1" ContainsQuestions="False">
+          </Question>
+          <Question name="Item55" Code="Item55" Box="4"  ContainsQuestions="False">
+          </Question>
+          <Question name="Item56" Code="Item56" Box="1" ContainsQuestions="False">
+          </Question>
+        </Questions>
+      </SubSection>
+      <SubSection name="Leisure time" ContainsQuestions="True">
+        <Questions>
+          <Question name="Item57" Code="Item57" Box="4"  ContainsQuestions="False">
+          </Question>
+        </Questions>
+      </SubSection>
+    </SubSections>
+  </Section>
+  <Section name="Responsibility" Skill="Personal Responsibility">
+
+    <SubSections>
+      <SubSection name="Personal belonging" ContainsQuestions="True">
+        <Questions>
+          <Question name="Item53" Code="Item58" Box="3"  ContainsQuestions="False">
+          </Question>
+         </Questions>
+      </SubSection>
+      <SubSection name="General responsibility"  ContainsQuestions="True">
+        <Questions>
+          <Question name="Item53" Code="Item59" Box="3"  ContainsQuestions="False">
+          </Question>
+        </Questions>
+      </SubSection>
+      <SubSection name="Personal responsibility"  ContainsQuestions="True">
+        <Questions>
+          <Question name="Item53" Code="Item60" Box="1"  ContainsQuestions="False">
+          </Question>
+        </Questions>
+      </SubSection>
+
+
+    </SubSections>
+
+  </Section>
+  <Section name="Socialization" Skill="Social Skills">
+
+    <SubSections>
+      <SubSection name="Item61" Code="Item61" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item62" Code="Item62" Box="1" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item63" Code="Item63" Box="1" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item64" Code="Item64" Box="3" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item65" Code="Item65" Box="3" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item66" Code="Item66" Box="1" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item67" Code="Item67" Box="1" ContainsQuestions="False">
+      </SubSection>
+     </SubSections>
+  </Section>
+  <Section name="Social behavior" Skill="Social Skills">
+
+    <SubSections>
+      <SubSection name="Item1" Code="Item1" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item2" Code="Item2" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item3" Code="Item3" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item4" Code="Item4" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item5" Code="Item5" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item6" Code="Item6" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item7" Code="Item7" Box="2" ContainsQuestions="False">
+      </SubSection>
+    </SubSections>
+  </Section>
+  
+  <Section name="Conformity" Skill="Behavior">
+    <SubSections>
+      <SubSection name="Item8" Code="Item8" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item9" Code="Item9" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item10" Code="Item10" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item11" Code="Item11" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item12" Code="Item12" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item13" Code="Item13" Box="2" ContainsQuestions="False">
+      </SubSection>
+    </SubSections>
+  </Section>
+  <Section name="Trustworthiness" Skill="Behavior">
+
+    <SubSections>
+      <SubSection name="Item14" Code="Item14" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item15" Code="Item15" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item16" Code="Item16" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item17" Code="Item17" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item18" Code="Item18" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item19" Code="Item19" Box="2" ContainsQuestions="False">
+      </SubSection>
+    </SubSections>
+  </Section>
+  <Section name="Stereotyped and hyperactive behavior" Skill="">
+    <SubSections>
+      <SubSection name="Item20" Code="Item20" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item21" Code="Item21 " Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item22" Code="Item22 " Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item23" Code="Item23 " Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item24" Code="Item24 " Box="2" ContainsQuestions="False">
+      </SubSection>
+    </SubSections>
+  </Section>
+  <Section name="Self abusive behavior" Skill="">
+    <SubSections>
+      <SubSection name="Item25" Code="Item25" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item26" Code="Item26 " Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item27" Code="Item27 " Box="2" ContainsQuestions="False">
+      </SubSection>
+     </SubSections>
+  </Section>
+  <Section name="Social Engagement" Skill="Social Skills">
+    <SubSections>
+      <SubSection name="Item28" Code="Item28" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item29" Code="Item29" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item30" Code="Item30" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item31" Code="Item31" Box="2" ContainsQuestions="False">
+      </SubSection>
+     </SubSections>
+  </Section>
+  <Section name="Disturbing interpersonal behavior" Skill="Social Skills">
+    <SubSections>
+      <SubSection name="Item32" Code="Item32" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item33" Code="Item33" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item34" Code="Item34" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item35" Code="Item35" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item36" Code="Item36" Box="2" ContainsQuestions="False">
+      </SubSection>
+      <SubSection name="Item37" Code="Item37" Box="2" ContainsQuestions="False">
+      </SubSection>
+     </SubSections>
+  </Section>
+</Sections>
+
+
+
+
+
+
+
+

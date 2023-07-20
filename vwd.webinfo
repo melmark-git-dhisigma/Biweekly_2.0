@@ -1,0 +1,12 @@
+﻿<?xml version="1.0"?>
+<!-- 
+  Visual Studio global web project settings.
+-->
+<VisualWebDeveloper>
+
+  <comReferences>
+    <reference Name="interop.statconnectorcommonlib" ID="{28C8B666-81A2-11D3-9254-00E09812F727}\1.3\0"/>
+    <reference Name="interop.statconnectorsrvlib" ID="{18C8B661-81A2-11D3-9254-00E09812F727}\1.1\0"/>
+    <reference Name="interop.statconnectorclntlib" ID="{18C8B666-81A2-11D3-9254-00E09812F727}\1.0\0"/>
+  </comReferences>
+</VisualWebDeveloper>

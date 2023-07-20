@@ -1,0 +1,200 @@
+
+@charset "utf-8";
+body {
+    border: 0 none;
+    color: #6B6B6B;
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 12px;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+.clear {
+    border: 0 none;
+    clear: both;
+    margin: 0;
+    padding: 0;
+}
+div.mainContainer {
+    height: auto !important;
+    min-height: 500px;
+    width: 100%;
+}
+div.mainContainer div.topHead {
+    background: url("../images/melmarkTop.jpg") repeat-y scroll left top #00539F;
+    height: 47px;
+    width: 100%;
+	min-width:800px;
+}
+
+ div.imgcorner {
+    height:100px;
+    margin: 0;
+    padding: 0;
+	min-width:600px;
+    width: 100%;
+}
+ div.imgcorner a.logo, 
+ div.imgcorner a.logo:link,
+ div.imgcorner a.logo:visited{border:0; margin:15px 0 0 25px;display:block; float:left;width:2220px; height:58px; display:block; } 
+ div.imgcorner a.logo img{border:0;} 
+
+ div.ContentAreaContainer {
+    background:#FFFFFF;
+    height: 3500px !important;
+    margin: 0 auto;
+   
+    min-width:600px;
+    width:100%;
+    z-index: 999;
+}
+ div.ContentAreaContainer img.logo{display:block; float:left; margin:10px 0 10px 10px;}
+  div.ContentAreaContainer div.titleContainer{float:right; min-height:50px; margin:10px 10px 10px 0;}
+    div.ContentAreaContainer div.titleContainer h2.ri{font-family:Arial, Helvetica, sans-serif; font-size:16px !important; color:#076859; text-align:left; text-decoration:none; margin:10px 0 5px 0 !important; background:none; border:none; text-align:left;padding:0;}
+	   div.ContentAreaContainer div.titleContainer h3.ri{background:none; font-family:Arial, Helvetica, sans-serif; font-size:14px !important; color:#666; text-align:left; text-decoration:none; text-align:left;padding:0 !important; margin:0;}
+	   
+	   	   div.ContentAreaContainer table.inr{width:90%; margin:0 auto;}
+		      div.ContentAreaContainer table.inr td img.im{display:block; margin:0 auto; padding:10px; border:5px solid #EDEDED;}
+			  
+			   div.ContentAreaContainer table.inr td.bgClr{background:#d1e4f3; text-align:center; color:#000; border:1px solid #fff;}
+			   
+			   div.ContentAreaContainer table.inr td h3{color:#333; font-size:12px; font-weight:bold; margin:2px 0; padding:0; background:none;}
+
+div.ContentAreaContainer div.middleContainer {
+    float: left;
+    height: auto !important;
+    margin:0 auto;
+    min-height: 500px;
+    min-width:550px;
+    width:98%;
+}
+input.ExportWord,
+input.ExportWord:link,
+input.ExportWord:visited{width:43px; height:43px; display:block; background:url(../images/ExportWord.png) left top no-repeat;float:left; margin:0 15px 0 0; border:none;cursor:pointer;}
+input.ExportWord:hover{background-position:0 -45px;}
+
+ div.ContentAreaContainer h2 {
+ 	background: url("../images/greenbullet.JPG") no-repeat scroll 15px 6px ;
+    border-bottom: 1px solid #f2f2f2;
+    border-top: 1px solid #f2f2f2;
+    font-size: 12px;
+    font-weight: bold;
+    margin:10px auto 10px auto;
+	color:#006351;
+    padding: 4px 0 5px 28px;
+    text-align: left;
+    width: 96%;
+	text-transform:uppercase;
+	letter-spacing:1px;
+}
+ div.ContentAreaContainer h3 {
+ 	background: url("../images/aro.PNG") no-repeat scroll 8px 4px rgba(0, 0, 0, 0);
+    color: #666666;
+    font-size: 12px;
+    font-weight: bold;
+    margin: 0 0 10px 12px;
+    padding: 4px 0 5px 28px;
+    text-align: left;
+    width: 98%;
+}
+ div.ContentAreaContainer h4 {
+    color: #e23d29;
+    font-size: 12px;
+    font-weight: bold;
+    margin: 0 0 10px 12px;
+    padding: 4px 0 5px 15px;
+    text-align: left;
+    width: 98%;}
+div.ContentAreaContainer p {
+    font-size: 12px;
+    font-weight: normal;
+    margin:10px auto 10px;
+	color:#666;
+    padding: 4px 0 5px 15px;
+    text-align: justify;
+    width: 96%;
+	line-height:18px;
+}
+
+div.ContentAreaContainer table{margin:0 auto !important; padding:0; width:98%;min-width:600px;}
+div.ContentAreaContainer table.shot{width:60%; margin:0 auto;}
+div.ContentAreaContainer table.medium{width:85%; margin:0 auto;}
+div.ContentAreaContainer table td{ 
+	border-bottom: 1px solid #EDEDED;
+    border-left: 1px solid #EDEDED;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 5px 1%;
+	min-width:95px;}
+div.ContentAreaContainer table td span{text-align:right !important; float:right;}
+div.ContentAreaContainer table td.top{border-top:1px solid #ededed;}
+div.ContentAreaContainer table td.bg{background:#f9f9f9; height:20px;}
+div.ContentAreaContainer table td.righ{border-right:1px solid #ededed;}
+div.ContentAreaContainer table td img.im{margin:5px auto !important; text-align:center; border:3px solid #ededed; display:block;}
+
+div.ContentAreaContainer table td label{margin:0 0 0 25px; padding:3px 0 0 0; display:block;}
+div.ContentAreaContainer table td input.chkbx{margin:3px 0 0 0; padding:0; float:left;}
+div.ContentAreaContainer table td select.dob{ 
+	background-color: #FFFFFF;
+    border: 1px solid #DADAC8;
+    border-radius: 3px 3px 3px 3px;
+    color: #666666;
+    font-size: 11px;
+    height: 25px !important;
+    padding: 4px 4px 2px;
+	margin:0 0 0 5px;
+	min-width:15px;
+    width:25%}
+	div.ContentAreaContainer table td select.selbox{
+	background-color: #FFFFFF;
+    border: 1px solid #DADAC8;
+    border-radius: 3px 3px 3px 3px;
+    color: #666666;
+    font-size: 11px;
+    height: 25px !important;
+    padding: 4px 4px 2px;
+    width:100% !important;
+	margin:0 0 0 5px;
+	}
+	
+	div.ContentAreaContainer table td textarea.txarea{
+	  background-color: #FFFFFF;
+    border: 1px solid #DADAC8;
+    border-radius: 3px 3px 3px 3px;
+    color: #666666;
+    float: left;
+    font-size: 11px;
+    height: 65px;
+    margin: 0 0 0 5px;
+    min-width: 72px !important;
+    padding: 2px 4px;
+    width: 92%;
+}
+	
+div.ContentAreaContainer table td input.textfield	
+    {
+	background-color: #FFFFFF;
+    border: 1px solid #DADAC8;
+    border-radius: 3px 3px 3px 3px;
+    color: #666666;
+    float: left;
+    font-size: 11px;
+    height: 19px;
+    margin: 0 0 0 6px;
+    min-width: 72px !important;
+    padding: 2px 4px;
+    width: 92%;
+	}
+	
+.bd{    
+	float: right;
+    min-width: 8px !important;
+    width: 28% !important;
+	}
+ div.ContentAreaContainer h5{font-family:Arial, Helvetica, sans-serif; font-size:12px; font-weight:bold; color: #e23d29; margin:0 0 0 20px; widows:15px; float:left; padding:0; height:10px;}	
+  div.ContentAreaContainer h6{font-family:Arial, Helvetica, sans-serif; font-size:12px; font-weight:bold; color: #0154a0; margin:0 0 0 20px; widows:15px; float:left; padding:0; height:10px;}	
+.smalltbl{width:90% !important;margin:0 auto!important; float:left; min-width:250px;}
+.rig{float:right !important;}
+ div.footer{width:100%; height:45px; margin:10px 0 0 0; }
+div.footer img{border:0; margin:10px 0 0 25px; float:left;}
+ div.footer div.copyright{width:22%; float:right;height:25px; color:#666; text-align:left; margin:5px 0 25px 0;font-size:11px;text-decoration:none;}

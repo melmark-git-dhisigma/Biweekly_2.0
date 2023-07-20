@@ -1,0 +1,130 @@
+﻿
+/*.mainDivU {
+    height: auto;
+    width: 1200px;
+}
+.mainDivS {
+    height: auto;
+    width: 1200px;
+}*/
+.headings {  
+    margin-bottom: 30px;
+    margin-top:50px;
+   
+}
+.headings ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+.headings ul li {
+    display: inline;   
+}
+.graphDiv {
+    background: url(../images/backg.png) repeat scroll 0 0 rgba(0, 0, 0, 0);
+    border-bottom: 1px solid #3F3F3F;
+    height: auto;
+    margin: 0 auto;
+    width: 1000px;
+}
+.graphLeft {
+    background-color: #1F77B4;
+    border-right: 1px solid #1F7C09;
+    float: left;
+    height: 16px;
+    margin: 1px auto 0;
+    width: 49.9%;
+}
+.graphRight {
+    background-color: #D62728;
+    border-left: 1px solid #1F7C09;
+    float: right;
+    height: 16px;
+    margin: 1px auto 0;
+    width: 49.9%;
+}
+.chart div {
+    background-color: #1F77B4;
+    color: #FFFFFF;
+    font: 10px sans-serif;
+    height: 16px;
+    padding: 3px;
+    text-align: right;
+    width: 50%;
+}
+.chartLeft {
+    background-color: #D62728 !important;
+  
+    text-align: left !important;
+}
+.chartLeft:hover {
+    background-color: #F63D3E !important;
+}
+.chartRight:hover {
+    background-color: #43C4F5 !important;
+}
+.chartRight {
+    background-color: #1BAEE6 !important;
+  
+}
+.names {
+     font-family: Arial,Helvetica,sans-serif;
+    font-size: 12px;
+    padding-top: 35px;
+    text-align: right;
+    vertical-align: bottom;
+}
+.session1 {
+    background-color: #D62728;
+    border-radius: 6px;
+    display: inline-block;
+    height: 12px;
+    margin: 0 5px;
+    width: 12px;
+}
+.session2 {
+    background-color: #1BAEE6;
+    border-radius: 6px;
+    display: inline-block;
+    height: 12px;
+    margin: 0 5px;
+    width: 12px;
+}
+table {
+    width: 100%;
+}
+table tr td {
+     font-family: Arial,Helvetica,sans-serif;
+    font-size: 10px;
+    width: 5%;
+}
+
+
+
+a.user, a.user:link, a.user:visited {
+    background: url("../images/userDashboard.png") no-repeat scroll left top rgba(0, 0, 0, 0);
+    color: #303130;
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 12px;
+    font-weight: normal;
+    padding: 4px 0 4px 25px;
+    text-align: left;
+    text-decoration: none;
+    margin:0 15px 0 0;
+}
+a.user:hover {
+    background-position: 0 -23px; color:#787978;
+}
+a.student, a.student:link, a.student:visited {
+    background:url(../images/studentDashboard.png) no-repeat scroll left top rgba(0, 0, 0, 0);
+    color: #303130;
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 12px;
+    font-weight: normal;
+    padding: 4px 0 4px 25px;
+    text-align: left;
+    text-decoration: none;
+}
+a.student:hover {
+    background-position: 0 -23px; color:#787978;
+}

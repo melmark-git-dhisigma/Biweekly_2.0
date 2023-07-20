@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+   
+
+    <Mapping Column="template" PlaceHolder="plcSchoolName1"/>
+    <Mapping Column="template" PlaceHolder="plcSchoolDate1"/>
+    <Mapping Column="template" PlaceHolder="plcSchoolAddress1"/>
+    
+    <Mapping Column="template" PlaceHolder="plcSchoolName2"/>
+    <Mapping Column="template" PlaceHolder="plcSchoolDate2"/>
+    <Mapping Column="template" PlaceHolder="plcSchoolAddress2"/>
+    
+    <Mapping Column="template" PlaceHolder="plcSchoolName3"/>
+    <Mapping Column="template" PlaceHolder="plcSchoolDate3"/>
+    <Mapping Column="template" PlaceHolder="plcSchoolAddress3"/> 
+    
+    
+    <Mapping Column="template" PlaceHolder="plcInitialDateforSpecialEducation"/>
+    <Mapping Column="template" PlaceHolder="plcDateOfMostRecentSpecialEducationEvaluation"/>
+    <Mapping Column="template" PlaceHolder="plcDateOfNextScheduleEvaluation"/>
+    <Mapping Column="template" PlaceHolder="plcIepStartDate"/>
+    <Mapping Column="template" PlaceHolder="plcIepExpirationDate"/>
+
+
+    
+    <Mapping Column="template" PlaceHolder="plcDischargeDate"/>
+    <Mapping Column="template" PlaceHolder="plcLocationAfterDischarge"/>
+    <Mapping Column="template" PlaceHolder="plcFollowUpResponsibilities"/>
+
+    <Mapping Column="template" PlaceHolder="plcLaisonFullname"/>
+    <Mapping Column="template" PlaceHolder="plcLaisonPhone"/>
+    <Mapping Column="template" PlaceHolder="plcReferringAgency"/>
+    <Mapping Column="template" PlaceHolder="plcSourceOfTuition"/>
+
+
+ </Mapping>
+  </State>
+</States>

@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+      <Mapping Column="IEP4IsBlind" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP4IsNotBlind" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP4Isdeaf" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP4IsNotdeaf" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP4CommNeeded" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP4NotCommNeeded" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP4AssistiveTechNeeded" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP4NotAssistiveTechNeeded" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP4EnglishProficiency" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP4NotEnglishProficiency" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP4ImpedeLearning" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP4NotImpedeLearning" PlaceHolder="abcdefgh"/>
+
+    </Mapping>
+
+  </State>
+</States>

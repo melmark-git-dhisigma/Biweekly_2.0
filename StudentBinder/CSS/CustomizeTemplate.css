@@ -1,0 +1,1199 @@
+﻿
+.clear {
+    border: 0 none;
+    clear: both;
+    margin: 0;
+    padding: 0;
+}
+
+.border {
+    border-right: thin solid #CCCCCC;
+}
+
+.borderLeft {
+    border-left: thin solid #CCCCCC;
+}
+
+.boxContainerContainer {
+    font-family: Arial,Helvetica,sans-serif;
+    height: auto !important;
+    margin: 0 auto;
+    min-height: 500px;
+    min-width: 1024px;
+    width: 100%;
+}
+
+    .boxContainerContainer div.itlepartContainer {
+        height: 35px;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+    }
+
+        .boxContainerContainer div.itlepartContainer h2 {
+            background: url("../img/bluerdesign.png") no-repeat scroll left top rgba(0, 0, 0, 0);
+            color: #FFFFFF;
+            float: left;
+            font-size: 12px;
+            font-weight: bold;
+            height: 23px;
+            margin: 0 100px 0 0;
+            padding: 8px 0 5px 12px;
+        }
+
+        .boxContainerContainer div.itlepartContainer h3.cf {
+            color: #0D668E;
+            float: right;
+            font-size: 12px;
+            font-weight: bold;
+            height: 23px;
+            margin: 0 10px 0 0;
+            padding: 8px 0 5px 12px;
+        }
+
+        .boxContainerContainer div.itlepartContainer h2 span {
+            color: #0D668E;
+            margin: 0 0 0 20px;
+        }
+
+    .boxContainerContainer div.btContainerPart {
+        height: auto !important;
+        margin: 5px auto 0;
+        min-height: 200px;
+        width: 100%;
+    }
+
+        .boxContainerContainer div.btContainerPart div.lBxpartContainer {
+            background: none repeat scroll 0 0 #F7F5F5;
+            border: 5px solid #E4E4E4;
+            float: left;
+            height: auto !important;
+            margin: 0 10px 0 0;
+            min-height: 300px;
+            padding: 10px;
+            width: 18%;
+        }
+
+            .boxContainerContainer div.btContainerPart div.lBxpartContainer h3 {
+                color: #0D668E;
+                font-size: 12px;
+                font-weight: bold;
+                margin: 5px 0;
+            }
+
+            .boxContainerContainer div.btContainerPart div.lBxpartContainer input.radio {
+                display: block;
+                float: left !important;
+                height: 20px;
+                margin: 5px 0 0;
+                padding: 0;
+                width: 20px;
+            }
+
+            .boxContainerContainer div.btContainerPart div.lBxpartContainer a.lpb {
+                background: url("../img/greenbtn.png") no-repeat scroll 0 0 rgba(0, 0, 0, 0);
+                color: #444545;
+                display: block;
+                float: right;
+                font-size: 12px;
+                font-weight: normal;
+                height: 22px;
+                margin: 0 0 3px;
+                padding: 6px 0 0 25px;
+                text-decoration: none;
+                width: 176px;
+            }
+
+                .boxContainerContainer div.btContainerPart div.lBxpartContainer a.lpb span {
+                    font-size: 11px;
+                    font-weight: bold;
+                }
+
+            .boxContainerContainer div.btContainerPart div.lBxpartContainer a.grb {
+                background: url("../img/graybtn.png") no-repeat scroll 0 0 rgba(0, 0, 0, 0);
+                color: #444545;
+                display: block;
+                float: right;
+                font-size: 12px;
+                font-weight: normal;
+                height: 23px;
+                margin: 0 0 3px;
+                padding: 6px 0 0 25px;
+                text-decoration: none;
+                width: 176px;
+            }
+
+            .boxContainerContainer div.btContainerPart div.lBxpartContainer input.txtfld {
+                border: 1px solid #C8CFCF;
+                border-radius: 3px;
+                color: #666666;
+                font-size: 12px;
+                height: 24px;
+                margin: 0 0 0 44px;
+                padding: 0 3px;
+                width: 160px;
+            }
+
+            .boxContainerContainer div.btContainerPart div.lBxpartContainer input.btn {
+                background: url("../img/zoomlens.png") no-repeat scroll 0 0 rgba(0, 0, 0, 0);
+                border: medium none;
+                cursor: pointer;
+                float: right !important;
+                height: 28px;
+                margin: -1px 0 0;
+                width: 27px;
+            }
+
+                .boxContainerContainer div.btContainerPart div.lBxpartContainer input.btn:hover {
+                    background-position: 0 -31px;
+                }
+
+            .boxContainerContainer div.btContainerPart div.lBxpartContainer p {
+                color: #505050;
+                font-size: 12px;
+                margin: 5px 0 5px 42px;
+            }
+
+            .boxContainerContainer div.btContainerPart div.lBxpartContainer input.smltxtfld {
+                border: 1px solid #C8CFCF;
+                border-radius: 3px;
+                color: #666666;
+                float: left;
+                font-size: 12px;
+                height: 24px;
+                margin: 0 5px 0 44px;
+                padding: 0 3px;
+                width: 67px;
+            }
+
+            .boxContainerContainer div.btContainerPart div.lBxpartContainer input.smltxt {
+                border: 1px solid #C8CFCF;
+                border-radius: 3px;
+                color: #666666;
+                float: left;
+                font-size: 12px;
+                height: 24px;
+                margin: 0 5px;
+                padding: 0 3px;
+                width: 70px;
+            }
+
+        .boxContainerContainer div.btContainerPart div.mBxContainer {
+            background: none repeat scroll 0 0 #F7F5F5;
+            border: 5px solid #E4E4E4;
+            float: left !important;
+            height: 530px;
+            margin: 0 2px 0 0;
+            min-width: 244px;
+            overflow-x: hidden;
+            overflow-y: scroll;
+            width: 14%;
+        }
+
+            .boxContainerContainer div.btContainerPart div.mBxContainer h3 {
+                color: #0D668E;
+                font-size: 12px;
+                font-weight: bold;
+                margin: 5px 0;
+            }
+
+            .boxContainerContainer div.btContainerPart div.mBxContainer a.gmb {
+                background: url("../img/lbtngrn.png") no-repeat scroll 0 0 rgba(0, 0, 0, 0);
+                color: #444545;
+                display: block;
+                float: left;
+                font-size: 12px;
+                font-weight: normal;
+                height: 22px;
+                margin: 0 0 3px;
+                padding: 7px 0 0 25px;
+                text-decoration: none;
+                width: 200px;
+            }
+
+            .boxContainerContainer div.btContainerPart div.mBxContainer a.grbmb {
+                background: url("../img/lbtngrngray.png") no-repeat scroll 0 0 rgba(0, 0, 0, 0);
+                color: #444545;
+                display: block;
+                float: left;
+                font-size: 12px;
+                font-weight: normal;
+                height: 22px;
+                margin: 0 0 3px;
+                padding: 6px 0 0 25px;
+                text-decoration: none;
+                width: 200px;
+            }
+
+            .boxContainerContainer div.btContainerPart div.mBxContainer a.grmb {
+                background: url("../img/lbtngrngray.png") no-repeat scroll 0 0 rgba(0, 0, 0, 0);
+                color: #0D668E;
+                display: block;
+                float: left;
+                font-size: 11px;
+                font-weight: normal;
+                height: 22px;
+                margin: 0 0 3px;
+                padding: 6px 0 0 25px;
+                text-decoration: none;
+                width: 200px;
+            }
+
+            .boxContainerContainer div.btContainerPart div.mBxContainer input.butn {
+                background: url("../img/blbtn.png") no-repeat scroll left top rgba(0, 0, 0, 0);
+                border: medium none;
+                color: #FFFFFF;
+                cursor: pointer;
+                font-size: 11px;
+                font-weight: bold;
+                height: 34px;
+                width: 220px;
+            }
+
+        .boxContainerContainer div.btContainerPart div.righMainContainer {
+            background: none repeat scroll 0 0 #FFFFFF;
+            border: 5px solid #E4E4E4;
+            float: right !important;
+            height: auto !important;
+            margin: 0;
+            min-height: 543px;
+            padding: 1px;
+            width: 55%;
+        }
+
+            .boxContainerContainer div.btContainerPart div.righMainContainer h3 {
+                color: #0D668E;
+                font-size: 12px;
+                font-weight: bold;
+                margin: 5px 0;
+            }
+
+h1, h2, h3, h4, h5, h6, p, ul, li {
+    border: 0 none;
+    list-style: none outside none;
+    margin: 0;
+    padding: 0;
+    vertical-align: baseline;
+}
+
+    h2 a {
+        padding: 7px 7px 7px 20px;
+    }
+
+    h3 a {
+        padding: 7px 7px 7px 30px;
+    }
+
+    h2 a, h3, a {
+        display: block;
+        text-decoration: none;
+    }
+
+    .accordion li, li.accordion {
+        border: medium none;
+    }
+
+.accordion h2 a, .accordion h3 a {
+    background: url("../img/computer.png") no-repeat scroll 5px 6px rgba(0, 0, 0, 0) !important;
+    color: #1F1F1F;
+    float: left;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 9px 0 2px 30px;
+    text-decoration: none;
+    width: 48%;
+    z-index: 999;
+}
+
+    .accordion h2 a.kk, .accordion h3 a.kk {
+        background: none repeat scroll 0 0 rgba(0, 0, 0, 0) !important;
+        border: medium none;
+        color: #444545;
+        cursor: pointer;
+        float: left;
+        font-size: 12px;
+        font-weight: normal;
+        padding: 2px 0 6px;
+        text-align: left;
+        text-decoration: none;
+        width: 78%;
+        z-index: 999;
+    }
+
+.accordion h2 span {
+    cursor: pointer;
+}
+
+.accordion .wrapper {
+    line-height: 18px;
+    padding: 5px;
+    width: 92%;
+}
+
+.accordion .nomar {
+    padding: 0;
+    width: 100%;
+}
+
+.accordion h2, .accordion h3 {
+    background: url("../img/longgreenbar.png") no-repeat scroll right top rgba(0, 0, 0, 0);
+    color: #000000;
+    font-size: 12px;
+    font-weight: bold;
+    height: 31px;
+    margin: 0 0 2px;
+    padding: 0;
+    width: 100%;
+}
+
+    .accordion h2 span.dd, .accordion h3 span.dd {
+        background: url("../img/llbar.jpg") no-repeat scroll left top rgba(0, 0, 0, 0);
+        display: block;
+        float: left;
+        height: 31px;
+        margin: 0;
+        padding: 0;
+        width: 4px;
+    }
+
+    .accordion h2.BG, .accordion h3.BG {
+        background: url("../img/dwngrenbg.png") no-repeat scroll 0 0 rgba(0, 0, 0, 0);
+        border: medium none;
+        color: #444545;
+        font-size: 12px;
+        font-weight: normal;
+        height: 23px;
+        margin: 0 0 3px;
+        padding: 6px 0 0 25px;
+        width: 230px;
+    }
+
+        .accordion h2.BG:hover, .accordion h3.BG:hover {
+            background-position: 0 -32px;
+            color: #000000 !important;
+        }
+
+    .accordion h2 div.container, .accordion h3 div.container {
+        background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
+        float: right;
+        height: 20px;
+        margin: 9px 0 0;
+        padding: 0;
+        width: 35%;
+    }
+
+        .accordion h2 div.container span, .accordion h3 div.container span {
+            color: #1F1F1F;
+            display: block;
+            float: left;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 0;
+            width: 180px;
+            z-index: 999;
+        }
+
+            .accordion h2 div.container span input.rdo, .accordion h3 div.container span input.rdo {
+                display: block;
+                float: left !important;
+                height: 20px;
+                margin: -2px 10px 0 0;
+                width: 20px;
+            }
+
+        .accordion h2 div.container a.dlt, .accordion h3 div.container a.dlt {
+            background: url("../img/delet0_2.png") no-repeat scroll left top rgba(0, 0, 0, 0) !important;
+            border-bottom: 0 none;
+            display: block;
+            float: right;
+            height: 17px;
+            margin: 0 15px 0 0;
+            padding: 0;
+            width: 20px;
+        }
+
+            .accordion h2 div.container a.dlt:hover, .accordion h3 div.container a.dlt:hover {
+                background-position: 0 -21px !important;
+            }
+
+.accordion .wrapper div.ingrContainer {
+    background: none repeat scroll 0 0 #EFEFEF;
+    border: 1px solid #A1A1A1;
+    border-radius: 5px;
+    color: #1F1F1F;
+    font-size: 12px;
+    font-weight: normal;
+    height: auto !important;
+    margin: 5px 0 0;
+    min-height: 75px;
+    padding: 10px;
+    width: 104%;
+}
+
+.accordion .wrapper div.nobdrrcontainer {
+    color: #1F1F1F;
+    font-size: 12px;
+    font-weight: normal;
+    height: auto !important;
+    margin: 1px 0 0;
+    min-height: 25px;
+    width: 99%;
+}
+
+.accordion .wrapper div.ingrContainer h3 {
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
+    color: #0D668E;
+    float: left;
+    font-size: 12px;
+    font-weight: bold;
+    margin: 0;
+    padding: 0;
+    width: 60%;
+}
+
+.accordion .wrapper div.ingrContainer p {
+    color: #1F1F1F;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.accordion .wrapper div.ingrContainer div.container {
+    float: right;
+    height: 20px;
+    margin: 0;
+    padding: 0;
+    width: 35%;
+}
+
+    .accordion .wrapper div.ingrContainer div.container span {
+        color: #1F1F1F;
+        display: block;
+        float: left;
+        font-size: 12px;
+        font-weight: bold;
+        margin: 0;
+        width: 180px;
+    }
+
+        .accordion .wrapper div.ingrContainer div.container span input.rdo {
+            display: block;
+            float: left !important;
+            height: 20px;
+            margin: -2px 10px 0 0;
+            width: 20px;
+        }
+
+    .accordion .wrapper div.ingrContainer div.container a.dlt {
+        background: url("../img/delet0_2.png") no-repeat scroll 0 0 rgba(0, 0, 0, 0);
+        border-bottom: 0 none;
+        display: block;
+        float: right;
+        height: 17px;
+        margin: 0 15px 0 0;
+        padding: 0;
+        width: 20px;
+    }
+
+        .accordion .wrapper div.ingrContainer div.container a.dlt:hover {
+            background-position: 0 -21px;
+        }
+
+.boxContainerContainer div.btContainerPart div.mBxContainer a.grmb div.grapgContainer {
+    border: 1px solid #9BA1A1;
+    border-radius: 3px;
+    color: #0D668E;
+    float: right;
+    font-size: 9px;
+    font-weight: normal;
+    height: 18px;
+    margin: -2px 28px 0 0;
+    width: 50px;
+}
+
+    .boxContainerContainer div.btContainerPart div.mBxContainer a.grmb div.grapgContainer span {
+        background: url("../img/loder.png") no-repeat scroll -21px 0 rgba(0, 0, 0, 0);
+        float: left;
+        height: 16px;
+        margin: 0 0 0 3px;
+        width: 16px;
+    }
+
+    .boxContainerContainer div.btContainerPart div.mBxContainer a.grmb div.grapgContainer p {
+        margin: 2px 0 0 22px;
+    }
+
+.boxContainerContainer div.btContainerPart div.large {
+    float: left !important;
+    margin: 0;
+    min-width: 706px;
+    width: 75.5%;
+}
+
+address, caption, cite, code, dfn, em, strong, th, var {
+    font-style: normal;
+    font-weight: normal;
+}
+
+ol, ul {
+    list-style: none outside none;
+    width: 100%;
+}
+
+caption, th {
+    text-align: left;
+}
+
+abbr, acronym {
+    border: 0 none;
+}
+
+.topper {
+    background: none repeat scroll 0 0 #EEEEEE;
+    margin: 0 auto;
+    text-align: left;
+    width: 100%;
+}
+
+    .topper ul {
+        display: block;
+        width: 100%;
+    }
+
+h1 {
+    font-size: 21px;
+    height: 43px;
+    line-height: 47px;
+    text-transform: uppercase;
+}
+
+.navigationTabs {
+    background: url("../img/blrbg.jpg") no-repeat scroll right top rgba(0, 0, 0, 0);
+    height: 35px;
+    line-height: 23px;
+    margin: 0;
+    padding: 0;
+}
+
+    .navigationTabs span.bgb {
+        background: url("../img/lblbtn.png") no-repeat scroll left top rgba(0, 0, 0, 0);
+        display: block;
+        float: left;
+        height: 35px;
+        margin: 0;
+        padding: 0;
+        width: 7px;
+    }
+
+    .navigationTabs li {
+        background: url("../img/linecut.jpg") no-repeat scroll right top rgba(0, 0, 0, 0);
+        float: left;
+        height: 35px;
+        line-height: 23px;
+        padding-right: 0;
+    }
+
+        .navigationTabs li.nobg {
+            background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
+            float: left;
+            height: 35px;
+            line-height: 23px;
+            padding-right: 0;
+        }
+
+        .navigationTabs li a {
+            background: url("../img/warrow.png") no-repeat scroll center bottom rgba(0, 0, 0, 0);
+            color: #FFFFFF;
+            float: left;
+            font-family: Arial,Helvetica,sans-serif;
+            font-size: 10px;
+            font-weight: bold;
+            height: 28px;
+            line-height: 23px;
+            margin: 0 1px;
+            overflow: hidden;
+            padding: 7px 1px 0;
+            text-align: center;
+            text-decoration: none;
+        }
+
+            .navigationTabs li a:hover {
+                background-attachment: scroll;
+                background-clip: border-box;
+                background-color: rgba(0, 0, 0, 0) !important;
+                background-image: url("../img/hoverbggreen.jpg");
+                background-origin: padding-box;
+                background-position: left top;
+                background-repeat: repeat-x;
+                background-size: auto auto;
+                border-bottom: medium none;
+                color: #000000 !important;
+            }
+
+            .navigationTabs li a.active {
+                background: none repeat scroll 0 0 #86B2C6;
+                border-bottom: medium none;
+                color: #0D668E;
+            }
+
+.tabsContent {
+    border-top: 0 solid;
+    overflow: hidden;
+    width: 100%;
+}
+
+.tab {
+    display: none;
+    height: auto !important;
+    min-height: 485px;
+    padding: 0px;
+}
+
+    .tab h2 {
+        color: #0D668E !important;
+        font-size: 14px;
+        font-weight: bold;
+        letter-spacing: 1px;
+        margin: 5px 0;
+    }
+
+    .tab h3 {
+        color: #514F4F !important;
+        font-size: 12px;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+
+    .tab p {
+        clear: both;
+        margin-top: 16px;
+    }
+
+    .tab ul {
+        list-style: disc outside none;
+        margin-top: 16px;
+    }
+
+    .tab li {
+        margin: 10px 0 0 35px;
+    }
+
+    .tab a {
+        color: #8FB0CF;
+    }
+
+    .tab strong {
+        font-weight: bold;
+    }
+
+    .tab pre {
+        clear: both;
+        font-size: 11px;
+        margin-top: 20px;
+        overflow: auto;
+        width: 668px;
+    }
+
+    .tab table {
+    }
+
+        .tab table td {
+            vertical-align: middle;
+        }
+
+            .tab table td input.rdoo {
+                border: medium none;
+                display: block;
+                float: left;
+                height: 16px;
+                margin: 10px 5px 0 0;
+                width: 16px;
+            }
+
+            .tab table td textarea.tarea {
+                background: none repeat scroll 0 0 #F5F5F5;
+                border: 1px solid #B2B2B2;
+                border-radius: 5px;
+                color: #666666;
+                float: left;
+                font-family: Arial,Helvetica,sans-serif;
+                font-size: 12px;
+                height: 75px;
+                margin: 5px 0 0;
+                text-align: left;
+                width: 300px;
+            }
+
+            .tab table td input.bTnn {
+                /*background: url("../img/btnbg.PNG") no-repeat scroll left top rgba(0, 0, 0, 0);
+                border: 0 none;
+                color: #FFFFFF;
+                cursor: pointer;
+                font-family: Arial,Helvetica,sans-serif;
+                font-size: 11px;
+                font-weight: bold;
+                height: 29px;
+                margin: 5px 0 0;
+                padding: 0;
+                width: 97px;*/
+                background-color: #03507D;
+                width: 91px;
+                height: 26px;
+                color: #fff;
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 12px;
+                font-weight: bold;
+                text-decoration: none;
+                background-position: 0 0;
+                border: none;
+                cursor: pointer;
+                -webkit-border-radius: 5px;
+                -moz-border-radius: 5px;
+                border-radius: 5px;
+                outline:none;
+            }
+
+                .tab table td input.bTnn:hover {
+                    /*color: #000000;*/
+                    background-color: #09646A;
+                }
+
+    .tab div.itomesContainer {
+        background: none repeat scroll 0 0 #E1E1E1;
+        border: 5px solid #CCCCCC;
+        height: auto !important;
+        margin: 0 1px;
+        min-height: 25px;
+        padding: 1px;
+        text-align: left;
+        width: 100%;
+    }
+
+    .tab table td p {
+        color: #514F4F;
+        display: block;
+        font-size: 12px;
+        font-weight: normal;
+        margin: 0;
+        padding: 5px 0 0;
+        text-align: left;
+        vertical-align: middle;
+    }
+
+    .tab table td a.smlbt {
+        /*background: url("../img/smlbtn.png") no-repeat scroll left top rgba(0, 0, 0, 0);
+        border: 0 none;
+        color: #FFFFFF;
+        cursor: pointer;
+        display: block;
+        font-family: Arial,Helvetica,sans-serif;
+        font-size: 11px;
+        font-weight: bold;
+        height: 20px;
+        margin: 0 auto;
+        padding: 4px 0 0;
+        text-align: center !important;
+        width: 69px;*/
+        background-color: #03507D;
+        width: 91px;
+        height: 26px;
+        color: #fff;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 12px;
+        font-weight: bold;
+        text-decoration: none;
+        background-position: 0 0;
+        border: none;
+        cursor: pointer;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+    }
+
+        .tab table td a.smlbt:hover {
+            color: #000000;
+        }
+
+    .tab table td input.smlbt {
+        /*background: url("../img/smlbtn.png") no-repeat scroll left top rgba(0, 0, 0, 0);
+        border: 0 none;
+        color: #FFFFFF;
+        cursor: pointer;
+        display: block;
+        font-family: Arial,Helvetica,sans-serif;
+        font-size: 11px;
+        font-weight: bold;
+        height: 24px;
+        margin: 0 auto;
+        padding: 0;
+        text-align: center !important;
+        width: 69px;*/
+        background-color: #03507D;
+        width: 91px;
+        height: 26px;
+        color: #fff;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 12px;
+        font-weight: bold;
+        text-decoration: none;
+        background-position: 0 0;
+        border: none;
+        cursor: pointer;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+        outline:none;
+    }
+
+        .tab table td input.smlbt:hover {
+            color: #000000;
+        }
+
+    .tab input.rbtn {
+        /*background: url("../img/btnbg.PNG") no-repeat scroll left top rgba(0, 0, 0, 0);
+        border: 0 none;
+        color: #FFFFFF;
+        cursor: pointer;
+        float: right;
+        font-family: Arial,Helvetica,sans-serif;
+        font-size: 11px;
+        font-weight: bold;
+        height: 29px;
+        margin: 5px 10px 5px 0;
+        padding: 0;
+        width: 97px;*/
+        background-color: #03507D;
+        width: 91px;
+        height: 26px;
+        color: #fff;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 12px;
+        font-weight: bold;
+        text-decoration: none;
+        background-position: 0 0;
+        border: none;
+        cursor: pointer;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+        margin: 5px 10px 5px 0;
+        float: right;
+        outline:none;
+    }
+
+        .tab input.rbtn:hover {
+            color: #000000;
+        }
+
+    .tab table td input.dx {
+        background: none repeat scroll 0 0 #F5F5F5;
+        border: 1px solid #B2B2B2;
+        border-radius: 3px;
+        color: #666666;
+        float: left;
+        font-family: Arial,Helvetica,sans-serif;
+        font-size: 12px;
+        height: 23px;
+        margin: 0;
+        text-align: left;
+        width: 300px;
+    }
+
+    .tab table td input.tp {
+        margin: 0 0 5px -2px;
+    }
+
+    .tab table td input.ti {
+        margin: 0 0 5px;
+    }
+
+    .tab table td input.rdo1 {
+        border: medium none;
+        display: block;
+        float: left;
+        height: 16px;
+        margin: 10px 5px 0 3px;
+        width: 16px;
+    }
+
+    .tab hr {
+        border: 1px dotted #0D668E;
+        margin: 10px 0;
+    }
+
+    .tab table td a.smlRbt {
+        background: url("../img/smlbtn.png") no-repeat scroll left top rgba(0, 0, 0, 0);
+        border: 0 none;
+        color: #FFFFFF;
+        cursor: pointer;
+        display: block;
+        font-family: Arial,Helvetica,sans-serif;
+        font-size: 11px;
+        font-weight: bold;
+        height: 20px;
+        margin: 5px auto 0;
+        padding: 4px 0 0;
+        text-align: center !important;
+        width: 69px;
+    }
+
+        .tab table td a.smlRbt:hover {
+            color: #000000;
+        }
+
+    .tab table td input.smlRbt {
+        background: url("../img/smlbtn.png") no-repeat scroll left top rgba(0, 0, 0, 0);
+        border: 0 none;
+        color: #FFFFFF;
+        cursor: pointer;
+        display: block;
+        font-family: Arial,Helvetica,sans-serif;
+        font-size: 11px;
+        font-weight: bold;
+        height: 25px;
+        margin: 5px auto 0;
+        padding: 0;
+        text-align: center !important;
+        width: 69px;
+    }
+
+    .tab table td a.input:hover {
+        color: #000000;
+    }
+
+    .tab textarea.tareaLong {
+        background: none repeat scroll 0 0 #F5F5F5;
+        border: 1px solid #B2B2B2;
+        border-radius: 5px;
+        color: #666666;
+        float: left;
+        font-family: Arial,Helvetica,sans-serif;
+        font-size: 12px;
+        height: 75px;
+        margin: 5px auto 0;
+        text-align: left;
+        width: 100%;
+    }
+
+    .tab select.txx {
+        background: none repeat scroll 0 0 #F5F5F5;
+        border: 1px solid #B2B2B2;
+        border-radius: 3px;
+        color: #666666;
+        float: left;
+        font-family: Arial,Helvetica,sans-serif;
+        font-size: 12px;
+        height: 23px;
+        margin: 5px 0 0;
+        text-align: left;
+        width: 250px;
+    }
+
+    .tab label.ii {
+        color: #514F4F;
+        display: block;
+        float: left;
+        font-size: 12px;
+        font-weight: normal;
+        margin: 0;
+        padding: 10px 0 0;
+        width: 430px;
+    }
+
+    .tab textarea.srBox {
+        background: none repeat scroll 0 0 #F5F5F5;
+        border: 1px solid #B2B2B2;
+        border-radius: 5px;
+        color: #666666;
+        float: left;
+        font-family: Arial,Helvetica,sans-serif;
+        font-size: 12px;
+        height: 110px !important;
+        margin: 5px auto 0;
+        text-align: left;
+        width: 100%;
+    }
+
+#AddSetDiv {
+    background-color: #FFFFFF;
+    display: none;
+    height: auto !important;
+    margin: auto;
+    min-height: 215px;
+    padding: 5px;
+    position: absolute;
+    top: 10px;
+    width: 840px;
+    z-index: 10000;
+}
+
+#AddStepDiv {
+    background-color: #FFFFFF;
+    display: none;
+    height: auto !important;
+    margin: auto;
+    min-height: 215px;
+    padding: 5px;
+    position: absolute;
+    top: 10px;
+    width: 905px;
+    z-index: 10000;
+}
+
+#AddSortDiv {
+    background-color: #FFFFFF;
+    display: none;
+    height: auto !important;
+    margin: auto;
+    min-height: 215px;
+    padding: 5px;
+    position: absolute;
+    top: 10px;
+    width: 905px;
+    z-index: 10000;
+}
+
+#AddMeasureDiv {
+    background-color: #FFFFFF;
+    display: none;
+    height: auto !important;
+    margin: auto;
+    min-height: 440px;
+    padding: 5px;
+    position: absolute;
+    top: 10px;
+    width: 905px;
+    z-index: 10000;
+}
+
+#AddCriteriaDiv {
+    background-color: #FFFFFF;
+    display: none;
+    height: 400px;
+    margin: auto;
+    padding: 5px;
+    position: absolute;
+    top: 10px;
+    width: 974px;
+    z-index: 10000;
+}
+
+#popupEmailMain {
+    background-color: #FFFFFF;
+    display: none;
+    height: 480px;
+    margin: auto;
+    padding: 5px;
+    position: absolute;
+    top: 10px;
+    width: 974px;
+    z-index: 10000;
+}
+
+.fullOverlay {
+    background-image: url("../images/overlay.png");
+    display: none;
+    height: 100%;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 2000;
+}
+
+#Close1 {
+    display: block;
+    height: 23px;
+    overflow: hidden;
+    position: absolute;
+    right: 4px;
+    top: 2px;
+    width: 24px;
+}
+
+#close_Step {
+    display: block;
+    height: 23px;
+    overflow: hidden;
+    position: absolute;
+    right: 4px;
+    top: 2px;
+    width: 24px;
+}
+
+#close_Step {
+    display: block;
+    height: 23px;
+    overflow: hidden;
+    position: absolute;
+    right: 4px;
+    top: 2px;
+    width: 24px;
+}
+
+#close_sort {
+    display: block;
+    height: 23px;
+    overflow: hidden;
+    position: absolute;
+    right: 4px;
+    top: 2px;
+    width: 24px;
+}
+
+a {
+    text-decoration: none;
+}
+
+.waitBlank {
+    background-color: #FFFFFF;
+    display: block;
+    margin: 0 auto !important;
+    opacity: 0.6;
+    position: absolute;
+    width: 10% !important;
+    z-index: 1;
+}
+
+input.lbtn {
+    background: url("../img/longbtn.png") no-repeat scroll 0 -40px rgba(0, 0, 0, 0);
+    border: 0 none;
+    color: #333333;
+    cursor: pointer;
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 11px !important;
+    font-weight: bold;
+    height: 31px;
+    letter-spacing: 1px;
+    line-height: 5px;
+    margin: 0 0 3px;
+    padding: 0;
+    text-align: center;
+    width: 96px;
+}
+
+    input.lbtn:hover {
+        background-position: 0 0;
+        color: #FFFFFF;
+    }
+
+input.smllbtn {
+    background: url("../img/smallbtn.png") no-repeat scroll 0 -40px rgba(0, 0, 0, 0);
+    border: 0 none;
+    color: #333333;
+    cursor: pointer;
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 14px !important;
+    font-weight: bold;
+    height: 31px;
+    letter-spacing: 1px;
+    line-height: 0;
+    margin: 0 0 3px;
+    padding: 0;
+    text-align: center;
+    width: 31px;
+}
+
+    input.smllbtn:hover {
+        background-position: 0 0;
+        color: #FFFFFF;
+    }

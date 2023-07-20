@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+   
+
+    <Mapping Column="template" PlaceHolder="plcSchoolFullName1"/>
+    <Mapping Column="template" PlaceHolder="plcSchoolPhone1"/>
+
+    <Mapping Column="template" PlaceHolder="plcSchoolFullName2"/>
+    <Mapping Column="template" PlaceHolder="plcSchoolPhone2"/>
+
+    <Mapping Column="template" PlaceHolder="plcSchoolFullName3"/>
+    <Mapping Column="template" PlaceHolder="plcSchoolPhone3"/>
+
+    <Mapping Column="template" PlaceHolder="plcSchoolFullName4"/>
+    <Mapping Column="template" PlaceHolder="plcSchoolPhone4"/>
+
+    <Mapping Column="template" PlaceHolder="plcSchoolFullName5"/>
+    <Mapping Column="template" PlaceHolder="plcSchoolPhone5"/>
+  
+     </Mapping>
+
+  </State>
+</States>

@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+      <Mapping Column="DistrictName" PlaceHolder="PlcDistrictName"/>
+      <Mapping Column="Address" PlaceHolder="PlcDistAddress"/>
+      <Mapping Column="DistPhoneNum" PlaceHolder="PlcDistrictContact"/>
+      <Mapping Column="StartDate" PlaceHolder="PlcIEPDF"/>
+      <Mapping Column="EndDate" PlaceHolder="PlcIEPDT"/>
+      <Mapping Column="StudentName" PlaceHolder="PlcStudentName"/>
+      <Mapping Column="DateOfBirth" PlaceHolder="PlcDOB"/>
+      <Mapping Column="Number" PlaceHolder="PlcID"/>
+      <Mapping Column="Grade" PlaceHolder="PlcGrade"/>
+      <Mapping Column="Concerns" PlaceHolder="PlcIEP1S1"/>
+      <Mapping Column="Strength" PlaceHolder="PlcIEP1S2"/>
+      <Mapping Column="Vision" PlaceHolder="PlcIEP1S3"/>
+    </Mapping>   
+    
+  </State>
+  <State Name="MA">
+    <Mappings>
+      <Mapping Column="Column11" PlaceHolder="Placeholder1"/>
+      <Mapping Column="Column14" PlaceHolder="Placeholder2"/>
+      <Mapping Column="Column12" PlaceHolder="Placeholder3"/>
+      <Mapping Column="Column5" PlaceHolder="Placeholder4"/>
+      <Mapping Column="Column1" PlaceHolder="Placeholder5"/>
+    </Mappings>
+  </State>
+  <State Name="AZ">
+    <Mappings>
+      <Mapping Column="Column10" PlaceHolder="Placeholder1"/>
+      <Mapping Column="Column14" PlaceHolder="Placeholder2"/>
+      <Mapping Column="Column11" PlaceHolder="Placeholder3"/>
+      <Mapping Column="Column5" PlaceHolder="Placeholder4"/>
+      <Mapping Column="Column1" PlaceHolder="Placeholder5"/>
+    </Mappings>
+  </State>
+</States>

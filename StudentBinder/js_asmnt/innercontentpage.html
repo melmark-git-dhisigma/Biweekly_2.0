@@ -1,0 +1,848 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Untitled Document</title>
+   <script src="../Administration/JS/jquery-1.8.0.js"></script>
+    <script src="jq1.js" type="text/javascript" charset="utf-8"></script>
+    <style>
+        .clear {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            clear: both;
+        }
+
+        .boxContainerContainer {
+            width: 100%;
+            min-height: 500px;
+            height: auto !important;
+            height: 500px;
+            margin: 0 auto;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+            .boxContainerContainer div.itlepartContainer {
+                width: 100%;
+                height: 35px;
+                margin: 0;
+                padding: 0;
+            }
+
+                .boxContainerContainer div.itlepartContainer h2 {
+                    background: url(images/bluerdesign.png) left top no-repeat;
+                    color: #fff;
+                    font-size: 12px;
+                    font-weight: bold;
+                    height: 23px;
+                    padding: 8px 0 5px 12px;
+                    margin: 0 150px 0 0;
+                    float: left;
+                }
+
+                    .boxContainerContainer div.itlepartContainer h2 span {
+                        margin: 0 0 0 20px;
+                        color: #0d668e;
+                    }
+
+            .boxContainerContainer div.btContainerPart {
+                width: 100%;
+                margin: 5px auto 0 auto;
+                min-height: 200px;
+                height: auto !important;
+                height: 200px;
+            }
+
+                .boxContainerContainer div.btContainerPart div.lBxpartContainer {
+                    width: 18%;
+                    min-height: 300px;
+                    height: auto !important;
+                    height: 300px;
+                    float: left;
+                    padding: 10px;
+                    background: #f7f5f5;
+                    border: 5px solid #e4e4e4;
+                    margin: 0 10px 0 0;
+                }
+
+                    .boxContainerContainer div.btContainerPart div.lBxpartContainer h3 {
+                        font-size: 12px;
+                        font-weight: bold;
+                        color: #0d668e;
+                        margin: 5px 0 5px 0;
+                    }
+
+                    .boxContainerContainer div.btContainerPart div.lBxpartContainer input.radio {
+                        float: left !important;
+                        margin: 5px 0 0 0;
+                        padding: 0;
+                        width: 20px;
+                        height: 20px;
+                        display: block;
+                    }
+
+                    .boxContainerContainer div.btContainerPart div.lBxpartContainer a.lpb {
+                        background: url(images/greenbtn.png) left top no-repeat;
+                        width: 176px;
+                        height: 22px;
+                        font-size: 12px;
+                        font-weight: normal;
+                        color: #444545;
+                        background-position: 0 -0;
+                        display: block;
+                        text-decoration: none;
+                        padding: 6px 0 0 25px;
+                        float: right;
+                        margin: 0 0 3px 0;
+                    }
+
+                        .boxContainerContainer div.btContainerPart div.lBxpartContainer a.lpb span {
+                            font-size: 11px;
+                            font-weight: bold;
+                        }
+
+                    .boxContainerContainer div.btContainerPart div.lBxpartContainer a.grb {
+                        background: url(images/graybtn.png) left top no-repeat;
+                        width: 176px;
+                        height: 23px;
+                        font-size: 12px;
+                        font-weight: normal;
+                        color: #444545;
+                        background-position: 0 -0;
+                        display: block;
+                        text-decoration: none;
+                        padding: 6px 0 0 25px;
+                        float: right;
+                        margin: 0 0 3px 0;
+                    }
+
+                    .boxContainerContainer div.btContainerPart div.lBxpartContainer input.txtfld {
+                        border-radius: 3px;
+                        border: 1px solid #c8cfcf;
+                        margin: 0 0 0 44px;
+                        height: 24px;
+                        color: #666;
+                        font-size: 12px;
+                        width: 160px;
+                        padding: 0 3px;
+                    }
+
+                    .boxContainerContainer div.btContainerPart div.lBxpartContainer input.btn {
+                        width: 27px;
+                        height: 28px;
+                        float: left;
+                        background: url(images/zoomlens.png) left top no-repeat;
+                        cursor: pointer;
+                        background-position: 0 -0;
+                        float: right !important;
+                        border: none;
+                        margin: -1px 0 0 0;
+                    }
+
+                        .boxContainerContainer div.btContainerPart div.lBxpartContainer input.btn:hover {
+                            background-position: 0 -31px;
+                        }
+
+                    .boxContainerContainer div.btContainerPart div.lBxpartContainer p {
+                        font-size: 12px;
+                        color: #505050;
+                        margin: 5px 0 5px 42px;
+                    }
+
+                    .boxContainerContainer div.btContainerPart div.lBxpartContainer input.smltxtfld {
+                        border-radius: 3px;
+                        border: 1px solid #c8cfcf;
+                        margin: 0 5px 0 44px;
+                        height: 24px;
+                        color: #666;
+                        font-size: 12px;
+                        width: 67px;
+                        padding: 0 3px;
+                        float: left;
+                    }
+
+                    .boxContainerContainer div.btContainerPart div.lBxpartContainer input.smltxt {
+                        border-radius: 3px;
+                        border: 1px solid #c8cfcf;
+                        margin: 0 5px 0 5px;
+                        height: 24px;
+                        color: #666;
+                        font-size: 12px;
+                        width: 70px;
+                        padding: 0 3px;
+                        float: left;
+                    }
+
+                .boxContainerContainer div.btContainerPart div.mBxContainer {
+                    width: 18%;
+                    height: 530px;
+                    float: left;
+                    padding: 10px;
+                    background: #f7f5f5;
+                    border: 5px solid #e4e4e4;
+                    margin: 0 10px 0 0;
+                    overflow: auto;
+                }
+
+                    .boxContainerContainer div.btContainerPart div.mBxContainer h3 {
+                        font-size: 12px;
+                        font-weight: bold;
+                        color: #0d668e;
+                        margin: 5px 0 5px 0;
+                    }
+
+                    .boxContainerContainer div.btContainerPart div.mBxContainer a.gmb {
+                        background: url(images/lbtngrn.png) left top no-repeat;
+                        width: 200px;
+                        height: 22px;
+                        font-size: 12px;
+                        font-weight: normal;
+                        color: #444545;
+                        background-position: 0 -0;
+                        display: block;
+                        text-decoration: none;
+                        padding: 7px 0 0 25px;
+                        float: left;
+                        margin: 0 0 3px 0;
+                    }
+
+                    .boxContainerContainer div.btContainerPart div.mBxContainer a.grbmb {
+                        background: url(images/lbtngrngray.png) left top no-repeat;
+                        width: 200px;
+                        height: 22px;
+                        font-size: 12px;
+                        font-weight: normal;
+                        color: #444545;
+                        background-position: 0 -0;
+                        display: block;
+                        text-decoration: none;
+                        padding: 6px 0 0 25px;
+                        float: left;
+                        margin: 0 0 3px 0;
+                    }
+
+                    .boxContainerContainer div.btContainerPart div.mBxContainer a.grmb {
+                        background: url(images/lbtngrngray.png) left top no-repeat;
+                        width: 200px;
+                        height: 22px;
+                        font-size: 11px;
+                        font-weight: normal;
+                        color: #0d668e;
+                        background-position: 0 -0;
+                        display: block;
+                        text-decoration: none;
+                        padding: 6px 0 0 25px;
+                        float: left;
+                        margin: 0 0 3px 0;
+                    }
+
+                    .boxContainerContainer div.btContainerPart div.mBxContainer input.butn {
+                        width: 220px;
+                        height: 34px;
+                        background: url(images/blbtn.png) left top no-repeat;
+                        color: #fff;
+                        font-weight: bold;
+                        font-size: 11px;
+                        border: none;
+                        cursor: pointer;
+                    }
+
+                .boxContainerContainer div.btContainerPart div.righMainContainer {
+                    width: 55%;
+                    min-height: 300px;
+                    height: auto !important;
+                    height: 300px;
+                    float: right;
+                    padding: 10px;
+                    background: #fff;
+                    border: 5px solid #e4e4e4;
+                    margin: 0 8px 0 0;
+                }
+
+                    .boxContainerContainer div.btContainerPart div.righMainContainer h3 {
+                        font-size: 12px;
+                        font-weight: bold;
+                        color: #0d668e;
+                        margin: 5px 0 5px 0;
+                    }
+
+
+        /*-----------------------------------------------------------JQuery Start-------------------------------------------*/
+
+        h1, h2, h3, h4, h5, h6, p, ul, li {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            vertical-align: baseline;
+            list-style: none;
+        }
+
+            h2 a {
+                padding: 7px 7px 7px 20px;
+            }
+
+            h3 a {
+                padding: 7px 7px 7px 30px;
+            }
+
+            h2 a, h3, a {
+                display: block;
+                text-decoration: none;
+            }
+
+            .accordion li, li.accordion {
+                border: none;
+            }
+
+        .accordion h2 a, .accordion h3 a {
+            text-decoration: none;
+            background: url(images/computer.png) 5px 6px no-repeat !important;
+            z-index: 999;
+            padding: 9px 0 2px 30px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #1f1f1f;
+            width: 48%;
+            float: left;
+        }
+
+            .accordion h2 a.kk, .accordion h3 a.kk {
+                text-decoration: none;
+                background: none !important;
+                z-index: 999;
+                padding: 2px 0 6px 0;
+                font-size: 12px;
+                font-weight: normal;
+                color: #444545;
+                width: 78%;
+                float: left;
+                border: none;
+                text-align: left;
+            }
+
+        .accordion .wrapper {
+            padding: 5px;
+            line-height: 18px;
+            width: 92%;
+        }
+
+        .accordion .nomar {
+            padding: 0px;
+            width: 100%;
+        }
+
+        .accordion h2,
+        .accordion h3 {
+            height: 31px;
+            background: url(images/longgreenbar.png) right top no-repeat;
+            font-size: 12px;
+            font-weight: bold;
+            color: #000;
+            margin: 0 0 2px 0;
+            padding: 0;
+            width: 100%;
+        }
+
+            .accordion h2 span.dd,
+            .accordion h3 span.dd {
+                width: 4px;
+                height: 31px;
+                float: left;
+                margin: 0;
+                padding: 0;
+                background: url(images/llbar.jpg) left top no-repeat;
+                display: block;
+            }
+
+            .accordion h2.BG,
+            .accordion h3.BG {
+                height: 23px;
+                background: url(images/dwngrenbg.png) left top no-repeat;
+                width: 230px;
+                font-size: 12px;
+                font-weight: normal;
+                color: #444545;
+                margin: 0 0 3px 0;
+                padding: 6px 0 0 25px;
+                border: none;
+                background-position: 0 -0;
+            }
+
+                .accordion h2.BG:hover,
+                .accordion h3.BG:hover {
+                    background-position: 0 -32px;
+                    color: #000 !important;
+                }
+
+
+
+            .accordion h2 div.container, .accordion h3 div.container {
+                float: right;
+                width: 35%;
+                height: 20px;
+                margin: 9px 0 0 0;
+                padding: 0;
+                background: none;
+            }
+
+                .accordion h2 div.container span, .accordion h3 div.container span {
+                    float: left;
+                    font-size: 12px;
+                    font-weight: bold;
+                    color: #1f1f1f;
+                    display: block;
+                    z-index: 999;
+                    margin: 0 0 0 0;
+                    width: 180px;
+                }
+
+                    .accordion h2 div.container span input.rdo, .accordion h3 div.container span input.rdo {
+                        float: left !important;
+                        display: block;
+                        width: 20px;
+                        height: 20px;
+                        margin: -2px 10px 0 0;
+                        margin: -6px 10px 0 0 \9;
+                    }
+
+                .accordion h2 div.container a.dlt, .accordion h3 div.container a.dlt {
+                    float: right;
+                    width: 20px;
+                    height: 17px;
+                    display: block;
+                    margin: 0 15px 0 0;
+                    padding: 0;
+                    background: url(images/delet0_2.png) left top no-repeat !important;
+                    background-position: 0 -0;
+                    border-bottom: 0;
+                }
+
+                    .accordion h2 div.container a.dlt:hover, .accordion h3 div.container a.dlt:hover {
+                        background-position: 0 -21px !important;
+                    }
+
+
+        .accordion .wrapper div.ingrContainer {
+            border-radius: 5px;
+            margin: 5px 0 0 0;
+            min-height: 75px;
+            height: auto !important;
+            height: 75px;
+            width: 104%;
+            border: 1px solid #a1a1a1;
+            background: #efefef;
+            padding: 10px;
+            font-size: 12px;
+            font-weight: normal;
+            color: #1f1f1f;
+        }
+
+
+        .accordion .wrapper div.nobdrrcontainer {
+            margin: 1px 0 0 0;
+            min-height: 25px;
+            height: auto !important;
+            height: 25px;
+            width: 99%;
+            font-size: 12px;
+            font-weight: normal;
+            color: #1f1f1f;
+        }
+
+        .accordion .wrapper div.ingrContainer h3 {
+            font-size: 12px;
+            color: #0d668e;
+            font-weight: bold;
+            float: left;
+            background: none;
+            margin: 0;
+            padding: 0;
+            width: 60%;
+            float: left;
+        }
+
+        .accordion .wrapper div.ingrContainer p {
+            font-size: 12px;
+            font-weight: normal;
+            color: #1f1f1f;
+        }
+
+        .accordion .wrapper div.ingrContainer div.container {
+            float: right;
+            width: 35%;
+            height: 20px;
+            margin: 0;
+            padding: 0;
+        }
+
+            .accordion .wrapper div.ingrContainer div.container span {
+                float: left;
+                font-size: 12px;
+                font-weight: bold;
+                color: #1f1f1f;
+                display: block;
+                margin: 0 0 0 0;
+                width: 180px;
+            }
+
+                .accordion .wrapper div.ingrContainer div.container span input.rdo {
+                    float: left !important;
+                    display: block;
+                    width: 20px;
+                    height: 20px;
+                    margin: -2px 10px 0 0;
+                    margin: -6px 10px 0 0 \9;
+                }
+
+
+            .accordion .wrapper div.ingrContainer div.container a.dlt {
+                float: right;
+                width: 20px;
+                height: 17px;
+                display: block;
+                margin: 0 15px 0 0;
+                padding: 0;
+                background: url(images/delet0_2.png) left top no-repeat;
+                background-position: 0 -0;
+                border-bottom: 0;
+            }
+
+                .accordion .wrapper div.ingrContainer div.container a.dlt:hover {
+                    background-position: 0 -21px;
+                }
+
+
+
+
+
+        .boxContainerContainer div.btContainerPart div.mBxContainer a.grmb div.grapgContainer {
+            width: 50px;
+            height: 18px;
+            border: 1px solid #9ba1a1;
+            border-radius: 3px;
+            float: right;
+            margin: -2px 28px 0 0;
+            font-size: 9px;
+            font-weight: normal;
+            color: #0d668e;
+        }
+
+            .boxContainerContainer div.btContainerPart div.mBxContainer a.grmb div.grapgContainer span {
+                width: 16px;
+                height: 16px;
+                margin: 0 0 0 3px;
+                float: left;
+                background: url(images/loder.png) left top no-repeat;
+                background-position: -21px 0;
+            }
+
+            .boxContainerContainer div.btContainerPart div.mBxContainer a.grmb div.grapgContainer p {
+                margin: 2px 0 0 22px;
+                margin: 5px 0 0 22px\9;
+            }
+
+
+        /*-----------------------------------------------------------JQuery End-------------------------------------------*/
+    </style>
+</head>
+
+<body>
+    <div class="boxContainerContainer">
+        <!-------------------------Top Container Start----------------------->
+        <div class="itlepartContainer">
+            <h2>1 <span>Choose Source</span></h2>
+            <h2>2 <span>Choose Goals and Lessons</span></h2>
+            <h2>3 <span>Assign Goals and Lessons</span></h2>
+        </div>
+        <!-------------------------Top Container End----------------------->
+
+        <!-------------------------Middle Container start----------------------->
+        <div class="btContainerPart">
+            <div class="lBxpartContainer">
+                <h3>By Latest Assessment (S)</h3>
+                <input name="" class="radio" type="checkbox" value="" />
+                <a class="lpb" href="#">Ablls-R</a>
+                <br clear="all" />
+                <input name="" class="radio" type="checkbox" value="" />
+                <a class="lpb" href="#">Abs-RC:2</a>
+                <br clear="all" />
+
+                <input name="" class="radio" type="checkbox" value="" />
+                <a class="grb" href="#">Wood cock johnson</a>
+                <br clear="all" />
+
+                <input name="" class="radio" type="checkbox" value="" />
+                <a class="lpb" href="#">Assessment2</a>
+                <br clear="all" />
+
+                <input name="" class="radio" type="checkbox" value="" />
+                <a class="grb" href="#">Cals</a>
+                <br clear="all" />
+                <input name="" class="radio" type="checkbox" value="" />
+                <a class="grb" href="#">Assessment1</a>
+                <br clear="all" />
+                <input name="" type="button" class="btn" />
+                <br clear="all" />
+                <h3>By Skill</h3>
+                <a class="lpb" href="#"><span>See All Lessions in Bank</span></a>
+                <br clear="all" />
+                <h3>Search</h3>
+                <input class="txtfld" name="" type="text" />
+                <input name="" type="button" class="btn" />
+                <br clear="all" />
+                <h3>Advanced Options</h3>
+                <a class="grb" href="#">Out-of-date Assessments</a>
+                <br clear="all" />
+                <a class="grb" href="#">All Latest Assessments</a>
+                <br clear="all" />
+
+                <input name="" class="radio" type="checkbox" value="" />
+                <p>
+                    Only Show Lessons
+With a % need between
+                </p>
+
+                <input class="smltxtfld" name="" type="text" />
+
+                <input class="smltxt" name="" type="text" />
+                <input name="" type="button" class="btn" />
+
+
+                <br />
+                <br />
+                <br />
+                <br />
+                <div class="clear"></div>
+            </div>
+
+            <!------------------------------------MContainer Start----------------------------------->
+
+            <div class="mBxContainer">
+                <h3>Skills Filtered by Source (s) </h3>
+
+                <a href="#" class="gmb">language Skills</a>
+                <br clear="all" />
+                <div id="page">
+                    <div id="content">
+                        <ul>
+                            <li style="position: static;" class="accordion">
+                                <h2 class="BG"><a class="kk" href="#our-company">Our Company</a></h2>
+                                <div style="display: none;" class="wrapper nomar">
+                                    <div class="nobdrrcontainer">
+                                        <a href="#" class="grmb">Action ID
+ <div class="grapgContainer">
+     <span></span>
+     <p>100%</p>
+ </div>
+                                        </a>
+                                        <a href="#" class="grmb">Answering Personal
+ <div class="grapgContainer">
+     <span></span>
+     <p>100%</p>
+ </div>
+                                        </a>
+                                        <a href="#" class="grmb">Answering Personal
+ <div class="grapgContainer">
+     <span></span>
+     <p>100%</p>
+ </div>
+                                        </a>
+                                        <a href="#" class="grmb">Answering Personal
+ <div class="grapgContainer">
+     <span></span>
+     <p>100%</p>
+ </div>
+                                        </a>
+                                        <div class="clear"></div>
+                                    </div>
+                                    <div class="clear"></div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="page">
+                    <div id="content">
+                        <ul>
+                            <li style="position: static;" class="accordion">
+                                <h2 class="BG"><a class="kk" href="#our-company">Social Skills</a></h2>
+                                <div style="display: none;" class="wrapper nomar">
+                                    <div class="nobdrrcontainer">
+                                        <a href="#" class="grbmb">Behavior</a>
+                                        <div class="clear"></div>
+                                    </div>
+                                    <div class="clear"></div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="page">
+                    <div id="content">
+                        <ul>
+                            <li style="position: static;" class="accordion">
+                                <h2 class="BG"><a class="kk" href="#our-company">Academic Skills</a></h2>
+                                <div style="display: none;" class="wrapper nomar">
+                                    <div class="nobdrrcontainer">
+                                        <a href="#" class="grbmb">Personal Responsibility</a>
+                                        <div class="clear"></div>
+                                    </div>
+                                    <div class="clear"></div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="page">
+                    <div id="content">
+                        <ul>
+                            <li style="position: static;" class="accordion">
+                                <h2 class="BG"><a class="kk" href="#our-company">Activities of Daily Living</a></h2>
+                                <div style="display: none;" class="wrapper nomar">
+                                    <div class="nobdrrcontainer">
+                                        <a href="#" class="grbmb">Fine  Motor Skills</a>
+                                        <a href="#" class="grbmb">Earley Learner Skills</a>
+                                        <a href="#" class="grbmb">Personal Responsibility</a>
+                                        <div class="clear"></div>
+                                    </div>
+                                    <div class="clear"></div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+
+
+
+
+
+                <input name="" type="button" class="butn" value="Create new Lesson Plan  and Assign " />
+                <div class="clear"></div>
+            </div>
+            <!------------------------------------MContainer End----------------------------------->
+
+            <!------------------------------------End Container Start----------------------------------->
+            <div class="righMainContainer">
+                <h3>Assigned  Goals and Lessons</h3>
+                <div id="page">
+
+                    <div id="content">
+                        <ul>
+                            <li style="position: static;" class="accordion">
+
+                                <h2 class="">
+                                    <span class="dd"></span>
+                                    <a href="#our-company">Our Company</a>
+                                    <div class="container">
+                                        <span>
+                                            <input name="" class="rdo" type="checkbox" value="" />Included in IEP</span>
+                                        <a class="dlt" href="#"></a>
+                                    </div>
+                                </h2>
+                                <div style="display: none;" class="wrapper">
+                                    <div class="ingrContainer">
+                                        <h3>Lorem Ipsum is simply dummy </h3>
+                                        <div class="container">
+                                            <span>
+                                                <input name="" class="rdo" type="checkbox" value="" />Included in IEP</span>
+                                            <a href="#" class="dlt"></a>
+                                        </div>
+                                        <br clear="all" />
+                                        <p>text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has </p>
+                                    </div>
+
+                                    <div class="ingrContainer">
+                                        <h3>Lorem Ipsum is simply dummy </h3>
+                                        <div class="container">
+                                            <span>
+                                                <input name="" class="rdo" type="checkbox" value="" />Included in IEP</span>
+                                            <a href="#" class="dlt"></a>
+                                        </div>
+                                        <br clear="all" />
+                                        <p>text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has </p>
+                                    </div>
+
+
+                                    <div class="clear"></div>
+                                </div>
+                            </li>
+                            <li style="position: static;" class="accordion">
+                                <h2 class="">
+                                    <span class="dd"></span>
+                                    <a href="#our-name">Our Name</a>
+                                    <div class="container">
+                                        <span>
+                                            <input name="" class="rdo" type="checkbox" value="" />
+                                            Included in IEP</span>
+                                        <a href="#" class="dlt"></a>
+                                    </div>
+                                </h2>
+                                <div style="display: none;" class="wrapper">
+                                    <div class="ingrContainer">
+                                        <h3>Lorem Ipsum is simply dummy </h3>
+                                        <div class="container">
+                                            <span>
+                                                <input name="" class="rdo" type="checkbox" value="" />Included in IEP</span>
+                                            <a href="#" class="dlt"></a>
+                                        </div>
+                                        <br clear="all" />
+                                        <p>text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has </p>
+                                    </div>
+
+                                </div>
+                            </li>
+                            <li style="position: static;" class="accordion">
+                                <h2 class="active">
+                                    <span class="dd"></span>
+                                    <a href="#our-people">Press Room</a>
+                                    <div class="container">
+
+                                        <span>
+                                            <input name="" class="rdo" type="checkbox" value="" />
+                                            Included in IEP</span>
+                                        <a href="#" class="dlt"></a>
+                                    </div>
+                                </h2>
+                                <div style="display: block;" class="wrapper" id="our-people">
+
+                                    <div class="ingrContainer">
+                                        <h3>Lorem Ipsum is simply dummy </h3>
+                                        <div class="container">
+                                            <span>
+                                                <input name="" class="rdo" type="checkbox" value="" />Included in IEP</span>
+                                            <a href="#" class="dlt"></a>
+                                        </div>
+                                        <br clear="all" />
+                                        <p>text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has </p>
+                                    </div>
+
+
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+
+
+
+
+
+                <div class="clear"></div>
+            </div>
+
+            <!------------------------------------End Container End----------------------------------->
+
+            <div class="clear"></div>
+        </div>
+        <!-------------------------Middle Container End----------------------->
+
+
+        <div class="clear"></div>
+    </div>
+</body>
+</html>

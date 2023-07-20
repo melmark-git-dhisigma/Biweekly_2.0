@@ -1,0 +1,170 @@
+.contentDiv
+{
+    height: auto;
+    width: 90%;
+    padding: 5px 0 5px 0;
+}
+
+.contentDivU
+{
+    height: auto;
+    width: 90%;
+    padding: 5px 0 5px 0;
+}
+
+.contentDivALinks
+{
+    height: auto;
+    width: 100%;
+    color: #1C5E55;
+    font-weight: bold;
+}
+
+    .contentDivALinks a:hover
+    {
+        text-decoration: underline;
+    }
+
+.contentDividerTop
+{
+    width: 99%;
+    height: 20px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    padding: 3px 2px 3px 2px;
+    margin: 1px 10px 1px 5px;
+}
+
+.contentDiv a
+{
+    color: #0D668E;
+    font-weight: bold;
+}
+
+.contentDivider
+{
+    background-color: #DBDBDB;
+    border: 1px solid #919191;
+    border-radius: 5px 5px 5px 5px;
+    color: #000000;
+    height: 135px;
+    margin: 1px 6px 1px 5px;
+    padding: 0 2px 3px 22px;
+    width: 100%;
+}
+
+    .contentDivider:hover
+    {
+        background-color: #C0C0C0;
+    }
+
+.contentDividerHead1
+{
+    float: left;
+    width: 32%;
+    height: 20px;
+    text-align: left;
+    padding: 3px 2px 3px 0px;
+    margin: 1px 6px 1px 0px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #0D668E;
+}
+
+.contentDividerHead2
+{
+    float: left;
+    width: 32%;
+    height: 20px;
+    text-align: left;
+    padding: 3px 2px 3px 0px;
+    margin: 1px 6px 1px 0px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #0D668E;
+}
+
+.contentDividerHead3
+{
+    float: left;
+    width: 62%;
+    height: 20px;
+    text-align: left;
+    padding: 3px 2px 3px 0px;
+    margin: 1px 6px 1px 0px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #0D668E;
+}
+
+input[type=text]
+{
+    border: 1px solid #919191;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 5px;
+    padding: 0px 3px 0px 7px;
+    height:21px;
+}
+
+
+
+    input[type=text]:focus
+    {
+        background-color: #F2EEEE;
+    }
+
+select
+{
+    border: 1px solid #919191;   
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    padding: 0px 3px 0px 7px;
+}
+
+td
+{
+    color: #000000;
+    font-family: Arial;
+    font-size: 12px;
+    font-weight: normal;      
+    padding-right: 1px;
+    text-align: left;
+    height:25px;
+}
+
+.rounded-corners
+{
+    behavior: url(/css/border-radius.htc);
+    border-radius: 5px;
+    background-color: #1C5E55;
+    width: 75px;
+    text-align: center;
+}
+
+    .rounded-corners:hover
+    {
+        background-color: #15d013;
+    }
+
+.NFButton
+{
+    border-style: none;
+    border-color: inherit;
+    border-width: medium;
+    font-weight: bold;
+    background-color: #1C5E55;
+    cursor: pointer;
+    color: #FFFFFF;
+    margin-top: 0px;
+    Width: auto;
+    text-align: center;
+    height: 22px;
+}
+
+    .NFButton:hover
+    {
+        background-color: #15d013;
+    }

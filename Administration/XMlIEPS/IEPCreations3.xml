@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+      <Mapping Column="StartDate" PlaceHolder="PlcIEPDF"/>
+      <Mapping Column="EndDate" PlaceHolder="PlcIEPDT"/>
+      <Mapping Column="Name" PlaceHolder="PlcStudentName"/>
+      <Mapping Column="DOB" PlaceHolder="PlcDOB"/>
+      <Mapping Column="IDNO" PlaceHolder="PlcID"/>
+      <Mapping Column="AdaptedPhyEduInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="AssistiveTechInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="BehaviourInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="BrailleInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="CommunicationallInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="CommunicationdeafInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="ExtraInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="LanguageInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="NonaccademicInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="SocialInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="TravelInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="VoccationalInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="OtherInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="Otherspec" PlaceHolder="plcOtherP2"/>
+      <Mapping Column="Childage3to5Ind" PlaceHolder="abcdefgh"/>
+      <Mapping Column="Childage14Ind" PlaceHolder="abcdefgh"/>
+      <Mapping Column="Childage16Ind" PlaceHolder="abcdefgh"/>
+      <Mapping Column="Disability" PlaceHolder="plcDisabilityP2"/>
+      <Mapping Column="Accomodation" PlaceHolder="plcAccomodationP2"/>
+      <Mapping Column="ContentInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="ContentModDesc" PlaceHolder="plcContentP2"/>
+      <Mapping Column="MethodologyInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="MethodModDesc" PlaceHolder="PlcMethodologyP2"/>
+      <Mapping Column="PerformanceInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PerfModDesc" PlaceHolder="PlcPerformanceP2"/>
+    </Mapping>
+
+  </State>
+  <State Name="MA">
+    <Mappings>
+      <Mapping Column="Column11" PlaceHolder="Placeholder1"/>
+      <Mapping Column="Column14" PlaceHolder="Placeholder2"/>
+      <Mapping Column="Column12" PlaceHolder="Placeholder3"/>
+      <Mapping Column="Column5" PlaceHolder="Placeholder4"/>
+      <Mapping Column="Column1" PlaceHolder="Placeholder5"/>
+    </Mappings>
+  </State>
+  <State Name="AZ">
+    <Mappings>
+      <Mapping Column="Column10" PlaceHolder="Placeholder1"/>
+      <Mapping Column="Column14" PlaceHolder="Placeholder2"/>
+      <Mapping Column="Column11" PlaceHolder="Placeholder3"/>
+      <Mapping Column="Column5" PlaceHolder="Placeholder4"/>
+      <Mapping Column="Column1" PlaceHolder="Placeholder5"/>
+    </Mappings>
+  </State>
+</States>

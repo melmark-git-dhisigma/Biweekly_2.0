@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+      <Mapping Column="StartDate" PlaceHolder="PlcIEPDF"/>
+      <Mapping Column="EndDate" PlaceHolder="PlcIEPDT"/>
+      <Mapping Column="Name" PlaceHolder="PlcStudentName"/>
+      <Mapping Column="DOB" PlaceHolder="PlcDOB"/>
+      <Mapping Column="IDNO" PlaceHolder="PlcID"/>
+      <Mapping Column="StudRemoveNInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="StudRemoveYInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="StudRemoveJustify" PlaceHolder="plcJustification"/>
+      <Mapping Column="StudShortScheduleNInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="StudShortScheduleYDayInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="StudShortScheduleYYearInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="StudLongScheduleNInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="StudLongScheduleYDayInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="StudLongScheduleYYearInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="StudScheduleJustify" PlaceHolder="plcSchedule"/>
+      <Mapping Column="RegularTransportNInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="SpecialTransportYInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="SpecialTransportRegularInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="SpecialTransRegular" PlaceHolder="PlcTrans1"/>
+      <Mapping Column="SpecialTransportSpecialInd" PlaceHolder="abcdefgh"/>      
+      <Mapping Column="SpecialTransSpecial" PlaceHolder="plcTrans2"/>
+    </Mapping>
+
+  </State>
+  <State Name="MA">
+    <Mappings>
+      <Mapping Column="Column11" PlaceHolder="Placeholder1"/>
+      <Mapping Column="Column14" PlaceHolder="Placeholder2"/>
+      <Mapping Column="Column12" PlaceHolder="Placeholder3"/>
+      <Mapping Column="Column5" PlaceHolder="Placeholder4"/>
+      <Mapping Column="Column1" PlaceHolder="Placeholder5"/>
+    </Mappings>
+  </State>
+  <State Name="AZ">
+    <Mappings>
+      <Mapping Column="Column10" PlaceHolder="Placeholder1"/>
+      <Mapping Column="Column14" PlaceHolder="Placeholder2"/>
+      <Mapping Column="Column11" PlaceHolder="Placeholder3"/>
+      <Mapping Column="Column5" PlaceHolder="Placeholder4"/>
+      <Mapping Column="Column1" PlaceHolder="Placeholder5"/>
+    </Mappings>
+  </State>
+</States>

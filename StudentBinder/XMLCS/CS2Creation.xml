@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+
+      <Mapping Column="Phaseline" PlaceHolder="PlcPhaseline"/>
+      <Mapping Column="Conditionline" PlaceHolder="PlcConditionline"/>
+      <Mapping Column="Arrownote" PlaceHolder="PlcArrowNotes"/>
+
+      <Mapping Column="Academic" PlaceHolder="PlcAcademic"/>
+      <Mapping Column="Clinical" PlaceHolder="PlcClinical"/>
+      <Mapping Column="Community" PlaceHolder="PlcCommunity"/>
+      <Mapping Column="Other" PlaceHolder="PlcSettingsOther"/>     
+      
+    </Mapping>
+  </State>
+</States>

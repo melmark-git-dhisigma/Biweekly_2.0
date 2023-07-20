@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Signature Id="idPackageSignature" xmlns="http://www.w3.org/2000/09/xmldsig">
+  <SignatureProperty Id="idOfficeV1Details" Target="#idPackageSignature">
+    <SignatureInfoV1 xmlns="http://schemas.microsoft.com/office/2006/digsig">
+      <SetupID>{B0FF908E-AD14-4863-93A7-856BCE3D536B}</SetupID>
+      <SignatureText>Parent , Ref</SignatureText>
+      <ManifestHashAlgorithm>http://www.w3.org/2000/09/xmldsig#sha1</ManifestHashAlgorithm>
+    </SignatureInfoV1>
+  </SignatureProperty>
+</Signature>

@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+    
+      <Mapping Column="ConsultGoal" PlaceHolder="plcaModificationSDI"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcaLocationSDI"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcaSDIFrequency"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcaSDIDate"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcaSDIDuration"/>
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcbModificationSDI"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcbLocationSDI"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcbSDIFrequency"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcbSDIDate"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcbSDIDuration"/>
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plccModificationSDI"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plccLocationSDI"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plccSDIFrequency"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plccSDIDate"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plccSDIDuration"/>
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSService1"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSLocation1"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSFrequency1"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSDate1"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSDuration1"/>
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSService2"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSLocation2"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSFrequency2"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSDate2"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSDuration2"/>
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSService3"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSLocation3"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSFrequency3"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSDate3"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSDuration3"/>
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSService4"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSLocation4"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSFrequency4"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSDate4"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSDuration4"/>
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSService5"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSLocation5"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSFrequency5"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSDate5"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRSDuration5"/>
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcaPersonal"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcaSupportSchool"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcaLocationSchool"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcaFrequencySchool"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcaSSPDate"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcaSSPDuration"/>
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcbPersonal"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcbSupportSchool"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcbLocationSchool"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcbFrequencySchool"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcbSSPDate"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcbSSPDuration"/>
+
+    </Mapping>
+
+  </State>
+</States>

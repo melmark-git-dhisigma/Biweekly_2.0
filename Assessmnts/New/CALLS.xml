@@ -1,0 +1,360 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Sections>
+  <Section name="Socialization"  Skill="Social Skills">
+    <SubSections>
+
+      <SubSection taskid="A1" name="item1" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="item2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="item3" Code ="A3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="item4" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="item5" Code ="A5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="item6" Code ="A6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="item7" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="item8" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="item9" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="item10" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+
+  <Section name="Eating"  Skill="Activities of Daily Living">
+    <SubSections>
+      <SubSection taskid="A1" name="item1" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="item2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="item3" Code ="A3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="item4" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="item5" Code ="A5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="item6" Code ="A6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="item7" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="item8" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="item9" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="item10" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+
+
+  <Section name="Grooming"  Skill="Activities of Daily Living">
+    <SubSections>
+      <SubSection taskid="A1" name="item1" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="item2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="item3" Code ="A3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="item4" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="item5" Code ="A5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="item6" Code ="A6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="item7" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="item8" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="item9" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="item10" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+
+
+  <Section name="Toileting"  Skill="Activities of Daily Living">
+    <SubSections>
+      <SubSection taskid="A1" name="item1" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="item2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="item3" Code ="A3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="item4" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="item5" Code ="A5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="item6" Code ="A6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="item7" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="item8" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="item9" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="item10" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+
+  <Section name="Dressing"  Skill="Activities of Daily Living">
+    <SubSections>
+      <SubSection taskid="A1" name="item1" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="item2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="item3" Code ="A3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="item4" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="item5" Code ="A5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="item6" Code ="A6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="item7" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="item8" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="item9" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="item10" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+
+
+
+  <Section name="Health_care"  Skill="Activities of Daily Living">
+    <SubSections>
+      <SubSection taskid="A1" name="item1" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="item2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="item3" Code ="A3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="item4" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="item5" Code ="A5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="item6" Code ="A6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="item7" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="item8" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="item9" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="item10" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+
+  <Section name="Sexuality"  Skill="Personal Responsibility">
+    <SubSections>
+      <SubSection taskid="A1" name="item1" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="item2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="item3" Code ="A3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="item4" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="item5" Code ="A5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="item6" Code ="A6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="item7" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="item8" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="item9" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="item10" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+
+
+  <Section name="Clothing_care"  Skill="Community Living">
+    <SubSections>
+      <SubSection taskid="A1" name="item1" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="item2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="item3" Code ="A3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="item4" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="item5" Code ="A5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="item6" Code ="A6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="item7" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="item8" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="item9" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="item10" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+
+  <Section name="Meal_planning"  Skill="Community Living">
+    <SubSections>
+      <SubSection taskid="A1" name="item1" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="item2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="item3" Code ="A3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="item4" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="item5" Code ="A5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="item6" Code ="A6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="item7" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="item8" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="item9" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="item10" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+
+  <Section name="Home_Cleaning"  Skill="Community Living">
+    <SubSections>
+      <SubSection taskid="A1" name="item1" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="item2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="item3" Code ="A3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="item4" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="item5" Code ="A5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="item6" Code ="A6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="item7" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="item8" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="item9" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="item10" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+
+  <Section name="Home_Safety"  Skill="Community Living">
+    <SubSections>
+      <SubSection taskid="A1" name="item1" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="item2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="item3" Code ="A3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="item4" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="item5" Code ="A5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="item6" Code ="A6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="item7" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="item8" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="item9" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="item10" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+
+  <Section name="Home_Leisure"  Skill="Social Skills">
+    <SubSections>
+      <SubSection taskid="A1" name="item1" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="item2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="item3" Code ="A3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="item4" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="item5" Code ="A5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="item6" Code ="A6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="item7" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="item8" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="item9" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="item10" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+
+
+  <Section name="social_interaction"  Skill="Social Skills">
+    <SubSections>
+      <SubSection taskid="A1" name="item1" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="item2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="item3" Code ="A3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="item4" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="item5" Code ="A5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="item6" Code ="A6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="item7" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="item8" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="item9" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="item10" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+
+  <Section name="Mobility_and_Travel"  Skill="Community Living">
+    <SubSections>
+      <SubSection taskid="A1" name="item1" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="item2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="item3" Code ="A3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="item4" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="item5" Code ="A5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="item6" Code ="A6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="item7" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="item8" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="item9" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="item10" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+
+  <Section name="Time_management"  Skill="Academic Skills">
+    <SubSections>
+      <SubSection taskid="A1" name="item1" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="item2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="item3" Code ="A3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="item4" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="item5" Code ="A5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="item6" Code ="A6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="item7" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="item8" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="item9" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="item10" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+
+
+  <Section name="Money_Management_and_Shopping"  Skill="Community Living">
+    <SubSections>
+      <SubSection taskid="A1" name="item1" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="item2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="item3" Code ="A3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="item4" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="item5" Code ="A5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="item6" Code ="A6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="item7" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="item8" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="item9" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="item10" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+
+  <Section name="Community_Safety"  Skill="Community Living">
+    <SubSections>
+      <SubSection taskid="A1" name="item1" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="item2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="item3" Code ="A3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="item4" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="item5" Code ="A5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="item6" Code ="A6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="item7" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="item8" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="item9" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="item10" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+
+  <Section name="Community_Leisure"  Skill="Social Skills">
+    <SubSections>
+      <SubSection taskid="A1" name="item1" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="item2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="item3" Code ="A3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="item4" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="item5" Code ="A5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="item6" Code ="A6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="item7" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="item8" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="item9" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="item10" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+
+
+  <Section name="Community_participation"  Skill="Social Skills">
+    <SubSections>
+      <SubSection taskid="A1" name="item1" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="item2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="item3" Code ="A3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="item4" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="item5" Code ="A5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="item6" Code ="A6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="item7" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="item8" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="item9" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="item10" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+
+  <Section name="Job_Search"  Skill="Vocational Skills">
+    <SubSections>
+      <SubSection taskid="A1" name="item1" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="item2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="item3" Code ="A3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="item4" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="item5" Code ="A5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="item6" Code ="A6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="item7" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="item8" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="item9" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="item10" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+
+
+  <Section name="Job_Performance_and_Attittudes"  Skill="Vocational Skills">
+    <SubSections>
+      <SubSection taskid="A1" name="item1" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="item2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="item3" Code ="A3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="item4" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="item5" Code ="A5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="item6" Code ="A6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="item7" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="item8" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="item9" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="item10" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+
+
+  <Section name="Employee_Relationships"  Skill="Vocational Skills">
+    <SubSections>
+      <SubSection taskid="A1" name="item1" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="item2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="item3" Code ="A3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="item4" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="item5" Code ="A5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="item6" Code ="A6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="item7" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="item8" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="item9" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="item10" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+
+
+
+  <Section name="Job_safety"  Skill="Vocational Skills">
+    <SubSections>
+      <SubSection taskid="A1" name="item1" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="item2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="item3" Code ="A3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="item4" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="item5" Code ="A5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="item6" Code ="A6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="item7" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="item8" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="item9" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="item10" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+</Sections>

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="matchingLesson" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import schemaLocation="http://localhost:59736/visual tool webservice/matchingLesson.svc?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://localhost:59736/visual tool webservice/matchingLesson.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://localhost:59736/visual tool webservice/matchingLesson.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="ImatchingLesson_saveDist_InputMessage">
+    <wsdl:part name="parameters" element="tns:saveDist" />
+  </wsdl:message>
+  <wsdl:message name="ImatchingLesson_saveDist_OutputMessage">
+    <wsdl:part name="parameters" element="tns:saveDistResponse" />
+  </wsdl:message>
+  <wsdl:message name="ImatchingLesson_createDist_InputMessage">
+    <wsdl:part name="parameters" element="tns:createDist" />
+  </wsdl:message>
+  <wsdl:message name="ImatchingLesson_createDist_OutputMessage">
+    <wsdl:part name="parameters" element="tns:createDistResponse" />
+  </wsdl:message>
+  <wsdl:message name="ImatchingLesson_getDist_InputMessage">
+    <wsdl:part name="parameters" element="tns:getDist" />
+  </wsdl:message>
+  <wsdl:message name="ImatchingLesson_getDist_OutputMessage">
+    <wsdl:part name="parameters" element="tns:getDistResponse" />
+  </wsdl:message>
+  <wsdl:message name="ImatchingLesson_getDistAll_InputMessage">
+    <wsdl:part name="parameters" element="tns:getDistAll" />
+  </wsdl:message>
+  <wsdl:message name="ImatchingLesson_getDistAll_OutputMessage">
+    <wsdl:part name="parameters" element="tns:getDistAllResponse" />
+  </wsdl:message>
+  <wsdl:message name="ImatchingLesson_deleteDist_InputMessage">
+    <wsdl:part name="parameters" element="tns:deleteDist" />
+  </wsdl:message>
+  <wsdl:message name="ImatchingLesson_deleteDist_OutputMessage">
+    <wsdl:part name="parameters" element="tns:deleteDistResponse" />
+  </wsdl:message>
+  <wsdl:message name="ImatchingLesson_getLeOptIds_InputMessage">
+    <wsdl:part name="parameters" element="tns:getLeOptIds" />
+  </wsdl:message>
+  <wsdl:message name="ImatchingLesson_getLeOptIds_OutputMessage">
+    <wsdl:part name="parameters" element="tns:getLeOptIdsResponse" />
+  </wsdl:message>
+  <wsdl:message name="ImatchingLesson_getSelOptId_InputMessage">
+    <wsdl:part name="parameters" element="tns:getSelOptId" />
+  </wsdl:message>
+  <wsdl:message name="ImatchingLesson_getSelOptId_OutputMessage">
+    <wsdl:part name="parameters" element="tns:getSelOptIdResponse" />
+  </wsdl:message>
+  <wsdl:portType name="ImatchingLesson">
+    <wsdl:operation name="saveDist">
+      <wsdl:input wsaw:Action="http://tempuri.org/ImatchingLesson/saveDist" message="tns:ImatchingLesson_saveDist_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ImatchingLesson/saveDistResponse" message="tns:ImatchingLesson_saveDist_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="createDist">
+      <wsdl:input wsaw:Action="http://tempuri.org/ImatchingLesson/createDist" message="tns:ImatchingLesson_createDist_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ImatchingLesson/createDistResponse" message="tns:ImatchingLesson_createDist_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="getDist">
+      <wsdl:input wsaw:Action="http://tempuri.org/ImatchingLesson/getDist" message="tns:ImatchingLesson_getDist_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ImatchingLesson/getDistResponse" message="tns:ImatchingLesson_getDist_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="getDistAll">
+      <wsdl:input wsaw:Action="http://tempuri.org/ImatchingLesson/getDistAll" message="tns:ImatchingLesson_getDistAll_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ImatchingLesson/getDistAllResponse" message="tns:ImatchingLesson_getDistAll_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="deleteDist">
+      <wsdl:input wsaw:Action="http://tempuri.org/ImatchingLesson/deleteDist" message="tns:ImatchingLesson_deleteDist_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ImatchingLesson/deleteDistResponse" message="tns:ImatchingLesson_deleteDist_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="getLeOptIds">
+      <wsdl:input wsaw:Action="http://tempuri.org/ImatchingLesson/getLeOptIds" message="tns:ImatchingLesson_getLeOptIds_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ImatchingLesson/getLeOptIdsResponse" message="tns:ImatchingLesson_getLeOptIds_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="getSelOptId">
+      <wsdl:input wsaw:Action="http://tempuri.org/ImatchingLesson/getSelOptId" message="tns:ImatchingLesson_getSelOptId_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ImatchingLesson/getSelOptIdResponse" message="tns:ImatchingLesson_getSelOptId_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_ImatchingLesson" type="tns:ImatchingLesson">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="saveDist">
+      <soap:operation soapAction="http://tempuri.org/ImatchingLesson/saveDist" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="createDist">
+      <soap:operation soapAction="http://tempuri.org/ImatchingLesson/createDist" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getDist">
+      <soap:operation soapAction="http://tempuri.org/ImatchingLesson/getDist" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getDistAll">
+      <soap:operation soapAction="http://tempuri.org/ImatchingLesson/getDistAll" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="deleteDist">
+      <soap:operation soapAction="http://tempuri.org/ImatchingLesson/deleteDist" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getLeOptIds">
+      <soap:operation soapAction="http://tempuri.org/ImatchingLesson/getLeOptIds" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSelOptId">
+      <soap:operation soapAction="http://tempuri.org/ImatchingLesson/getSelOptId" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="matchingLesson">
+    <wsdl:port name="BasicHttpBinding_ImatchingLesson" binding="tns:BasicHttpBinding_ImatchingLesson">
+      <soap:address location="http://localhost:59736/visual%20tool%20webservice/matchingLesson.svc" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

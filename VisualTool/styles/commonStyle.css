@@ -1,0 +1,23 @@
+﻿h2.cokin, .dashboard-RHS-content h2, h2.clk {
+    background: none repeat scroll 0 0 transparent;
+    color: #666666;
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    height: 7px;
+    line-height: 0;
+    padding: 20px 0 10px 1px;
+    text-align: left;
+    width: 99%;
+}
+
+    h2.cokin span, h2.mous span, h2.clk span {
+        width: 280px;
+        float: right;
+        display: block;
+        height: 11px;
+        font-family: Arial;
+        font-size: 12px;
+        color: #0d668e;
+        font-weight: normal;
+    }

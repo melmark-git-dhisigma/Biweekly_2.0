@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+    
+      <Mapping Column="ConsultGoal" PlaceHolder="plcDateRevision1"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRoles1"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcIEPSession1"/>
+      
+      <Mapping Column="ConsultGoal" PlaceHolder="plcDateRevision2"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRoles2"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcIEPSession2"/>
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcDateRevision3"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRoles3"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcIEPSession3"/>
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcDateRevision4"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRoles4"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcIEPSession4"/>
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcDateRevision5"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRoles5"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcIEPSession5"/>
+      
+      
+    </Mapping>
+
+  </State>
+</States>

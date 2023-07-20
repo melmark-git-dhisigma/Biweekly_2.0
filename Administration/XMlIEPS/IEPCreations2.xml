@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+      <Mapping Column="StartDate" PlaceHolder="PlcIEPDF"/>
+      <Mapping Column="EndDate" PlaceHolder="PlcIEPDT"/>
+      <Mapping Column="Name" PlaceHolder="PlcStudentName"/>
+      <Mapping Column="DOB" PlaceHolder="PlcDOB"/>     
+      <Mapping Column="IDNO" PlaceHolder="PlcID"/>
+      <Mapping Column="EngLangInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="HistInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="TechInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="MathInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="OtherInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="OtherDesc" PlaceHolder="plcSpecifyP1"/>
+      <Mapping Column="AffectDesc" PlaceHolder="plcDisabilityP1"/>
+      <Mapping Column="AccomDesc" PlaceHolder="plcAccomodationP1"/>
+      
+      <Mapping Column="ContentInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="ContentModDesc" PlaceHolder="plcContentP1"/>
+      <Mapping Column="MethodologyInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="MethodModDesc" PlaceHolder="PlcMethodologyP1"/>
+      <Mapping Column="PerformanceInd" PlaceHolder="abcdefgh"/>    
+      <Mapping Column="PerfModDesc" PlaceHolder="PlcPerformanceP1"/>
+    </Mapping>
+
+  </State>
+  <State Name="MA">
+    <Mappings>
+      <Mapping Column="Column11" PlaceHolder="Placeholder1"/>
+      <Mapping Column="Column14" PlaceHolder="Placeholder2"/>
+      <Mapping Column="Column12" PlaceHolder="Placeholder3"/>
+      <Mapping Column="Column5" PlaceHolder="Placeholder4"/>
+      <Mapping Column="Column1" PlaceHolder="Placeholder5"/>
+    </Mappings>
+  </State>
+  <State Name="AZ">
+    <Mappings>
+      <Mapping Column="Column10" PlaceHolder="Placeholder1"/>
+      <Mapping Column="Column14" PlaceHolder="Placeholder2"/>
+      <Mapping Column="Column11" PlaceHolder="Placeholder3"/>
+      <Mapping Column="Column5" PlaceHolder="Placeholder4"/>
+      <Mapping Column="Column1" PlaceHolder="Placeholder5"/>
+    </Mappings>
+  </State>
+</States>

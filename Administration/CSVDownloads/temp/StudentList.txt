@@ -1,0 +1,2 @@
+StudentNbr,SASID,StudentFname,StudentLname,Grade,Gender,JoinDt (MM-DD-YYYY),DOB  (MM-DD-YYYY),ActiveInd,Address1,Address2,Address3,City,State,Country,Homephone,Mobile,Email,Zip,Dist_Code,SchoolId
+87654321,1063879201,Thomas Chacko,gg,1,M,12-13-2013,12-13-2013,A,4 Green Needles Road,,,Westford,Maine,United States of America,(999)999-1234,,,18867,1,1

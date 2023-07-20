@@ -1,0 +1,53 @@
+E:\Clients\Melmark\DataSheet Editor\DSComponentTester\Chained\bin\Debug\Chained.dll
+E:\Clients\Melmark\DataSheet Editor\DSComponentTester\Chained\bin\Debug\Chained.pdb
+E:\Clients\Melmark\DataSheet Editor\DSComponentTester\Chained\obj\Debug\ResolveAssemblyReference.cache
+E:\Clients\Melmark\DataSheet Editor\DSComponentTester\Chained\obj\Debug\Chained.dll
+E:\Clients\Melmark\DataSheet Editor\DSComponentTester\Chained\obj\Debug\Chained.pdb
+G:\Phase2Tester\DSComponentTester\Chained\bin\Debug\Chained.dll
+G:\Phase2Tester\DSComponentTester\Chained\bin\Debug\Chained.pdb
+G:\Phase2Tester\DSComponentTester\Chained\obj\Debug\Chained.dll
+G:\Phase2Tester\DSComponentTester\Chained\obj\Debug\Chained.pdb
+G:\MELMARK TRUNK\Chained\bin\Debug\Chained.dll
+G:\MELMARK TRUNK\Chained\bin\Debug\Chained.pdb
+G:\MELMARK TRUNK\Chained\obj\Debug\Chained.csprojResolveAssemblyReference.cache
+G:\MELMARK TRUNK\Chained\obj\Debug\Chained.dll
+G:\MELMARK TRUNK\Chained\obj\Debug\Chained.pdb
+G:\Melmark\Chained\bin\Debug\Chained.dll
+G:\Melmark\Chained\bin\Debug\Chained.pdb
+G:\Melmark\Chained\obj\Debug\Chained.csprojResolveAssemblyReference.cache
+G:\Melmark\Chained\obj\Debug\Chained.dll
+G:\Melmark\Chained\obj\Debug\Chained.pdb
+D:\BAck Up\Melmark Version 1.2\Chained\bin\Debug\Chained.dll
+D:\BAck Up\Melmark Version 1.2\Chained\bin\Debug\Chained.pdb
+D:\BAck Up\Melmark Version 1.2\Chained\obj\Debug\Chained.csprojResolveAssemblyReference.cache
+D:\BAck Up\Melmark Version 1.2\Chained\obj\Debug\Chained.dll
+D:\BAck Up\Melmark Version 1.2\Chained\obj\Debug\Chained.pdb
+D:\suhaim\Melmark 07-2013\Chained\bin\Debug\Chained.dll
+D:\suhaim\Melmark 07-2013\Chained\bin\Debug\Chained.pdb
+D:\suhaim\Melmark 07-2013\Chained\obj\Debug\Chained.dll
+D:\suhaim\Melmark 07-2013\Chained\obj\Debug\Chained.pdb
+D:\suhaim\Melmark 08-2013\12-08-2013\Chained\bin\Debug\Chained.dll
+D:\suhaim\Melmark 08-2013\12-08-2013\Chained\bin\Debug\Chained.pdb
+D:\suhaim\Melmark 08-2013\12-08-2013\Chained\obj\Debug\Chained.csprojResolveAssemblyReference.cache
+D:\suhaim\Melmark 08-2013\12-08-2013\Chained\obj\Debug\Chained.dll
+D:\suhaim\Melmark 08-2013\12-08-2013\Chained\obj\Debug\Chained.pdb
+D:\suhaim\Chained Class Backup\Chained\bin\Debug\Chained.dll
+D:\suhaim\Chained Class Backup\Chained\bin\Debug\Chained.pdb
+D:\suhaim\Chained Class Backup\Chained\obj\Debug\Chained.dll
+D:\suhaim\Chained Class Backup\Chained\obj\Debug\Chained.pdb
+D:\suhaim\Chained Class Backup\Chained\obj\Debug\Chained.csprojResolveAssemblyReference.cache
+D:\suhaim\Melmark 29-04-2014\Chained\bin\Debug\Chained.dll
+D:\suhaim\Melmark 29-04-2014\Chained\bin\Debug\Chained.pdb
+D:\suhaim\Melmark 29-04-2014\Chained\obj\Debug\Chained.dll
+D:\suhaim\Melmark 29-04-2014\Chained\obj\Debug\Chained.pdb
+D:\suhaim\Melmark 29-04-2014\Chained\obj\Debug\Chained.csprojResolveAssemblyReference.cache
+G:\107 Biweekly v1.3\Chained\bin\Debug\Chained.dll
+G:\107 Biweekly v1.3\Chained\bin\Debug\Chained.pdb
+G:\107 Biweekly v1.3\Chained\obj\Debug\Chained.csprojResolveAssemblyReference.cache
+G:\107 Biweekly v1.3\Chained\obj\Debug\Chained.dll
+G:\107 Biweekly v1.3\Chained\obj\Debug\Chained.pdb
+G:\MelmarkPublishCheckout\Chained\bin\Debug\Chained.dll
+G:\MelmarkPublishCheckout\Chained\bin\Debug\Chained.pdb
+G:\MelmarkPublishCheckout\Chained\obj\Debug\Chained.dll
+G:\MelmarkPublishCheckout\Chained\obj\Debug\Chained.pdb
+G:\MelmarkPublishCheckout\Chained\obj\Debug\Chained.csprojResolveAssemblyReference.cache

@@ -1,0 +1,727 @@
+﻿body {
+}
+
+#mainContainer {
+    margin: auto;
+    height: 496px;
+    width: 100%;
+    background-color: #ffffff;
+}
+
+
+
+#workSpace {
+    height:480px;
+    width:98%;
+    background:#E6E6E6;
+    border: 5px solid #D4D4D4;
+    overflow: auto;
+}
+
+workSpacePreview {
+    height: 460px;
+    width: 100%;
+    overflow: auto;
+}
+
+#workSpace-ppt {
+    height: 440px;
+    width: 100%;
+    background-color: #EAEAEA;
+    overflow: hidden;
+}
+
+.slides {
+    height: 30px;
+    width: 30px;
+    border: 2px dashed gray;
+    margin-left: 10px;
+    margin-top: 10px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: large;
+    font-weight: bold;
+    cursor: pointer;
+    -webkit-transition: 0.5s ease;
+    -moz-transition: 0.5s ease;
+    -ms-transition: 0.5s ease;
+    -o-transition: 0.5s ease;
+    transition: 0.5s ease;
+}
+
+    .slides:hover {
+        border: 2px dashed #FE2DC7;
+        background-color: #fee0a3;
+    }
+
+.slideSelected {
+    border: 2px dashed #FE2DC7;
+}
+
+
+
+#rightPanel2 {
+    background-color: #EAEAEA;
+    height: 233px;
+    overflow: auto;
+}
+
+    #rightPanel1 table td, #rightPanel2 table td {
+        padding: 0px;
+    }
+
+#elementList 
+{
+padding: 0px;
+margin: 0px;
+}
+
+#elementList li 
+			{
+			margin: 1px 0px 5px 0px !important;
+			line-height: 15px;
+			padding:2px;
+			list-style: none;
+			color: Gray;
+			font-size: x-large;
+			border-radius:4px;
+			margin:1px 0;
+			border:1px solid #b6d1dd;
+			background-color:#DFEFFF;
+			}
+
+        #elementList li img {
+            opacity: .6;
+			margin:5px 0 0 8px;
+        }
+
+        #elementList li span {
+            color: #35AC46;
+            font-size: small;
+        }
+
+        #elementList li:hover {
+            cursor: pointer;
+            background-color: #CECECE;
+        }
+
+.workSpaceTable {
+    width: 100%;
+}
+
+    .workSpaceTable td {
+        border: 1px dashed #939393;
+        height: 100px;
+        padding: 0px;
+    }
+
+#DataList1 td, #DataList2 td {
+    border: 1px groove #BABABA;
+}
+
+    #DataList1 td:hover, #DataList2 td:hover {
+        border: 1px groove #BABABA;
+        background-color: #D1D1D1;
+    }
+
+.popup_msg {
+    position: absolute;
+    z-index: 10;
+    width: 200px;
+    text-align: left;
+    color: #FF0000;
+    font: 14px Verdana, Arial, Helvetica, sans-serif;
+    display: none;
+    background-color: #F8D7D7;
+    border: 1px groove #ED9B9B;
+    box-shadow: 0px 0px 25px #6d6b6b;
+    -moz-box-shadow: 0px 0px 25px #6d6b6b; /*FF 3.5+*/
+    -webkit-text-shadow: 0px 0px 25px #6d6b6b; /*Saf3-4, Chrome, iOS 4.0.2-4.2, Android 2.3+*/
+    -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=25, Direction=90, Color=#6d6b6b)"; /*IE 8*/
+    filter: progid:DXImageTransform.Microsoft.Shadow(Strength=25, Direction=90, Color=#6d6b6b); /*IE 5.5-7*/
+    border: 1px solid #000000;
+    -moz-border-radius: 10px; /*Firefox*/
+    -webkit-border-radius: 10px; /*Safari, Chrome*/
+    border-radius: 10px;
+    text-shadow: 0px 0px 3px #fff; /* FF3.5+, Opera 9+, Saf1+, Chrome, IE10 */
+    -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=3, Direction=90, Color=#fff)"; /*IE 8*/
+    filter: progid:DXImageTransform.Microsoft.Shadow(Strength=3, Direction=90, Color=#fff); /*IE 5.5-7*/
+}
+
+
+
+.close_msg {
+    position: absolute;
+    right: 3px;
+    top: 3px;
+    cursor: pointer;
+    color: Gray;
+    border: 0px groove Black;
+    padding: 2px;
+    z-index: 11;
+}
+
+    .close_msg:hover {
+        color: Black;
+        border-width: 1px;
+    }
+
+#finalButtons {
+    float: right;
+    margin-left: auto;
+    margin-right: auto;
+    z-index: 100;
+    padding-right: 10px;
+}
+
+#menu {
+    margin: auto;
+    width: 100%;
+    margin-bottom: -20px;
+    padding-left: 10px;
+}
+
+.finalButtons {
+    height: 30px;
+    width: 100px;
+    border: 1px groove Black;
+    background-color: Gray;
+}
+
+    .finalButtons:hover {
+        opacity: 1;
+        cursor: pointer;
+    }
+
+.droper {
+    width: 100%;
+    background-color: Black;
+}
+
+.loadingDiv {
+    position: absolute;
+    background-color: White;
+    opacity: .8;
+    background-image: url('../images/29.gif');
+    background-repeat: no-repeat;
+    background-position: center;
+    display: none;
+}
+
+.fullOverlay {
+    display: none;
+    top: 0px;
+    left: 0px;
+    position: fixed;
+    z-index: 2000;
+    width: 100%;
+    height: 100%;
+    background-image: url("../images/overlay.png");
+}
+
+/*#previewBoard {
+    background-color: #fff;
+    padding: 5px;
+    position: absolute;
+    top: 10px;
+    background-color: White;
+    display: none;
+    margin: auto;
+    z-index: 10000;
+    width: 680px;
+}*/
+
+
+
+#previewBoard {
+    background-color: #fff;
+    padding: 5px;
+    position: absolute;
+    top: 10px;
+    background-color: White;
+    display: none;
+    margin: auto;
+    z-index: 10000;
+    width: 905px;
+}
+
+#previewBox {
+    background-color: #fff;
+    padding: 5px;
+    position: absolute;
+    top: 10px;
+    background-color: White;
+    display: none;
+    margin: auto;
+    z-index: 10000;
+    width: 1200px;
+}
+
+#previewBoard1 {
+    background-color: #fff;
+    padding: 5px;
+    position: absolute;
+    top: 20px;
+    background-color: White;
+    display: none;
+    margin: auto;
+    z-index: 10000;
+}
+/*#profileBoard
+{
+    position: absolute;
+    z-index: 21;
+    width: 680px;
+    height: 590px;
+    top: 20px;
+    background-color: White;
+    overflow: auto;
+    display: block;
+}*/
+
+#previewClose {
+    position: absolute;
+    z-index: 22;
+    top: -10px;
+    width: 100px;
+    background-color: blue;
+}
+
+#previewClose1 {
+    z-index: 10000;
+    position: absolute;
+    top: -10px;
+    right: -15px;
+}
+
+#textEditorDiv {
+    position: absolute;
+    z-index: 2001;
+    width: 680px;
+    height: 590px;
+    top: 20px;
+    background-color: White;
+    overflow: auto;
+    display: none;
+    margin: auto;
+}
+
+.selected {
+    box-shadow: 0px 0px 5px #FE2DC7;
+    -moz-box-shadow: 0px 0px 5px #FE2DC7; /*FF 3.5+*/
+    -webkit-box-shadow: 0px 0px 5px #FE2DC7; /*Saf3-4, Chrome, iOS 4.0.2-4.2, Android 2.3+*/
+    -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=5, Direction=90, Color=#FE2DC7)"; /*IE 8*/
+    filter: progid:DXImageTransform.Microsoft.Shadow(Strength=5, Direction=90, Color=#6d6FE2DC7b6b); /*IE 5.5-7*/
+}
+
+.-r {
+    box-shadow: 0px 0px 5px #2DC3FE;
+    -moz-box-shadow: 0px 0px 5px #2DC3FE; /*FF 3.5+*/
+    -webkit-box-shadow: 0px 0px 5px #2DC3FE; /*Saf3-4, Chrome, iOS 4.0.2-4.2, Android 2.3+*/
+    -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=5, Direction=90, Color=#2DC3FE)"; /*IE 8*/
+    filter: progid:DXImageTransform.Microsoft.Shadow(Strength=5, Direction=90, Color=#2DC3FE); /*IE 5.5-7*/
+}
+
+#topRibbon {
+    z-index: 1001;
+    border: 1px groove #000000;
+    width: 1072px;
+    top: 80px;
+    display: none;
+    position: absolute;
+    color: black;
+    background-color: white;
+    padding: 3px;
+}
+
+.close_ribbon {
+    float: right;
+    padding: 5px;
+    border: 1px groove #6B6B6B;
+    margin: 5px 2px -15px auto;
+    color: Gray;
+    background-color: #C1C1C1;
+    cursor: pointer;
+    -webkit-transition: 0.5s ease;
+    -moz-transition: 0.5s ease;
+    -ms-transition: 0.5s ease;
+    -o-transition: 0.5s ease;
+    transition: 0.5s ease;
+}
+
+    .close_ribbon:hover {
+        border: 1px groove #000000;
+        background-color: #B2B2B2;
+        color: #000000;
+    }
+
+.txtContainer {
+    border: 3px dotted gray;
+}
+
+#toolBox {
+    background-color: white;
+    position: absolute;
+    border: 1px groove Black;
+    width: 62px;
+    display: none;
+    -webkit-transition: 0.5s ease;
+    -moz-transition: 0.5s ease;
+    -ms-transition: 0.5s ease;
+    -o-transition: 0.5s ease;
+    transition: 0.5s ease;
+}
+
+    #toolBox:hover {
+        opacity: 1;
+    }
+
+    #toolBox img {
+        padding: 2px;
+        margin: 2px;
+        width: 20px;
+        height: 20px;
+        z-index: 100;
+        border: 1px dashed white;
+        -webkit-transition: 0.5s ease;
+        -moz-transition: 0.5s ease;
+        -ms-transition: 0.5s ease;
+        -o-transition: 0.5s ease;
+        transition: 0.5s ease;
+    }
+
+        #toolBox img:hover {
+            border: 1px dashed gray;
+        }
+
+#smallMenuClose {
+    height: 10px;
+    width: 10px;
+    position: absolute;
+    right: -5px;
+    top: -5px;
+    border: 1px groove black;
+    background-color: Gray;
+    font-size: 8px;
+    text-align: center;
+    background-color: #C1C1C1;
+    cursor: pointer;
+}
+
+
+
+.container {
+    font-size: large;
+    color: black;
+}
+
+#slideWarning {
+    background-color: #FEEAF9;
+    height: 50px;
+    width: 200px;
+    position: fixed;
+    top: 2px;
+    right: -202px;
+    border: 1px groove #FE2DC7;
+    -webkit-transition: 0.5s ease;
+    -moz-transition: 0.5s ease;
+    -ms-transition: 0.5s ease;
+    -o-transition: 0.5s ease;
+    transition: 0.5s ease;
+}
+
+    #slideWarning img {
+        right: 0px;
+        position: fixed;
+        z-index: 999;
+        -webkit-transition: 0.5s ease;
+        -moz-transition: 0.5s ease;
+        -ms-transition: 0.5s ease;
+        -o-transition: 0.5s ease;
+        transition: 0.5s ease;
+    }
+
+#warningMsg {
+    display: block;
+    float: left;
+    width: 148px;
+    border-collapse: collapse;
+    color: orange;
+}
+
+    #warningMsg .errorMsg {
+        color: #ff0000;
+    }
+
+    #warningMsg .errorSuggestion {
+        color: #56AC7F;
+        text-align: right;
+    }
+
+.rightPanelSearch {
+    margin: 0px;
+    border: 1px groove #EAEAEA;
+    background-repeat: no-repeat;
+    height: 18px;
+    width: 18px;
+    float:right !important;
+
+}
+
+
+#rightPanelSearch:hover {
+    border: 1px groove #FE2DC7;
+    cursor: pointer;
+}
+
+.pnlsearch {
+    margin-right:25px;
+}
+
+#ribbonVideoListContainer {
+    width: 500px;
+    border: 1px dashed gray;
+    display: block;
+}
+
+#ribbonVideoList {
+    min-height: 100px;
+    min-width: 500px;
+    overflow: auto;
+    display: block;
+}
+
+#dragDown {
+    height: 40px;
+    width: 40px;
+    background-image: url('../images/down.png');
+    float: right;
+    cursor: pointer;
+    margin-top: -15px;
+    padding: 0px;
+    background-position-x: 0px;
+    background-position-y: 0px;
+    background-repeat: no-repeat;
+}
+
+.videoStyle {
+    margin: 2px;
+}
+
+.descriptionBox {
+    display: none;
+    width: 200px;
+    border: 1px groove black;
+    background-color: #DDDDDD;
+    position: absolute;
+    opacity: .5;
+    -webkit-transition: 0.5s ease;
+    -moz-transition: 0.5s ease;
+    -ms-transition: 0.5s ease;
+    -o-transition: 0.5s ease;
+    transition: 0.5s ease;
+}
+
+    .descriptionBox:hover {
+        opacity: 1;
+    }
+
+.descriptionDiv {
+    width: 100%;
+    min-height: 20px;
+}
+
+.slideHeader {
+    font-size: small;
+    text-align: center;
+    font-weight: bold;
+    padding: 3px;
+}
+
+#slideDiv {
+    height: 458px;
+    overflow: auto;
+}
+
+#loadingOverlay {
+    position: fixed;
+    width: 100%;
+    height: 800px;
+    opacity: .5;
+    background-color: white;
+    top: 0px;
+    left: 0px;
+    z-index: 1000;
+    display: none;
+}
+
+/*Loading*/
+#loading {
+    display: none;
+    font-size: 25px;
+    padding-top: 100px;
+    z-index: 1001;
+    position: absolute;
+    top: 0px;
+    left: 500px;
+}
+
+#profileBar {
+    float: right;
+    border: 1px groove white;
+    width: 500px;
+    height: 20px;
+    margin-top: -21px;
+    background-color: #ffffff;
+}
+
+.messageRibbon {
+    width: 100%;
+    height: 50px;
+    margin-left: -8px;
+    position: absolute;
+    z-index: 999;
+    top: 120px;
+    display: none;
+}
+
+    .messageRibbon .innerMsgRibbon {
+        /*margin: auto;*/
+        width: 1100px;
+        text-align: center;
+        font-size: x-large;
+        font-weight: bold;
+        vertical-align: middle;
+        text-transform: uppercase;
+        color: #61C6F9;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+.innerMsgRibbon {
+    background-color: #BAE6FC;
+}
+
+.checkbox, .radio {
+    width: 19px;
+    height: 25px;
+    padding: 0 5px 0 0;
+    background: url(../icons/select.png) no-repeat;
+    display: block;
+    clear: left;
+    float: left;
+    margin-top: -20px;
+    position: absolute;
+}
+
+.correctAnswerDiv, .wrongAnswerDiv {
+    height: 297px;
+}
+
+.trashBox {
+    height: 128px;
+    width: 128px;
+    background: url(../icons/trashBox.png) no-repeat;
+    position: absolute;
+    top: 160px;
+    right: 0px;
+    border: 1px groove black;
+    background-color: wheat;
+    display: none;
+}
+
+.droppableDiv1, .droppableDiv2 {
+    width:90%;
+	min-height:200px; height:auto !important;
+    height: 200px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background:#F9F9F9;
+    vertical-align: top;
+	margin-bottom:5px;
+	padding:10px;
+	border:6px solid #e8e8e8;
+}
+
+.droppableDiv img {
+    width: 50px;
+    height: 50px;
+}
+
+.draggableDiv {
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 275px;
+}
+
+.divHeader {
+    text-align:left;
+	padding:5px 0 0 10px;
+    height:20px;
+	border-bottom:3px solid #c4c4c4;
+	margin:5px 0;
+    width:99%;
+    background: #F5F5F5;
+	font-family:Arial, Helvetica, sans-serif; font-size:12px; font-weight:bold; color:#2c2d2d;
+}
+
+#dashboard-top-panel {
+    width: 100%;
+    height: 30px;
+    float: left;
+    padding: 0px 0px 0px 0px;
+    margin: 0px;
+    background: url("../images/db-top-bg.jpg") no-repeat scroll right center #1db439;
+}
+
+
+#audioPlayer {
+    position: absolute;
+    background-color: white;
+    padding: 2px;
+    display: none;
+}
+
+    #audioPlayer td:hover {
+        background-color: wheat;
+    }
+
+
+.smallDelete {
+    height: 20px;
+    width: 16px;
+    cursor: pointer;
+    background-color: Red;
+}
+
+.smallEdit {
+    height: 20px;
+    width: 16px;
+    cursor: pointer;
+    background-color: Blue;
+}
+
+.menuButtons {
+    height: 20px;
+    width: 16px;
+    position: absolute;
+    z-index: 9;
+    right: -14px;
+    display: none;
+}
+
+.downArrow {
+    display: block;
+    height: 30px;
+}
+
+.upDownArea {
+    display: block;
+    height: 30px;
+    margin-left: 783px;
+}
+
+.upArrow {
+    display: none;
+    height: 30px;
+}

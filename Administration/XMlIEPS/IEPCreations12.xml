@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+      <Mapping Column="ResponseSign" PlaceHolder="plcResponseSign"/>
+      <Mapping Column="ResponseDate" PlaceHolder="plcResponseDate"/>
+      <Mapping Column="ResponseParentAcceptInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="ResponseParentRejectInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="ResponseParentFollowInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="ResponseParentFollow" PlaceHolder="plcResponseParent"/>
+      <Mapping Column="ResponseParentMeetingInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="ResponseParentSign" PlaceHolder="PlcParentSign"/>
+      <Mapping Column="ResponseParentDate" PlaceHolder="plcParentDate"/>
+      <Mapping Column="ResponseParentComment" PlaceHolder="plcParentComment"/>
+    </Mapping>
+  </State>
+</States>

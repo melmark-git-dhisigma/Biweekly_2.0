@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+      <Mapping Column="PlOneEarlyPgm" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlOneSeparatePgm" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlOneBothPgm" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlOneEnrolledPrnt" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlOnePlcdTeam" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlOneTimeMore" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlOneTimeTwo" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlOneTimeThree" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlOneSeparateClass" PlaceHolder="abcdefgh"/>
+      
+      <Mapping Column="PlOneSeparateDayScl" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlOneSeparatePublic" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlOneSeparatePvt" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlOneResidentialFacility" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlOneHome" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlOneServiceLctn" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlOnePsychiatric" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlOneMassachusetts" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlOneMassachusettsDay" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlOneMassachusettsRes" PlaceHolder="abcdefgh"/>
+      
+      <Mapping Column="PlOneDoctorHme" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlOneDoctorHsptl" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlOneConsent" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlOneRefuse" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlOnePlacement" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlTwoFullInclusionPgm" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlTwoPartialPgm" PlaceHolder="abcdefgh"/>
+      
+      <Mapping Column="PlTwoSubstantially" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlTwoSeparateScl" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlTwoPublicScl" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlTwoPrivateScl" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlTwoResScl" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlTwoOther" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlTwoYouth" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlTwoPsychiatric" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlTwoMassachusetts" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlTwoMassachusettsDay" PlaceHolder="abcdefgh"/>
+      
+      <Mapping Column="PltwoMassachusettsRes" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlTwoCorrectionFacility" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlTwoDoctorHome" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlTwoDoctorHsptl" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlTwoConsent" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlTwoPlacement" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PlTwoFullPgm" PlaceHolder="abcdefgh"/>
+
+      <Mapping Column="HoursPerWeek" PlaceHolder="plcEarlyChildPgm1"/>
+      <Mapping Column="Location1ServiceOne" PlaceHolder="Plc1LocService"/>
+      <Mapping Column="Location2Servicetwo" PlaceHolder="plc2LocationServiceTwo"/>
+      <Mapping Column="SignParentOne" PlaceHolder="plc1SignParent"/>
+      <Mapping Column="SignParentTwo" PlaceHolder="plcUndefined"/>
+      <Mapping Column="Sign1ParentDateOne" PlaceHolder="plc1ParentDate"/>
+      <Mapping Column="SignParentDateTwo" PlaceHolder="PlcParentDatetwo"/>
+      <Mapping Column="OtherDesc" PlaceHolder="plcOtherDesc"/>
+    </Mapping>
+  </State>
+</States>

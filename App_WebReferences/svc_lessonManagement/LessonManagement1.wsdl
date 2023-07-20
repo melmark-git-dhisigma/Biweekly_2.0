@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="LessonManagement" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import schemaLocation="http://localhost:59736/visual tool webservice/LessonManagement.svc?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://localhost:59736/visual tool webservice/LessonManagement.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://localhost:59736/visual tool webservice/LessonManagement.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="ILessonManagement_getLessonsList_InputMessage">
+    <wsdl:part name="parameters" element="tns:getLessonsList" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_getLessonsList_OutputMessage">
+    <wsdl:part name="parameters" element="tns:getLessonsListResponse" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_GetDomainList_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetDomainList" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_GetDomainList_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetDomainListResponse" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_GetSearchLesson_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetSearchLesson" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_GetSearchLesson_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetSearchLessonResponse" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_GetLessonDomain_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetLessonDomain" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_GetLessonDomain_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetLessonDomainResponse" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_GetCategoryList_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCategoryList" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_GetCategoryList_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCategoryListResponse" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_GetCatDomainLesson_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCatDomainLesson" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_GetCatDomainLesson_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCatDomainLessonResponse" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_FillDropDomainWithId_InputMessage">
+    <wsdl:part name="parameters" element="tns:FillDropDomainWithId" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_FillDropDomainWithId_OutputMessage">
+    <wsdl:part name="parameters" element="tns:FillDropDomainWithIdResponse" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_FillDropDomainComplete_InputMessage">
+    <wsdl:part name="parameters" element="tns:FillDropDomainComplete" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_FillDropDomainComplete_OutputMessage">
+    <wsdl:part name="parameters" element="tns:FillDropDomainCompleteResponse" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_FillDropCategoryCat_InputMessage">
+    <wsdl:part name="parameters" element="tns:FillDropCategoryCat" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_FillDropCategoryCat_OutputMessage">
+    <wsdl:part name="parameters" element="tns:FillDropCategoryCatResponse" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_FillDropCategoryComplete_InputMessage">
+    <wsdl:part name="parameters" element="tns:FillDropCategoryComplete" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_FillDropCategoryComplete_OutputMessage">
+    <wsdl:part name="parameters" element="tns:FillDropCategoryCompleteResponse" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_SaveLesson_InputMessage">
+    <wsdl:part name="parameters" element="tns:SaveLesson" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_SaveLesson_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SaveLessonResponse" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_EditLessonData_InputMessage">
+    <wsdl:part name="parameters" element="tns:EditLessonData" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_EditLessonData_OutputMessage">
+    <wsdl:part name="parameters" element="tns:EditLessonDataResponse" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_UpdateLesson_InputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateLesson" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_UpdateLesson_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateLessonResponse" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_FillClassList_InputMessage">
+    <wsdl:part name="parameters" element="tns:FillClassList" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_FillClassList_OutputMessage">
+    <wsdl:part name="parameters" element="tns:FillClassListResponse" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_FillStudentListComplete_InputMessage">
+    <wsdl:part name="parameters" element="tns:FillStudentListComplete" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_FillStudentListComplete_OutputMessage">
+    <wsdl:part name="parameters" element="tns:FillStudentListCompleteResponse" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_DeleteLessonPlan_InputMessage">
+    <wsdl:part name="parameters" element="tns:DeleteLessonPlan" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_DeleteLessonPlan_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DeleteLessonPlanResponse" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_GetLessonDomainWithSearch_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetLessonDomainWithSearch" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_GetLessonDomainWithSearch_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetLessonDomainWithSearchResponse" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_GetCategoryListWithSearch_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCategoryListWithSearch" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_GetCategoryListWithSearch_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCategoryListWithSearchResponse" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_GetCatDomainLessonWithSearch_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCatDomainLessonWithSearch" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_GetCatDomainLessonWithSearch_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCatDomainLessonWithSearchResponse" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_SaveOtherLessonType_InputMessage">
+    <wsdl:part name="parameters" element="tns:SaveOtherLessonType" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_SaveOtherLessonType_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SaveOtherLessonTypeResponse" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_UpdateProfileLesson_InputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateProfileLesson" />
+  </wsdl:message>
+  <wsdl:message name="ILessonManagement_UpdateProfileLesson_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateProfileLessonResponse" />
+  </wsdl:message>
+  <wsdl:portType name="ILessonManagement">
+    <wsdl:operation name="getLessonsList">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILessonManagement/getLessonsList" message="tns:ILessonManagement_getLessonsList_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILessonManagement/getLessonsListResponse" message="tns:ILessonManagement_getLessonsList_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDomainList">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILessonManagement/GetDomainList" message="tns:ILessonManagement_GetDomainList_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILessonManagement/GetDomainListResponse" message="tns:ILessonManagement_GetDomainList_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSearchLesson">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILessonManagement/GetSearchLesson" message="tns:ILessonManagement_GetSearchLesson_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILessonManagement/GetSearchLessonResponse" message="tns:ILessonManagement_GetSearchLesson_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetLessonDomain">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILessonManagement/GetLessonDomain" message="tns:ILessonManagement_GetLessonDomain_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILessonManagement/GetLessonDomainResponse" message="tns:ILessonManagement_GetLessonDomain_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCategoryList">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILessonManagement/GetCategoryList" message="tns:ILessonManagement_GetCategoryList_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILessonManagement/GetCategoryListResponse" message="tns:ILessonManagement_GetCategoryList_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCatDomainLesson">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILessonManagement/GetCatDomainLesson" message="tns:ILessonManagement_GetCatDomainLesson_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILessonManagement/GetCatDomainLessonResponse" message="tns:ILessonManagement_GetCatDomainLesson_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="FillDropDomainWithId">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILessonManagement/FillDropDomainWithId" message="tns:ILessonManagement_FillDropDomainWithId_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILessonManagement/FillDropDomainWithIdResponse" message="tns:ILessonManagement_FillDropDomainWithId_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="FillDropDomainComplete">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILessonManagement/FillDropDomainComplete" message="tns:ILessonManagement_FillDropDomainComplete_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILessonManagement/FillDropDomainCompleteResponse" message="tns:ILessonManagement_FillDropDomainComplete_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="FillDropCategoryCat">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILessonManagement/FillDropCategoryCat" message="tns:ILessonManagement_FillDropCategoryCat_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILessonManagement/FillDropCategoryCatResponse" message="tns:ILessonManagement_FillDropCategoryCat_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="FillDropCategoryComplete">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILessonManagement/FillDropCategoryComplete" message="tns:ILessonManagement_FillDropCategoryComplete_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILessonManagement/FillDropCategoryCompleteResponse" message="tns:ILessonManagement_FillDropCategoryComplete_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SaveLesson">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILessonManagement/SaveLesson" message="tns:ILessonManagement_SaveLesson_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILessonManagement/SaveLessonResponse" message="tns:ILessonManagement_SaveLesson_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="EditLessonData">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILessonManagement/EditLessonData" message="tns:ILessonManagement_EditLessonData_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILessonManagement/EditLessonDataResponse" message="tns:ILessonManagement_EditLessonData_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateLesson">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILessonManagement/UpdateLesson" message="tns:ILessonManagement_UpdateLesson_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILessonManagement/UpdateLessonResponse" message="tns:ILessonManagement_UpdateLesson_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="FillClassList">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILessonManagement/FillClassList" message="tns:ILessonManagement_FillClassList_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILessonManagement/FillClassListResponse" message="tns:ILessonManagement_FillClassList_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="FillStudentListComplete">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILessonManagement/FillStudentListComplete" message="tns:ILessonManagement_FillStudentListComplete_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILessonManagement/FillStudentListCompleteResponse" message="tns:ILessonManagement_FillStudentListComplete_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="DeleteLessonPlan">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILessonManagement/DeleteLessonPlan" message="tns:ILessonManagement_DeleteLessonPlan_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILessonManagement/DeleteLessonPlanResponse" message="tns:ILessonManagement_DeleteLessonPlan_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetLessonDomainWithSearch">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILessonManagement/GetLessonDomainWithSearch" message="tns:ILessonManagement_GetLessonDomainWithSearch_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILessonManagement/GetLessonDomainWithSearchResponse" message="tns:ILessonManagement_GetLessonDomainWithSearch_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCategoryListWithSearch">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILessonManagement/GetCategoryListWithSearch" message="tns:ILessonManagement_GetCategoryListWithSearch_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILessonManagement/GetCategoryListWithSearchResponse" message="tns:ILessonManagement_GetCategoryListWithSearch_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCatDomainLessonWithSearch">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILessonManagement/GetCatDomainLessonWithSearch" message="tns:ILessonManagement_GetCatDomainLessonWithSearch_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILessonManagement/GetCatDomainLessonWithSearchResponse" message="tns:ILessonManagement_GetCatDomainLessonWithSearch_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SaveOtherLessonType">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILessonManagement/SaveOtherLessonType" message="tns:ILessonManagement_SaveOtherLessonType_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILessonManagement/SaveOtherLessonTypeResponse" message="tns:ILessonManagement_SaveOtherLessonType_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateProfileLesson">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILessonManagement/UpdateProfileLesson" message="tns:ILessonManagement_UpdateProfileLesson_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILessonManagement/UpdateProfileLessonResponse" message="tns:ILessonManagement_UpdateProfileLesson_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_ILessonManagement" type="tns:ILessonManagement">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="getLessonsList">
+      <soap:operation soapAction="http://tempuri.org/ILessonManagement/getLessonsList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDomainList">
+      <soap:operation soapAction="http://tempuri.org/ILessonManagement/GetDomainList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSearchLesson">
+      <soap:operation soapAction="http://tempuri.org/ILessonManagement/GetSearchLesson" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetLessonDomain">
+      <soap:operation soapAction="http://tempuri.org/ILessonManagement/GetLessonDomain" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCategoryList">
+      <soap:operation soapAction="http://tempuri.org/ILessonManagement/GetCategoryList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCatDomainLesson">
+      <soap:operation soapAction="http://tempuri.org/ILessonManagement/GetCatDomainLesson" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FillDropDomainWithId">
+      <soap:operation soapAction="http://tempuri.org/ILessonManagement/FillDropDomainWithId" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FillDropDomainComplete">
+      <soap:operation soapAction="http://tempuri.org/ILessonManagement/FillDropDomainComplete" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FillDropCategoryCat">
+      <soap:operation soapAction="http://tempuri.org/ILessonManagement/FillDropCategoryCat" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FillDropCategoryComplete">
+      <soap:operation soapAction="http://tempuri.org/ILessonManagement/FillDropCategoryComplete" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SaveLesson">
+      <soap:operation soapAction="http://tempuri.org/ILessonManagement/SaveLesson" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="EditLessonData">
+      <soap:operation soapAction="http://tempuri.org/ILessonManagement/EditLessonData" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateLesson">
+      <soap:operation soapAction="http://tempuri.org/ILessonManagement/UpdateLesson" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FillClassList">
+      <soap:operation soapAction="http://tempuri.org/ILessonManagement/FillClassList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FillStudentListComplete">
+      <soap:operation soapAction="http://tempuri.org/ILessonManagement/FillStudentListComplete" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteLessonPlan">
+      <soap:operation soapAction="http://tempuri.org/ILessonManagement/DeleteLessonPlan" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetLessonDomainWithSearch">
+      <soap:operation soapAction="http://tempuri.org/ILessonManagement/GetLessonDomainWithSearch" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCategoryListWithSearch">
+      <soap:operation soapAction="http://tempuri.org/ILessonManagement/GetCategoryListWithSearch" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCatDomainLessonWithSearch">
+      <soap:operation soapAction="http://tempuri.org/ILessonManagement/GetCatDomainLessonWithSearch" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SaveOtherLessonType">
+      <soap:operation soapAction="http://tempuri.org/ILessonManagement/SaveOtherLessonType" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateProfileLesson">
+      <soap:operation soapAction="http://tempuri.org/ILessonManagement/UpdateProfileLesson" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="LessonManagement">
+    <wsdl:port name="BasicHttpBinding_ILessonManagement" binding="tns:BasicHttpBinding_ILessonManagement">
+      <soap:address location="http://localhost:59736/visual%20tool%20webservice/LessonManagement.svc" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

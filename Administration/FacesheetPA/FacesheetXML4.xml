@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="PA">
+    <Mapping>
+
+
+      <Mapping Column="PreferredActivities" PlaceHolder="plcPreferredAct"/>
+   
+      <Mapping Column="GeneralInfo" PlaceHolder="plcGeneralinfo"/>
+  
+      <Mapping Column="SuggestedProactiveEnvironment" PlaceHolder="plcSuggestProactiveProc"/>
+      
+    </Mapping>
+  </State>
+</States>

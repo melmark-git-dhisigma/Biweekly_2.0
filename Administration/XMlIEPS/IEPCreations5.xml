@@ -1,0 +1,192 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+      <Mapping Column="StartDate" PlaceHolder="PlcIEPDF"/>
+      <Mapping Column="EndDate" PlaceHolder="PlcIEPDT"/>
+      <Mapping Column="Name" PlaceHolder="PlcStudentName"/>
+      <Mapping Column="DOB" PlaceHolder="PlcDOB"/>
+      <Mapping Column="IDNO" PlaceHolder="PlcID"/>
+      <Mapping Column="OtherDesc1" PlaceHolder="plcServiceDelivery"/>
+      <Mapping Column="Cycle5dayInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="Cycle6dayInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="Cycle10dayInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="CycleOtherInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="SpecifyCycle" PlaceHolder="plcSpecifycycle"/>
+      
+      
+      <Mapping Column="ConsultGoal" PlaceHolder="plcaG"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcaS"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcaP"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcaC"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcaDate"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcaaDate"/>
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcbG"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcbS"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcbP"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcbC"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcabDate"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcbbDate"/>
+
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plccG"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plccS"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plccP"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plccC"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcacDate"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcccDate"/>
+
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcdG"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcdS"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcdP"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcdC"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcadDate"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcddDate"/>
+
+
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plceG"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plceS"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plceP"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plceC"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcaeDate"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plceeDate"/>
+
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcfG"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plfS"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plfP"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plfC"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcafDate"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcffDate"/>
+
+
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcgG"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plgS"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plgP"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plgC"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcagDate"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcggDate"/>
+
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plchG"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plhS"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plhP"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plhC"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcahDate"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plchhDate"/>
+
+
+
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plciG"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="pliS"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="pliP"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="pliC"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcaiDate"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plciiDate"/>
+
+
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcjG"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="pljS"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="pljP"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="pljC"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="PlcajDate"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcjjDate"/>
+
+
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plckG"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plkS"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plkP"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plkC"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcakDate"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plckkDate"/>
+
+
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plclG"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="pllS"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="pllP"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="pllC"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcalDate"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcllDate"/>
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcmG"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plmS"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plmP"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plmC"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcamDate"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcmmDate"/>
+
+
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcnG"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plnS"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plnP"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plnC"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcanDate"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcnnDate"/>
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcoG"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="ploS"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="ploP"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="ploC"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcaoDate"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="PlcooDate"/>
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcpG"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plpS"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plpP"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plpC"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcapDate"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcppDate"/>
+
+
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcqG"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plqS"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plqP"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plqC"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcaqDate"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcqqDate"/>
+
+
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcrG"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plrS"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plrP"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plrC"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcarDate"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcrrDate"/>
+      
+      
+      
+      
+    </Mapping>
+      
+
+  </State>
+  <State Name="MA">
+    <Mappings>
+      <Mapping Column="Column11" PlaceHolder="Placeholder1"/>
+      <Mapping Column="Column14" PlaceHolder="Placeholder2"/>
+      <Mapping Column="Column12" PlaceHolder="Placeholder3"/>
+      <Mapping Column="Column5" PlaceHolder="Placeholder4"/>
+      <Mapping Column="Column1" PlaceHolder="Placeholder5"/>
+    </Mappings>
+  </State>
+  <State Name="AZ">
+    <Mappings>
+      <Mapping Column="Column10" PlaceHolder="Placeholder1"/>
+      <Mapping Column="Column14" PlaceHolder="Placeholder2"/>
+      <Mapping Column="Column11" PlaceHolder="Placeholder3"/>
+      <Mapping Column="Column5" PlaceHolder="Placeholder4"/>
+      <Mapping Column="Column1" PlaceHolder="Placeholder5"/>
+    </Mappings>
+  </State>
+</States>

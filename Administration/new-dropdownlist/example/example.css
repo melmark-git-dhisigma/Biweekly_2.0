@@ -1,0 +1,112 @@
+/* This file is a mess and i dont care about it...get out of here! */
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+
+
+.group:before,
+.group:after {
+    content: "";
+    display: table;
+}
+.group:after {
+    clear: both;
+}
+.group {
+    zoom: 1; /* For IE 6/7 (trigger hasLayout) */
+}
+
+.part p {
+  clear: left;
+  margin-bottom: 1.5em;
+}
+
+.gist {
+  font-weight: normal;
+  text-shadow: none;
+}
+  .gist a {
+    color: #556270!important
+  }
+  .gist-file {
+    border: none!important;
+  }
+  .gist-meta {
+    background-color: transparent!important;
+    font-size: 10px!important;
+  }
+  .gist-data {
+    background-color: transparent!important
+  }
+  .gist-highlight .line {
+    color: #999!important;
+  }
+  .gist-highlight .nt,
+  .gist-highlight .na {
+    color: #556270!important;
+  }
+  .gist-highlight .s {
+    color: #C44D58!important;  
+  }
+  .gist-highlight .nx {
+    color: #3B2D38!important;
+  }
+
+code {
+  background-color: #fff;
+  border-bottom: 1px dotted #ccc;
+}
+
+.part {
+  border-bottom: 1px solid #ccc;
+  margin: 0 auto 30px auto;
+  padding:  0 0 10px;
+  width: 600px;
+}
+
+.header {
+  background-color: #F4EAD5;
+  width: 100%;
+}
+  .header h1 {
+    color: #E94E77;
+  }
+  .header h1 span {
+    color: #556270;
+  }
+
+ing: 50px;
+ ul {
+  list-style: none;
+}
+
+.header_inner {
+  margin: 0 auto;
+  padding: 50px;
+  width: 600px;
+}
+  .header_inner h1 {
+    float: left;
+  }
+
+.example {
+  background-color: rgba(255, 255, 255, .5);
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 20px;
+  padding: 18px;
+}
+  .example .gist-data {
+    font-size: 12px!important;
+  }
+
+
+  display: block;
+  font-size: 16px;
+}
+
+.dk_container {
+  margin-right: 10px;
+}

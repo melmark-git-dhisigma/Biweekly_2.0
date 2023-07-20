@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>      
+      <Mapping Column="PgmCord" PlaceHolder="PlcPgmCoordinator"/>
+      <Mapping Column="PgmCordDate" PlaceHolder="plcPdate"/>
+      <Mapping Column="EduCord" PlaceHolder="plcEduCod"/>
+      <Mapping Column="EduCordDate" PlaceHolder="PlcEduDate"/>
+      <Mapping Column="BCBA" PlaceHolder="plcBcB"/>
+      <Mapping Column="BCBADate" PlaceHolder="plcBdate"/>
+    </Mapping>
+  </State>
+</States>

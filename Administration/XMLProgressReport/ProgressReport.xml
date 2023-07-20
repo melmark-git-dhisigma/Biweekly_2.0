@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+      <Mapping Column="SchoolDistName" PlaceHolder="plcSchDistName"/>
+      <Mapping Column="SchoolDistAddress" PlaceHolder="plcSchDistAdd"/>
+      <Mapping Column="SchoolDistPhoneNum" PlaceHolder="plcSchDistCntPrsn"/>
+      <Mapping Column="IEPFromDate" PlaceHolder="plcIEPFrmDate"/>
+      <Mapping Column="IEPToDate" PlaceHolder="plcIEPToDate"/>
+	  
+	  <Mapping Column="StudName" PlaceHolder="plcStdName"/>
+      <Mapping Column="StudDOB" PlaceHolder="plcStdDOB"/>
+      <Mapping Column="StudID" PlaceHolder="plcStdID"/>
+	  
+	  <Mapping Column="StudName1" PlaceHolder="plcStdName1"/>
+      <Mapping Column="StudDOB1" PlaceHolder="plcStdDOB1"/>
+      <Mapping Column="StudID1" PlaceHolder="plcStdID1"/>
+      <Mapping Column="IEPFromDate1" PlaceHolder="plcIEPFrmDate1"/>
+      <Mapping Column="IEPToDate1" PlaceHolder="plcIEPToDate1"/>
+      </Mapping>
+  </State>
+</States>

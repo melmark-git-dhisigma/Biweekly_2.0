@@ -1,0 +1,451 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="AdminMaster.master.cs" Inherits="AdminMaster1" %>
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="asp" %>
+<!DOCTYPE HTML>
+<html>
+<head id="Head1" runat="server">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title runat="server" id="TitleName">Melmark New England</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=10,9" />
+    <script type="text/javascript" src="JS/jquery-1.8.0.js"></script>
+    <link type="text/css" href="CSS/jquery-ui-1.8.19.custom.css" rel="stylesheet" />
+    <link href="CSS/ClassHome.css" rel="stylesheet" type="text/css" />
+    <link href="CSS/MenuStyle.css" rel="stylesheet" type="text/css" />
+    <link href="CSS/validationEngine.jquery.css" rel="stylesheet" type="text/css" />
+    <link href="CSS/popupStyle.css" rel="stylesheet" type="text/css" />
+    <link href="CSS/popupStyle1.css" rel="stylesheet" type="text/css" />
+
+
+    <script src="../Administration/JS/123.js" type="text/javascript"></script>
+    <script src="../Administration/JS/script.js" type="text/javascript"></script>
+    <script type="text/javascript" src="JS/jquery.min.js"></script>
+    <script src="JS/jconfirmaction.jquery.js" type="text/javascript"></script>
+    <script src="JS/SearchSuggest.js" type="text/javascript"></script>
+    <script type="text/javascript" src="JS/jquery-1.7.2.min.js"></script>
+
+
+    <script type="text/javascript" src="JS/jquery-ui-1.8.19.custom.min.js"></script>
+    <script src="JS/jquery.easing.1.3.js" type="text/javascript"></script>
+    <script src="JS/jquery.MultiFile.js" type="text/javascript"></script>
+    <script src="JS/jquery.validationEngine-en.js" type="text/javascript"></script>
+    <script src="JS/jquery.validationEngine.js" type="text/javascript"></script>
+    <script src="JS/jquery.lightbox_me.js" type="text/javascript"></script>
+
+
+    <script src="JS/jsPopUp.js" type="text/javascript"></script>
+    <script src="JS/jquery.jclock-1.3.js" type="text/javascript"></script>
+    <link href="CSS/style2.css" rel="stylesheet" type="text/css">
+    <link href="CSS/buttons.css" rel="stylesheet" type="text/css" />
+    <link href="CSS/DisplayStyles.css" rel="stylesheet" />
+    <script type="text/javascript" src="JS/ddaccordion.js"></script>
+
+    <script type="text/javascript">
+        $(function ($) {
+            $('.jclock').jclock();
+        });
+    </script>
+    <script type="text/javascript">
+
+        $(function () {
+            // Patch fractional .x, .y form parameters for IE10.
+            if (typeof (Sys) !== 'undefined' && Sys.Browser.agent === Sys.Browser.InternetExplorer && Sys.Browser.version === 10) {
+                Sys.WebForms.PageRequestManager.getInstance()._onFormElementActive = function Sys$WebForms$PageRequestManager$_onFormElementActive(element, offsetX, offsetY) {
+                    if (element.disabled) {
+                        return;
+                    }
+                    this._activeElement = element;
+                    this._postBackSettings = this._getPostBackSettings(element, element.name);
+                    if (element.name) {
+                        var tagName = element.tagName.toUpperCase();
+                        if (tagName === 'INPUT') {
+                            var type = element.type;
+                            if (type === 'submit') {
+                                this._additionalInput = encodeURIComponent(element.name) + '=' + encodeURIComponent(element.value);
+                            }
+                            else if (type === 'image') {
+                                this._additionalInput = encodeURIComponent(element.name) + '.x=' + Math.floor(offsetX) + '&' + encodeURIComponent(element.name) + '.y=' + Math.floor(offsetY);
+                            }
+                        }
+                        else if ((tagName === 'BUTTON') && (element.name.length !== 0) && (element.type === 'submit')) {
+                            this._additionalInput = encodeURIComponent(element.name) + '=' + encodeURIComponent(element.value);
+                        }
+                    }
+                };
+            }
+        });
+
+    </script>
+
+
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+
+
+    <script type="text/javascript">
+
+
+
+
+
+        $(document).ready(
+            function () {
+                $('#close_x').click(function () {
+                    $('#dialog').animate({ top: "-300%" }, function () {
+                        $('#overlay').fadeOut('slow');
+                    });
+                });
+
+                $('#rbtnClass').click(function () {
+                    //alert("hty");
+                    window.document.forms[0].target = '_blank';
+                    setTimeout(function () { window.document.forms[0].target = ''; }, 500);
+                    $('.classDrop').fadeOut('slow');
+                });
+
+
+
+            });
+    </script>
+
+
+
+
+
+    <script type="text/javascript">
+        ddaccordion.init({
+            headerclass: "expandable", //Shared CSS class name of headers group that are expandable
+            contentclass: "categoryitems", //Shared CSS class name of contents group
+            revealtype: "click", //Reveal content when user clicks or onmouseover the header? Valid value: "click", "clickgo", or "mouseover"
+            mouseoverdelay: 200, //if revealtype="mouseover", set delay in milliseconds before header expands onMouseover
+            collapseprev: true, //Collapse previous content (so only one open at any time)? true/false 
+            defaultexpanded: [0], //index of content(s) open by default [index1, index2, etc]. [] denotes no content
+            onemustopen: false, //Specify whether at least one header should be open always (so never all headers closed)
+            animatedefault: false, //Should contents open by default be animated into view?
+            persiststate: true, //persist state of opened contents within browser session?
+            toggleclass: ["", "openheader"], //Two CSS classes to be applied to the header when it's collapsed and expanded, respectively ["class1", "class2"]
+            togglehtml: ["prefix", "", ""], //Additional HTML added to the header when it's collapsed and expanded, respectively  ["position", "html1", "html2"] (see docs)
+            animatespeed: "fast", //speed of animation: integer in milliseconds (ie: 200), or keywords "fast", "normal", or "slow"
+            oninit: function (headers, expandedindices) { //custom code to run when headers have initalized
+                //do nothing
+            },
+            onopenclose: function (header, index, state, isuseractivated) { //custom code to run whenever a header is opened or closed
+                //do nothing
+            }
+        })
+    </script>
+
+
+
+    <style type="text/css">
+        #dialogClass {
+            display: none;
+            background: #FFFFFF;
+            color: black;
+            z-index: 1000;
+        }
+
+        .time {
+            padding-bottom: 1px;
+            color: aliceblue;
+        }
+
+        .classDrop {
+            position: absolute;
+            border: 1px groove black;
+            padding: 20px;
+            background-color: #ffffff;
+            display: none;
+            margin-left: -80px;
+            width: 300px;
+        }
+
+        .closeThis {
+            position: absolute;
+            right: 0px;
+            top: 0px;
+            width: 10px;
+            border: 1px groove #ffffff;
+            padding: 2px;
+            cursor: pointer;
+        }
+
+            .closeThis:hover {
+                border-color: #808080;
+            }
+
+        @font-face {
+            font-family: Oswald;
+            src: url("Oswald.ttf");
+        }
+
+        @font-face {
+            font-family: Orienta;
+            src: url("Orienta-Regular.otf");
+        }
+
+        .td {
+            width: 180px;
+            color: #666;
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 0 0 0 10px;
+            height: 20px;
+            background: #f00;
+        }
+
+        .clear {
+            margin: 0;
+            padding: 0;
+            clear: both;
+            border: 0;
+        }
+    </style>
+    <script type="text/javascript">
+        function redirectVisual() {
+            window.location = "../VisualTool/homePage.aspx";
+        }
+        function redirectHome() {
+            window.location = "AdminHome.aspx";
+        }
+        function showClass() {
+
+            $('.classBox').slideToggle();
+
+        }        
+
+        function loadmaster() {
+
+            var currHref = window.location.href.replace('http://', '');
+
+            var currHref_splitted = currHref.split('/');
+
+            var redirectUrl = "http://" + currHref_splitted[0] + '/';
+
+            for (var i = 0; i < currHref_splitted.length; i++) {
+                if (currHref_splitted[i].substring(0, 2) == '(S') {
+                    redirectUrl += currHref_splitted[i] + '/';
+                }
+
+            }
+            redirectUrl += 'LoginContinue.aspx';
+
+            //alert(redirectUrl);
+
+            self.location = redirectUrl;
+
+
+
+        }
+
+        function Classbinder() {
+
+            var cntSel = document.getElementById("");
+            var radio = cntSel.getElementsByTagName("input");
+            if (radio.length > 1) {
+                for (var i = 0; i < radio.length; i++) {
+                    if (radio[i].checked) {
+                        radio[i].checked = false;
+                    }
+                }
+                $('.classDrop').fadeIn('slow');
+            }
+            else if (cntSel.length = 1) {
+
+                //PageMethods.fillSingleClass();
+                document.getElementById("studbind").target = '_blank';
+                document.getElementById("studbind").href = "../StudentBinder/Home.aspx";
+                $('.classDrop').fadeOut('slow');
+
+            }
+            else {
+                alert("Class is not Assigned!!!");
+                document.getElementById("studbind").href = "AdminHome.aspx";
+            }
+        }
+
+        function gettab() {
+            window.document.forms[0].target = '_blank';
+            setTimeout(function () { window.document.forms[0].target = ''; }, 500);
+        }
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.close-popUp, .done').click(function () {
+                $('#dialogClass').fadeOut('slow', function () {
+                    $('#popupClass').fadeOut('slow');
+                });
+            });
+
+            $('.closeThis').click(function () {
+                $('.classDrop').fadeOut('slow');
+            });
+            
+        });
+
+        
+    </script>
+
+</head>
+
+<body>
+
+    <form id="form1" runat="server">
+
+
+        <asp:ToolkitScriptManager ID="ToolkitScriptManager1" runat="server" EnablePageMethods="true"></asp:ToolkitScriptManager>
+        <!-- top panel -->
+
+
+        <div id="dashboard-top-panel">
+            <div id="top-panel-container">
+
+                <ul>
+                    <li class="user">
+                        <asp:Image ID="imgUserIcon" runat="server" src="images/admin-icon.png" Width="16" Height="16" align="baseline" />
+                        <asp:Label ID="lblLoginName" runat="server" Text="Label"></asp:Label></li>
+
+
+                    
+
+                    <li>
+
+                        <div>
+                            <div style="float: left; width: auto;">
+                                <img src="images/time-icon.png" width="14" height="14" align="baseline">
+                            </div>
+                            <div style="float: left; width: auto;" class="jclock"></div>
+
+                        </div>
+                    </li>
+                    <li style="width:120px">
+                        <a href="#" title="StartUp Page" onclick="loadmaster();">
+                            <img src="images/StartHome.png" width="10" height="10" align="baseline" />
+                            Landing Portal</a>
+
+                    </li>
+
+                    <li>
+
+                        <a href="../Logout.aspx">
+                            <img src="images/logout-icon.png" width="15" height="15" align="baseline" />Logout</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- dashboard container panel -->
+        <div id="db-container">
+            <!-- header -->
+            <div id="header-panel">
+                <div class="Dashboard-logo">
+                    <img src="images/dashboard-logo.jpg" width="269" height="70">
+                </div>
+                <div class="header-links">
+                    <ul>
+                        <%--href="../StudentBinder/Home.aspx" --%>
+                        
+
+                        <li onclick="redirectVisual()"><a href="#">
+                            <img src="images/visual.png" width="26" height="23"><br>
+                            Visual Lesson</a></li>
+                        <li onclick="showClass()"><a id="studbind" href="#">
+                            <img src="images/Student.png" width="28" height="25"><br>
+                            Student Binder
+                        </a>
+                        </li>
+
+                        <li onclick="redirectHome()"><a href="#">
+                            <img src="images/home.png" width="26" height="23"><br>
+                            Home</a></li>
+                         <li onclick="ExecuteBatch()"><a href="#">
+                            <img src="images/databse.png" width="26" height="23"><br>
+                             <span id="lnkExecute">Execute batch</span></a></li>
+                      
+                    
+                      
+                    </ul>
+                </div>
+            </div>
+
+
+            <!-- content panel -->
+            <div id="dashboard-content-panel">
+                <!-- content Left side -->
+
+                <!-- content right side -->
+                <div id="dashboard-RHS">
+
+                    <div class="dashboard-RHS-content">
+                        <div class="bread-crumbs">
+
+                            <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+                                <ContentTemplate>
+                                    <div id="HeadingDiv" style="width: 570px;" runat="server" class="mainheadingpanel"></div>
+
+
+
+
+                                    </div>
+                                </ContentTemplate>
+                            </asp:UpdatePanel>
+                            <div class="content-panel">
+
+                                <asp:ContentPlaceHolder ID="PageContent" runat="server">
+                                </asp:ContentPlaceHolder>
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="classBox">
+            <span style="text-align: center" class="tdText">
+                <asp:Label ID="lblchoose" runat="server" Text="Choose Class" CssClass="tdText"></asp:Label>
+            </span>
+            <div class="clear"></div>
+            <div class="topmenuDD" style="height: 133px; width: 240px; overflow-y: scroll;">
+
+
+
+                <span style="text-align: center" class="tdText">
+                    <asp:DataList ID="DlClass" runat="server" BackColor="White" ForeColor="#333333" BorderColor="#336666" CellPadding="4" GridLines="None" OnItemCommand="DlClass_ItemCommand" Width="100%">
+                        <FooterStyle CssClass="FooterStyle" Font-Bold="True" ForeColor="White" />
+                        <HeaderStyle CssClass="HeaderStyle" Font-Bold="True" ForeColor="White" />
+                        <ItemStyle CssClass="RowStyle" />
+
+                        <ItemTemplate>
+                            <table cellpadding="0" cellspacing="0" style="width: 100%; text-align: center;">
+                                <tr>
+                                    <td style="width: 100%; text-align: center">
+                                        <asp:LinkButton ID="lnkClass" Font-Underline="true" OnClientClick="window.document.forms[0].target='_blank'; setTimeout(function(){window.document.forms[0].target='';}, 500);$('.classBox').fadeOut();" runat="server" CommandArgument='<%# Eval("Id") %>' Text='<%# Eval("Name") %>'></asp:LinkButton>
+                                    </td>
+
+                                </tr>
+                                <div class="clear"></div>
+                            </table>
+                        </ItemTemplate>
+                        <SelectedItemStyle CssClass="SelectedRowStyle" BackColor="#C5BBAF" Font-Bold="True" ForeColor="#333333" />
+                    </asp:DataList>
+                    <asp:Label ID="Lblnoclass" runat="server" Visible="false" Text="" CssClass="tdText"></asp:Label>
+                </span>
+            </div>
+            <div class="clear"></div>
+        </div>
+
+
+        <!-- footer -->
+        <div id="footer-panel">
+            &copy; Copyright 2015, Melmark, Inc. All rights reserved.
+
+
+        </div>
+    </form>
+</body>
+</html>

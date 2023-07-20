@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="ResponseOut">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="outputInt" type="xs:int" />
+      <xs:element minOccurs="0" name="outputInt2" type="xs:int" />
+      <xs:element minOccurs="0" name="outputList" nillable="true" type="tns:ArrayOfoutput" />
+      <xs:element minOccurs="0" name="outputString" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="retDomainName" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ResponseOut" nillable="true" type="tns:ResponseOut" />
+  <xs:complexType name="ArrayOfoutput">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="output" nillable="true" type="tns:output" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfoutput" nillable="true" type="tns:ArrayOfoutput" />
+  <xs:complexType name="output">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AsmntCatName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="AsmtLpId" type="xs:int" />
+      <xs:element minOccurs="0" name="LessonType" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="categryName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="classId" type="xs:int" />
+      <xs:element minOccurs="0" name="className" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="desc" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="domName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="domainId" type="xs:int" />
+      <xs:element minOccurs="0" name="imageURL" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="lpId" type="xs:int" />
+      <xs:element minOccurs="0" name="lpKeywrd" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="lpName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="lpType" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="stdId" type="xs:int" />
+      <xs:element minOccurs="0" name="studName" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="output" nillable="true" type="tns:output" />
+  <xs:complexType name="clsRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="LessonType" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="catType" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="clsId" type="xs:int" />
+      <xs:element minOccurs="0" name="discreate" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="domId" type="xs:int" />
+      <xs:element minOccurs="0" name="indexId" type="xs:int" />
+      <xs:element minOccurs="0" name="lesnDesc" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="lesnId" type="xs:int" />
+      <xs:element minOccurs="0" name="lesnName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="loginId" type="xs:int" />
+      <xs:element minOccurs="0" name="lpKey" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="searchName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="setNmbr" type="xs:int" />
+      <xs:element minOccurs="0" name="stepNmbr" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="clsRequest" nillable="true" type="tns:clsRequest" />
+</xs:schema>

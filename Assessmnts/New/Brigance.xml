@@ -1,0 +1,203 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Sections>
+  <Section name="BRIGANCE" Skill="Academic Skills">
+    <SubSections>
+      <SubSection name="Math-Algebra" Code="B2" ContainsQuestions="True" Applicable="false" >
+        <Questions>
+          <Question name="test" Code="Q1" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q2" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q3" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q4" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q5" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q6" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q7" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q8" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q9" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q10" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+        </Questions>
+      </SubSection>
+      <SubSection name="Math-Data_Analysis_and_Probability" Code="B2" ContainsQuestions="True" Applicable="false">
+        <Questions>
+          <Question name="test" Code="Q1" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q2" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q3" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q4" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q5" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q6" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q7" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q8" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q9" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q10" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+        </Questions>
+      </SubSection>
+      <SubSection name="Math-Geometry" Code="B2" ContainsQuestions="True" Applicable="false">
+        <Questions>
+          <Question name="test" Code="Q1" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q2" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q3" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q4" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q5" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q6" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q7" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q8" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q9" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q10" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+        </Questions>
+      </SubSection>
+      <SubSection name="Math-Measurement" Code="B2" ContainsQuestions="True" Applicable="false">
+        <Questions>
+          <Question name="test" Code="Q1" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q2" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q3" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q4" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q5" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q6" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q7" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q8" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q9" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q10" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+        </Questions>
+      </SubSection>
+      <SubSection name="Math-Number_Operations" Code="B2" ContainsQuestions="True" Applicable="false">
+        <Questions>
+          <Question name="test" Code="Q1" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q2" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q3" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q4" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q5" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q6" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q7" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q8" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q9" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q10" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+        </Questions>
+      </SubSection>
+      <SubSection name="Reading-Compre_Long" Code="B2" ContainsQuestions="True" Applicable="false">
+        <Questions>
+          <Question name="test" Code="Q1" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q2" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q3" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q4" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q5" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q6" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q7" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q8" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q9" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q10" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+        </Questions>
+      </SubSection>
+      <SubSection name="Reading-Compre_short" Code="B2" ContainsQuestions="True" Applicable="false">
+        <Questions>
+          <Question name="test" Code="Q1" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q2" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q3" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q4" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q5" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q6" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q7" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q8" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q9" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q10" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+        </Questions>
+      </SubSection>
+      <SubSection name="Reading-Functional_Word_Recog" Code="B2" ContainsQuestions="True" Applicable="false">
+        <Questions>
+          <Question name="test" Code="Q1" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q2" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q3" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q4" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q5" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q6" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q7" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q8" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q9" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q10" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+        </Questions>
+      </SubSection>
+      <SubSection name="Reading-Listening" Code="B2" ContainsQuestions="True" Applicable="false">
+        <Questions>
+          <Question name="test" Code="Q1" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q2" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q3" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q4" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q5" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q6" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q7" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q8" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q9" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q10" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+        </Questions>
+      </SubSection>
+      <SubSection name="Reading-Oral_reading" Code="B2" ContainsQuestions="True" Applicable="false">
+        <Questions>
+          <Question name="test" Code="Q1" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q2" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q3" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q4" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q5" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q6" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q7" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q8" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q9" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q10" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+        </Questions>
+      </SubSection>
+      <SubSection name="Reading-Responding_to_writing_prompts" Code="B2" ContainsQuestions="True" Applicable="false">
+        <Questions>
+          <Question name="test" Code="Q1" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q2" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q3" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q4" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q5" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q6" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q7" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q8" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q9" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q10" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+        </Questions>
+      </SubSection>
+      <SubSection name="Reading-Spelling" Code="B2" ContainsQuestions="True" Applicable="false">
+        <Questions>
+          <Question name="test" Code="Q1" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q2" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q3" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q4" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q5" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q6" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q7" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q8" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q9" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q10" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+        </Questions>
+      </SubSection>
+      <SubSection name="Reading-Word_Recogniztion" Code="B2" ContainsQuestions="True" Applicable="false">
+        <Questions>
+          <Question name="test" Code="Q1" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q2" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q3" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q4" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q5" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q6" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q7" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q8" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q9" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q10" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+        </Questions>
+      </SubSection>
+      <SubSection name="Reading-Writing" Code="B2" ContainsQuestions="True" Applicable="false">
+        <Questions>
+          <Question name="test" Code="Q1" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q2" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q3" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q4" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q5" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q6" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q7" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q8" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q9" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+          <Question name="test" Code="Q10" Box="2" ContainsQuestions="False"  Applicable="false"></Question>
+        </Questions>
+      </SubSection>
+    </SubSections>
+  </Section>
+</Sections>

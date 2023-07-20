@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="contentPage" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import schemaLocation="http://localhost:59736/visual tool webservice/contentPage.svc?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://localhost:59736/visual tool webservice/contentPage.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://localhost:59736/visual tool webservice/contentPage.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/LessonTool" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IcontentPage_getElementTable_InputMessage">
+    <wsdl:part name="parameters" element="tns:getElementTable" />
+  </wsdl:message>
+  <wsdl:message name="IcontentPage_getElementTable_OutputMessage">
+    <wsdl:part name="parameters" element="tns:getElementTableResponse" />
+  </wsdl:message>
+  <wsdl:message name="IcontentPage_getElementDetails_InputMessage">
+    <wsdl:part name="parameters" element="tns:getElementDetails" />
+  </wsdl:message>
+  <wsdl:message name="IcontentPage_getElementDetails_OutputMessage">
+    <wsdl:part name="parameters" element="tns:getElementDetailsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IcontentPage_saveLesson_InputMessage">
+    <wsdl:part name="parameters" element="tns:saveLesson" />
+  </wsdl:message>
+  <wsdl:message name="IcontentPage_saveLesson_OutputMessage">
+    <wsdl:part name="parameters" element="tns:saveLessonResponse" />
+  </wsdl:message>
+  <wsdl:message name="IcontentPage_getContentData_InputMessage">
+    <wsdl:part name="parameters" element="tns:getContentData" />
+  </wsdl:message>
+  <wsdl:message name="IcontentPage_getContentData_OutputMessage">
+    <wsdl:part name="parameters" element="tns:getContentDataResponse" />
+  </wsdl:message>
+  <wsdl:message name="IcontentPage_getMediaSearch_InputMessage">
+    <wsdl:part name="parameters" element="tns:getMediaSearch" />
+  </wsdl:message>
+  <wsdl:message name="IcontentPage_getMediaSearch_OutputMessage">
+    <wsdl:part name="parameters" element="tns:getMediaSearchResponse" />
+  </wsdl:message>
+  <wsdl:message name="IcontentPage_getSearchElements_InputMessage">
+    <wsdl:part name="parameters" element="tns:getSearchElements" />
+  </wsdl:message>
+  <wsdl:message name="IcontentPage_getSearchElements_OutputMessage">
+    <wsdl:part name="parameters" element="tns:getSearchElementsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IcontentPage_getSlideContents_InputMessage">
+    <wsdl:part name="parameters" element="tns:getSlideContents" />
+  </wsdl:message>
+  <wsdl:message name="IcontentPage_getSlideContents_OutputMessage">
+    <wsdl:part name="parameters" element="tns:getSlideContentsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IcontentPage_getLessonDetails_InputMessage">
+    <wsdl:part name="parameters" element="tns:getLessonDetails" />
+  </wsdl:message>
+  <wsdl:message name="IcontentPage_getLessonDetails_OutputMessage">
+    <wsdl:part name="parameters" element="tns:getLessonDetailsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IcontentPage_deleteSlide_InputMessage">
+    <wsdl:part name="parameters" element="tns:deleteSlide" />
+  </wsdl:message>
+  <wsdl:message name="IcontentPage_deleteSlide_OutputMessage">
+    <wsdl:part name="parameters" element="tns:deleteSlideResponse" />
+  </wsdl:message>
+  <wsdl:message name="IcontentPage_getStudDetails_InputMessage">
+    <wsdl:part name="parameters" element="tns:getStudDetails" />
+  </wsdl:message>
+  <wsdl:message name="IcontentPage_getStudDetails_OutputMessage">
+    <wsdl:part name="parameters" element="tns:getStudDetailsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IcontentPage_getCoinCollection_InputMessage">
+    <wsdl:part name="parameters" element="tns:getCoinCollection" />
+  </wsdl:message>
+  <wsdl:message name="IcontentPage_getCoinCollection_OutputMessage">
+    <wsdl:part name="parameters" element="tns:getCoinCollectionResponse" />
+  </wsdl:message>
+  <wsdl:message name="IcontentPage_getSearchCoinElements_InputMessage">
+    <wsdl:part name="parameters" element="tns:getSearchCoinElements" />
+  </wsdl:message>
+  <wsdl:message name="IcontentPage_getSearchCoinElements_OutputMessage">
+    <wsdl:part name="parameters" element="tns:getSearchCoinElementsResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IcontentPage">
+    <wsdl:operation name="getElementTable">
+      <wsdl:input wsaw:Action="http://tempuri.org/IcontentPage/getElementTable" message="tns:IcontentPage_getElementTable_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IcontentPage/getElementTableResponse" message="tns:IcontentPage_getElementTable_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="getElementDetails">
+      <wsdl:input wsaw:Action="http://tempuri.org/IcontentPage/getElementDetails" message="tns:IcontentPage_getElementDetails_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IcontentPage/getElementDetailsResponse" message="tns:IcontentPage_getElementDetails_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="saveLesson">
+      <wsdl:input wsaw:Action="http://tempuri.org/IcontentPage/saveLesson" message="tns:IcontentPage_saveLesson_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IcontentPage/saveLessonResponse" message="tns:IcontentPage_saveLesson_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="getContentData">
+      <wsdl:input wsaw:Action="http://tempuri.org/IcontentPage/getContentData" message="tns:IcontentPage_getContentData_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IcontentPage/getContentDataResponse" message="tns:IcontentPage_getContentData_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="getMediaSearch">
+      <wsdl:input wsaw:Action="http://tempuri.org/IcontentPage/getMediaSearch" message="tns:IcontentPage_getMediaSearch_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IcontentPage/getMediaSearchResponse" message="tns:IcontentPage_getMediaSearch_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="getSearchElements">
+      <wsdl:input wsaw:Action="http://tempuri.org/IcontentPage/getSearchElements" message="tns:IcontentPage_getSearchElements_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IcontentPage/getSearchElementsResponse" message="tns:IcontentPage_getSearchElements_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="getSlideContents">
+      <wsdl:input wsaw:Action="http://tempuri.org/IcontentPage/getSlideContents" message="tns:IcontentPage_getSlideContents_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IcontentPage/getSlideContentsResponse" message="tns:IcontentPage_getSlideContents_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="getLessonDetails">
+      <wsdl:input wsaw:Action="http://tempuri.org/IcontentPage/getLessonDetails" message="tns:IcontentPage_getLessonDetails_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IcontentPage/getLessonDetailsResponse" message="tns:IcontentPage_getLessonDetails_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="deleteSlide">
+      <wsdl:input wsaw:Action="http://tempuri.org/IcontentPage/deleteSlide" message="tns:IcontentPage_deleteSlide_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IcontentPage/deleteSlideResponse" message="tns:IcontentPage_deleteSlide_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="getStudDetails">
+      <wsdl:input wsaw:Action="http://tempuri.org/IcontentPage/getStudDetails" message="tns:IcontentPage_getStudDetails_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IcontentPage/getStudDetailsResponse" message="tns:IcontentPage_getStudDetails_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="getCoinCollection">
+      <wsdl:input wsaw:Action="http://tempuri.org/IcontentPage/getCoinCollection" message="tns:IcontentPage_getCoinCollection_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IcontentPage/getCoinCollectionResponse" message="tns:IcontentPage_getCoinCollection_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="getSearchCoinElements">
+      <wsdl:input wsaw:Action="http://tempuri.org/IcontentPage/getSearchCoinElements" message="tns:IcontentPage_getSearchCoinElements_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IcontentPage/getSearchCoinElementsResponse" message="tns:IcontentPage_getSearchCoinElements_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_IcontentPage" type="tns:IcontentPage">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="getElementTable">
+      <soap:operation soapAction="http://tempuri.org/IcontentPage/getElementTable" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getElementDetails">
+      <soap:operation soapAction="http://tempuri.org/IcontentPage/getElementDetails" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="saveLesson">
+      <soap:operation soapAction="http://tempuri.org/IcontentPage/saveLesson" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getContentData">
+      <soap:operation soapAction="http://tempuri.org/IcontentPage/getContentData" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getMediaSearch">
+      <soap:operation soapAction="http://tempuri.org/IcontentPage/getMediaSearch" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSearchElements">
+      <soap:operation soapAction="http://tempuri.org/IcontentPage/getSearchElements" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSlideContents">
+      <soap:operation soapAction="http://tempuri.org/IcontentPage/getSlideContents" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getLessonDetails">
+      <soap:operation soapAction="http://tempuri.org/IcontentPage/getLessonDetails" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="deleteSlide">
+      <soap:operation soapAction="http://tempuri.org/IcontentPage/deleteSlide" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getStudDetails">
+      <soap:operation soapAction="http://tempuri.org/IcontentPage/getStudDetails" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCoinCollection">
+      <soap:operation soapAction="http://tempuri.org/IcontentPage/getCoinCollection" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSearchCoinElements">
+      <soap:operation soapAction="http://tempuri.org/IcontentPage/getSearchCoinElements" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="contentPage">
+    <wsdl:port name="BasicHttpBinding_IcontentPage" binding="tns:BasicHttpBinding_IcontentPage">
+      <soap:address location="http://localhost:59736/visual%20tool%20webservice/contentPage.svc" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

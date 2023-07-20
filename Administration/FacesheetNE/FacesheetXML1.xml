@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+
+      <Mapping Column="template" PlaceHolder="plcLname"/>
+      <Mapping Column="template" PlaceHolder="PlcAddress"/>
+      <Mapping Column="template" PlaceHolder="plcNickName"/>
+      <Mapping Column="template" PlaceHolder="plcCitizenship"/>
+
+
+      <Mapping Column="template" PlaceHolder="plcDateofBirth"/>
+      <Mapping Column="template" PlaceHolder="plcHeight"/>
+      <Mapping Column="template" PlaceHolder="plcWeight"/>
+      <Mapping Column="template" PlaceHolder="plcHairColor"/>
+      <Mapping Column="template" PlaceHolder="plcEyeColor"/>
+
+
+      <Mapping Column="template" PlaceHolder="plcPrimaryLanguage"/>
+      <Mapping Column="template" PlaceHolder="plcDistingushMarks"/>
+      <Mapping Column="template" PlaceHolder="plcParentMarital"/>
+
+
+      <Mapping Column="template" PlaceHolder="plcGender"/>
+
+      <Mapping Column="template" PlaceHolder="plcDateOFAdmission"/>
+	  <Mapping Column="template" PlaceHolder="plcUpdated"/>
+
+      <Mapping Column="template" PlaceHolder="plcPlaceOFBirth"/>
+
+      <Mapping Column="template" PlaceHolder="plcImage"/>
+      
+
+
+
+
+
+
+
+      <Mapping Column="template" PlaceHolder="plcLegalCompetency"/>
+
+
+
+      <Mapping Column="template" PlaceHolder="plcGuardianship"/>
+
+      <Mapping Column="template" PlaceHolder="plcOtherState"/>
+
+
+
+
+
+      <Mapping Column="template" PlaceHolder="plcCaseManagerResidential"/>
+      <Mapping Column="template" PlaceHolder="plcCaseManagerEducational"/>
+
+      <Mapping Column="template" PlaceHolder="plcRace"/>
+      
+      <Mapping Column="template" PlaceHolder="plcPhotodate"/>      
+      <Mapping Column="template" PlaceHolder="plcEducationalSurrogate"/>
+      
+      
+      
+      
+    </Mapping>
+
+
+  </State>
+</States>

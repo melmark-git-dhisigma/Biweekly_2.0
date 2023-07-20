@@ -1,0 +1,183 @@
+
+
+
+.contentDiv
+{
+    height: auto;
+    width: 100%;
+    color: #080000;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    padding: 3px 2px 3px 2px;
+    margin: 1px 2px 1px 2px;
+    background-color: #DBDBDB;
+    border: 1px solid #919191;
+}
+
+.contentDivALinks
+{
+    height: auto;
+    width: 100%;
+    color: #1C5E55;
+    font-weight: bold;
+}
+
+    .contentDivALinks a:hover
+    {
+        text-decoration: underline;
+    }
+
+.contentDiv a
+{
+    color: #FFFFFF;
+    font-weight: bold;
+}
+
+.contentDiv:hover
+{
+    background-color: #C0C0C0;
+}
+
+.contentDiv1:hover
+{
+    background-color: #C0C0C0;
+}
+
+.contentDiv1
+{
+    height: auto;
+    width: 100%;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    padding: 3px 2px 3px 2px;
+    margin: 1px 2px 1px 2px;
+    background-color: #DBDBDB;
+    border: 1px solid #919191;
+    color: #080000;
+}
+
+td
+{
+    color: #000000;
+    font-family: Arial;
+    font-size: 12px;
+    font-weight: normal;
+    line-height: 22px;
+    padding-right: 1px;
+    text-align: left;
+}
+
+input[type=text]
+{
+    border: 1px solid #919191;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 5px;
+    padding: 0px 3px 0px 7px;
+    height: 21px;
+}
+
+    input[type=text]:focus
+    {
+        background-color: #F2EEEE;
+    }
+
+select
+{
+    border: 1px solid #919191;
+    height: 21px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    padding: 0px 3px 0px 7px;
+}
+
+.contentDiv1 a
+{
+    color: #0D668E;
+    font-weight: bold;
+}
+
+.contentDiv1:hover
+{
+    background-color: #C0C0C0;
+}
+
+
+.matchToSampleText
+{
+    height: auto;
+    width: auto;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    background-color: #d1cece;
+    padding: 1px 2px 1px 2px;
+    margin: 1px 2px 1px 2px;
+    float: left;
+}
+
+#close
+{
+    display: block;
+    float: right;
+    width: 30px;
+    height: 29px;
+    background: url(http://digitalsbykobke.com/images/close.png) no-repeat center center;
+}
+
+
+
+
+.tempMenu
+{
+    width: 100%;
+    height: 45px;
+    text-align: center;
+    font-weight: bold;
+    border-bottom: solid 3px #0099CC;
+}
+
+.divHoverStyle
+{
+    height: 25px;
+    width: auto;
+    -webkit-border-top-left-radius: 8px;
+    -moz-border-top-left-radius: 8px;
+    border-top-left-radius: 8px;
+    -webkit-border-top-right-radius: 8px;
+    -moz-border-top-right-radius: 8px;
+    border-top-right-radius: 8px;
+    background-color: #0099CC;
+    padding: 1px 2px 1px 2px;
+    margin: 1px 2px 1px 2px;
+    text-align: center;
+    font-family: 'Orienta', sans-serif !important;
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 13px;
+    text-shadow: #fff 0px 1px 1px;
+}
+
+.divSelectedStyle
+{
+    height: 25px;
+    width: auto;
+    -webkit-border-top-left-radius: 8px;
+    -moz-border-top-left-radius: 8px;
+    border-top-left-radius: 8px;
+    -webkit-border-top-right-radius: 8px;
+    -moz-border-top-right-radius: 8px;
+    border-top-right-radius: 8px;
+    background-color: #0a5774;
+    padding: 1px 2px 1px 2px;
+    margin: 1px 2px 1px 2px;
+    text-align: center;
+    font-family: 'Orienta', sans-serif !important;
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 13px;
+    text-shadow: #fff 0px 1px 1px;
+}

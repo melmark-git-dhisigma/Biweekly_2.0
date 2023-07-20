@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+
+
+      <Mapping Column="template" PlaceHolder="plcRelation1"/>
+      <Mapping Column="template" PlaceHolder="plcFullName1"/>
+      <Mapping Column="template" PlaceHolder="plcContactPrimaryLanguage1"/>
+      <Mapping Column="template" PlaceHolder="plcApartment1"/>
+      <Mapping Column="template" PlaceHolder="plcContactHphone1"/>
+      <Mapping Column="template" PlaceHolder="plcContactOphone1"/>
+      <Mapping Column="template" PlaceHolder="plcContactEmail1"/>
+
+      <Mapping Column="template" PlaceHolder="plcRelation2"/>
+      <Mapping Column="template" PlaceHolder="plcFullName2"/>
+      <Mapping Column="template" PlaceHolder="plcContactPrimaryLanguage2"/>
+      <Mapping Column="template" PlaceHolder="plcApartment2"/>
+      <Mapping Column="template" PlaceHolder="plcContactHphone2"/>
+      <Mapping Column="template" PlaceHolder="plcContactOphone2"/>
+      <Mapping Column="template" PlaceHolder="plcContactEmail2"/>
+
+      <Mapping Column="template" PlaceHolder="plcRelation3"/>
+      <Mapping Column="template" PlaceHolder="plcFullName3"/>
+      <Mapping Column="template" PlaceHolder="plcContactPrimaryLanguage3"/>
+      <Mapping Column="template" PlaceHolder="plcApartment3"/>
+      <Mapping Column="template" PlaceHolder="plcContactHphone3"/>
+      <Mapping Column="template" PlaceHolder="plcContactOphone3"/>
+      <Mapping Column="template" PlaceHolder="plcContactEmail3"/>
+
+      <Mapping Column="template" PlaceHolder="plcRelation4"/>
+      <Mapping Column="template" PlaceHolder="plcFullName4"/>
+      <Mapping Column="template" PlaceHolder="plcContactPrimaryLanguage4"/>
+      <Mapping Column="template" PlaceHolder="plcApartment4"/>
+      <Mapping Column="template" PlaceHolder="plcContactHphone4"/>
+      <Mapping Column="template" PlaceHolder="plcContactOphone4"/>
+      <Mapping Column="template" PlaceHolder="plcContactEmail4"/>
+
+    </Mapping>
+  </State>
+</States>

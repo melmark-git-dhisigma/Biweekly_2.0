@@ -1,0 +1,146 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/MasterPage.master" AutoEventWireup="true" CodeFile="LandingDesign.aspx.cs" Inherits="LandingDesign" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
+    <link href="styles/LandDesign.css" rel="stylesheet" />
+    <script src="scripts/jquery-1.8.0.js"></script>
+    <script type="text/javascript">
+        function Mouseover(imgbtn) {
+
+            imgbtn.style.width = "15%";
+            imgbtn.style.height = "15%";
+        }
+        function Mouseout(imgbtn) {
+            imgbtn.style.width = "10%";
+            imgbtn.style.height = "10%";
+        }
+
+
+        $(document).ready(function () {
+
+            $('.OuterDiv').fadeIn(1000, function () {
+                $('.InnerBoxStyle ').fadeIn('slow', function () {
+                    // alert($('.OuterDiv').css('height'));
+                });
+            });
+
+            $('legend').attr('align', 'center');
+        });
+
+    </script>
+
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder2" runat="Server">
+
+    <div style="background-color: #EBEBEB; height: 700px;">
+        <table style="width: 100%">
+            <tr>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
+                <td style="width: 50%;">
+                    <h2><span style="margin-left: 120px">Welcome
+                        <asp:Label ID="lblUserName" runat="server" Text="User" CssClass="Heading"></asp:Label></span> </h2>
+                </td>
+
+                <td style="width: 50%; text-align: right;">
+                    <div>
+                        <span style="margin-right: 120px;">
+                            <asp:ImageButton ID="imgHelp" CssClass="imgHelp" runat="server" Width="70px" Height="70px" ImageUrl="~/icons/HelpBlue.png" ToolTip="Help" /></span>
+                    </div>
+                </td>
+
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div class="OuterDiv ">
+
+                        <table style="width: 50%;">
+                            <tr>
+                                <td style="width: 40%; height: 50%;">
+                                    <fieldset class="InnerBoxStyle ">
+                                        <legend class="legend">TEACH</legend>
+                                        <table style="width: 100%; height: 100%;">
+                                            <tr>
+
+                                                <td style="text-align: center">
+                                                    <asp:ImageButton ID="imgeTeach" ImageUrl="~/icons/1342777509_ordinateur off.png" Width="90%" Height="90%" runat="server" ToolTip="Teach" OnClick="imgeTeach_Click" />
+                                                </td>
+                                            </tr>
+                                        </table>
+
+
+                                    </fieldset>
+
+
+                                </td>
+                                <td style="width: 40%; height: 50%">
+                                    <fieldset class="InnerBoxStyle ">
+                                        <legend class="legend">LESSON MANAGEMENT</legend>
+                                        <table style="width: 100%; height: 100%;">
+                                            <tr>
+                                                <td style="text-align: center">
+                                                    <asp:ImageButton ID="imgeManagement" ImageUrl="~/icons/1344315942_spreadsheet.png" Width="90%" Height="90%" runat="server" ToolTip="Lesson Management" OnClick="imgeManagement_Click" />
+                                                </td>
+
+                                            </tr>
+
+                                        </table>
+
+                                    </fieldset>
+
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td style="width: 40%; height: 50%;">
+                                    <fieldset class="InnerBoxStyle ">
+                                        <legend class="legend">REPOSITORY MANAGEMENT</legend>
+                                        <table style="width: 100%; height: 100%;">
+                                            <tr>
+
+                                                <td style="text-align: center">
+                                                    <asp:ImageButton ID="imgRepository" ImageUrl="~/icons/1344229480_package_settings.png" Width="90%" Height="90%" runat="server" ToolTip="Repository Management" OnClick="imgRepository_Click" />
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </fieldset>
+
+
+                                </td>
+                                <td style="width: 40%; height: 50%">
+                                    <fieldset class="InnerBoxStyle ">
+                                        <legend class="legend">LESSON ASSIGN AND SCORE</legend>
+                                        <table style="width: 100%; height: 100%;">
+                                            <tr>
+                                                <td style="text-align: center">
+                                                    <asp:ImageButton ID="imgLessonScore" ImageUrl="~/icons/LessonPlanGames.png" Width="90%" Height="90%" runat="server" ToolTip="Lesson Assign and Score" OnClick="imgLessonScore_Click" />
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                    </fieldset>
+
+                                </td>
+
+
+                            </tr>
+
+
+
+                        </table>
+
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</asp:Content>
+

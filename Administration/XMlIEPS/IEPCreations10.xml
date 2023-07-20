@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<States>
+  <State Name="NE">
+    <Mapping>
+      <Mapping Column="AdminFullName" PlaceHolder="PlcFullName"/>
+      <Mapping Column="AdminDOB" PlaceHolder="plcDOB"/>
+      <Mapping Column="AdminAge" PlaceHolder="plcAge"/>
+      <Mapping Column="AdminGrade" PlaceHolder="plcGrade"/>
+      <Mapping Column="AdminSchoolid" PlaceHolder="plcSchoolId"/>
+      <Mapping Column="AdminSASID" PlaceHolder="plcSASID"/>
+      <Mapping Column="AdminAdress" PlaceHolder="plcAddress"/>
+      <Mapping Column="AdminHomePhone" PlaceHolder="plcHomePhone"/>
+      <Mapping Column="AdminPlaceBirth" PlaceHolder="plcPlaceBirth"/>
+      <Mapping Column="AdminPrimaryLang" PlaceHolder="plcPrimaryLang"/>
+      <Mapping Column="AdminGenderMale" PlaceHolder="abcdefgh"/>
+      <Mapping Column="AdminGenderFemale" PlaceHolder="abcdefgh"/>
+      <Mapping Column="AdminLangOf" PlaceHolder="plcLangOf"/>
+      <Mapping Column="AssignedRole" PlaceHolder="plcrAssignedRole"/>
+      <Mapping Column="ActonOwnBehalfCk" PlaceHolder="abcdefgh"/>
+      <Mapping Column="CourtAppGrdCk" PlaceHolder="abcdefgh"/>
+      <Mapping Column="SharedDecMakingCk" PlaceHolder="abcdefgh"/>
+      <Mapping Column="DelegateDeciMakCk" PlaceHolder="abcdefgh"/>
+      <Mapping Column="AdminCourtGuard" PlaceHolder="plcCourtGuard"/>
+      <Mapping Column="ParentGuardPrimLang" PlaceHolder="plcLgLangGuard1"/>
+      <Mapping Column="ParentGuardInfoPrimLang" PlaceHolder="plc2LangGuard2"/>
+      <Mapping Column="MeetingDate" PlaceHolder="plcDateMeeting"/>
+      <Mapping Column="MeetingType" PlaceHolder="plcTypeMeeting"/>
+      <Mapping Column="MeetingNext" PlaceHolder="plcNext"/>
+      <Mapping Column="MeetingNextSchedule" PlaceHolder="plc1NextSchedule"/>
+      <Mapping Column="AssignedCostNoInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="AssignedCostYesInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="AssignedAgency" PlaceHolder="plcSpecifyAgency"/>
+      <Mapping Column="ParentGuardName" PlaceHolder="plcZpNameParent"/>
+      <Mapping Column="ParentGuardInfoRelation" PlaceHolder="plcErRelation"/>
+      
+      <Mapping Column="ParentGuardAddress" PlaceHolder="plcXAddressParent"/>
+      <Mapping Column="ParentGuardHomePhone" PlaceHolder="plcYhHomeTele"/>
+      <Mapping Column="ParentGuardOtherPhone" PlaceHolder="plcOpOtherPhoneGuard"/>
+      <Mapping Column="ParentGuardInfoName" PlaceHolder="plc2NameParent2"/>
+      <Mapping Column="ParentGuardInfoRelation" PlaceHolder="plc2Relation2"/>
+      <Mapping Column="ParentGuardInfoAddress" PlaceHolder="plc2AddressParent2"/>
+      <Mapping Column="ParentGuardInfoHomePhone" PlaceHolder="plc2HomeTele2"/>
+      <Mapping Column="ParentGuardInfoOtherPhone" PlaceHolder="plc2OtherPhoneGuard2"/>
+      <Mapping Column="AssignedName" PlaceHolder="plcsAssignedSchoolName"/>
+      <Mapping Column="AssignedHomePhone" PlaceHolder="plchAssignedHomePhone"/>
+      <Mapping Column="AssignedAddress" PlaceHolder="plcaAssignedAddress"/>
+      <Mapping Column="AssignedContact" PlaceHolder="plcAsAssignedContact"/>
+      <Mapping Column="AssignedPhone" PlaceHolder="plc1pAssignedPhone"/>
+      
+    </Mapping>
+  </State>
+</States>

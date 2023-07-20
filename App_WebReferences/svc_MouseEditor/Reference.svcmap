@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="8bded931-1ddc-4794-8e43-81a851bd146e" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>false</ReferenceAllAssemblies>
+    <ReferencedAssemblies>
+      <ReferencedAssembly AssemblyName="AjaxControlToolkit" />
+      <ReferencedAssembly AssemblyName="Chained" />
+      <ReferencedAssembly AssemblyName="DiscreetTrial" />
+      <ReferencedAssembly AssemblyName="Interop.STATCONNECTORCLNTLib" />
+      <ReferencedAssembly AssemblyName="Interop.StatConnectorCommonLib" />
+      <ReferencedAssembly AssemblyName="Interop.STATCONNECTORSRVLib" />
+      <ReferencedAssembly AssemblyName="Microsoft.CSharp" />
+      <ReferencedAssembly AssemblyName="Microsoft.Office.Interop.Word" />
+      <ReferencedAssembly AssemblyName="Microsoft.SqlServer.Management.Sdk.Sfc" />
+      <ReferencedAssembly AssemblyName="Microsoft.SqlServer.Smo" />
+      <ReferencedAssembly AssemblyName="Microsoft.Vbe.Interop" />
+      <ReferencedAssembly AssemblyName="Microsoft.Web.Preview" />
+      <ReferencedAssembly AssemblyName="mscorlib" />
+      <ReferencedAssembly AssemblyName="office" />
+      <ReferencedAssembly AssemblyName="System" />
+      <ReferencedAssembly AssemblyName="System.Activities" />
+      <ReferencedAssembly AssemblyName="System.ComponentModel.DataAnnotations" />
+      <ReferencedAssembly AssemblyName="System.Configuration" />
+      <ReferencedAssembly AssemblyName="System.Core" />
+      <ReferencedAssembly AssemblyName="System.Data" />
+      <ReferencedAssembly AssemblyName="System.Data.DataSetExtensions" />
+      <ReferencedAssembly AssemblyName="System.Design" />
+      <ReferencedAssembly AssemblyName="System.Drawing" />
+      <ReferencedAssembly AssemblyName="System.EnterpriseServices" />
+      <ReferencedAssembly AssemblyName="System.IdentityModel" />
+      <ReferencedAssembly AssemblyName="System.Management" />
+      <ReferencedAssembly AssemblyName="System.Runtime.Serialization" />
+      <ReferencedAssembly AssemblyName="System.ServiceModel" />
+      <ReferencedAssembly AssemblyName="System.ServiceModel.Activation" />
+      <ReferencedAssembly AssemblyName="System.ServiceModel.Activities" />
+      <ReferencedAssembly AssemblyName="System.ServiceModel.Web" />
+      <ReferencedAssembly AssemblyName="System.Web" />
+      <ReferencedAssembly AssemblyName="System.Web.ApplicationServices" />
+      <ReferencedAssembly AssemblyName="System.Web.DynamicData" />
+      <ReferencedAssembly AssemblyName="System.Web.Extensions" />
+      <ReferencedAssembly AssemblyName="System.Web.Extensions.Design" />
+      <ReferencedAssembly AssemblyName="System.Web.Services" />
+      <ReferencedAssembly AssemblyName="System.Web.WebPages.Deployment" />
+      <ReferencedAssembly AssemblyName="System.Windows.Forms" />
+      <ReferencedAssembly AssemblyName="System.WorkflowServices" />
+      <ReferencedAssembly AssemblyName="System.Xml" />
+      <ReferencedAssembly AssemblyName="System.Xml.Linq" />
+      <ReferencedAssembly AssemblyName="WindowsBase" />
+    </ReferencedAssemblies>
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://localhost:59736/visual tool webservice/MouseEditor.svc" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="MouseEditor4.xsd" MetadataType="Schema" ID="ff50e4db-578e-4763-b57b-b8209b2e2c6b" SourceId="1" SourceUrl="http://localhost:59736/visual tool webservice/MouseEditor.svc?xsd=xsd2" />
+    <MetadataFile FileName="MouseEditor1.disco" MetadataType="Disco" ID="02ac43ec-9fd8-4ce1-8657-1715b764aabd" SourceId="1" SourceUrl="http://localhost:59736/visual tool webservice/MouseEditor.svc?disco" />
+    <MetadataFile FileName="MouseEditor44.xsd" MetadataType="Schema" ID="5dcbe65a-97c8-401b-9818-f0a4f4b38718" SourceId="1" SourceUrl="http://localhost:59736/visual tool webservice/MouseEditor.svc?xsd=xsd0" />
+    <MetadataFile FileName="MouseEditor43.xsd" MetadataType="Schema" ID="980fa69a-2537-49c2-9d4b-fb0e3aece400" SourceId="1" SourceUrl="http://localhost:59736/visual tool webservice/MouseEditor.svc?xsd=xsd1" />
+    <MetadataFile FileName="MouseEditor1.wsdl" MetadataType="Wsdl" ID="c8551e2d-7668-4fdc-9289-5323adf230df" SourceId="1" SourceUrl="http://localhost:59736/visual tool webservice/MouseEditor.svc?wsdl" />
+    <MetadataFile FileName="MouseEditor42.xsd" MetadataType="Schema" ID="68906d4b-1a37-4e13-badf-b978493599b9" SourceId="1" SourceUrl="http://localhost:59736/visual tool webservice/MouseEditor.svc?xsd=xsd3" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

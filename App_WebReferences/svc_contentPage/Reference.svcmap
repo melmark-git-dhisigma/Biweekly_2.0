@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="3f142ebd-230f-4a76-97c1-b2c74277406f" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>false</ReferenceAllAssemblies>
+    <ReferencedAssemblies>
+      <ReferencedAssembly AssemblyName="AjaxControlToolkit" />
+      <ReferencedAssembly AssemblyName="Chained" />
+      <ReferencedAssembly AssemblyName="DiscreetTrial" />
+      <ReferencedAssembly AssemblyName="Interop.STATCONNECTORCLNTLib" />
+      <ReferencedAssembly AssemblyName="Interop.StatConnectorCommonLib" />
+      <ReferencedAssembly AssemblyName="Interop.STATCONNECTORSRVLib" />
+      <ReferencedAssembly AssemblyName="Microsoft.CSharp" />
+      <ReferencedAssembly AssemblyName="Microsoft.Office.Interop.Word" />
+      <ReferencedAssembly AssemblyName="Microsoft.SqlServer.Management.Sdk.Sfc" />
+      <ReferencedAssembly AssemblyName="Microsoft.SqlServer.Smo" />
+      <ReferencedAssembly AssemblyName="Microsoft.Vbe.Interop" />
+      <ReferencedAssembly AssemblyName="Microsoft.Web.Preview" />
+      <ReferencedAssembly AssemblyName="mscorlib" />
+      <ReferencedAssembly AssemblyName="office" />
+      <ReferencedAssembly AssemblyName="System" />
+      <ReferencedAssembly AssemblyName="System.Activities" />
+      <ReferencedAssembly AssemblyName="System.ComponentModel.DataAnnotations" />
+      <ReferencedAssembly AssemblyName="System.Configuration" />
+      <ReferencedAssembly AssemblyName="System.Core" />
+      <ReferencedAssembly AssemblyName="System.Data" />
+      <ReferencedAssembly AssemblyName="System.Data.DataSetExtensions" />
+      <ReferencedAssembly AssemblyName="System.Design" />
+      <ReferencedAssembly AssemblyName="System.Drawing" />
+      <ReferencedAssembly AssemblyName="System.EnterpriseServices" />
+      <ReferencedAssembly AssemblyName="System.IdentityModel" />
+      <ReferencedAssembly AssemblyName="System.Management" />
+      <ReferencedAssembly AssemblyName="System.Runtime.Serialization" />
+      <ReferencedAssembly AssemblyName="System.ServiceModel" />
+      <ReferencedAssembly AssemblyName="System.ServiceModel.Activation" />
+      <ReferencedAssembly AssemblyName="System.ServiceModel.Activities" />
+      <ReferencedAssembly AssemblyName="System.ServiceModel.Web" />
+      <ReferencedAssembly AssemblyName="System.Web" />
+      <ReferencedAssembly AssemblyName="System.Web.ApplicationServices" />
+      <ReferencedAssembly AssemblyName="System.Web.DynamicData" />
+      <ReferencedAssembly AssemblyName="System.Web.Extensions" />
+      <ReferencedAssembly AssemblyName="System.Web.Extensions.Design" />
+      <ReferencedAssembly AssemblyName="System.Web.Services" />
+      <ReferencedAssembly AssemblyName="System.Web.WebPages.Deployment" />
+      <ReferencedAssembly AssemblyName="System.Windows.Forms" />
+      <ReferencedAssembly AssemblyName="System.WorkflowServices" />
+      <ReferencedAssembly AssemblyName="System.Xml" />
+      <ReferencedAssembly AssemblyName="System.Xml.Linq" />
+      <ReferencedAssembly AssemblyName="WindowsBase" />
+    </ReferencedAssemblies>
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://localhost:59736/visual tool webservice/contentPage.svc" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="contentPage33.xsd" MetadataType="Schema" ID="0269e922-77cd-4478-8abe-51717e1b42d1" SourceId="1" SourceUrl="http://localhost:59736/visual tool webservice/contentPage.svc?xsd=xsd0" />
+    <MetadataFile FileName="contentPage1.wsdl" MetadataType="Wsdl" ID="6f21e751-ba5a-427b-a934-5bc6f999b921" SourceId="1" SourceUrl="http://localhost:59736/visual tool webservice/contentPage.svc?wsdl" />
+    <MetadataFile FileName="contentPage3.xsd" MetadataType="Schema" ID="f880b9ca-d028-4d0c-8557-e7b27924431f" SourceId="1" SourceUrl="http://localhost:59736/visual tool webservice/contentPage.svc?xsd=xsd1" />
+    <MetadataFile FileName="contentPage32.xsd" MetadataType="Schema" ID="4e4a8b0f-aa16-4ab0-81a2-c190cfc8e972" SourceId="1" SourceUrl="http://localhost:59736/visual tool webservice/contentPage.svc?xsd=xsd2" />
+    <MetadataFile FileName="contentPage1.disco" MetadataType="Disco" ID="cbdf3133-0c67-46b6-88e3-2fbbe775aed8" SourceId="1" SourceUrl="http://localhost:59736/visual tool webservice/contentPage.svc?disco" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

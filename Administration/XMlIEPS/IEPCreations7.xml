@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+      <Mapping Column="StartDate" PlaceHolder="PlcIEPDF"/>
+      <Mapping Column="EndDate" PlaceHolder="PlcIEPDT"/>
+      <Mapping Column="Name" PlaceHolder="PlcStudentName"/>
+      <Mapping Column="DOB" PlaceHolder="PlcDOB"/>
+      <Mapping Column="IDNO" PlaceHolder="PlcID"/>
+      <Mapping Column="IEPPeriod" PlaceHolder="PlcPeriod"/>
+      <Mapping Column="EngCol1" PlaceHolder="abcdefgh"/>
+      <Mapping Column="EnglishColu2Ind" PlaceHolder="abcdefgh"/>
+      <Mapping Column="EnglishColu3Ind" PlaceHolder="abcdefgh"/>
+      <Mapping Column="HistColu1Ind" PlaceHolder="abcdefgh"/>
+      <Mapping Column="HistColu2Ind" PlaceHolder="abcdefgh"/>
+      <Mapping Column="HistColu3Ind" PlaceHolder="abcdefgh"/>
+      <Mapping Column="MathsColu1Ind" PlaceHolder="abcdefgh"/>
+      <Mapping Column="MathsColu2Ind" PlaceHolder="abcdefgh"/>
+      <Mapping Column="MathsColu3Ind" PlaceHolder="abcdefgh"/>
+      <Mapping Column="ScienceColu1Ind" PlaceHolder="abcdefgh"/>
+      <Mapping Column="ScienceColu2Ind" PlaceHolder="abcdefgh"/>
+      <Mapping Column="ScienceColu3Ind" PlaceHolder="abcdefgh"/>
+      <Mapping Column="ReadColu1Ind" PlaceHolder="abcdefgh"/>
+      <Mapping Column="ReadColu2Ind" PlaceHolder="abcdefgh"/>
+      <Mapping Column="ReadColu3Ind" PlaceHolder="abcdefgh"/>
+      <Mapping Column="Info1" PlaceHolder="plcinfo1"/>
+      <Mapping Column="Info2" PlaceHolder="plcinfo2"/>
+      
+
+    </Mapping>
+
+  </State>
+  <State Name="MA">
+    <Mappings>
+      <Mapping Column="Column11" PlaceHolder="Placeholder1"/>
+      <Mapping Column="Column14" PlaceHolder="Placeholder2"/>
+      <Mapping Column="Column12" PlaceHolder="Placeholder3"/>
+      <Mapping Column="Column5" PlaceHolder="Placeholder4"/>
+      <Mapping Column="Column1" PlaceHolder="Placeholder5"/>
+    </Mappings>
+  </State>
+  <State Name="AZ">
+    <Mappings>
+      <Mapping Column="Column10" PlaceHolder="Placeholder1"/>
+      <Mapping Column="Column14" PlaceHolder="Placeholder2"/>
+      <Mapping Column="Column11" PlaceHolder="Placeholder3"/>
+      <Mapping Column="Column5" PlaceHolder="Placeholder4"/>
+      <Mapping Column="Column1" PlaceHolder="Placeholder5"/>
+    </Mappings>
+  </State>
+</States>

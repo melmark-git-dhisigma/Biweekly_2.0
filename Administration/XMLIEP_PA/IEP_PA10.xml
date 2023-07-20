@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+        
+      <Mapping Column="IEP9NoRegAsmt" PlaceHolder="plcCntParRAss"/>
+      <Mapping Column="IEP8AssmtAcc" PlaceHolder="plcLocalAccomadation"/>
+      <Mapping Column="IEP9AssmtAppropriate" PlaceHolder="plcLocalAlAss"/>
+   
+
+      <Mapping Column="IEP8AsmtStdtGrade" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP8AsmtWithoutAcc" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP8AsmtWithAcc" PlaceHolder="abcdefgh"/>
+      <Mapping Column="IEP8LocalAltrntAssmnt" PlaceHolder="abcdefgh"/>
+    </Mapping>
+
+    
+
+
+
+  </State>
+</States>

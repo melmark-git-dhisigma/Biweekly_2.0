@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+      <Mapping Column="Number" PlaceHolder="plcID"/>
+      <Mapping Column="StudentName" PlaceHolder="plcStudentName"/>
+      <Mapping Column="DateOfBirth" PlaceHolder="plcDOB"/>
+      <Mapping Column="HomePhone" PlaceHolder="plcPhoneHome"/>
+      <Mapping Column="Mobile" PlaceHolder="plcPhoneWork"/>
+      <Mapping Column="Address" PlaceHolder="plcPAddress"/>
+      <Mapping Column="GradeLevel" PlaceHolder="plcGrade"/>
+      <Mapping Column="IepTeamMeetingDate" PlaceHolder="plcMeetingDT"/>
+      <Mapping Column="IepImplementationDate" PlaceHolder="plcImpDate"/>
+      <Mapping Column="AnticipatedDurationofServices" PlaceHolder="plcServiceAndPrograms"/>
+      <Mapping Column="LocalEducationAgency" PlaceHolder="plcLEA"/>
+      <Mapping Column="AnticipatedYearOfGraduation" PlaceHolder="plcGraduation"/>
+      <Mapping Column="CountyOfResidance" PlaceHolder="plcCountryRes"/> 
+      <Mapping Column="DocumentedBy" PlaceHolder="plcIEPDocumentedby"/>
+      <Mapping Column="OtherInformation" PlaceHolder="plcOtherInformation"/>
+      <Mapping Column="Age" PlaceHolder="plcAge"/>
+
+
+    </Mapping>
+
+  </State>
+</States>

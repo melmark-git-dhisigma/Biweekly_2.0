@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+          
+      <Mapping Column="ConsultGoal" PlaceHolder="plcMAGoal1"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcStPrgss1"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcDescPerRep1"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRepPrgss1"/>
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcMAGoal2"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcStPrgss2"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcDescPerRep2"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRepPrgss2"/>
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcMAGoal3"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcStPrgss3"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcDescPerRep3"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRepPrgss3"/>
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcMAGoal4"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcStPrgss4"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcDescPerRep4"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRepPrgss4"/>
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcMAGoal5"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcStPrgss5"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcDescPerRep5"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcRepPrgss5"/>
+
+      <Mapping Column="ConsultGoal" PlaceHolder="plcShortObj1"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcShortObj2"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcShortObj3"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcShortObj4"/>
+      <Mapping Column="ConsultGoal" PlaceHolder="plcShortObj5"/>
+
+      
+
+
+    </Mapping>
+
+  </State>
+</States>

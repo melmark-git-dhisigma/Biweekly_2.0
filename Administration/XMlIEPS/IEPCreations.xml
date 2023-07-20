@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mappings>
+      <Mapping Column="IDNO" PlaceHolder="plcID"/>
+      <Mapping Column="Name" PlaceHolder="plcStudentName"/>
+      <Mapping Column="DOB" PlaceHolder="plcDOB"/>
+      <Mapping Column="DistrictName" PlaceHolder="plcDistrictName"/>
+      <Mapping Column="DistPhoneNum" PlaceHolder="plcDistrictContact"/>
+      <Mapping Column="Address" PlaceHolder="plcDistAddress"/>
+
+
+      <Mapping Column="StartDate" PlaceHolder="plcIEPDF"/>
+      <Mapping Column="EndDate" PlaceHolder="plcIEPDT"/>
+      <Mapping Column="Concerns" PlaceHolder="PlcIEP1S1"/>
+      <Mapping Column="Strength" PlaceHolder="PlcIEP1S2"/>
+      <Mapping Column="Vision" PlaceHolder="PlcIEP1S3"/>
+
+    
+
+      <Mapping Column="EngLangInd" PlaceHolder="abcdefgh"/>          
+      <Mapping Column="HistInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="TechInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="MathInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="OtherInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="MethodModInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="PerfModInd" PlaceHolder="abcdefgh"/>     
+      <Mapping Column="ContentModInd" PlaceHolder="abcdefgh"/>
+      
+      <Mapping Column="OtherDesc" PlaceHolder="plcSpecifyP1"/>
+      <Mapping Column="AffectDesc" PlaceHolder="plcDisabilityP1"/>
+      <Mapping Column="AccomDesc" PlaceHolder="plcAccomodationP1"/>    
+      <Mapping Column="ContentModDesc" PlaceHolder="plcContentP1"/>
+      <Mapping Column="MethodModDesc" PlaceHolder="PlcMethodologyP1"/>
+      <Mapping Column="PerfModDesc" PlaceHolder="PlcPerformanceP1"/>
+
+
+      
+
+      <Mapping Column="PEInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="TechDeviceInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="BehaviorInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="BrailleInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="CommInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="CommDfInd" PlaceHolder="abcdefgh"/>      
+      <Mapping Column="ExtCurInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="LEPInd" PlaceHolder="abcdefgh"/>  
+      <Mapping Column="NonAcdInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="SocialIInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="TravelInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="VocInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="OtherInd" PlaceHolder="abcdefgh"/>      
+      <Mapping Column="OtherDesc" PlaceHolder="plcOtherP2"/>      
+      <Mapping Column="AgeBand1Ind" PlaceHolder="abcdefgh"/>
+      <Mapping Column="AgeBand2Ind" PlaceHolder="abcdefgh"/>
+      <Mapping Column="AgeBand3Ind" PlaceHolder="abcdefgh"/>      
+      <Mapping Column="AffectDesc" PlaceHolder="plcDisabilityP2"/>
+      <Mapping Column="AccomDesc" PlaceHolder="plcAccomodationP2"/>      
+      <Mapping Column="ContentModInd" PlaceHolder="abcdefgh"/>      
+      <Mapping Column="ContentModDesc" PlaceHolder="plcContentP2"/>
+      <Mapping Column="MethodModInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="MethodModDesc" PlaceHolder="PlcMethodologyP2"/>      
+      <Mapping Column="PerfModInd" PlaceHolder="abcdefgh"/>      
+      <Mapping Column="PerfModDesc" PlaceHolder="PlcPerformanceP2"/>
+
+
+
+
+
+      <Mapping Column="RemovedInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="RemovedDesc" PlaceHolder="plcJustification"/>
+      <Mapping Column="ShorterCd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="LongerCd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="SchedModDesc" PlaceHolder="plcSchedule"/>
+      <Mapping Column="TransportInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="RegTransInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="RegTransDesc" PlaceHolder="plcTrans1"/>
+      <Mapping Column="SpTransInd" PlaceHolder="abcdefgh"/>
+      <Mapping Column="SpTransDesc" PlaceHolder="plcTrans2"/>
+      <Mapping Column="AsmntPlanned" PlaceHolder="abcdefgh"/>
+      <Mapping Column="EngCol1" PlaceHolder="abcdefgh"/>
+      <Mapping Column="HistCol1" PlaceHolder="abcdefgh"/>
+      <Mapping Column="MathCol1" PlaceHolder="abcdefgh"/>
+      <Mapping Column="TechCol1" PlaceHolder="abcdefgh"/>
+      <Mapping Column="ReadCol1" PlaceHolder="abcdefgh"/>
+      <Mapping Column="EngCol2" PlaceHolder="abcdefgh"/>
+      <Mapping Column="HistCol2" PlaceHolder="abcdefgh"/>
+      <Mapping Column="MathCol2" PlaceHolder="abcdefgh"/>
+      <Mapping Column="TechCol2" PlaceHolder="abcdefgh"/>
+      <Mapping Column="ReadCol2" PlaceHolder="abcdefgh"/>
+      <Mapping Column="EngCol3" PlaceHolder="abcdefgh"/>
+      <Mapping Column="HistCol3" PlaceHolder="abcdefgh"/>
+      <Mapping Column="MathCol3" PlaceHolder="abcdefgh"/>
+      <Mapping Column="TechCol3" PlaceHolder="abcdefgh"/>
+      <Mapping Column="ReadCol3" PlaceHolder="abcdefgh"/>
+      <Mapping Column="InfoCol2" PlaceHolder="abcdefgh"/>
+      <Mapping Column="InfoCol3" PlaceHolder="abcdefgh"/>
+      <Mapping Column="AddInfoCol1" PlaceHolder="abcdefgh"/>
+      <Mapping Column="AddInfoCol2" PlaceHolder="abcdefgh"/>
+      <Mapping Column="AddInfoCol3" PlaceHolder="abcdefgh"/>
+      <Mapping Column="AddInfoCol3Desc" PlaceHolder="abcdefgh"/>
+      
+      
+
+
+
+
+
+
+    </Mappings>
+  </State>
+  <State Name="MA">
+    <Mappings>
+      <Mapping Column="Column11" PlaceHolder="Placeholder1"/>
+      <Mapping Column="Column14" PlaceHolder="Placeholder2"/>
+      <Mapping Column="Column12" PlaceHolder="Placeholder3"/>
+      <Mapping Column="Column5" PlaceHolder="Placeholder4"/>
+      <Mapping Column="Column1" PlaceHolder="Placeholder5"/>
+    </Mappings>
+  </State>
+  <State Name="AZ">
+    <Mappings>
+      <Mapping Column="Column10" PlaceHolder="Placeholder1"/>
+      <Mapping Column="Column14" PlaceHolder="Placeholder2"/>
+      <Mapping Column="Column11" PlaceHolder="Placeholder3"/>
+      <Mapping Column="Column5" PlaceHolder="Placeholder4"/>
+      <Mapping Column="Column1" PlaceHolder="Placeholder5"/>
+    </Mappings>
+  </State>
+</States>

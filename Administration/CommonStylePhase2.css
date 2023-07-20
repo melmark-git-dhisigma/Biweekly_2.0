@@ -1,0 +1,42 @@
+﻿
+
+.NFButton
+{
+    border: 1px solid #006000;
+    background-position: 0 -80px;
+    background-repeat: repeat-x;
+    border-radius: 5px 5px 5px 5px;
+    color: #FFFFFF;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: bold;
+    height: 30px;
+    line-height: 26px;
+    margin: 0 5px 0 0;
+    padding: 0 7px 5px;
+    position: relative;
+    text-decoration: none;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+    background-color: #028302;
+    color: white;   
+    top: 2px;
+    left: 4px;
+}
+
+    .NFButton:visited
+    {
+        background-color: #028302;
+        border-color: #006000;
+        color: #FFF;
+        font-size: 11px;
+    }
+
+    .NFButton:hover
+    {
+        background-color: #05ac05;
+        color: #FFF;
+        border-color: #048c04;
+    }
+
+

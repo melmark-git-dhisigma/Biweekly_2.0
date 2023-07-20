@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="36e5275e-5186-48d3-8d1a-0b60db8b5a05" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>false</ReferenceAllAssemblies>
+    <ReferencedAssemblies>
+      <ReferencedAssembly AssemblyName="AjaxControlToolkit" />
+      <ReferencedAssembly AssemblyName="Chained" />
+      <ReferencedAssembly AssemblyName="DiscreetTrial" />
+      <ReferencedAssembly AssemblyName="Interop.STATCONNECTORCLNTLib" />
+      <ReferencedAssembly AssemblyName="Interop.StatConnectorCommonLib" />
+      <ReferencedAssembly AssemblyName="Interop.STATCONNECTORSRVLib" />
+      <ReferencedAssembly AssemblyName="Microsoft.CSharp" />
+      <ReferencedAssembly AssemblyName="Microsoft.Office.Interop.Word" />
+      <ReferencedAssembly AssemblyName="Microsoft.SqlServer.Management.Sdk.Sfc" />
+      <ReferencedAssembly AssemblyName="Microsoft.SqlServer.Smo" />
+      <ReferencedAssembly AssemblyName="Microsoft.Vbe.Interop" />
+      <ReferencedAssembly AssemblyName="Microsoft.Web.Preview" />
+      <ReferencedAssembly AssemblyName="mscorlib" />
+      <ReferencedAssembly AssemblyName="office" />
+      <ReferencedAssembly AssemblyName="System" />
+      <ReferencedAssembly AssemblyName="System.Activities" />
+      <ReferencedAssembly AssemblyName="System.ComponentModel.DataAnnotations" />
+      <ReferencedAssembly AssemblyName="System.Configuration" />
+      <ReferencedAssembly AssemblyName="System.Core" />
+      <ReferencedAssembly AssemblyName="System.Data" />
+      <ReferencedAssembly AssemblyName="System.Data.DataSetExtensions" />
+      <ReferencedAssembly AssemblyName="System.Design" />
+      <ReferencedAssembly AssemblyName="System.Drawing" />
+      <ReferencedAssembly AssemblyName="System.EnterpriseServices" />
+      <ReferencedAssembly AssemblyName="System.IdentityModel" />
+      <ReferencedAssembly AssemblyName="System.Management" />
+      <ReferencedAssembly AssemblyName="System.Runtime.Serialization" />
+      <ReferencedAssembly AssemblyName="System.ServiceModel" />
+      <ReferencedAssembly AssemblyName="System.ServiceModel.Activation" />
+      <ReferencedAssembly AssemblyName="System.ServiceModel.Activities" />
+      <ReferencedAssembly AssemblyName="System.ServiceModel.Web" />
+      <ReferencedAssembly AssemblyName="System.Web" />
+      <ReferencedAssembly AssemblyName="System.Web.ApplicationServices" />
+      <ReferencedAssembly AssemblyName="System.Web.DynamicData" />
+      <ReferencedAssembly AssemblyName="System.Web.Extensions" />
+      <ReferencedAssembly AssemblyName="System.Web.Extensions.Design" />
+      <ReferencedAssembly AssemblyName="System.Web.Services" />
+      <ReferencedAssembly AssemblyName="System.Web.WebPages.Deployment" />
+      <ReferencedAssembly AssemblyName="System.Windows.Forms" />
+      <ReferencedAssembly AssemblyName="System.WorkflowServices" />
+      <ReferencedAssembly AssemblyName="System.Xml" />
+      <ReferencedAssembly AssemblyName="System.Xml.Linq" />
+      <ReferencedAssembly AssemblyName="WindowsBase" />
+    </ReferencedAssemblies>
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://localhost:59736/visual tool webservice/LessonManagement.svc" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="LessonManagement33.xsd" MetadataType="Schema" ID="eaccde6c-c406-4e15-8cc2-8c05267f1632" SourceId="1" SourceUrl="http://localhost:59736/visual tool webservice/LessonManagement.svc?xsd=xsd2" />
+    <MetadataFile FileName="LessonManagement1.wsdl" MetadataType="Wsdl" ID="b711d507-d79f-47c9-856e-befaee17485b" SourceId="1" SourceUrl="http://localhost:59736/visual tool webservice/LessonManagement.svc?wsdl" />
+    <MetadataFile FileName="LessonManagement32.xsd" MetadataType="Schema" ID="a89eed76-fb63-487e-aacd-680fe57668af" SourceId="1" SourceUrl="http://localhost:59736/visual tool webservice/LessonManagement.svc?xsd=xsd1" />
+    <MetadataFile FileName="LessonManagement1.disco" MetadataType="Disco" ID="d13d60ff-f40e-4c3f-9d57-c097f4e06664" SourceId="1" SourceUrl="http://localhost:59736/visual tool webservice/LessonManagement.svc?disco" />
+    <MetadataFile FileName="LessonManagement3.xsd" MetadataType="Schema" ID="03952023-a96b-49f2-91d7-775649b41a3a" SourceId="1" SourceUrl="http://localhost:59736/visual tool webservice/LessonManagement.svc?xsd=xsd0" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

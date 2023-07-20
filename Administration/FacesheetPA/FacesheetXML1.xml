@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="PA">
+    <Mapping>
+
+      <Mapping Column="Name" PlaceHolder="plcName"/>
+      <Mapping Column="Gender" PlaceHolder="plcGender"/>
+      <Mapping Column="DOB" PlaceHolder="plcDOB"/>
+      <Mapping Column="DateUpdated" PlaceHolder="plcDateUp"/>
+      
+      <Mapping Column="ResidentAddress" PlaceHolder="plcResIndAdd"/>
+      <Mapping Column="ResidentAddressPhNo" PlaceHolder="plcResIndPhno"/>
+      <Mapping Column="ResidentAddressFundSource" PlaceHolder="plcResIndFundSource"/>
+
+      <Mapping Column="PrimaryContactAddress" PlaceHolder="plcPrimaryAdd"/>
+      <Mapping Column="PrimaryContactHomePhNo" PlaceHolder="plcPrimaryHomePhno"/>
+      <Mapping Column="PrimaryContactWorkPhNo" PlaceHolder="plcPrimaryWorkPhno"/>
+      <Mapping Column="PrimaryContactCellPhNo" PlaceHolder="plcPrimaryCellPhno"/>
+      <Mapping Column="PrimaryContactEmail" PlaceHolder="plcPrimaryEmail"/>
+
+      <Mapping Column="LegalGuardAddress" PlaceHolder="plcLegalGuardAdd"/>
+      <Mapping Column="LegalGuardHomePhNo" PlaceHolder="plcLegalGuardHomePhno"/>
+      <Mapping Column="LegalGuardWorkPhNo" PlaceHolder="plcLegalGuardWorkPhno"/>
+      <Mapping Column="LegalGuardCellPhNo" PlaceHolder="plcLegalGuardCellPhno"/>
+      <Mapping Column="LegalGuardEmail" PlaceHolder="plcLegalGuardEmail"/>
+
+      <Mapping Column="LegalGuard2Address" PlaceHolder="plcLegalGuard2Add"/>
+      <Mapping Column="LegalGuard2HomePhNo" PlaceHolder="plcLegalGuard2HomePhno"/>
+      <Mapping Column="LegalGuard2WorkPhNo" PlaceHolder="plcLegalGuard2WorkPhno"/>
+      <Mapping Column="LegalGuard2CellPhNo" PlaceHolder="plcLegalGuard2CellPhno"/>
+      <Mapping Column="LegalGuard2Email" PlaceHolder="plcLegalGuard2Email"/>
+
+      <Mapping Column="SupportCordinatorAddress" PlaceHolder="plcSupportCrdntrAdd"/>
+      <Mapping Column="SupportCordinatorWorkPhNo" PlaceHolder="plcSupportCrdntrWorkPhno"/>
+      <Mapping Column="SupportCordinatorCellPhNo" PlaceHolder="plcSupportCrdntrCellPhno"/>
+      <Mapping Column="SupportCordinatorEmail" PlaceHolder="plcSupportCrdntrEmail"/>
+
+      <Mapping Column="AdvocateAddress" PlaceHolder="plcAdvocateAdd"/>
+      <Mapping Column="AdvocateWorkPhNo" PlaceHolder="plcAdvocateWorkPhno"/>
+      <Mapping Column="AdvocateCellPhNo" PlaceHolder="plcAdvocateCellPhno"/>
+      <Mapping Column="AdvocateEmail" PlaceHolder="plcAdvocateEmail"/>
+
+    </Mapping>
+
+  </State>
+</States>

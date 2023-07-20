@@ -1,0 +1,37 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+public partial class LandingDesign : System.Web.UI.Page
+{
+    clsSession sess = null;
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        //sess = (clsSession)Session["UserSession"];
+        //if (sess == null)
+        //{
+        //    Response.Redirect("Error.aspx?Error=Your session has expired. Please log-in again");
+        //}
+
+    }
+
+    protected void imgeTeach_Click(object sender, ImageClickEventArgs e)
+    {
+        Response.Redirect("Teach.aspx");
+    }
+    protected void imgeManagement_Click(object sender, ImageClickEventArgs e)
+    {
+        Response.Redirect("LessonManagement.aspx");
+    }
+    protected void imgRepository_Click(object sender, ImageClickEventArgs e)
+    {
+        Response.Redirect("repository-manag.aspx");
+    }
+    protected void imgLessonScore_Click(object sender, ImageClickEventArgs e)
+    {
+        Response.Redirect("LpAssignAndScore.aspx");
+    }
+}

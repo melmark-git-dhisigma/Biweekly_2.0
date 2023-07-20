@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+      <Mapping Column="StdName" PlaceHolder="PlcStdName"/>
+      <Mapping Column="Location" PlaceHolder="PlcLocation"/>
+      <Mapping Column="Program" PlaceHolder="PlcProgram"/>
+      <Mapping Column="IepYear" PlaceHolder="PlcIepYear"/>
+      <Mapping Column="PeriodOfAssmt" PlaceHolder="PlcPeriodOfAssmnt"/>      
+    </Mapping>
+  </State>
+</States>

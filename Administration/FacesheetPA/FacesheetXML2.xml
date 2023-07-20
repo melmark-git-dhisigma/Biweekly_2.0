@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="PA">
+    <Mapping>
+      <Mapping Column="Diagnoses1" PlaceHolder="plcADiagnoses"/>
+      <Mapping Column="Diagnoses2" PlaceHolder="plcBDiagnoses"/>
+      <Mapping Column="Diagnoses3" PlaceHolder="plcCDiagnoses"/>
+      <Mapping Column="Diagnoses4" PlaceHolder="plcDDiagnoses"/>
+      <Mapping Column="Diagnoses5" PlaceHolder="plcEDiagnoses"/>
+      <Mapping Column="Diagnoses6" PlaceHolder="plcFDiagnoses"/>
+
+      <Mapping Column="SupervisionBathroom" PlaceHolder="plcSprGenBath"/>
+      <Mapping Column="SupervisionOnCampus" PlaceHolder="plcSprGenOnCampus"/>
+      <Mapping Column="SupervisionTransporting" PlaceHolder="plcSprGenTransport"/>
+      <Mapping Column="SupervisionOffCampus" PlaceHolder="plcSprGenOffCampus"/>
+      <Mapping Column="SupervisionPool" PlaceHolder="plcSprGenPool"/>
+      <Mapping Column="SupervisionVan" PlaceHolder="plcSprGenVan"/>
+
+      <Mapping Column="HomeCommonArea" PlaceHolder="plcSprHomeCmnArea"/>
+      <Mapping Column="HomeBedroomAwake" PlaceHolder="plcSprHomeBedrmAwake"/>
+      <Mapping Column="HomeBedroomAsleep" PlaceHolder="plcSprHomeBedrmAsleep"/>
+
+      <Mapping Column="DayProgramTask" PlaceHolder="plcSprDayPgmTask"/>
+      <Mapping Column="DayProgramTransitionsInside" PlaceHolder="plcSprDayPgmTrans"/>
+      <Mapping Column="DayProgramTransitionsUneven" PlaceHolder="plcUSprDayPgmTrans"/>
+
+      <Mapping Column="EvacuationskillsRiskofResistance" PlaceHolder="plcEvacuationRisk"/>
+      <Mapping Column="EvacuationskillsMobility" PlaceHolder="plcEvacuationMobility"/>
+      <Mapping Column="EvacuationskillsNeedforExtraHelp" PlaceHolder="plcEvacuationNeed"/>
+      <Mapping Column="EvacuationskillsResponseToInstruction" PlaceHolder="plcEvacuationResponse"/>
+      <Mapping Column="EvacuationskillsConsciousness" PlaceHolder="plcEvacuationConsciousness"/>
+      <Mapping Column="EvacuationskillsWakingResponse" PlaceHolder="plcEvacuationWaking"/>
+
+      <Mapping Column="MedicalInfoAllergies" PlaceHolder="plcMedicalAllergies"/>
+      <Mapping Column="MedicalInfoSeizures" PlaceHolder="plcMedicalSeizures"/>
+      <Mapping Column="MedicalInfoDiet" PlaceHolder="plcMedicalDiet"/>
+      <Mapping Column="MedicalInfoOther" PlaceHolder="plcMedicalOther"/>
+
+      <Mapping Column="FundingVerification" PlaceHolder="plc2ResIndFundSource"/>
+
+      <Mapping Column="Lifting1" PlaceHolder="plcLifting1"/>
+      <Mapping Column="Lifting2" PlaceHolder="plc2Lifting"/>
+
+      <Mapping Column="Ambulation1" PlaceHolder="plcAmbulation1"/>
+      <Mapping Column="Ambulation2" PlaceHolder="plc2Ambulation"/>
+      
+      <Mapping Column="Toileting1" PlaceHolder="plcToileting1"/>
+      <Mapping Column="Toileting2" PlaceHolder="plc2Toileting"/>
+     
+      <Mapping Column="Eating1" PlaceHolder="plcEating1"/>
+      <Mapping Column="Eating2" PlaceHolder="plc2Eating"/>
+     
+      <Mapping Column="Showering1" PlaceHolder="plcShowering1"/>
+      <Mapping Column="Showering2" PlaceHolder="plc2Showering"/>
+     
+      <Mapping Column="ToothBrushing1" PlaceHolder="plcToothBrushing1"/>
+      <Mapping Column="ToothBrushing2" PlaceHolder="plc2ToothBrushing"/>
+      
+      <Mapping Column="Dressing1" PlaceHolder="plcDressing1"/>
+      <Mapping Column="Dressing2" PlaceHolder="plc2Dressing"/>
+
+      <Mapping Column="Skincare1" PlaceHolder="plcSkinCare1"/>
+      <Mapping Column="Skincare2" PlaceHolder="plc2SkinCare"/>
+      
+      <Mapping Column="Communication1" PlaceHolder="plcCommunication1"/>
+      <Mapping Column="Communication2" PlaceHolder="plc2Communication"/>
+
+      <Mapping Column="PreferredActivities" PlaceHolder="plcPreferredAct"/>
+      <Mapping Column="PreferredActivities2" PlaceHolder="plc2PreferredAct"/>
+
+      <Mapping Column="GeneralInfo" PlaceHolder="plcGeneralinfo"/>
+      <Mapping Column="GeneralInfo2" PlaceHolder="plc2Generalinfo"/>
+
+      <Mapping Column="SuggestedProactiveEnvironment" PlaceHolder="plcSuggestProactiveProc"/>
+      <Mapping Column="SuggestedProactiveEnvironment2" PlaceHolder="plc2SuggestProactiveProc"/>
+     
+    </Mapping>
+  </State>
+</States>

@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+      <Mapping PlaceHolder="abcdefgh" Column="IEP15RegularCls80"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP15Regular79"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP15Regular40"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP15ApprovePrivateSchool"/>
+
+      <Mapping PlaceHolder="plcOUTSchoolNon" Column="IEP15ApprovePrivateText"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP15OtherPublic"/>
+
+      <Mapping PlaceHolder="plcOUTPubFacilityNon" Column="IEP15OtherPublicText"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP15ApproveResidential"/>
+
+      <Mapping PlaceHolder="plcOUTSchoolRes" Column="IEP15ApproveResidentialText"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP15Hospital"/>
+
+      <Mapping PlaceHolder="plcOUTHme" Column="IEP15HospitalText"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP15PrivateFacility"/>
+
+      <Mapping PlaceHolder="plcOUTPvtFacilityNon" Column="IEP15PrivateFacilityText"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP15CorrectionalFacility"/>
+
+      <Mapping PlaceHolder="plcOUTCrrFacility" Column="IEP15CorrectionText"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP15PrivateResi"/>
+
+      <Mapping PlaceHolder="plcOUTPvtFacilityRes" Column="IEP15PrivateResText"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP15ChkoutState"/>
+
+      <Mapping PlaceHolder="plcOUTStateFacility" Column="IEP15ChkoutStateText"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP15PublicFacility"/>
+
+      <Mapping PlaceHolder="plcOUTPubFacilityRes" Column="IEP15PublicFacilityText"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP15InstructionConducted"/>
+
+      <Mapping PlaceHolder="plcOUTInstrnHme" Column="IEP15InstructionText"/>
+
+    </Mapping>
+
+  </State>
+
+</States>
+
+

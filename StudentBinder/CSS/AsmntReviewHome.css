@@ -1,0 +1,661 @@
+﻿
+.clear {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    clear: both;
+}
+
+.boxContainerContainer {
+    width: 96%;
+    height: auto !important;
+    margin: 0 auto;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+    .boxContainerContainer div.itlepartContainer {
+        width: 100%;
+        height: 35px;
+        margin: 0;
+        padding: 0;
+        padding-left: 2%;
+    }
+
+        .boxContainerContainer div.itlepartContainer h2 {
+            background: url(../images/bluerdesign.png) left top no-repeat;
+            color: #fff;
+            font-size: 12px;
+            font-weight: bold;
+            height: 23px;
+            padding: 8px 0 5px 12px;
+            margin: 0 0 0 0;
+            width: 19%;
+            float: left;
+        }
+
+            .boxContainerContainer div.itlepartContainer h2 span {
+                margin: 0 0 0 20px;
+                color: #0d668e;
+            }
+
+    .boxContainerContainer div.btContainerPart {
+        width: 100% !important;
+        margin: 5px auto 0 auto;
+      
+        height: auto !important;
+        height: 200px;
+        position: relative;
+    }
+
+        .boxContainerContainer div.btContainerPart div.lBxpartContainer {
+            width: 21%;
+            min-height: 300px;
+            height: 530px;
+            float: left;
+            padding: .5%;
+            background: #f7f5f5;
+            border: 5px solid #e4e4e4;
+            margin: 0 10px 0 0;
+            overflow-y: scroll;
+        }
+
+            .boxContainerContainer div.btContainerPart div.lBxpartContainer h3 {
+                font-size: 12px;
+                font-weight: bold;
+                color: #0d668e;
+                margin: 5px 0 5px 0;
+            }
+
+            .boxContainerContainer div.btContainerPart div.lBxpartContainer input.radio {
+                float: left !important;
+                margin: 5px 0 0 0;
+                padding: 0;
+                width: 20px;
+                height: 20px;
+                display: block;
+            }
+
+            .boxContainerContainer div.btContainerPart div.lBxpartContainer a.lpb {
+                background: url(../images/greenbtn.png) left top no-repeat !important;
+                width: 176px;
+                height: 22px;
+                font-size: 12px;
+                font-weight: normal;
+                color: #444545;
+                background-position: 0;
+                display: block;
+                text-decoration: none;
+                padding: 6px 0 0 32px;
+                float: right;
+                margin: 0 0 3px 0;
+            }
+
+                .boxContainerContainer div.btContainerPart div.lBxpartContainer a.lpb span {
+                    font-size: 11px;
+                    font-weight: bold;
+                }
+
+            .boxContainerContainer div.btContainerPart div.lBxpartContainer a.grb {
+                background: url(../images/graybtn.png) left top no-repeat;
+                width: 150px;
+                height: 23px;
+                font-size: 12px;
+                font-weight: normal;
+                color: #444545;
+                background-position: 0 -0;
+                display: block;
+                text-decoration: none;
+                padding: 6px 0 0 25px;
+                float: right;
+                margin: 0 37px 3px 0;
+            }
+
+            .boxContainerContainer div.btContainerPart div.lBxpartContainer input.txtfld {
+                border-radius: 3px;
+                border: 1px solid #c8cfcf;
+                margin: 0 5px 0 31px;
+                height: 24px;
+                color: #666;
+                font-size: 12px;
+                width: 166px;
+                padding: 0 3px;
+                float: left;
+            }
+
+            .boxContainerContainer div.btContainerPart div.lBxpartContainer input.btn {
+                width: 27px;
+                height: 28px;
+                float: left;
+                background: url(../images/zoomlens.png) left top no-repeat;
+                cursor: pointer;
+                background-position: 0 -0;
+                float: right !important;
+                border: none;
+                margin: -1px 0 0 0;
+            }
+
+                .boxContainerContainer div.btContainerPart div.lBxpartContainer input.btn:hover {
+                    background-position: 0 -31px;
+                }
+
+            .boxContainerContainer div.btContainerPart div.lBxpartContainer p {
+                font-size: 12px;
+                color: #505050;
+                margin: 5px 0 5px 35px;
+            }
+
+            .boxContainerContainer div.btContainerPart div.lBxpartContainer input.smltxtfld {
+                border-radius: 3px;
+                border: 1px solid #c8cfcf;
+                margin: 0 5px 0 35px;
+                height: 24px;
+                color: #666;
+                font-size: 12px;
+                width: 79px;
+                padding: 0 3px;
+                float: left;
+            }
+
+            .boxContainerContainer div.btContainerPart div.lBxpartContainer input.smltxt {
+                border-radius: 3px;
+                border: 1px solid #c8cfcf;
+                margin: 0 5px 0 5px;
+                height: 24px;
+                color: #666;
+                font-size: 12px;
+                width: 79px;
+                padding: 0 3px;
+                float: left;
+            }
+
+        .boxContainerContainer div.btContainerPart div.mBxContainer {
+            width: 20%;
+            height: 530px;
+            float: left;
+            padding: .5%;
+            background: #f7f5f5;
+            border: 5px solid #e4e4e4;
+            margin: 0 10px 0 0;
+            overflow-y: scroll;
+        }
+
+            .boxContainerContainer div.btContainerPart div.mBxContainer h3 {
+                font-size: 12px;
+                font-weight: bold;
+                color: #0d668e;
+                margin: 5px 0 5px 0;
+            }
+
+            .boxContainerContainer div.btContainerPart div.mBxContainer a.gmb {
+                background: url(../images/lbtngrn.png) left top no-repeat;
+                width: 200px;
+                height: 22px;
+                font-size: 12px;
+                font-weight: normal;
+                color: #444545;
+                background-position: 0 -0;
+                display: block;
+                text-decoration: none;
+                padding: 7px 0 0 25px;
+                float: left;
+                margin: 0 0 3px 0;
+            }
+
+            .boxContainerContainer div.btContainerPart div.mBxContainer a.grbmb {
+                background: url(../images/lbtngrngray1.png) left top no-repeat;
+                width: 200px;
+                height: 22px;
+                font-size: 12px;
+                font-weight: normal;
+                color: #444545;
+                background-position: 0 -0;
+                display: block;
+                text-decoration: none;
+                padding: 6px 0 0 25px;
+                float: left;
+                margin: 0 0 3px 0;
+            }
+
+
+            .boxContainerContainer div.btContainerPart div.mBxContainer div.grmb {
+                background: url(../images/lbtngrngray1.png) left top no-repeat;
+                width: 200px;
+                height: 22px;
+                background-position: 0 -0;
+                text-decoration: none;
+                padding: 6px 0 0 25px;
+                float: left;
+                margin: 0 0 3px 0;
+            }
+
+                .boxContainerContainer div.btContainerPart div.mBxContainer div.grmb a {
+                    margin: 0;
+                    padding: 0;
+                    text-decoration: none;
+                    font-size: 11px;
+                    font-weight: normal;
+                    color: #0d668e;
+                    display: block;
+                    float: left;
+                }
+
+                .boxContainerContainer div.btContainerPart div.mBxContainer div.grmb div.grapgContainer {
+                    width: 50px;
+                    height: 18px;
+                    border: 1px solid #9ba1a1;
+                    border-radius: 3px;
+                    float: right;
+                    margin: -2px 5px 0 0;
+                    font-size: 9px;
+                    font-weight: normal;
+                    color: #0d668e;
+                }
+
+                    .boxContainerContainer div.btContainerPart div.mBxContainer div.grmb div.grapgContainer span {
+                        width: 16px;
+                        height: 16px;
+                        margin: 0 0 0 3px;
+                        float: left;
+                        background: url(images/loder.png) left top no-repeat;
+                        background-position: -21px 0;
+                    }
+
+                    .boxContainerContainer div.btContainerPart div.mBxContainer div.grmb div.grapgContainer p {
+                        margin: 2px 0 0 22px;
+                        margin: 5px 0 0 22px\9;
+                    }
+
+
+            .boxContainerContainer div.btContainerPart div.mBxContainer a.grmb {
+                background: url(../images/lbtngrngray1.png) left top no-repeat;
+                width: 200px;
+                height: 22px;
+                font-size: 11px;
+                font-weight: normal;
+                color: #0d668e;
+                background-position: 0 -0;
+                display: block;
+                text-decoration: none;
+                padding: 6px 0 0 25px;
+                float: left;
+                margin: 0 0 3px 0;
+            }
+
+            .boxContainerContainer div.btContainerPart div.mBxContainer input.butn {
+                width: 220px;
+                height: 34px;
+                background: url(../images/blbtn.png) left top no-repeat;
+                color: #fff;
+                font-weight: bold;
+                font-size: 11px;
+                border: none;
+                cursor: pointer;
+            }
+
+        .righMainContainer {
+            width: 51%;
+            min-height: 300px;
+            height: 530px;
+            float: right;
+            padding: .5%;
+            background: #fff;
+            border: 5px solid #e4e4e4;
+            overflow-y: scroll;
+        }
+
+            .boxContainerContainer div.btContainerPart div.righMainContainer h3 {
+                font-size: 12px;
+                font-weight: bold;
+                color: #0d668e;
+                margin: 5px 0 5px 0;
+            }
+
+
+/*-----------------------------------------------------------JQuery Start-------------------------------------------*/
+
+h1, h2, h3, h4, h5, h6, p, ul, li {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    vertical-align: baseline;
+    list-style: none;
+}
+
+    h2 a {
+        padding: 7px 7px 7px 20px;
+    }
+
+    h3 a {
+        padding: 7px 7px 7px 30px;
+    }
+
+    h2 a, h3, a {
+        display: block;
+        text-decoration: none;
+    }
+
+    .accordion li, li.accordion {
+        border: none;
+    }
+
+.accordion h2 a, .accordion h3 a {
+    text-decoration: none;
+    background: url(../images/computer.png) 5px 6px no-repeat !important;
+    z-index: 999;
+    padding: 9px 0 2px 30px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #1f1f1f;
+    width: 48%;
+    float: left;
+}
+
+    .accordion h2 a.kk, .accordion h3 a.kk {
+        text-decoration: none;
+        background: none !important;
+        z-index: 999;
+        padding: 2px 0 6px 0;
+        font-size: 12px;
+        font-weight: normal;
+        color: #444545;
+        width: auto;
+        float: left;
+        border: none;
+        text-align: left;
+    }
+
+.accordion .wrapper {
+    padding: 5px;
+    line-height: 18px;
+    width: 98%;
+}
+
+.accordion .nomar {
+    padding: 0px;
+    width: 100%;
+}
+
+.accordion h2,
+.accordion h3 {
+    height: 31px;
+    background: url(../images/longgreenbar.png) right top no-repeat;
+    font-size: 12px;
+    font-weight: bold;
+    color: #000;
+    margin: 0 0 2px 0;
+    padding: 0;
+    width: 99%;
+}
+
+    .accordion h2 span.dd,
+    .accordion h3 span.dd {
+        width: 4px;
+        height: 31px;
+        float: left;
+        margin: 0;
+        padding: 0;
+        background: url(../images/llbar.jpg) left top no-repeat;
+        display: block;
+    }
+
+    .accordion h2.BG,
+    .accordion h3.BG {
+        height: 23px;
+        background: url(../images/dwngrenbg.png) left top no-repeat;
+        width: 200px;
+        font-size: 12px;
+        font-weight: normal;
+        color: #444545;
+        margin: 0 0 3px 0;
+        padding: 6px 0 0 25px;
+        border: none;
+        background-position: 0 -0;
+    }
+
+        .accordion h2.BG:hover,
+        .accordion h3.BG:hover {
+            background-position: 0 -32px;
+            color: #000 !important;
+        }
+
+    .accordion h2.tBG,
+    .accordion h3.tBG {
+        height: 18px;
+        background: none;
+        width: 230px;
+        margin: 0 0 3px 0;
+        padding: 2px 0 0 5px;
+        border: none;
+        background-position: 0 -0;
+    }
+
+        .accordion h2.tBG:hover,
+        .accordion h3.tBG:hover {
+            background-position: 0 -32px;
+            color: #000 !important;
+        }
+
+    .accordion h2 a.jj, .accordion h3 a.jj {
+        text-decoration: none;
+        background: url(../images/updwnarrow.jpg) left 5px no-repeat !important;
+        z-index: 999;
+        padding: 2px 0 2px 25px;
+        font-size: 12px;
+        font-weight: bold;
+        color: #0d668e;
+        width: 78%;
+        float: left;
+        border: none;
+        text-align: left;
+    }
+
+        .accordion h2 a.jj:hover, .accordion h3 a.jj:hover {
+            color: #666;
+        }
+
+
+
+    .accordion h2 div.container, .accordion h3 div.container {
+        float: right;
+        width: 35%;
+        height: 20px;
+        margin: 9px 0 0 0;
+        padding: 0;
+        background: none;
+    }
+
+        .accordion h2 div.container span, .accordion h3 div.container span {
+            float: left;
+            font-size: 12px;
+            font-weight: bold;
+            color: #1f1f1f;
+            display: block;
+            z-index: 999;
+            margin: 0 0 0 0;
+            width: 80%;
+        }
+
+            .accordion h2 div.container span input.rdo, .accordion h3 div.container span input.rdo {
+                float: left !important;
+                display: block;
+                width: 20px;
+                height: 20px;
+                margin: -2px 10px 0 0;
+            }
+
+            .accordion h2 div.container span input.rdoDay, .accordion h3 div.container span input.rdoDay {
+                float: left !important;
+                display: block;
+                width: 20px;
+                height: 20px;
+                margin: -2px 10px 0 0;
+            }
+              .accordion h2 div.container span input.rdoResi, .accordion h3 div.container span input.rdoResi {
+                float: left !important;
+                display: block;
+                width: 20px;
+                height: 20px;
+                margin: -2px 10px 0 0;
+            }
+
+
+
+        .accordion h2 div.container a.dlt, .accordion h3 div.container a.dlt {
+            float: right;
+            width: 10%;
+            height: 17px;
+            display: block;
+            margin: 0 5% 0 0;
+            padding: 0;
+            background: url(../images/delet0_2.png) left top no-repeat !important;
+            background-position: 0 -0;
+            border-bottom: 0;
+        }
+
+            .accordion h2 div.container a.dlt:hover, .accordion h3 div.container a.dlt:hover {
+                background-position: 0 -21px !important;
+            }
+
+
+.accordion .wrapper div.ingrContainer {
+    border-radius: 5px;
+    margin: 3px 0 0 0;
+    min-height: 75px;
+    height: auto !important;
+    height: 75px;
+    width: 96%;
+    border: 1px solid #a1a1a1;
+    background: #efefef;
+    padding: 10px;
+    font-size: 12px;
+    font-weight: normal;
+    color: #1f1f1f;
+}
+
+
+.accordion .wrapper div.nobdrrcontainer {
+    margin: 1px 0 0 0;
+    min-height: 25px;
+    height: auto !important;
+    height: 25px;
+    width: 99%;
+    font-size: 12px;
+    font-weight: normal;
+    color: #1f1f1f;
+}
+
+.accordion .wrapper div.ingrContainer h3 {
+    font-size: 12px;
+    color: #0d668e;
+    font-weight: bold;
+    float: left;
+    background: none;
+    margin: 0;
+    padding: 0;
+    width: 60%;
+    float: left;
+}
+
+.accordion .wrapper div.ingrContainer p {
+    font-size: 12px;
+    font-weight: normal;
+    color: #1f1f1f;
+}
+
+.accordion .wrapper div.ingrContainer div.container {
+    float: right;
+    width: 35%;
+    height: 20px;
+    margin: 0;
+    padding: 0;
+}
+
+    .accordion .wrapper div.ingrContainer div.container span {
+        float: left;
+        font-size: 12px;
+        font-weight: bold;
+        color: #1f1f1f;
+        display: block;
+        margin: 0 0 0 0;
+        width: 180px;
+    }
+
+        .accordion .wrapper div.ingrContainer div.container span input.rdo {
+            float: left !important;
+            display: block;
+            width: 20px;
+            height: 20px;
+            margin: -6px 10px 0 5px;
+        }
+        .accordion .wrapper div.ingrContainer div.container span input.rdoResi {
+            float: left !important;
+            display: block;
+            width: 20px;
+            height: 20px;
+            margin: -6px 10px 0 5px;
+        }
+        .accordion .wrapper div.ingrContainer div.container span input.rdoDay {
+            float: left !important;
+            display: block;
+            width: 20px;
+            height: 20px;
+            margin: -6px 10px 0 5px;
+        }
+.accordion .wrapper div.nobdrrcontainer h3.lr {
+    font-size: 12px;
+    color: #0d668e;
+    font-weight: bold;
+    float: left;
+    background: none;
+    margin: 0;
+    padding: 0;
+    width: 60%;
+    float: left;
+}
+
+
+.accordion .wrapper div.ingrContainer div.container a.dlt {
+    float: right;
+    width: 20px;
+    height: 17px;
+    display: block;
+    /*margin: -18px 3px 0 0;*/
+    padding: 0;
+    background: url(../images/delet0_2.png) left top no-repeat;
+    background-position: 0 -0;
+    border-bottom: 0;
+}
+
+    .accordion .wrapper div.ingrContainer div.container a.dlt:hover {
+        background-position: 0 -21px;
+    }
+
+
+
+
+
+.boxContainerContainer div.btContainerPart div.mBxContainer a.grmb div.grapgContainer {
+    width: 50px;
+    height: 18px;
+    border: 1px solid #9ba1a1;
+    border-radius: 3px;
+    float: right;
+    margin: -22px 28px 0 0;
+    font-size: 9px;
+    font-weight: normal;
+    color: #0d668e;
+}
+
+    .boxContainerContainer div.btContainerPart div.mBxContainer a.grmb div.grapgContainer span {
+        width: 16px;
+        height: 16px;
+        margin: 0 0 0 3px;
+        float: left;
+        background: url(../images/loder.png) left top no-repeat;
+        background-position: -21px 0;
+    }
+
+    .boxContainerContainer div.btContainerPart div.mBxContainer a.grmb div.grapgContainer p {
+        margin: 2px 0 0 22px;
+        margin: 5px 0 0 22px\9;
+    }

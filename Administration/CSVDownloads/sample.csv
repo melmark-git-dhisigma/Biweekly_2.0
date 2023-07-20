@@ -1,0 +1,2 @@
+StudentNbr,SASID,StudentFname,StudentLname,Grade,Gender,JoinDt (YYYY-MM-DD),DOB  (YYYY-MM-DD),ActiveInd,Address1,Address2,Address3,City,State,Country,Homephone,Mobile,Email,Zip,Dist_Code,SchoolId
+17500022,N0001,test-6.48,sssssss,,Male,1894-07-23,1894-07-23,A,xxxxx,vvvvvv,,Muvattupuzha,Alabama,United States of America,,90372605,suhaim@gmail.com,686673,dhgh,1

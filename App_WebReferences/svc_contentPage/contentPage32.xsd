@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/LessonTool" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/LessonTool" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="content_clsRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="MusicFile" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="contentData" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="elemId" type="xs:int" />
+      <xs:element minOccurs="0" name="elemType" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="lessonId" type="xs:int" />
+      <xs:element minOccurs="0" name="loginId" type="xs:int" />
+      <xs:element minOccurs="0" name="pageNo" type="xs:int" />
+      <xs:element minOccurs="0" name="pageType" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="searchWord" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="studID" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="content_clsRequest" nillable="true" type="tns:content_clsRequest" />
+  <xs:complexType name="clsResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="List_contentLesson" nillable="true" type="tns:ArrayOfclsContentLesson" />
+      <xs:element minOccurs="0" name="responseInt" type="xs:int" />
+      <xs:element minOccurs="0" name="responseList" nillable="true" type="tns:ArrayOfmedia" />
+      <xs:element minOccurs="0" name="responseSearchList" nillable="true" type="tns:ArrayOfmediaSearch" />
+      <xs:element minOccurs="0" name="responseString" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="responseString2" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="clsResponse" nillable="true" type="tns:clsResponse" />
+  <xs:complexType name="ArrayOfclsContentLesson">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="clsContentLesson" nillable="true" type="tns:clsContentLesson" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfclsContentLesson" nillable="true" type="tns:ArrayOfclsContentLesson" />
+  <xs:complexType name="clsContentLesson">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ContentData" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ContentLessId" type="xs:int" />
+      <xs:element minOccurs="0" name="LessonId" type="xs:int" />
+      <xs:element minOccurs="0" name="LessonType" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="PageNo" type="xs:int" />
+      <xs:element minOccurs="0" name="className" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="imgUrl" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="studName" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="clsContentLesson" nillable="true" type="tns:clsContentLesson" />
+  <xs:complexType name="ArrayOfmedia">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="media" nillable="true" type="tns:media" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfmedia" nillable="true" type="tns:ArrayOfmedia" />
+  <xs:complexType name="media">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Description" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Duration" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Keyword" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="MediaId" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Path" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Size" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Thumbnail" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Type" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="contentData" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="media" nillable="true" type="tns:media" />
+  <xs:complexType name="ArrayOfmediaSearch">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="mediaSearch" nillable="true" type="tns:mediaSearch" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfmediaSearch" nillable="true" type="tns:ArrayOfmediaSearch" />
+  <xs:complexType name="mediaSearch">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="searchResult" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="mediaSearch" nillable="true" type="tns:mediaSearch" />
+</xs:schema>

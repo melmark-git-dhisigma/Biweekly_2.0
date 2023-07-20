@@ -1,0 +1,573 @@
+﻿
+@charset "utf-8";
+
+body {
+    border: 0 none;
+    color: #6B6B6B;
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 12px;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.clear {
+    border: 0 none;
+    clear: both;
+    margin: 0;
+    padding: 0;
+}
+
+div.mainContainer {
+    height: auto !important;
+    min-height: 500px;
+    width: 100%;
+}
+
+    div.mainContainer div.topHead {
+        background: url("../images/melmarkTop.jpg") repeat-y scroll left top #00539F;
+        height: 47px;
+        width: 100%;
+        min-width: 800px;
+    }
+
+div.imgcorner {
+    height: 100px;
+    margin: 0;
+    padding: 0;
+    min-width: 600px;
+    width: 100%;
+}
+
+    div.imgcorner a.logo,
+    div.imgcorner a.logo:link,
+    div.imgcorner a.logo:visited {
+        border: 0;
+        margin: 15px 0 0 25px;
+        display: block;
+        float: left;
+        width: 2220px;
+        height: 58px;
+        display: block;
+    }
+
+        div.imgcorner a.logo img {
+            border: 0;
+        }
+
+div.ContentAreaContainer {
+    background: #FFFFFF;
+    height: auto !important;
+    margin: 0 auto;
+    min-height:50px;
+    min-width: 600px;
+    width: 100%;
+    z-index: 999;
+}
+
+    div.ContentAreaContainer div.middleContainer {
+        float: left;
+        height: auto !important;
+        margin: 0 auto;
+        min-height: 500px;
+        min-width: 550px;
+        width: 98%;
+    }
+
+
+    div.ContentAreaContainer h2 {
+        background: url("../images/greenbullet.JPG") no-repeat scroll 15px 6px;
+        border-bottom: 1px solid #f2f2f2;
+        border-top: 1px solid #f2f2f2;
+        font-size: 12px;
+        font-weight: bold;
+        margin: 10px auto 10px auto;
+        color: #006351;
+        padding: 4px 0 5px 28px;
+        text-align: left;
+        width: 96%;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+
+    div.ContentAreaContainer h2.simble {
+        background: none;
+        /*font-size: 12px;*/
+        font-size:20px;
+        font-weight: bold;
+        color: #006351;
+        padding: 4px 0 5px 5px;
+        border:none;
+        text-align: center;
+        width: 99%;
+        margin:0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        background-color:#DADAC8;
+    }
+
+    div.ContentAreaContainer h3 {
+      
+        font-size: 12px;
+        font-weight: bold;
+        margin: 0 0 10px 12px;
+        padding: 4px 0 5px 28px;
+        text-align: left;
+        width: 98%;
+    }
+        div.ContentAreaContainer h3.dark {
+        background:none !important;
+        color: #333232;
+        font-size: 12px;
+        font-weight: bold;
+        margin: 0 0 10px 0;
+        padding: 4px 0 5px 0;
+        text-align: left;
+        width: 98%;
+    }
+
+    div.ContentAreaContainer h4 {
+        color:#333232;
+        font-size: 12px;
+        font-weight: bold;
+        margin: 0 0 10px 12px;
+        padding: 4px 0 5px 15px;
+        text-align: left;
+        width: 98%;
+    }
+
+    div.ContentAreaContainer p {
+        font-size: 11px;
+        font-weight: normal;
+        margin: 10px auto 10px;
+        color: #666;
+        padding: 4px 0 5px 15px;
+        text-align: justify;
+        width: 96%;
+        line-height: 17px;
+    }
+
+    div.ContentAreaContainer table {
+        margin: 0 auto !important;
+        padding: 0;
+        width: 98%;
+    }
+
+        div.ContentAreaContainer table.shot {
+            width: 60%;
+            margin: 0 auto;
+        }
+
+        div.ContentAreaContainer table.medium {
+            width: 85%;
+            margin: 0 auto;
+        }
+
+        div.ContentAreaContainer table td {
+            /*border-bottom: 1px solid #EDEDED;
+            border-left: 1px solid #EDEDED;*/
+            font-size: 12px;
+            padding: 5px 1%;
+            width:auto;
+        }
+
+
+
+            div.ContentAreaContainer table td.top {
+                /*border-top: 1px solid #ededed;*/
+            }
+
+            div.ContentAreaContainer table td.bg {
+                background: #f9f9f9;
+                height: 20px;
+            }
+
+            div.ContentAreaContainer table td.righ {
+                /*border-right: 1px solid #ededed;*/
+            }
+
+            div.ContentAreaContainer table td img.im {
+                margin: 5px auto !important;
+                text-align: center;
+                border: 3px solid #ededed;
+                display: block;
+            }
+
+            div.ContentAreaContainer table td label {
+   
+                display: block;
+                margin: 0;
+                min-height:10px;
+                padding: 3px 0 0;
+            }
+
+            div.ContentAreaContainer table td input.chkbx {
+                margin: 3px 0 0 0;
+                padding: 0;
+                float: left;
+            }
+
+            div.ContentAreaContainer table td select.dob {
+                background-color: #FFFFFF;
+                border: 1px solid #DADAC8;
+                border-radius: 3px 3px 3px 3px;
+                color: #666666;
+                font-size: 11px;
+                height: 25px !important;
+                padding: 4px 4px 2px;
+                margin: 0 0 0 5px;
+                min-width: 15px;
+                width: 25%;
+            }
+
+            div.ContentAreaContainer table td select.selbox {
+                background-color: #FFFFFF;
+                border: 1px solid #DADAC8;
+                border-radius: 3px 3px 3px 3px;
+                color: #666666;
+                font-size: 11px;
+                height: 25px !important;
+                padding: 4px 4px 2px;
+                width: 100% !important;
+                margin: 0 0 0 5px;
+            }
+
+            div.ContentAreaContainer table td textarea.txarea {
+                background-color: #FFFFFF;
+                border: 1px solid #DADAC8;
+                border-radius: 3px 3px 3px 3px;
+                color: #666666;
+                float: left;
+                font-size: 11px;
+                height: 65px;
+                margin: 0 0 0 5px;
+                min-width: 72px !important;
+                padding: 2px 4px;
+                width: 92%;
+            }
+
+            div.ContentAreaContainer table td input.textfield {
+                background-color: #FFFFFF;
+                border: 1px solid #DADAC8;
+                border-radius: 3px 3px 3px 3px;
+                color: #666666;
+                float: left;
+                font-size: 11px;
+                height: 19px;
+                margin:3px 3px 0 -1px;
+                min-width: 72px !important;
+                padding: 2px 4px;
+                width:50%;
+            }
+
+.bd {
+    float: right;
+    min-width: 8px !important;
+    width: 28% !important;
+}
+
+div.ContentAreaContainer h5 {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    color: #e23d29;
+    margin: 0 0 0 20px;
+    widows: 15px;
+    float: left;
+    padding: 0;
+    height: 10px;
+}
+
+div.ContentAreaContainer h6 {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    color: #0154a0;
+    margin: 0 0 0 20px;
+    widows: 15px;
+    float: left;
+    padding: 0;
+    height: 10px;
+}
+
+.smalltbl {
+    width: 90% !important;
+    margin: 0 auto!important;
+    float: left;
+    min-width: 250px;
+}
+
+.rig {
+    float: right !important;
+}
+
+div.footer {
+    width: 100%;
+    height: 45px;
+    margin: 10px 0 0 0;
+}
+
+    div.footer img {
+        border: 0;
+        margin: 10px 0 0 25px;
+        float: left;
+    }
+
+    div.footer div.copyright {
+        width: 22%;
+        float: right;
+        height: 25px;
+        color: #666;
+        text-align: left;
+        margin: 5px 0 25px 0;
+        font-size: 11px;
+        text-decoration: none;
+    }
+
+div.ContentAreaContainer table td a.clsbbtn {
+    color: #FFFFFF;
+    display: block;
+    font-size: 1px;
+    height: 15px;
+    margin: 0 0 0 5px;
+    width: 15px;
+    background: url("../images/clsbtn.png") left top no-repeat;
+}
+    div.ContentAreaContainer table td a.clsbbtn:hover {
+        background-position:0 -16px;
+    }
+
+div.ContentAreaContainer table td img {
+    display:block; margin:3px 0 0 2px;
+}
+
+div.ContentAreaContainer table th scope {
+       border-bottom: 1px solid #EDEDED;
+    border-left: 1px solid #EDEDED;
+    font-size: 11px;
+    font-weight: bold;
+    min-width: 95px;
+    padding: 5px 1%;
+}
+div.ContentAreaContainer table td.righ .FreeTextDivContent {
+      background-color: #FFFFFF;
+    border: 1px solid #DADAC8;
+    border-radius: 3px;
+    color: #999999 !important;
+    float: left;
+    font-family: arial;
+    font-size: 10px!important;
+    height: auto;
+    letter-spacing: 1px;
+    margin: 0 !important;
+    max-height: 65px!important;
+    min-height: 65px!important;
+    min-width: 200px !important;
+    overflow: auto !important;
+    padding: 4px;
+    width: 92%;
+}
+
+input.hasDatepicker,input.textClass {
+        background-color: #FFFFFF;
+    border: 1px solid #DADAC8;
+    border-radius: 3px;
+    color: #666666;
+    float: left;
+    font-size: 11px;
+    height: 19px;
+    margin: 3px 0 0 -1px;
+    min-width: 72px !important;
+    padding: 2px 4px;
+    width: 50%;
+}
+
+
+
+        .HeaderStyle {
+            background: none repeat scroll 0 0 #7EABBE;
+            color: #FFFFFF !important;
+            font-weight: normal;
+            font-family: Arial;
+            font-size: 10px;
+            height: 30px;
+            letter-spacing: 0;
+            line-height: 12px;
+            padding: 0 8px !important;
+            text-align: left;
+            text-decoration: none;
+            vertical-align: middle;
+            border-right:1px solid #fff;
+        }
+
+        .gridStyle {
+            border: 1px solid #d8dbdb;
+            margin: 10px 0 10px 0;
+            border-spacing: 0;
+            border-collapse: collapse;
+        }
+.gridStyle tr td {
+
+    width:15% !important;
+
+}
+
+            .gridStyle tr:nth-child(even) {
+                background: #F4F4F4;
+                color: #4F5050;
+                font-family: Arial;
+                font-size: 11px;
+                height: 30px;
+                letter-spacing: 0;
+                line-height: 12px;
+                padding: 0 8px !important;
+                text-align: left;
+                text-decoration: none;
+                vertical-align: middle;
+            }
+
+
+            .gridStyle tr:nth-child(odd) {
+                font-family: Arial;
+                font-size: 11px;
+                height: 30px;
+                letter-spacing: 0;
+                line-height: 12px;
+                padding: 0 8px !important;
+                text-align: left;
+                text-decoration: none;
+                vertical-align: middle;
+                color: #4F5050;
+            }
+
+
+
+        .ui-datepicker {
+            font-size: 8pt !important;
+        }
+
+div.ContentAreaContainer table td input.NFButton ,div.ContentAreaContainer table td input.NFButtonWithNoImage{
+   background: none repeat scroll 0 0 #0D668E;
+    border: medium none;
+    border-radius: 3px;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: normal;
+    margin: 5px 15px 0 0!important;
+    padding: 3px 6px;
+    text-align: center;
+    text-decoration: none;
+    width: auto;
+     height:25px;
+}
+    div.ContentAreaContainer table td input.NFButton:hover,
+    div.ContentAreaContainer table td input.NFButtonWithNoImage:hover {
+        background:#5599b8!important;
+        color:#000;
+    }
+
+div.ContentAreaContainer table.innerpag td{
+    width:auto !important;
+}
+
+div.ContentAreaContainer table td textarea.FreeTextDivContent {
+         background-color: #FFFFFF;
+    border: 1px solid #DADAC8;
+    border-radius: 3px;
+    color: #999999;
+    float: left;
+    font-family: arial;
+    font-size: 10px;
+    height: auto;
+    letter-spacing: 1px;
+    margin: 0 !important;
+    max-height: 65px;
+    min-height: 65px;
+    min-width: 200px !important;
+    overflow: auto !important;
+    padding: 4px;
+    width: 92%;
+}
+
+input #chkSpeech,input #chkMultipleDis {
+    float:right;width:15px; height:15px; margin:0 10px 0 0;
+}
+
+div.splCtr {
+    width: 60%;
+    margin: 0 0 0 20px;
+    border: 2px solid #ccc;
+    padding: 10px;
+    height: auto!important;
+    min-height: 50px;
+}
+
+    div.splCtr table td.borderBox {
+        width:15%;
+    }
+    div.splCtr table,.ContentAreaContainer table {
+        margin:0;
+    }
+
+
+
+span.chkbox,input.chkbox {
+    float:left; margin:0 15px 0 0; width:15px; height:15px; display:block;
+}
+
+
+div.ContentAreaContainer table td span.chkbx {
+    text-align: right !important;
+    float:left;
+}
+
+div.ContentAreaContainer table td span{text-align:right !important; }
+div.ContentAreaContainer table.innerpag td.top{border-top:1px solid #ededed;}
+div.ContentAreaContainer table td.bg{background:#f9f9f9; height:20px;}
+div.ContentAreaContainer table td img.im{margin:5px auto !important; text-align:center; border:3px solid #ededed; display:block;}
+
+
+div.ContentAreaContainer table.container {
+    border:1px solid #DADAC8 !important;
+    font-size:11px !important; color:#666 !important;
+}
+    div.ContentAreaContainer table.container td.top1 {
+    background:#DADAC8; border:1px solid #DADAC8;font-size:11px !important; color:#999 !important;}
+        div.ContentAreaContainer table.container td.top2 {
+        border-right:1px solid #DADAC8!important;font-size:11px !important; color:#999 !important; padding:0 5px 0 5px;}
+         div.ContentAreaContainer table td.btmm {
+       border-bottom:1px solid #DADAC8 !important;font-size:11px !important; color:#999 !important;}
+
+
+
+ a.tpContant:link, a.tpContant:visited, a.tpContant:visited{
+    font-family:Arial; font-size:10px;  font-weight:bold; text-decoration:none; text-align:center; padding:0 15px;
+}
+a.tpContant:hover {
+    color:#0d668e;
+}
+
+div.ContentAreaContainer table input.txbbx {
+width:15px;height:15px; display:block; float:left;
+}
+
+.smalldashboard-RHS {
+    background-color: #FFFFFF;
+    border: 2px solid #B6D1DD;
+    border-radius: 5px !important;
+    box-shadow: 0 1px 5px 3px #BFC0C1;
+    height: auto;
+    margin: 15px auto;
+    padding: 5px;
+    width: 75%!important;
+}
+
+#CheckBoxListLocalAsssesment input{
+    float:left;
+}
+
+input[type='checkbox'] {
+float:left;
+}

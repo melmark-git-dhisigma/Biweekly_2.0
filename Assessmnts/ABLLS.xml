@@ -1,0 +1,648 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Sections>
+  <Section name="Coorporation and reinforcer effectiveness" Skill="Early Learner Skills">
+    <SubSections>
+      <SubSection taskid="A1" name="Take reinforcer when offered" Code ="A1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A2" name="Take reinforcer from choice of 2" Code ="A2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A3" name="Look at non-reinforcing item" Code ="A3" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A4" name="Take common object offered" Code ="A4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A5" name="Approaches when a response is req'd for reinforcement" Code ="A5" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A6" name="Responds to instructor controlled reinforcers" Code ="A6" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A7" name="Responds for multiple instructors" Code ="A7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A8" name="Waits without touching stimuli" Code ="A8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A9" name="Looks to instructor for instruction" Code ="A9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A10" name="Scans items in array before responding" Code ="A10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A11" name="Responds quickly when given an instruction" Code ="A11" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A12" name="Variation in reinforcement (non-edible)" Code ="A12" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A13" name="Intermittent tangible reinforcement" Code ="A13" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A14" name="Instructor iteration reinforcement" Code ="A14" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A15" name="Looks for instructors change in facial expression and voice" Code ="A15" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A16" name="Responds to social reinforcers" Code ="A16" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A17" name="Waits appropriately if reinforcer delivery is delayed" Code ="A17" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="A18" name="Seeks approval for task completion" Code ="A18" Box ="4" ContainsQuestions="Fals3e" Applicable="false"/>
+      <SubSection taskid="A19" name="Task completion serves as reinforcer" Code ="A19" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+  <Section name="Visual Performance" Skill="Early Learner Skills">
+    <SubSections>
+      <SubSection taskid="B1" name="Puzzle with single piece insert" Code ="B1" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B2" name="Form box" Code ="B2" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B3" name="Match identical objects to sample" Code ="B3" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B4" name="Match objects to pictures" Code ="B4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B5" name="Match identical pictures to sample" Code ="B5" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B6" name="Match pictures to objects" Code ="B6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B7" name="Fluent matching" Code ="B7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B8" name="Sort non-identical items" Code ="B8" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B9" name="Block designs on picture card" Code ="B9" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B10" name="Puzzles with multiple connecting pieces inset" Code ="B10" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B11" name="Puzzles with a square edge border frame" Code ="B11" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B12" name="Blocked designs from pictures" Code ="B12" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B13" name="Sequence pattern to match a visual model" Code ="B13" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B14" name="Puzzles with multiple pieces which must be juxtaposed" Code ="B14" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B15" name="Jigsaw puzzles" Code ="B15" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B16" name="Match associated pictures" Code ="B16" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B17" name="Sort by function" Code ="B17" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B18" name="Sort by feature" Code ="B18" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B19" name="Sort by class" Code ="B19" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B20" name="Delayed replication of a sequence" Code ="B20" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B21" name="Delayed finding a sample" Code ="B21" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B22" name="Extend a sequence pattern" Code ="B22" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B23" name="Replicate simple 3-D objects" Code ="B23" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B24" name="Dependent matching sequences" Code ="B24" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B25" name="Seriation" Code ="B25" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B26" name="Picture sequences" Code ="B26" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="B27" name="Mazes" Code ="B27" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+  <Section name="Receptive Language" Skill="Language Skills">
+    <SubSections>
+      <SubSection taskid="C1" name="Responds to name" Code ="C1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C2" name="Follows inst. for pref. activity" Code ="C2" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C3" name="Follows inst. to look at rf item" Code ="C3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C4" name="Follows inst. To touch a rf item in various positions" Code ="C4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C5" name="Follows inst. To touch a common item in var. positions" Code ="C5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C6" name="Follows instr./do an enjoyable action out of context" Code ="C6" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C7" name="Follows instr. In routine situations" Code ="C7" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C8" name="Follows instr./give a named, non-rf object" Code ="C8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C9" name="Follows instr./do a simple motor action" Code ="C9" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C10" name="Follows instr./touch item vs. distracter" Code ="C10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C11" name="Follows instr./select rf. item from array of 2 " Code ="C11" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C12" name="Follows instr./select 1 of 2 reinforcing objects" Code ="C12" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C13" name="Follows instr./select 1 of 2 common items" Code ="C13" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C14" name="Select 1 of 2 pictures of common items" Code ="C14" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C15" name="Touch own body part" Code ="C15" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C16" name="Select 1 of 6+ objects" Code ="C16" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C17" name="Select 1 of 6+ pictures" Code ="C17" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C18" name="Acquires new selection skills w/o intensive training" Code ="C18" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C19" name="Fluent receptive discriminations" Code ="C19" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C20" name="Varied inst. To select using any response" Code ="C20" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C21" name="Point to body parts or other pictures" Code ="C21" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C22" name="Touch own pieces of clothing" Code ="C22" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C23" name="Touches parts of items" Code ="C23" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C24" name="Select adjectives" Code ="C24" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C25" name="Selects items by following anothers gaze" Code ="C25" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C26" name="Follows hand signals" Code ="C26" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C27" name="Follows inst. to go to person" Code ="C27" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C28" name="Follows inst. to give item " Code ="C28" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C29" name="Follows instruction to get item" Code ="C29" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C30" name="Follows instr./go to person and do action" Code ="C30" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C31" name="Specific motor responses in receptive tasks" Code ="C31" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C32" name="Demonstrates action w/object" Code ="C32" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C33" name="Multiple actions with an object" Code ="C33" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C34" name="Demonstrates a specific pretend action" Code ="C34" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C35" name="Select 1 of 3 pics representing actions" Code ="C35" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C36" name="Select associated pictures" Code ="C36" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C37" name="Select by function" Code ="C37" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C38" name="Select by feature" Code ="C38" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C39" name="Select by class" Code ="C39" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C40" name="Select 2 items from a larger set" Code ="C40" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C41" name="Select 2 items in sequence from a larger set" Code ="C41" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C42" name="Select community helpers" Code ="C42" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C43" name="Locate objects in larger, complex picture" Code ="C43" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C44" name="Locate objects from parts of objs in larger, complex picture" Code ="C44" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C45" name="Select common environmental sounds" Code ="C45" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C46" name="Selects all examples of an item" Code ="C46" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C47" name="Select single item w/2 specified characteristics" Code ="C47" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C48" name="Select set of items with a specific characteristic" Code ="C48" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C49" name="Select set of items with 2 specific characteristics" Code ="C49" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C50" name="Follows a mult component sequence instruction" Code ="C50" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C51" name="Receptive prepositions" Code ="C51" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C52" name="Receptive pronouns" Code ="C52" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C53" name="Select pics representing a location or act. Pres. In a scene" Code ="C53" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C54" name="Selects pics representing emotions" Code ="C54" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C55" name="Selects same='' and different=''" Code ="C55" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C56" name="Select non-examples" Code ="C56" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="C57" name="Selects pics of social interactions" Code ="C57" Box ="4" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+  <Section name="Motor Imitation" Skill="Early Learner Skills">
+    <SubSections>
+      <SubSection taskid="D1" name="Motor imitation with objects" Code ="D1" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D2" name="Motor imitation w/obj. in disc." Code ="D2" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D3" name="GMI w/verbal prompts" Code ="D3" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D4" name="Imitaties leg/foot movement" Code ="D4" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D5" name="Imitates arm/hand movements" Code ="D5" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D6" name="Imitates discriminating static/kinetic movements" Code ="D6" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D7" name="Varied imitation instructions" Code ="D7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D8" name="Imitation of gross motor actions modeled in mirror" Code ="D8" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D9" name="Imitates head movements" Code ="D9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D10" name="Imitates mouth/tongue mvmnts." Code ="D10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D11" name="Imitation of facial/oral motor movements in mirror" Code ="D11" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D12" name="Fine motor imitation" Code ="D12" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D13" name="Imitation of sequence of actions" Code ="D13" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D14" name="Imitation of blowing" Code ="D14" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D15" name="Imitate speed of ongoing action with obj" Code ="D15" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D16" name="Imitate speed of a recently modeled action with objs" Code ="D16" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D17" name="Imitate speed of an action" Code ="D17" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D18" name="Imitation touching objs in sequence following a model" Code ="D18" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D19" name="Imitation of a sequence of actions switching with model" Code ="D19" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D20" name="Imitation of a dequence of actions" Code ="D20" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D21" name="Imitation of intensity of actions" Code ="D21" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D22" name="Imitation of reps of a motor movt" Code ="D22" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D23" name="Simutaneous imitation of motor movt and vocalization" Code ="D23" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D24" name="Motor imitation seq using mult objs" Code ="D24" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D25" name="Imitates motor movt w/o a direct verbal prompt" Code ="D25" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D26" name="Spont init the actions of others" Code ="D26" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="D27" name="Delayed imitation" Code ="D27" Box ="4" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+  <Section name="Verbal behavior-Vocal imitation" Skill="Communication">
+    <SubSections>
+      <SubSection taskid="E1" name="Imitates sounds on request" Code ="E1" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="E2" name="Imitates seq of sing sounds switching with a model" Code ="E2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="E3" name="Imitates initial sounds of words" Code ="E3" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="E4" name="Imitates multiple separate sound combos" Code ="E4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="E5" name="Imitation of short and fast vs. elongated/slow sounds" Code ="E5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="E6" name="Imitation of the reps of a sound" Code ="E6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="E7" name="Imitation of a held sound to a second sound" Code ="E7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="E8" name="Consonant-vowel/Vowel-consonant combos" Code ="E8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="E9" name="Consonant-vowel-consonant-vowel" Code ="E9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="E10" name="Consonant-vowel-consonant combos" Code ="E10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="E11" name="Imitates consonant blends" Code ="E11" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="E12" name="Imitation of words on req" Code ="E12" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="E13" name="Imitation of phrases on req" Code ="E13" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="E14" name="Imitation of seqs on req" Code ="E14" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="E15" name="Imitation of short and fast vs. elongated/slow words" Code ="E15" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="E16" name="Imitation of loud vs. soft sounds and words" Code ="E16" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="E17" name="Imitation of low vs. high sounds and words" Code ="E17" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="E18" name="Repeat short msg to another person" Code ="E18" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="E19" name="Spontaneously imitate words" Code ="E19" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="E20" name="Spontaneously imitate of phrases" Code ="E20" Box ="4" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+  <Section name="Requests" Skill="Early Learner Skills">
+    <SubSections>
+      <SubSection taskid="F1" name="Requests by indicating" Code ="F1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F2" name="Multiply controlled requests" Code ="F2" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F3" name="Requesting w/the reinforcer  and What='' do='' you='' want=''?''" Code ="F3" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F4" name="Requesting when asked What='' do='' you='' want='?'" Code ="F4" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F5" name="Spontaneous requests with items present" Code ="F5" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F6" name="Spontaneous requests with items not present" Code ="F6" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F7" name="Requests with eye contact" Code ="F7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F8" name="Reqs others to perform an action" Code ="F8" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F9" name="Requests missing items" Code ="F9" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F10" name="Reqs w/head mvmt or Yes/No" Code ="F10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F11" name="Requests using sentences" Code ="F11" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F12" name="Requests help" Code ="F12" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F13" name="Acquires novel reqs w/o intensive training" Code ="F13" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F14" name="Reqs attention" Code ="F14" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F15" name="Reqs others to remove an item or stop an activity" Code ="F15" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F16" name="Reqs using adjectives" Code ="F16" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F17" name="Reqs using propositions" Code ="F17" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F18" name="Reqs future items/events" Code ="F18" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F19" name="Reqs using 'What'" Code ="F19" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F20" name="Reqs using 'Where'" Code ="F20" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F21" name="Reqs using 'Who/Whose'" Code ="F21" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F22" name="Reqs using adverbs" Code ="F22" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F23" name="Reqs using pronouns" Code ="F23" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F24" name="Reqs info using 'which='" Code ="F24" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F25" name="Reqs info using 'when='" Code ="F25" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F26" name="Reqs info using 'how='" Code ="F26" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F27" name="Reqs info using 'can='', do='', does='', or='' will=''" Code ="F27" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F28" name="Reqs info using 'why=''" Code ="F28" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="F29" name="Spontaneous requests" Code ="F29" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+  <Section name="Labeling" Skill="Early Learner Skills">
+    <SubSections>
+      <SubSection taskid="G1" name="Labels reinforcerers" Code ="G1" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G2" name="Labels common objects" Code ="G2" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G3" name="Labels common people" Code ="G3" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G4" name="Labels pics. of common items" Code ="G4" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G5" name="Labels Body Parts" Code ="G5" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G6" name="Labels Pieces of Clothing" Code ="G6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G7" name="Labels common ong. actions" Code ="G7" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G8" name="Labels pic. of common actions" Code ="G8" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G9" name="Fluent labeling" Code ="G9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G10" name="Acquires novel labels w/o intensive training" Code ="G10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G11" name="Labels items w/ carrier phrase" Code ="G11" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G12" name="Labels parts/features of obj." Code ="G12" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G13" name="Labels adjectives" Code ="G13" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G14" name="Labels associated pictures" Code ="G14" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G15" name="Labels item when told function" Code ="G15" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G16" name="Labels item when told feature" Code ="G16" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G17" name="Labels item when told class" Code ="G17" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G18" name="2-comp. labels(nouns) w/obj." Code ="G18" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G19" name="2-comp. labels(nouns) w/pics" Code ="G19" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G20" name="Labels 2-comp. w/carrier phrase" Code ="G20" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G21" name="2-comp. labels (noun, verb)" Code ="G21" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G22" name="2-comp.labels (noun, adj.)" Code ="G22" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G23" name="Labels by indicating Yes/No" Code ="G23" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G24" name="Labels function of item" Code ="G24" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G25" name="Labels class of object" Code ="G25" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G26" name="Discrimination of question to label aspects of items" Code ="G26" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G27" name="Labels class of set of items" Code ="G27" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G28" name="Labels features which are missing or incorrect" Code ="G28" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G29" name="Labels exclusion from category (negation)" Code ="G29" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G30" name="Identifies obvious problems." Code ="G30" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G31" name="Labels community helpers" Code ="G31" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G32" name="Labels items at a distance" Code ="G32" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G33" name="Labels common env. Sounds" Code ="G33" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G34" name="Uses carrier phrase when labeling noun w/ verbs or adj./" Code ="G34" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G35" name="Labels prepositions" Code ="G35" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G36" name="Uses carrier phrases w/prepo." Code ="G36" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G37" name="Labels pronouns" Code ="G37" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G38" name="Uses carrier phrases w/pron" Code ="G38" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G39" name="Labels event/items in scene" Code ="G39" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G40" name="Names specific parts of scenes" Code ="G40" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G41" name="Labels adverbs" Code ="G41" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G42" name="Labels emotions of others" Code ="G42" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G43" name="Labels internal events/emotions" Code ="G43" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G44" name="Mult. comp.(3+) labels" Code ="G44" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G45" name="Mult. comp. labels w/carrier phrases" Code ="G45" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G46" name="Labels soc. int. behavior" Code ="G46" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="G47" name="Spontaneous labeling" Code ="G47" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+  <Section name="Intraverbal" Skill="Language Skills">
+    <SubSections>
+      <SubSection taskid="H1" name="Fill in words from songs" Code ="H1" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H2" name="Fill in blanks/ fun items/act." Code ="H2" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H3" name="Sign English words (ASL only)" Code ="H3" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H4" name="Animal sounds" Code ="H4" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H5" name="Answers personal info ?" Code ="H5" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H6" name="Fill in words/common activities" Code ="H6" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H7" name="Intraverbal associations" Code ="H7" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H8" name="Fill in item given function" Code ="H8" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H9" name="Fill in function given item" Code ="H9" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H10" name="Answers 'what' questions re: items in home" Code ="H10" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H11" name="Answers 'what' questions re: functions" Code ="H11" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H12" name="Answers 'Where' questions re: items in classroom" Code ="H12" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H13" name="Answers 'Where' questions re: activities" Code ="H13" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H14" name="Fill in item given class" Code ="H14" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H15" name="Mult. resp. given categories" Code ="H15" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H16" name="Fill in features given item" Code ="H16" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H17" name="Fill in item given features" Code ="H17" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H18" name="Fill in class given item" Code ="H18" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H19" name="Name items previously observed" Code ="H19" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H20" name="Name previously observed activities" Code ="H20" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H21" name="Name people previously observed" Code ="H21" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H22" name="W/visual display, makes related statements" Code ="H22" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H23" name="Answers 'What' questions re: items in community" Code ="H23" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H24" name="Answers 'What' questions re: activities in comm." Code ="H24" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H25" name="Answers 'Where' questions re: act. In comm." Code ="H25" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H26" name="Answers ? w/ mult. resp. re. immediate community" Code ="H26" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H27" name="States class given multiple class members" Code ="H27" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H28" name="Answers 'Who=''/Whose' questions" Code ="H28" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H29" name="Answers 'When=''' questions" Code ="H29" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H30" name="Discrimination of questions re:items vs. activities" Code ="H30" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H31" name="Answers 'Which=''' questions" Code ="H31" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H32" name="Answers 'How=''' questions" Code ="H32" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H33" name="Answers 'why=''' questions" Code ="H33" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H34" name="Describes steps in sequence of daily activity" Code ="H34" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H35" name="States activity when told sequence of actions" Code ="H35" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H36" name="States item when told its functions, features or class" Code ="H36" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H37" name="Intraverbal Yes/No w/ 'Can='', Do='', Does='', or Will=''' questions" Code ="H37" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H38" name="Answers ? w/ 2 critical stimuli" Code ="H38" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H39" name="Answers ? w/ 3 critical stimuli" Code ="H39" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H40" name="Describes items" Code ="H40" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H41" name="Describes steps before and after in sequence of daily activity" Code ="H41" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H42" name="Answers ? re: past/future events" Code ="H42" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H43" name="Maintains conv. w/ adult or peer" Code ="H43" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H44" name="Answers novel questions" Code ="H44" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H45" name="Answers ? re:current events" Code ="H45" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H46" name="Answers ? w/ mult. resp.re:current events" Code ="H46" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H47" name="Answers ? w/ group discussions" Code ="H47" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H48" name="Tells stories" Code ="H48" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="H49" name="Spontaneous conversation" Code ="H49" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+
+  <Section name="Spontaneous vocalizations" Skill="Early Learner Skills">
+    <SubSections>
+      <SubSection taskid="I1" name="Identifiable speech sounds" Code ="I1" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="I2" name="Spont. says words or approx." Code ="I2" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="I3" name="Spontaneously says phrases" Code ="I3" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="I4" name="Sings songs with models" Code ="I4" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="I5" name="Sings songs " Code ="I5" Box ="4" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="I6" name="Spontaneous vocal imitation" Code ="I6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="I7" name="Spontaneous requests" Code ="I7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="I8" name="Spontaneous labeling" Code ="I8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+      <SubSection taskid="I9" name="Spontaneous conversation" Code ="I9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+    </SubSections>
+  </Section>
+  <Section name="Syntax and grammar" Skill="Language Skills">
+    <SubSections>
+      <SubSection taskid="J1" name="Mean length of response" Code ="J1" Box ="4" ContainsQuestions="False" Applicable="false"/>
+        <SubSection taskid="J2" name="Syntax (word order)" Code ="J2" Box ="4" ContainsQuestions="False" Applicable="false"/>
+          <SubSection taskid="J3" name="Articles" Code ="J3" Box ="4" ContainsQuestions="False" Applicable="false"/>
+            <SubSection taskid="J4" name="Verbs-present progressive" Code ="J4" Box ="4" ContainsQuestions="False" Applicable="false"/>
+              <SubSection taskid="J5" name="Regular plurals" Code ="J5" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                <SubSection taskid="J6" name="Verb-irregular past tense" Code ="J6" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                  <SubSection taskid="J7" name="Contractions" Code ="J7" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                    <SubSection taskid="J8" name="Is/am with 'ing=''' verbs" Code ="J8" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                      <SubSection taskid="J9" name="Verbs-regular past tense" Code ="J9" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                        <SubSection taskid="J10" name="Possessive 'S='''" Code ="J10" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                          <SubSection taskid="J11" name="Negatives" Code ="J11" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                            <SubSection taskid="J12" name="Locatives" Code ="J12" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                              <SubSection taskid="J13" name="Future tense" Code ="J13" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                                <SubSection taskid="J14" name="Conjunctions" Code ="J14" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                                  <SubSection taskid="J15" name="Irregular plurals" Code ="J15" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                                    <SubSection taskid="J16" name="Comparatives" Code ="J16" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                                      <SubSection taskid="J17" name="Demonstratives" Code ="J17" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                                        <SubSection taskid="J18" name="Labels strength of verbal response" Code ="J18" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                                          <SubSection taskid="J19" name="Qualification of verbal response" Code ="J19" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                                            <SubSection taskid="J20" name="Labels emotional state associated w/ verbal response" Code ="J20" Box ="4" ContainsQuestions="False" Applicable="false"/>
+	</SubSections>
+  </Section>
+  <Section name="Play and Leisure Skills" Skill="Early Learner Skills">
+    <SubSections>
+      <SubSection taskid="K1" name="Explores toys in env." Code ="K1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+        <SubSection taskid="K2" name="Allows others to touch toys" Code ="K2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+          <SubSection taskid="K3" name="Independent outdoor activity" Code ="K3" Box ="4" ContainsQuestions="False" Applicable="false"/>
+            <SubSection taskid="K4" name="Independent indoor leisure activities" Code ="K4" Box ="4" ContainsQuestions="False" Applicable="false"/>
+              <SubSection taskid="K5" name="Plays w/ toys as designed" Code ="K5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                <SubSection taskid="K6" name="Ind. Plays w/toys and engages in verbal behavior" Code ="K6" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                  <SubSection taskid="K7" name="Mult. resp. w/toys re:  theme" Code ="K7" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                    <SubSection taskid="K8" name="Plays interactively w/peers" Code ="K8" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                      <SubSection taskid="K9" name="Plays interactively w/ a variety of peers" Code ="K9" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                        <SubSection taskid="K10" name="Sociodramatic play" Code ="K10" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                          <SubSection taskid="K11" name="Plays w/ toys and talks w/ peers" Code ="K11" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                            <SubSection taskid="K12" name="Plays simple ball games" Code ="K12" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                              <SubSection taskid="K13" name="Coordinated play w/peers" Code ="K13" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                                <SubSection taskid="K14" name="Interactive motor games" Code ="K14" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                                  <SubSection taskid="K15" name="Board games" Code ="K15" Box ="4" ContainsQuestions="False" Applicable="false"/>
+		</SubSections>
+  </Section>
+  <Section name="Social interactions" Skill="Social Skills">
+    <SubSections>
+      <SubSection taskid="L1" name="App. when near peers/siblings" Code ="L1" Box ="4" ContainsQuestions="False" Applicable="false"/>
+        <SubSection taskid="L2" name="Takes offered items" Code ="L2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+          <SubSection taskid="L3" name="Tolerates touches by peers/sibs" Code ="L3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+            <SubSection taskid="L4" name="Shows inte.in behavior of others" Code ="L4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+              <SubSection taskid="L5" name="Looks at others to init. soc.int." Code ="L5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                <SubSection taskid="L6" name="Phys. approaches/engages others" Code ="L6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                  <SubSection taskid="L7" name="Looks at others anticipating completion of action" Code ="L7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                    <SubSection taskid="L8" name="Listener-receptive" Code ="L8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                      <SubSection taskid="L9" name="Imitates peers" Code ="L9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                        <SubSection taskid="L10" name="Returns greetings" Code ="L10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                          <SubSection taskid="L11" name="Phys. prompts others for activities" Code ="L11" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                            <SubSection taskid="L12" name="Responds to interact. from peers" Code ="L12" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                              <SubSection taskid="L13" name="Sharing - gives up items to others" Code ="L13" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                <SubSection taskid="L14" name="Searches for missing person" Code ="L14" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                  <SubSection taskid="L15" name="Active attention seeking" Code ="L15" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                    <SubSection taskid="L16" name="Labels items for others" Code ="L16" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                                      <SubSection taskid="L17" name="Eye contact" Code ="L17" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                        <SubSection taskid="L18" name="Asks peers for item" Code ="L18" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                          <SubSection taskid="L19" name="Asks for items to be shared" Code ="L19" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                            <SubSection taskid="L20" name="Offers items to others" Code ="L20" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                                              <SubSection taskid="L21" name="Initiates greetings" Code ="L21" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                                <SubSection taskid="L22" name="Joins peers in activity" Code ="L22" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                                  <SubSection taskid="L23" name="observation of peers attention to activity" Code ="L23" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                                    <SubSection taskid="L24" name="Feedback from peers" Code ="L24" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                                      <SubSection taskid="L25" name="Adjusts behavior based on peers actions" Code ="L25" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                                        <SubSection taskid="L26" name="Assists others to participate" Code ="L26" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                                          <SubSection taskid="L27" name="States what others like/dislike" Code ="L27" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                                            <SubSection taskid="L28" name="Direct others attention to something of int to them" Code ="L28" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                                              <SubSection taskid="L29" name="Attends to the reactions of interest of others" Code ="L29" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                                                <SubSection taskid="L30" name="Delivers a message" Code ="L30" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                                                  <SubSection taskid="L31" name="Waits for break in convo to interrupt" Code ="L31" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                                                    <SubSection taskid="L32" name="Converses with others" Code ="L32" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                                                                      <SubSection taskid="L33" name="Asks for information" Code ="L33" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                                                        <SubSection taskid="L34" name="Obtains and maintains attention of others" Code ="L34" Box ="4" ContainsQuestions="False" Applicable="false"/>
+	</SubSections>
+  </Section>
+  <Section name="Group Instruction" Skill="Early Learner Skills">
+    <SubSections>
+      <SubSection taskid="M1" name="Sits app. In small group" Code ="M1" Box ="4" ContainsQuestions="False" Applicable="false"/>
+        <SubSection taskid="M2" name="Sits app. In large group" Code ="M2" Box ="4" ContainsQuestions="False" Applicable="false"/>
+          <SubSection taskid="M3" name="Attends to teacher in group" Code ="M3" Box ="4" ContainsQuestions="False" Applicable="false"/>
+            <SubSection taskid="M4" name="Attends to other students in group" Code ="M4" Box ="4" ContainsQuestions="False" Applicable="false"/>
+              <SubSection taskid="M5" name="Follows group instruction" Code ="M5" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                <SubSection taskid="M6" name="Follows grp instr. w/discrimination" Code ="M6" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                  <SubSection taskid="M7" name="Raises hand for teacher attention" Code ="M7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                    <SubSection taskid="M8" name="Raises hand to answer question" Code ="M8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                      <SubSection taskid="M9" name="Raises hand and names item" Code ="M9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                        <SubSection taskid="M10" name="Raises hand and answers question" Code ="M10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                          <SubSection taskid="M11" name="Takes turns during instruction" Code ="M11" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                            <SubSection taskid="M12" name="Learns new skills in group teaching" Code ="M12" Box ="2" ContainsQuestions="False" Applicable="false"/>
+	</SubSections>
+  </Section>
+  <Section name="Follow Classroom Routines" Skill="Early Learner Skills">
+    <SubSections>
+      <SubSection taskid="N1" name="Follows daily routine" Code ="N1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+        <SubSection taskid="N2" name="Works ind. on non-acad. activities" Code ="N2" Box ="4" ContainsQuestions="False" Applicable="false"/>
+          <SubSection taskid="N3" name="Sits and waits during transitions" Code ="N3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+            <SubSection taskid="N4" name="Phys. transitions to next activity" Code ="N4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+              <SubSection taskid="N5" name="Waits turn to do activities" Code ="N5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                <SubSection taskid="N6" name="Line-up on requests" Code ="N6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                  <SubSection taskid="N7" name="Works ind. on academic activities" Code ="N7" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                    <SubSection taskid="N8" name="Gets and returns own materials" Code ="N8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                      <SubSection taskid="N9" name="Completes task/brings to teacher" Code ="N9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                        <SubSection taskid="N10" name="Stands and waits during transitions" Code ="N10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+	</SubSections>
+  </Section>
+  <Section name="Generalized Responding" Skill="Early Learner Skills">
+    <SubSections>
+      <SubSection taskid="P1" name="Generalizes across stimuli" Code ="P1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+        <SubSection taskid="P2" name="Generalizes across instructors" Code ="P2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+          <SubSection taskid="P3" name="Generalizes across env." Code ="P3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+            <SubSection taskid="P4" name="Use of skills in groups" Code ="P4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+              <SubSection taskid="P5" name="Generalized response forms" Code ="P5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                <SubSection taskid="P6" name="Generalization of lang. skills" Code ="P6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+	</SubSections>
+  </Section>
+  <Section name="Reading" Skill="Academic Skills">
+    <SubSections>
+      <SubSection taskid="Q1" name="Receptive letters" Code ="Q1" Box ="4" ContainsQuestions="False" Applicable="false"/>
+        <SubSection taskid="Q2" name="Labels letters" Code ="Q2" Box ="4" ContainsQuestions="False" Applicable="false"/>
+          <SubSection taskid="Q3" name="Receptive sound of letters" Code ="Q3" Box ="4" ContainsQuestions="False" Applicable="false"/>
+            <SubSection taskid="Q4" name="Labels sounds of letters" Code ="Q4" Box ="4" ContainsQuestions="False" Applicable="false"/>
+              <SubSection taskid="Q5" name="Match words with pictures" Code ="Q5" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                <SubSection taskid="Q6" name="Match words to words" Code ="Q6" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                  <SubSection taskid="Q7" name="Names letters in word l-r" Code ="Q7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                    <SubSection taskid="Q8" name="Match ind. letters on word card" Code ="Q8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                      <SubSection taskid="Q9" name="Fill in missing letters of words" Code ="Q9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                        <SubSection taskid="Q10" name="Read simple words" Code ="Q10" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                          <SubSection taskid="Q11" name="Decode words" Code ="Q11" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                            <SubSection taskid="Q12" name="Read small groups of words l-r" Code ="Q12" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                              <SubSection taskid="Q13" name="Read simple sent (3-6 words)" Code ="Q13" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                                <SubSection taskid="Q14" name="Fill in missing words" Code ="Q14" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                  <SubSection taskid="Q15" name="Reads and follows simple instructions to do actions" Code ="Q15" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                    <SubSection taskid="Q16" name="Reads and follows simple instructions on worksheet" Code ="Q16" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                      <SubSection taskid="Q17" name="Read passages and answer compr. Questions" Code ="Q17" Box ="2" ContainsQuestions="False" Applicable="false"/>
+	</SubSections>
+  </Section>
+  <Section name="Math" Skill="Academic Skills">
+    <SubSections>
+      <SubSection taskid="R1" name="Rote counts with prompts" Code ="R1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+        <SubSection taskid="R2" name="Rote counting" Code ="R2" Box ="4" ContainsQuestions="False" Applicable="false"/>
+          <SubSection taskid="R3" name="Counts objects w/prompts" Code ="R3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+            <SubSection taskid="R4" name="Count given objects" Code ="R4" Box ="4" ContainsQuestions="False" Applicable="false"/>
+              <SubSection taskid="R5" name="Count objects from larger set" Code ="R5" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                <SubSection taskid="R6" name="Names numerals in sequence" Code ="R6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                  <SubSection taskid="R7" name="Names numbers" Code ="R7" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                    <SubSection taskid="R8" name="Match number w/same amt. of obj." Code ="R8" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                      <SubSection taskid="R9" name="more" Code ="R9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                        <SubSection taskid="R10" name="less " Code ="R10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                          <SubSection taskid="R11" name="some" Code ="R11" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                            <SubSection taskid="R12" name="all" Code ="R12" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                              <SubSection taskid="R13" name="zero/none" Code ="R13" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                <SubSection taskid="R14" name="Add items to specified quantity" Code ="R14" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                  <SubSection taskid="R15" name="same" Code ="R15" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                    <SubSection taskid="R16" name="diff" Code ="R16" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                      <SubSection taskid="R17" name="greater" Code ="R17" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                        <SubSection taskid="R18" name="add  " Code ="R18" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                          <SubSection taskid="R19" name="Walk and get specified number of objs from set" Code ="R19" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                                            <SubSection taskid="R20" name="add number" Code ="R20" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                                              <SubSection taskid="R21" name="Time telling" Code ="R21" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                                                <SubSection taskid="R22" name="I.D. coins by name" Code ="R22" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                                  <SubSection taskid="R23" name="ID coins by value" Code ="R23" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                                    <SubSection taskid="R24" name="Interchange coins to arrive at equal values" Code ="R24" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                                                      <SubSection taskid="R25" name="equal" Code ="R25" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                                        <SubSection taskid="R26" name="unequal" Code ="R26" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                                          <SubSection taskid="R27" name="minus" Code ="R27" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                                            <SubSection taskid="R28" name="plus" Code ="R28" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                                              <SubSection taskid="R29" name="subtract/take away" Code ="R29" Box ="2" ContainsQuestions="False" Applicable="false"/>
+	</SubSections>
+  </Section>
+  <Section name="Writing" Skill="Fine Motor Skills">
+    <SubSections>
+      <SubSection taskid="S1" name="Mark on paper" Code ="S1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+        <SubSection taskid="S2" name="Color between lines" Code ="S2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+          <SubSection taskid="S3" name="Trace lines/shapes/letters/numbers" Code ="S3" Box ="4" ContainsQuestions="False" Applicable="false"/>
+            <SubSection taskid="S4" name="Trace letters and numbers" Code ="S4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+              <SubSection taskid="S5" name="Copy straight lines" Code ="S5" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                <SubSection taskid="S6" name="Copy curved lines" Code ="S6" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                  <SubSection taskid="S7" name="Copy letters w/ sample" Code ="S7" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                    <SubSection taskid="S8" name="Copy numbers w/ sample" Code ="S8" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                      <SubSection taskid="S9" name="Print letters" Code ="S9" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                        <SubSection taskid="S10" name="Print numbers" Code ="S10" Box ="4" ContainsQuestions="False" Applicable="false"/>
+  </SubSections>
+  </Section>
+  <Section name="Spelling" Skill="Academic Skills">
+    <SubSections>
+      <SubSection taskid="T1" name="Match letters to letters on word card" Code ="T1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+        <SubSection taskid="T2" name="Fill in missing letters of words" Code ="T2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+          <SubSection taskid="T3" name="Copy words" Code ="T3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+            <SubSection taskid="T4" name="Writes in missing letters" Code ="T4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+              <SubSection taskid="T5" name="Spell words vocally" Code ="T5" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                <SubSection taskid="T6" name="Spell words in written form" Code ="T6" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                  <SubSection taskid="T7" name="Spell own name" Code ="T7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+	</SubSections>
+  </Section>
+  <Section name="Dressing" Skill="Activities of Daily Living">
+    <SubSections>
+      <SubSection taskid="U1" name="Pants up and down" Code ="U1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+        <SubSection taskid="U2" name="Shoes on and off" Code ="U2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+          <SubSection taskid="U3" name="Pullover shirts on and off" Code ="U3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+            <SubSection taskid="U4" name="Buttoning shirts on and off" Code ="U4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+              <SubSection taskid="U5" name="Pants on and off" Code ="U5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                <SubSection taskid="U6" name="Socks on and off" Code ="U6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                  <SubSection taskid="U7" name="Coat on and off" Code ="U7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                    <SubSection taskid="U8" name="Unzip zipper" Code ="U8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                      <SubSection taskid="U9" name="Fasten zipper" Code ="U9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                        <SubSection taskid="U10" name="Use zipper on clothes" Code ="U10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                          <SubSection taskid="U11" name="Fasten buttons" Code ="U11" Box ="4" ContainsQuestions="False" Applicable="false"/>
+                            <SubSection taskid="U12" name="Uses snaps" Code ="U12" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                              <SubSection taskid="U13" name="Uses buckles" Code ="U13" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                <SubSection taskid="U14" name="Adjust clothing when needed" Code ="U14" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                                  <SubSection taskid="U15" name="Ties shoes" Code ="U15" Box ="2" ContainsQuestions="False" Applicable="false"/>
+	</SubSections>
+  </Section>
+  <Section name="Eating" Skill="Activities of Daily Living">
+    <SubSections>
+      <SubSection taskid="V1" name="Eat finger food" Code ="V1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+        <SubSection taskid="V2" name="Drink from a straw" Code ="V2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+          <SubSection taskid="V3" name="Drink from a cup" Code ="V3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+            <SubSection taskid="V4" name="Feed self w/ spoon or fork" Code ="V4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+              <SubSection taskid="V5" name="Spread with a knife" Code ="V5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                <SubSection taskid="V6" name="Pour liquid into a cup" Code ="V6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                  <SubSection taskid="V7" name="Cut food w/ a knife" Code ="V7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                    <SubSection taskid="V8" name="Take prepared lunch to table" Code ="V8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                      <SubSection taskid="V9" name="Clean up table after meals" Code ="V9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                        <SubSection taskid="V10" name="Keep eating area clean" Code ="V10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+	</SubSections>
+  </Section>
+  <Section name="Grooming" Skill="Activities of Daily Living">
+    <SubSections>
+      <SubSection taskid="W1" name="Wash hands" Code ="W1" Box ="2" ContainsQuestions="False" Applicable="false"/>
+        <SubSection taskid="W2" name="Dry hands" Code ="W2" Box ="2" ContainsQuestions="False" Applicable="false"/>
+          <SubSection taskid="W3" name="Wash face" Code ="W3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+            <SubSection taskid="W4" name="Dry face" Code ="W4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+              <SubSection taskid="W5" name="Comb or brush hair" Code ="W5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                <SubSection taskid="W6" name="Brush teeth" Code ="W6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                  <SubSection taskid="W7" name="Blow nose when needed" Code ="W7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+	</SubSections>
+  </Section>
+  <Section name="Toileting" Skill="Activities of Daily Living">
+    <SubSections>
+      <SubSection taskid="X1" name="Urinate in toilet" Code ="X1" Box ="4" ContainsQuestions="False" Applicable="false"/>
+        <SubSection taskid="X2" name="Remain dry on a schedule" Code ="X2" Box ="4" ContainsQuestions="False" Applicable="false"/>
+          <SubSection taskid="X3" name="Ind. uses known restrm for urination" Code ="X3" Box ="2" ContainsQuestions="False" Applicable="false"/>
+            <SubSection taskid="X4" name="Requests to use toilet when needed" Code ="X4" Box ="2" ContainsQuestions="False" Applicable="false"/>
+              <SubSection taskid="X5" name="Wipes self after urinating (females)" Code ="X5" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                <SubSection taskid="X6" name="Defecates in toilet" Code ="X6" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                  <SubSection taskid="X7" name="Remain clean (b.m.) on a schedule" Code ="X7" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                    <SubSection taskid="X8" name="Wipes self after bowel movement" Code ="X8" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                      <SubSection taskid="X9" name="Ind. uses known restrm for b.m." Code ="X9" Box ="2" ContainsQuestions="False" Applicable="false"/>
+                        <SubSection taskid="X10" name="Uses restroom without assistance" Code ="X10" Box ="2" ContainsQuestions="False" Applicable="false"/>
+	</SubSections>
+  </Section>
+  <Section name="Gross Motor Skills" Skill="Gross Motor Skills">
+    <SubSections>
+      <SubSection taskid="Y1" name="Walk forward w/ appropriate gait" Code ="Y1" Box ="1" ContainsQuestions="False" Applicable="false"/>
+        <SubSection taskid="Y2" name="Kneel" Code ="Y2" Box ="1" ContainsQuestions="False" Applicable="false"/>
+          <SubSection taskid="Y3" name="Run smoothly" Code ="Y3" Box ="1" ContainsQuestions="False" Applicable="false"/>
+            <SubSection taskid="Y4" name="Roll sideways" Code ="Y4" Box ="1" ContainsQuestions="False" Applicable="false"/>
+              <SubSection taskid="Y5" name="Jump forward" Code ="Y5" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                <SubSection taskid="Y6" name="Jump down" Code ="Y6" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                  <SubSection taskid="Y7" name="Walk backward" Code ="Y7" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                    <SubSection taskid="Y8" name="Hop on 2 feet" Code ="Y8" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                      <SubSection taskid="Y9" name="Throw ball from chest or overhand" Code ="Y9" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                        <SubSection taskid="Y10" name="Roll a ball" Code ="Y10" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                          <SubSection taskid="Y11" name="Climb a ladder w/reciprocal motion" Code ="Y11" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                            <SubSection taskid="Y12" name="Creep on stomach" Code ="Y12" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                              <SubSection taskid="Y13" name="Squat" Code ="Y13" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                <SubSection taskid="Y14" name="Walk across a balance beam" Code ="Y14" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                  <SubSection taskid="Y15" name="Catch a ball any method" Code ="Y15" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                    <SubSection taskid="Y16" name="Ride a tricycle" Code ="Y16" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                      <SubSection taskid="Y17" name="Walk sideways" Code ="Y17" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                        <SubSection taskid="Y18" name="Gallop" Code ="Y18" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                          <SubSection taskid="Y19" name="Balance on one foot" Code ="Y19" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                            <SubSection taskid="Y20" name="Kick ball at target" Code ="Y20" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                              <SubSection taskid="Y21" name="Hang from bar" Code ="Y21" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                                <SubSection taskid="Y22" name="Catch a ball in hands" Code ="Y22" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                                  <SubSection taskid="Y23" name="Throw ball underhand" Code ="Y23" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                                    <SubSection taskid="Y24" name="Toss and catch a ball" Code ="Y24" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                                      <SubSection taskid="Y25" name="Bounce a ball" Code ="Y25" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                                        <SubSection taskid="Y26" name="Kick a  moving ball" Code ="Y26" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                                          <SubSection taskid="Y27" name="Pump while swinging" Code ="Y27" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                                            <SubSection taskid="Y28" name="Skip" Code ="Y28" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                                              <SubSection taskid="Y29" name="Jumping jacks" Code ="Y29" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                                                <SubSection taskid="Y30" name="Ride a bicycle" Code ="Y30" Box ="1" ContainsQuestions="False" Applicable="false"/>
+	</SubSections>
+  </Section>
+  <Section name="Fine Motor" Skill="Fine Motor Skills">
+    <SubSections>
+      <SubSection taskid="Z1" name="Mark on paper w/crayon" Code ="Z1" Box ="1" ContainsQuestions="False" Applicable="false"/>
+        <SubSection taskid="Z2" name="Places objects in form box" Code ="Z2" Box ="1" ContainsQuestions="False" Applicable="false"/>
+          <SubSection taskid="Z3" name="Single piece inset puzzle" Code ="Z3" Box ="1" ContainsQuestions="False" Applicable="false"/>
+            <SubSection taskid="Z4" name="Multiple puzzle pieces into a frame" Code ="Z4" Box ="1" ContainsQuestions="False" Applicable="false"/>
+              <SubSection taskid="Z5" name="Blocks on block design card" Code ="Z5" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                <SubSection taskid="Z6" name="Transfer object to the opposite hand" Code ="Z6" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                  <SubSection taskid="Z7" name="Places pegs in peg board" Code ="Z7" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                    <SubSection taskid="Z8" name="Turns pages of book" Code ="Z8" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                      <SubSection taskid="Z9" name="Clothespins on a line" Code ="Z9" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                        <SubSection taskid="Z10" name="Color within boundaries" Code ="Z10" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                          <SubSection taskid="Z11" name="Open Ziploc type bags" Code ="Z11" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                            <SubSection taskid="Z12" name="Snips with scissors" Code ="Z12" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                              <SubSection taskid="Z13" name="Stacks blocks" Code ="Z13" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                <SubSection taskid="Z14" name="Strings beads" Code ="Z14" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                  <SubSection taskid="Z15" name="Remove lids from jar" Code ="Z15" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                    <SubSection taskid="Z16" name="Cuts across paper with scissors" Code ="Z16" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                      <SubSection taskid="Z17" name="Traces lines with finger" Code ="Z17" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                        <SubSection taskid="Z18" name="Squeezes glue from a bottle" Code ="Z18" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                          <SubSection taskid="Z19" name="Removes wrappers" Code ="Z19" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                            <SubSection taskid="Z20" name="Roughly copy shapes and patterns" Code ="Z20" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                              <SubSection taskid="Z21" name="Pastes shapes on outlined picture" Code ="Z21" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                                <SubSection taskid="Z22" name="Pastes shapes on plain picture" Code ="Z22" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                                  <SubSection taskid="Z23" name="Objects on pegs" Code ="Z23" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                                    <SubSection taskid="Z24" name="Replaces lids on jar" Code ="Z24" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                                      <SubSection taskid="Z25" name="Uses pincer grip" Code ="Z25" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                                        <SubSection taskid="Z26" name="Fold a piece of paper" Code ="Z26" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                                          <SubSection taskid="Z27" name="Cuts out shapes" Code ="Z27" Box ="1" ContainsQuestions="False" Applicable="false"/>
+                                                            <SubSection taskid="Z28" name="Accurately copy shapes/patterns" Code ="Z28" Box ="1" ContainsQuestions="False" Applicable="false"/>
+		</SubSections>
+  </Section>
+</Sections>

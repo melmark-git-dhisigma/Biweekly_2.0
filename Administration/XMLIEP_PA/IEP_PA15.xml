@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mapping>
+      <Mapping PlaceHolder="abcdefgh" Column="IEP14Itinerant"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP14Supplemental"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP14FullTime"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP14AutisticSupport"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP14Blind"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP14Deaf"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP14Emotional"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP14Learning"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP14LifeSkills"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP14MultipleDisabilities"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP14Physical"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP14Speech"/>
+
+      <Mapping PlaceHolder="plcLocNameDistrict" Column="IEP14SchoolDistrict"/>
+
+      <Mapping PlaceHolder="plcBuildingName" Column="plcBuildingName"/>
+	  
+	  <Mapping PlaceHolder="plcLocPgmOther" Column="plcLocPgmOther"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP14IsNeighbour"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP14IsNeibhourNo"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP14SpclEdu"/>
+
+      <Mapping PlaceHolder="abcdefgh" Column="IEP14Other"/>
+
+    </Mapping>
+
+  </State>
+
+</States>

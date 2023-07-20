@@ -1,0 +1,54 @@
+@charset "utf-8";
+/* CSS Document */
+
+/*----------------------------------------------------- Drope Down Blue Menu Edeted Css By Antony Start--------------------------------------*/		
+.dropstylecontainer{width:90%!important;float:right;  }
+.pageDropStyle{background:#b2cbe2 url(../images/gradent.PNG) 100px center no-repeat!important; border-radius:3px; border:1px solid #7fa9cf;  box-shadow:none; padding:5px 0; margin:0 0 1px 0!important; width:99%!important; }
+.pageDropStyle a,
+.pageDropStyle a:link,
+.pageDropStyle a:visited{font-family:Arial, Helvetica, sans-serif; font-size:12px; text-decoration:none; color:#333!important; font-weight:normal; background:url(../images/whitearrow.PNG) 10px 6px no-repeat; padding:4px 0 0 23px;}
+  .pnlCSS
+        {
+			margin:0 auto; width:99.5%; padding-left:15px;
+        }
+.HeaderStyle th
+{
+text-align: left;
+background:#c5e0b1;
+border-top:2px solid #fff;
+color:#666;
+
+}
+.RowStyle td
+{
+text-align: left;
+background:#e3e9fb;
+border-bottom:1px solid #c5c5c5;
+border-top:1px solid #c5c5c5;
+padding:3px 0 3px 15px;
+}
+td.tddrstl{width:81.5%!important;  margin:0 auto!important; display:block; padding:0 0 0 15px; color:#666;}
+table td.mainheadingpanel{color:#666; font-family: Oswald!important; font-size:14px;}
+
+.AltRowStyle td
+{
+padding-left: 5px;
+border-top:2px solid #fff;
+text-align: left;
+background:#d8d8d8;
+padding:3px 0 3px 15px;
+}
+
+
+.RowStyle:hover
+{
+background-color: #DDDDDD;
+}
+
+
+.NFButtonLong{ background:url(../images/masterbtnbglong.PNG) left top no-repeat; width:117px;  background-position:0 0; color:#fff; font-family:Arial, Helvetica, sans-serif; font-size:11px;  text-decoration:none; border:none; display:block; margin:5px 5px 5px 0; padding:6px 0 8px 0; cursor:pointer; float:left;}
+.NFButtonLong:hover, .NFButtonLong:visited{ background-position:0 -31px; color:#000;}
+
+
+/*----------------------------------------------------- Drope Down Blue Menu Edeted Css By Antony End--------------------------------------*/	
+
