@@ -592,7 +592,12 @@
             }
             return statFlag;
         }
-
+        function onEnterKeyPress(event) {
+            if (event.keyCode === 13) { 
+                event.preventDefault(); 
+               document.getElementById('<%= btnSrchEmail.ClientID %>').click(); 
+        }
+    }
         function uncheckEmailSelection() {
             var RB1 = document.getElementById("<%=dlEmailforSorting.ClientID%>");
             var radio = RB1.getElementsByTagName("input");
@@ -4353,7 +4358,7 @@
                                  <div style="float:left;border: 1px solid #909095;border-radius:5px;padding-right: 10px;padding-bottom: 10px;margin-left: 5px;">
                                      <div style="margin-top:5px;margin-left:10px">
                                         <asp:Label ID="lblEmailSrch" CssClass="tdText" runat="server" Text="Enter Keyword for Search Emails" Visible="true"></asp:Label>
-                                        <asp:Textbox ID="txtEmailSrch" CssClass="tdText" runat="server" ></asp:Textbox>                                         
+                                        <asp:Textbox ID="txtEmailSrch" CssClass="tdText" runat="server" onkeydown="onEnterKeyPress(event)" ></asp:Textbox>                                         
                                         <asp:Button ID="btnSrchEmail" runat="server" Text="Search Email" CssClass="NFButton" Visible="true" OnClick="btnSrchEmail_Click" />
                                         <hr />
                                      </div>
