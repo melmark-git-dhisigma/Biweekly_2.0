@@ -121,7 +121,12 @@ public partial class Admin_AddRole : System.Web.UI.Page
                     if (RoleId == 0 && btnSave.Text == "Save")
                     {
 
-                        if (clsGeneral.IsExit("RoleCode", "Role", txtCode.Text.Trim()) == true)
+                        //if (clsGeneral.IsExit("RoleCode", "Role", txtCode.Text.Trim()) == true)
+                        string Qry = "Select * from [Role] r join RoleGroup rg on rg.RoleId=r.RoleId join [Group] g on g.GroupId=rg.GroupId " +
+                        "where r.RoleCode ='" + txtCode.Text.Trim() + "' and g.GroupId ='" + ddlGroup.Text.Trim() + "'";
+                        DataTable Dt = objData.ReturnDataTable("Select * from [Role] r join RoleGroup rg on rg.RoleId=r.RoleId join [Group] g on g.GroupId=rg.GroupId "+
+                        "where r.RoleCode ='" + txtCode.Text.Trim() + "' and g.GroupId ='" + ddlGroup.Text.Trim() + "'", false);
+                        if (Dt.Rows.Count > 0)
                         {
                             tdMsg.InnerHtml = clsGeneral.warningMsg("Role Code already exit.Please choose another code.");
                             txtCode.Focus();
