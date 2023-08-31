@@ -324,7 +324,7 @@
 
             var currHref_splitted = currHref.split('/');
 
-            var redirectUrl = "http://" + currHref_splitted[0] + '/';
+            var redirectUrl = currHref_splitted[0] + '/';
 
             for (var i = 0; i < currHref_splitted.length; i++) {
                 if (currHref_splitted[i].substring(0, 2) == '(S') {
