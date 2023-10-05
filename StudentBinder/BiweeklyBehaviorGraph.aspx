@@ -157,21 +157,6 @@
             });
             $('.homeloading').fadeOut('fast');
 
-
-            $("#chkbxevents").toggle(
-function () {
-    if ($('#<%=chkbxevents.ClientID %>').is(':checked')) {
-               $('#<%=chkbxmajor.ClientID %>').attr('checked', true);
-               $('#<%=chkbxminor.ClientID %>').attr('checked', true);
-               $('#<%=chkbxarrow.ClientID %>').attr('checked', true);
-
-           }
-           else {
-               $('#divpopupEvents').slideToggle("slow");
-           }
-});
-
-
             $("#chkbxevents").change(function () {
                 if (this.checked) {
                     $('#divpopupEvents').slideToggle("slow");
@@ -186,17 +171,54 @@ function () {
                     $('#<%=chkbxarrow.ClientID %>').attr('checked', false);
                 }
             });
+            $("#chkbxevents").toggle(
+            function () {
+                if ($('#<%=chkbxevents.ClientID %>').is(':checked')) {
+                    $('#<%=chkbxmajor.ClientID %>').attr('checked', true);
+                    $('#<%=chkbxminor.ClientID %>').attr('checked', true);
+                    $('#<%=chkbxarrow.ClientID %>').attr('checked', true);
+
+                }
+                else {
+                    $('#divpopupEvents').slideToggle("slow");
+                }
+            });
+
+
+            
 
             $('#<%=btnExport.ClientID %>').click(function () {
                 $('.loading').fadeIn('fast');
             });
 
         });
-
+        function showEvents() {
+                if ($('#<%=chkbxevents.ClientID %>').is(':checked')) {
+                    //$('#divpopupEvents').slideToggle("slow");
+                    $('#<%=chkbxmajor.ClientID %>').attr('checked', true);
+                    $('#<%=chkbxminor.ClientID %>').attr('checked', true);
+                    $('#<%=chkbxarrow.ClientID %>').attr('checked', true);
+                }
+                else {
+                    $('#divpopupEvents').slideToggle("slow");
+                    $('#<%=chkbxmajor.ClientID %>').attr('checked', false);
+                    $('#<%=chkbxminor.ClientID %>').attr('checked', false);
+                    $('#<%=chkbxarrow.ClientID %>').attr('checked', false);
+                }
+            if ($('#<%=chkbxevents.ClientID %>').is(':checked')) {
+                //$('#divpopupEvents').slideToggle("slow");
+            }
+            else {
+                $('#<%=chkbxmajor.ClientID %>').attr('checked', false);
+                $('#<%=chkbxminor.ClientID %>').attr('checked', false);
+                $('#<%=chkbxarrow.ClientID %>').attr('checked', false);
+            }
+        }
         function LoadGraph() {
             $('.loading').fadeOut('slow', function () {
                 $('#fullContents').fadeIn('fast');
             });
+            $('.homeloading').fadeOut('fast');
         }
         function loadWait() {
             $('.loading').fadeIn('fast');//, function () { });
@@ -504,7 +526,7 @@ function () {
                         </td>
                         <td style="text-align: center" class="tdText"></td>
                         <td style="text-align: left" rowspan="2">
-                    <asp:CheckBox ID="chkbxevents" runat="server" Text="Display Events"></asp:CheckBox><br />
+                    <asp:CheckBox ID="chkbxevents" runat="server" Text="Display Events" OnCheckedChanged="EvntCheckBox_CheckedChanged" AutoPostBack="true"></asp:CheckBox><br />
                         <div id="divpopupEvents" style="display:none">
                             <asp:checkbox id="chkbxmajor" runat="server" text="Display Major Events" onclick="eventinpopup();" ></asp:checkbox>
                             <br /> 
