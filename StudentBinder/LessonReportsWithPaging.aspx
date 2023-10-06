@@ -647,7 +647,7 @@
                                     <br />
                                     <asp:CheckBox ID="chkmedication" runat="server" Text="Include Medication"></asp:CheckBox>
                                     <br />
-                                    <asp:RadioButtonList ID="rbtnClassTypeall" runat="server" RepeatDirection="Horizontal" Visible="false">
+                                    <asp:RadioButtonList ID="rbtnClassTypeall" runat="server" RepeatDirection="Horizontal">
                                         <asp:ListItem Value="Day">Day</asp:ListItem>
                                         <asp:ListItem Value="Residence">Residence</asp:ListItem>
                                         <asp:ListItem Value="Day,Residence" Selected="True">Both</asp:ListItem>
