@@ -119,6 +119,21 @@
             border-left: 1px solid black;
             border-right: 1px solid black;
         }
+        .SeldivLeftPanel {
+            margin-top: 1px;
+            margin-left: 4px;
+            display: none;
+            width: 260px;
+            float: left;
+            position: absolute;
+            z-index: 1002;
+            height: 245px;
+            text-align: center;
+            background-color: #ECE9D8;
+            border-bottom: 1px solid black;
+            border-left: 1px solid black;
+            border-right: 1px solid black;
+        }
 
         .divRightPanel {
             width: 100%;
@@ -156,6 +171,32 @@
                 cursor: pointer;
                 background-color: #F8F1C6;
             }
+
+           .loading {
+            display: none;
+            position: fixed;
+            width: 100%;
+            height: 800px;
+            top: 200px;
+            left: 500px;
+            z-index: 1000;
+            /*background-image: url("../Administration/images/overlay.png");*/
+            /*background: repeat-x scroll center top transparent;*/
+        }
+      
+           .innerLoading {
+            margin: auto;
+            height: 50px;
+            width: 250px;
+            text-align: center;
+            font-weight: bold;
+            font-size: large;
+        }
+            .innerLoading img {
+                margin-top: 20px;
+                height: 10px;
+                width: 100px;
+            }
     </style>
     <script>
 
@@ -183,6 +224,7 @@
     </script>
     <script type="text/javascript">
         function view(viewDiv) {
+            hideSel();
             HideDialog();
             HideEditPopup();
             HidePopup();
@@ -210,6 +252,29 @@
         function hide() {
             //var div = document.getElementById("Calndr");
             var div = document.getElementsByClassName("divLeftPanel");
+            div = div[0];
+            div.style.display = 'none';
+        }
+        function view1(viewDiv) {
+            hide();
+            HideDialog();
+            HideEditPopup();
+            HidePopup();
+            var div = document.getElementsByClassName("selDivLeftPanel");
+            div = div[0];
+            if (div.style.display == 'block') {
+                div.style.display = 'none';
+                viewDiv.style.background = '#ECE9D8';
+            }
+            else {
+                div.style.display = 'block';
+                viewDiv.style.background = '#DFDFC7';
+                $("#overlay").show();
+                //$("#PopUpStud").fadeIn(300);
+            }
+        }
+        function hideSel() {
+            var div = document.getElementsByClassName("selDivLeftPanel");
             div = div[0];
             div.style.display = 'none';
         }
@@ -925,6 +990,22 @@
         });
     });
 
+
+    function showLoader()
+    {
+        $('.loading').css("display", "block");
+        $('#Buttoncalender').trigger("click");
+    }
+
+    function showLoader2() {
+        $('.loading').css("display", "block");
+        $('#Buttoncalender2').trigger("click");
+    }
+    function hideLoader()
+    {
+        $('.loading').css("display", "none");
+    }
+
     </script>
 
 </head>
@@ -938,7 +1019,7 @@
                 <table width="100%">
                     <tr>
                         <td style="width: 25%;" align="left">
-                            <asp:Button ID="btnReplicate" runat="server" Text="Copy To Current Week" CssClass="NFButtonWithNoImage" Width="235px" OnClick="btnReplicate_Click" /></td>
+                            <asp:Button ID="btnReplicate" runat="server" Text="Copy Selected Week" CssClass="NFButtonWithNoImage" Width="235px" onclick="btnReplicate_Click" class ="divMenu"/></td>
                         <td style="width: 25%;" align="right">
                             <asp:Label ID="lblDate" runat="server" Font-Bold="True"></asp:Label>
                             <asp:HiddenField ID="hfMode" runat="server" />
@@ -972,6 +1053,14 @@
                 </table>
             </ContentTemplate>
         </asp:UpdatePanel>
+
+        <div id ="Loader" class="loading" runat ="server">
+                        <div id="innerloader" class="innerLoading">
+                         <img id="img1" src="../Administration/images/load.gif" alt="loading" />
+                         Please Wait...
+                        </div>
+        </div>
+
         <div class="divRightPanel">
 
             <asp:HiddenField ID="hfCellID" runat="server" />
@@ -1035,7 +1124,7 @@
                                                         PrevMonthText="&lt;&lt;"
                                                         DayStyle-BackColor="White"
                                                         DayStyle-ForeColor="Black"
-                                                        DayStyle-Font-Names="Arial" OnSelectionChanged="Calendar1_SelectionChanged" OnDayRender="Calendar1_DayRender" OnVisibleMonthChanged="Calendar1_VisibleMonthChanged" BackColor="White" BorderColor="White" BorderWidth="1px" Font-Names="Verdana" Font-Size="9pt" ForeColor="Black" NextPrevFormat="FullMonth">
+                                                        DayStyle-Font-Names="Arial" OnSelectionChanged="Calendartest_SelectionChanged" OnDayRender="Calendar1_DayRender" OnVisibleMonthChanged="Calendar1_VisibleMonthChanged" BackColor="White" BorderColor="White" BorderWidth="1px" Font-Names="Verdana" Font-Size="9pt" ForeColor="Black" NextPrevFormat="FullMonth">
                                                         <DayHeaderStyle
                                                             Font-Names="Arial Black" Font-Bold="True" Font-Size="8pt" />
                                                         <SelectedDayStyle
@@ -1064,6 +1153,55 @@
                                                     <hr />
                                                 </div>
                                             </td>
+                                            <td align="center" style="vertical-align: top;"></td>
+                                        </tr>
+                                    </table>
+                                </ContentTemplate>
+                            </asp:UpdatePanel>
+                        </div>
+                        <div id="SelCalender" runat="server" class="selDivLeftPanel">
+                            <asp:UpdatePanel ID="UpdatePanel5" runat="server">
+                                <ContentTemplate>
+                                    <table width="100%">
+                                        <tr>
+                                            <td align="center" style="width: 15%; vertical-align: top;">
+                                                <div>
+                                                    <asp:Calendar ID="Calendar2" runat="server" Width="250px" Height="190px"
+                                                        FirstDayOfWeek="Monday"
+                                                        NextMonthText="&gt;&gt;"
+                                                        PrevMonthText="&lt;&lt;"
+                                                        DayStyle-BackColor="White"
+                                                        DayStyle-ForeColor="Black"
+                                                        DayStyle-Font-Names="Arial" OnSelectionChanged="Calendar2test_SelectionChanged" SelectionMode="DayWeek" OnDayRender="Calendar2_DayRender" OnVisibleMonthChanged="Calendar2_VisibleMonthChanged" BackColor="White" BorderColor="White" BorderWidth="1px" Font-Names="Verdana" Font-Size="9pt" ForeColor="Black" NextPrevFormat="FullMonth">
+                                                        <DayHeaderStyle
+                                                            Font-Names="Arial Black" Font-Bold="True" Font-Size="8pt" />
+                                                        <SelectedDayStyle
+                                                            BackColor="#333399"
+                                                            Font-Names="Arial"
+                                                            ForeColor="White" />
+                                                        <WeekendDayStyle
+                                                            Font-Names="Arial" />
+                                                        <OtherMonthDayStyle
+                                                            Font-Names="Arial"
+                                                            ForeColor="#999999" />
+                                                        <TodayDayStyle
+                                                            Font-Names="Arial" BackColor="#CCCCCC" />
+
+                                                        <DayStyle Font-Names="Arial"></DayStyle>
+                                                        <WeekendDayStyle ForeColor="Red" />
+                                                        <NextPrevStyle
+                                                            Font-Names="Arial"
+                                                            ForeColor="#333333" Font-Bold="True" Font-Size="8pt" VerticalAlign="Bottom" />
+                                                        <TitleStyle
+                                                            BackColor="#ECE9D8"
+                                                            Font-Names="Arial Black"
+                                                            ForeColor="#000000"
+                                                            HorizontalAlign="Center" BorderColor="Black" BorderWidth="1 px" Font-Bold="True" Font-Size="10pt" />
+                                                    </asp:Calendar>
+                                                    <hr />
+                                                    <asp:Button ID="btnCopyWeek" runat="server" Text="Copy To Current Week" CssClass="NFButtonWithNoImage" Width="235px" onclick ="btnCopyWeek_Click" class ="divMenu"/>
+                                                </div>
+                                                    </td>
                                             <td align="center" style="vertical-align: top;"></td>
                                         </tr>
                                     </table>
@@ -1229,6 +1367,8 @@
                             </td>
 
                         </tr>
+                           <asp:Button ID="Buttoncalender" runat="server" Style="display: none;"  OnClick="Calendar1_SelectionChanged"/>          
+                           <asp:Button ID="Buttoncalender2" runat="server" Style="display: none;"  OnClick="Calendar2_SelectionChanged"/>                                              
                     </table>
                 </ContentTemplate>
             </asp:UpdatePanel>
