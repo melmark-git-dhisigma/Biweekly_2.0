@@ -1684,5 +1684,247 @@ public class clsData
 
     }
 
+ public DataTable ReturnAcademicTable(String proc, String StartDate, String enddate, int studid, String AllLesson, int SchoolId, String Events, String Trendtype, String IncludeIOA, String Clstype)
+    {
+        DataTable Dt = new DataTable();
+        SqlConnection con = Open();
+        try
+        {
+            SqlDataAdapter da = new SqlDataAdapter();
+            cmd = new SqlCommand(proc, con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@StartDate", StartDate);
+            cmd.Parameters.AddWithValue("@ENDDate", enddate);
+            cmd.Parameters.AddWithValue("@StudentId", studid);
+            cmd.Parameters.AddWithValue("@LessonPlanid", AllLesson);
+            cmd.Parameters.AddWithValue("@SchoolId", SchoolId);
+            cmd.Parameters.AddWithValue("@Event", Events);
+            cmd.Parameters.AddWithValue("@TrendType", Trendtype);
+            cmd.Parameters.AddWithValue("@IncludeIOA", IncludeIOA);
+            cmd.Parameters.AddWithValue("@ClsType", Clstype);
+            cmd.CommandTimeout = 1800;
+            da = new SqlDataAdapter(cmd);
+            da.Fill(Dt);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error: " + e);
+        }
+        finally
+        {
+            Close(con);
+        }
+        return Dt;
+    }
+    public DataTable ReturnAcademicTableNext(String proc, String lplan, int studid,string lpstatus)
+    {
+        DataTable Dt = new DataTable();
+        SqlConnection con = Open();
+        try
+        {
+            SqlDataAdapter da = new SqlDataAdapter();
+            cmd = new SqlCommand(proc, con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@AllLesson", lplan);
+            cmd.Parameters.AddWithValue("@StudentId", studid);
+            cmd.Parameters.AddWithValue("@LPStatus", lpstatus);
+            da = new SqlDataAdapter(cmd);
+            da.Fill(Dt);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error: " + e);
+        }
+        finally
+        {
+            Close(con);
+        }
+        return Dt;
+    }
+    public DataTable ReturnClinicalTable(String proc, String StartDate, String enddate, int studid, String Behav, int SchoolId, String Events, String Trendtype, String Clstype)
+    {
+        DataTable Dt = new DataTable();
+        SqlConnection con = Open();
+        try
+        {
+            SqlDataAdapter da = new SqlDataAdapter();
+            cmd = new SqlCommand(proc, con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@StartDate", StartDate);
+            cmd.Parameters.AddWithValue("@ENDDate", enddate);
+            cmd.Parameters.AddWithValue("@Studentid", studid);
+            cmd.Parameters.AddWithValue("@SchoolId", SchoolId);
+            cmd.Parameters.AddWithValue("@Behavior", Behav);
+            cmd.Parameters.AddWithValue("@Trendtype", Trendtype);
+            cmd.Parameters.AddWithValue("@Event", Events);
+           // cmd.Parameters.AddWithValue("@IncludeIOA", IncludeIOA);
+            cmd.Parameters.AddWithValue("@ClassType", Clstype);
+            cmd.CommandTimeout = 1800;
+            da = new SqlDataAdapter(cmd);
+            da.Fill(Dt);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error: " + e);
+        }
+        finally
+        {
+            Close(con);
+        }
+        return Dt;
+    }
+    public DataTable ReturnNewAcademicTable(string ProcName, string cid, string sid, string mis)
+    {
+        DataTable Dt = new DataTable();
+        SqlConnection con = Open();
+        try
+        {
+
+
+            SqlDataAdapter da = new SqlDataAdapter();
+            cmd = new SqlCommand(ProcName, con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@ParamClassid", cid);
+            cmd.Parameters.AddWithValue("@ParamStudid", sid);
+            cmd.Parameters.AddWithValue("@ParamMistrial", mis);
+            da = new SqlDataAdapter(cmd);
+            da.Fill(Dt);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error: " + e);
+        }
+        finally
+        {
+            Close(con);
+        }
+        return Dt;
+    }
+
+    public DataTable ReturnNewTableClinicClient(string ProcName, string cid, string sid)
+    {
+        DataTable Dt = new DataTable();
+        SqlConnection con = Open();
+        try
+        {
+
+
+            SqlDataAdapter da = new SqlDataAdapter();
+            cmd = new SqlCommand(ProcName, con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@ParamClassid", cid);
+            cmd.Parameters.AddWithValue("@ParamStudid", sid);
+            da = new SqlDataAdapter(cmd);
+            da.Fill(Dt);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error: " + e);
+        }
+        finally
+        {
+            Close(con);
+        }
+        return Dt;
+    }
+
+    public DataTable ReturnSessTable(String proc, String StartDate, String enddate, int studid, String AllLesson, int SchoolId, String Events, String Trendtype, String IncludeIOA, String Clstype)
+    {
+        DataTable Dt = new DataTable();
+        SqlConnection con = Open();
+        try
+        {
+
+
+            SqlDataAdapter da = new SqlDataAdapter();
+            cmd = new SqlCommand(proc, con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@StartDate", StartDate);
+            cmd.Parameters.AddWithValue("@EndDate", enddate);
+            cmd.Parameters.AddWithValue("@StudentId", studid);
+            cmd.Parameters.AddWithValue("@LessonPlan", AllLesson);
+            cmd.Parameters.AddWithValue("@SchoolId", SchoolId);
+            cmd.Parameters.AddWithValue("@Event", Events);
+            cmd.Parameters.AddWithValue("@TrendType", Trendtype);
+            cmd.Parameters.AddWithValue("@IncludeIOA", IncludeIOA);
+            cmd.Parameters.AddWithValue("@ClsType", Clstype);
+            da = new SqlDataAdapter(cmd);
+            da.Fill(Dt);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error: " + e);
+        }
+        finally
+        {
+            Close(con);
+        }
+        return Dt;
+
+
+    }
+
+    public DataTable ReturnSessTableNext(String proc, String lplan, int studid)
+    {
+        DataTable Dt = new DataTable();
+        SqlConnection con = Open();
+        try
+        {
+
+
+            SqlDataAdapter da = new SqlDataAdapter();
+            cmd = new SqlCommand(proc, con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@LessonPlan", lplan);
+            cmd.Parameters.AddWithValue("@StudentId", studid);
+            da = new SqlDataAdapter(cmd);
+            da.Fill(Dt);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error: " + e);
+        }
+        finally
+        {
+            Close(con);
+        }
+        return Dt;
+
+
+    }
+    public DataTable ReturnChainedBarTable(String proc, String StartDate, String enddate, int studid, int AllLesson, int SchoolId, int Templateid, String PromptType,String Clstype)
+    {
+        DataTable Dt = new DataTable();
+        SqlConnection con = Open();
+        try
+        {
+
+
+            SqlDataAdapter da = new SqlDataAdapter();
+            cmd = new SqlCommand(proc, con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@SDate", StartDate);
+            cmd.Parameters.AddWithValue("@EDate", enddate);
+            cmd.Parameters.AddWithValue("@StudentId", studid);
+            cmd.Parameters.AddWithValue("@LessonPlanId", AllLesson);
+            cmd.Parameters.AddWithValue("@SchoolId", SchoolId);
+            cmd.Parameters.AddWithValue("@DSTempHdrId", Templateid);
+            cmd.Parameters.AddWithValue("@PromptType", PromptType);
+            cmd.Parameters.AddWithValue("@ClassType", Clstype);
+            da = new SqlDataAdapter(cmd);
+            da.Fill(Dt);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error: " + e);
+        }
+        finally
+        {
+            Close(con);
+        }
+        return Dt;
+
+
+    }
 
 }

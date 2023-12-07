@@ -195,6 +195,9 @@
                                 <asp:CheckBox ID="chkbx_Mistrial" runat="server" style=" color: #00549f;font-size:12px" Checked="True" OnCheckedChanged="chkbx_Mistrial_CheckedChanged"/>
                                 <span style="text-align:right; font-size:12px;color: #00549f;vertical-align: text-bottom;">Count Mistrial</span>
                             </td>
+                            <td>
+                                 <asp:radiobutton runat="server" id="R1" text=""  style="text-align:right;font-weight:bolder;font-size:12px;color: #00549f;padding-right:10px"></asp:radiobutton>
+                            </td>
                         </tr>
                     </table>
                 </div>

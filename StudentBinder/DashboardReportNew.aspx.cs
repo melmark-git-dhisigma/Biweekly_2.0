@@ -734,6 +734,12 @@ public partial class Graph : System.Web.UI.Page
         parm[2] = new ReportParameter("ParamMistrial", Mistrial);
         this.RV_DBReport.ServerReport.SetParameters(parm);
         RV_DBReport.ServerReport.Refresh();
+
+        if (R1.Checked == true)
+        {
+            Btnview_Click();
+    }
+     
     }
 
     private void LoadDashBoardClientAcademicPercentage(string CAgraphClassid, string CAgraphStudid)
@@ -790,6 +796,10 @@ public partial class Graph : System.Web.UI.Page
         parm[1] = new ReportParameter("ParamStudid", Studids);
         this.RV_DBReport.ServerReport.SetParameters(parm);
         RV_DBReport.ServerReport.Refresh();
+        if (R1.Checked == true)
+        {
+            ClinicalClientBtnview_Click();
+    }
     }
 
     private void LoadDashBoardStaffClinicalGraph(string SCgraphClassid, string SCgraphStudid)
@@ -1109,4 +1119,111 @@ public partial class Graph : System.Web.UI.Page
             //chkbx_leson_deliverd.Enabled = true;
         }
     }
+
+    public void Btnview_Click()
+    {
+        string mis;
+        string cid = "";
+        string sid = "";
+        if (chkbx_Mistrial.Checked)
+        {
+            mis= "1";
+        }
+        else
+        {
+            mis = "0";
+        }
+
+        if (grphclasid == null)
+        {
+
+            foreach (System.Web.UI.WebControls.ListItem item in ddcb_clas.Items)
+            {
+                if (item.Selected == false)
+                {
+                    cid += item.Value + ",";
+
+                }
+            }
+        }
+        else
+        {
+            cid = grphclasid;
+        }
+
+        if (grphstudid == null)
+        {
+
+            foreach (System.Web.UI.WebControls.ListItem item in ddcb_stud.Items)
+            {
+                if (item.Selected == false)
+                {
+                    sid += item.Value + ",";
+
+                }
+            }
+        }
+        else
+        {
+            sid = grphstudid;
+        }
+        
+
+        Session["cid"] = cid;
+        Session["sid"] = sid;
+        Session["mis"] = mis;
+
+
+        Response.Redirect("~/StudentBinder/ViewAcademicByclient.aspx");
+    }
+    protected void ClinicalClientBtnview_Click()
+    {
+        string cid = "";
+        string sid = "";
+        if (grphclasid == null)
+        {
+
+            foreach (System.Web.UI.WebControls.ListItem item in ddcb_clas.Items)
+            {
+                if (item.Selected == false)
+                {
+                    cid += item.Value + ",";
+
+                }
+            }
+        }
+        else
+        {
+            cid = grphclasid;
+        }
+
+        if (grphstudid == null)
+        {
+
+            foreach (System.Web.UI.WebControls.ListItem item in ddcb_stud.Items)
+            {
+                if (item.Selected == false)
+                {
+                    sid += item.Value + ",";
+
+                }
+            }
+        }
+        else
+        {
+            sid = grphstudid;
+        }
+
+
+        Session["cid"] = cid;
+        Session["sid"] = sid;
+        Response.Redirect("~/StudentBinder/ViewClinicalClient.aspx");
+
+    }
+
+
+
+
 }
+
+

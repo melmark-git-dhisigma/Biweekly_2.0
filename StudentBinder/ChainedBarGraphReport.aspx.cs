@@ -9,12 +9,31 @@ using System.Net;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.Web.Script.Serialization;
+using System.Web.Services;
+using System.Web.Script.Services;
+using System.Data.SqlClient;
+using System.Data;
+using PdfSharp;
+using PdfSharp.Drawing;
+using PdfSharp.Pdf;
+using PdfSharp.Pdf.IO;
 
 public partial class StudentBinder_ChainedBarGraphReport : System.Web.UI.Page
 {
     clsSession sess = null;
     ClsTemplateSession ObjTempSess;
     clsData ObjData = null;
+    public static clsData objData = null;
+    public int lid;
+    public string prompttype;
+    public int sid;
+    public int scid;
+    public string sdate;
+    public string edate;
+    public int tempid;
+    public string classtype;
+    public bool reptype = false;
     protected void Page_Load(object sender, EventArgs e)
     {
         try
@@ -174,10 +193,13 @@ public partial class StudentBinder_ChainedBarGraphReport : System.Web.UI.Page
             RV_LPReport.ServerReport.ReportServerCredentials = new CustomReportCredentials(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"], ConfigurationManager.AppSettings["Domain"]);
             if (HttpContext.Current.Request.UserAgent.ToLower().Contains("ipad"))
             {
+                reptype = true;
+
                 RV_LPReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["ChainedDupBar"];
             }
             else
             {
+                reptype = false;
                 RV_LPReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["ChainedBar"];
             }
 
@@ -189,7 +211,8 @@ public partial class StudentBinder_ChainedBarGraphReport : System.Web.UI.Page
             }
 
             RV_LPReport.ShowParameterPrompts = false;
-
+            if (highcheck.Checked == false)
+            {
             ReportParameter[] parm = new ReportParameter[8];
             parm[0] = new ReportParameter("LessonPlanId", AllLesson);
             parm[1] = new ReportParameter("StudentId",studid.ToString());
@@ -205,6 +228,18 @@ public partial class StudentBinder_ChainedBarGraphReport : System.Web.UI.Page
             this.RV_LPReport.ServerReport.SetParameters(parm);
 
             RV_LPReport.ServerReport.Refresh();
+            }
+            else
+            {
+             lid=Convert.ToInt32(AllLesson);
+             prompttype=RbtnPloatType.SelectedValue;
+             sid=studid;
+             scid=sess.SchoolId;
+             sdate=StartDate.ToString();
+             edate=enddate.ToString();
+             tempid=templateId;
+             classtype = rbtnClassType.SelectedValue;
+            }
 
         }
         else
@@ -242,7 +277,26 @@ public partial class StudentBinder_ChainedBarGraphReport : System.Web.UI.Page
             ChainedBarReport.ServerReport.ReportServerUrl = new Uri(ConfigurationManager.AppSettings["ReportUrl"]);
             ChainedBarReport.ServerReport.Refresh();
             string LPStatus = ObjData.FetchValue("SELECT LookupName FROM LOOKUP LU INNER JOIN DSTempHdr HD ON LU.LookupId=HD.StatusId WHERE LookupType='TemplateStatus' AND DSTempHdrId=" + templateId).ToString();
-
+            if (highcheck.Checked == true)
+            {
+                ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "loadWait();", true);
+                lid = Convert.ToInt32(AllLesson);
+                prompttype = RbtnPloatType.SelectedValue;
+                sid = studid;
+                scid = sess.SchoolId;
+                sdate = StartDate.ToString();
+                edate = enddate.ToString();
+                tempid = templateId;
+                classtype = rbtnClassType.SelectedValue;
+                Session["StudName"]=StudName;
+                ClientScript.RegisterStartupScript(GetType(), "", "exportChart();", true);
+                tdMsgExport.InnerHtml = clsGeneral.sucessMsg("Export Successfully Created...");
+                ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "HideWait();", true);
+                hdnExport.Value = "true";
+              //  ClientScript.RegisterStartupScript(GetType(), "", "DownloadPopup();", true);
+            }
+            else
+            {
             ReportParameter[] parm = new ReportParameter[8];
             parm[0] = new ReportParameter("LessonPlanId", AllLesson);
             parm[1] = new ReportParameter("StudentId", studid.ToString());
@@ -258,9 +312,9 @@ public partial class StudentBinder_ChainedBarGraphReport : System.Web.UI.Page
             Warning[] warnings;
             string[] streamids;
             string mimeType, encoding, extension, deviceInfo;
-            
+
             deviceInfo = "<DeviceInfo><PageHeight>8.5in</PageHeight><PageWidth>11in</PageWidth><MarginTop>1in</MarginTop></DeviceInfo>";
-            
+
             //deviceInfo = "<DeviceInfo><PageHeight>8.5in</PageHeight><PageWidth>11in</PageWidth></DeviceInfo>";
 
             byte[] bytes = ChainedBarReport.ServerReport.Render("PDF", deviceInfo, out mimeType, out encoding, out extension, out streamids, out warnings);
@@ -281,6 +335,7 @@ public partial class StudentBinder_ChainedBarGraphReport : System.Web.UI.Page
 
             //Response.BinaryWrite(bytes); // create the file
             //Response.Flush(); // send it to the client to download
+            }
 
         }
         catch (Exception Ex)
@@ -347,6 +402,52 @@ public partial class StudentBinder_ChainedBarGraphReport : System.Web.UI.Page
     {
         try
         {
+            if (highcheck.Checked == true)
+            {
+
+                string sourcePdfPath = HttpContext.Current.Server.MapPath("~/StudentBinder/Exported/TempChained/");
+                string outputFileName = Session["StudName"].ToString() + "ChainedReport.pdf";
+                string outputPath = HttpContext.Current.Server.MapPath("~/StudentBinder/Exported/" + outputFileName);
+                int count = 0;
+                string originalFileName = outputFileName;
+                while (System.IO.File.Exists(outputPath))
+                {
+                    count++;
+                    string fileNameWithoutExtension = System.IO.Path.GetFileNameWithoutExtension(originalFileName);
+                    string fileExtension = System.IO.Path.GetExtension(originalFileName);
+                    outputFileName = fileNameWithoutExtension + " (" + count + ")" + fileExtension;
+                    outputPath = HttpContext.Current.Server.MapPath("~/StudentBinder/Exported/" + outputFileName);
+                }
+                PdfDocument outputDocument = new PdfDocument();
+                string[] fileNames = System.IO.Directory.GetFiles(sourcePdfPath);
+                foreach (string fileName in fileNames)
+                {
+                    PdfDocument inputDocument = PdfReader.Open(fileName, PdfDocumentOpenMode.Import);
+                    foreach (PdfPage page in inputDocument.Pages)
+                    {
+                        outputDocument.AddPage(page);
+                    }
+                    inputDocument.Close();
+                    inputDocument.Dispose();
+                    File.Delete(fileName);
+                }
+                outputDocument.Save(outputPath);
+                ClientScript.RegisterStartupScript(GetType(), "", "CloseDownload();", true);
+                outputDocument.Close();
+                WebClient req = new WebClient();
+                HttpResponse response = HttpContext.Current.Response;
+                response.Clear();
+                response.ClearContent();
+                response.ClearHeaders();
+                response.Buffer = true;
+                response.AddHeader("Content-Disposition", "attachment;filename=\"" + outputPath + "\"");
+                byte[] data = req.DownloadData(outputPath);
+                response.BinaryWrite(data);
+                btnsubmit_Click(sender, e);
+                response.End();
+            }
+            else
+            {
             string FileName = Session["PdfPath"].ToString();
             WebClient req = new WebClient();
             HttpResponse response = HttpContext.Current.Response;
@@ -360,10 +461,110 @@ public partial class StudentBinder_ChainedBarGraphReport : System.Web.UI.Page
             ClientScript.RegisterStartupScript(GetType(), "", "HideWait();", true);
             response.End();
         }
+        }
         catch (Exception ex)
         {
             throw ex;
         }
     }
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public static string getChainedBarReport(string StartDate, string enddate, int studid, int AllLesson, int SchoolId, int Templateid, string PromptType, string Clstype)
+    {
+        objData = new clsData();
+        string str = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
+        SqlConnection cn = new SqlConnection(str);
+        cn.Open();
 
+        List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+        Dictionary<string, object> row;
+        String proc = "[dbo].[Chainedbargraphreport]";
+
+        DataTable dt = objData.ReturnChainedBarTable(proc, StartDate, enddate, studid, AllLesson, SchoolId, Templateid, PromptType, Clstype);
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            row = new Dictionary<string, object>();
+            foreach (DataColumn dc in dt.Columns)
+            {
+                row.Add(dc.ColumnName, dr[dc]);
+            }
+            rows.Add(row);
+
+        }
+
+        JavaScriptSerializer json = new JavaScriptSerializer();
+        return json.Serialize(rows);
+    }
+    [WebMethod]
+    public static string[] getgraphs(string base64, string chartId)
+    {
+        try
+        {
+            HttpContext currentContext = HttpContext.Current;
+
+            if (currentContext != null)
+            {
+                string base64Images = base64.Split(',')[1];
+                string pdfFilePath = currentContext.Server.MapPath("~/StudentBinder/Exported/TempChained/stud" + chartId + ".pdf");
+
+                PdfSharp.Pdf.PdfDocument pdfDocument = new PdfSharp.Pdf.PdfDocument();
+                PdfSharp.Pdf.PdfPage page = pdfDocument.AddPage();
+                page.Orientation = PageOrientation.Landscape;
+                XGraphics gfx = XGraphics.FromPdfPage(page);
+
+                byte[] bytes = Convert.FromBase64String(base64Images);
+                using (MemoryStream imageStream = new MemoryStream(bytes))
+                {
+                    XImage image = XImage.FromStream(imageStream);
+
+                    double pageWidth = page.Width;
+                    double pageHeight = page.Height;
+                    double imageWidth = image.PixelWidth;
+                    double imageHeight = image.PixelHeight;
+
+                    double scale = Math.Min(pageWidth / imageWidth, pageHeight / imageHeight);
+                    double newWidth = imageWidth * scale;
+                    double newHeight = imageHeight * scale;
+
+                    double x = (pageWidth - newWidth) / 2;
+                    double y = (pageHeight - newHeight) / 2;
+
+                    gfx.DrawImage(image, x, y, newWidth, newHeight);
+                }
+
+                pdfDocument.Save(pdfFilePath);
+                return new string[] { pdfFilePath };
+            }
+            else
+            {
+                return new string[] { "Error: HttpContext is null" };
+            }
+        }
+        catch (Exception ex)
+        {
+            return new string[] { "Error: " + ex.Message };
+        }
+    }
+    protected void btnDone_Click(object sender, EventArgs e)
+    {
+        string sourcePdfPath = HttpContext.Current.Server.MapPath("~/StudentBinder/Exported/TempChained/");
+        if (Directory.Exists(sourcePdfPath))
+        {
+            try
+            {
+                string[] pdfFiles = Directory.GetFiles(sourcePdfPath, "*.pdf");
+                foreach (string pdfFile in pdfFiles)
+                {
+                    File.Delete(pdfFile);
+                }
+                btnsubmit_Click(sender, e);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+    }
 }
