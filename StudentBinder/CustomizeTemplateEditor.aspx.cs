@@ -3724,8 +3724,17 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 if (dtNew.Rows.Count > 0)
                 {
                     txtLessonName.Text = dtNew.Rows[0]["LessonPlanName"].ToString();
-                    txtNoofTimesTried.Text = dtNew.Rows[0]["NoofTimesTried"].ToString();
-                    noofTimesTriedPer.SelectedValue = dtNew.Rows[0]["NoofTimesTriedPer"].ToString();
+                    if (NoofTimesTried != null && NoofTimesTried.Rows.Count > 0)
+                    {
+                        txtNoofTimesTried.Text = NoofTimesTried.Rows[0]["NoofTimesTried"].ToString();
+                        noofTimesTriedPer.SelectedValue = NoofTimesTried.Rows[0]["NoofTimesTriedPer"].ToString();
+                    }
+                    else
+                    {
+                        txtNoofTimesTried.Text = "";
+                        noofTimesTriedPer.SelectedIndex = 0;
+                    }
+                    
                     txtFramework.Text = dtNew.Rows[0]["FrameandStrand"].ToString();
                     txtSpecStandrd.Text = dtNew.Rows[0]["SpecStandard"].ToString();
                     txtSpecEntrypoint.Text = dtNew.Rows[0]["SpecEntryPoint"].ToString();
