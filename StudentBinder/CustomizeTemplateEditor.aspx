@@ -65,6 +65,29 @@
             width: 974px;
             z-index: 10000;
         }
+        .ddchkLessonYear {
+            width:130px;
+            Height:300px;
+            height: 19px !important;
+            color: #676767 !important;
+            border-radius: 3px !important;
+            padding: 3px 3px 3px 3px!important;
+            background-image: url(./images/statusdownarow.png) !important;
+            background-size: 14px 17px !important;
+            background-position-x: 97%!important;
+        }
+        div.dd_chk_select div#caption{
+            top: 3px !important;
+        }
+        div.dd_chk_drop div#checks {
+            Height: 150px;
+            width:128px;
+            background-color: #F2EEEE;
+        }
+        div.dd_chk_drop {
+            margin-top: 10px;
+            Height: 150px;
+        }
     </style>
     <script>
         function PlusminusAoTb1() {
@@ -1865,8 +1888,12 @@
                                 <h2>1 <span>Choose Lesson Plan</span></h2>
                             </td>--%>
                             <td style="width: 15%; padding-left: 16px;">
-
-                                <div class="tooltip">
+                                <asp:DropDownCheckBoxes ID="ddlIepYear" runat="server" CssClass="ddchkLessonYear" UseButtons="false" UseSelectAllNode="false" Height="26px" Width="150px" AutoPostBack="true" 
+                                     OnSelectedIndexChanged="ddlIepYear_SelectedIndexChanged">
+                    <Texts SelectBoxCaption="IEP Start Year"/>
+                </asp:DropDownCheckBoxes>
+                                <asp:Button ID="Button_Search" runat="server" CssClass="btn btn-orange" Text="" />
+                                <%--<div class="tooltip">
                                     <div class="tooltip1">
 
                                         <div id="idLessonType" class="" runat="server">
@@ -1894,7 +1921,7 @@
                                         </span>
                                     </div>
 
-                                </div>
+                                </div>--%>
 
                             </td>
                             <td>

@@ -1439,12 +1439,13 @@ fillGraphhighchart(LessonId);
             string script = "closePopup();";
             ScriptManager.RegisterStartupScript(this, this.GetType(), "hidepop3", script, true);
         fillGraph(LessonId);
-    }
+        }
     }
     protected void EvntCheckBox_CheckedChanged(object sender, EventArgs e)
     {
         ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "showEvents();", true); 
     }
+
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public static string getClinicalcReport(string StartDate, string enddate, int studid, string Behav, int SchoolId, string Events, string Trendtype, string Clstype)
@@ -1494,7 +1495,6 @@ fillGraphhighchart(LessonId);
         }
         JavaScriptSerializer json = new JavaScriptSerializer();
         return json.Serialize(rows);
-
     }
     [WebMethod]
     public static string[] getgraphs(string base64, string chartId)

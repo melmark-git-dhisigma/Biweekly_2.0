@@ -18,6 +18,7 @@ public partial class StudentBinder_Event : System.Web.UI.Page
     clsSession sess = null;
     int srhck = 0;
     string query3 = "";
+    string query4 = "";
     
 
     protected void Page_Load(object sender, EventArgs e)
@@ -255,8 +256,7 @@ public partial class StudentBinder_Event : System.Web.UI.Page
             DataTable Dt = null;
             if (RadioButtonevent.SelectedValue == "Medication" && (txtSdate0.Text != "" || txtEdate1.Text != ""))
             {
-                Dt = objData.ReturnDataTable("select * from(Select StdtSessEventId,EventName,Comment,EvntTs,CreatedOn,ModifiedOn,CASE WHEN EndTime='1900-01-01 00:00:00.000' THEN NULL ELSE EndTime END AS EndTime from [StdtSessEvent] Where EventType='EV' And StudentId=" + sess.StudentId + " AND StdtSessEventType='Medication' )" + query3, false);//AND ClassId=" + sess.Classid + "
-            
+                    Dt = objData.ReturnDataTable("Select StdtSessEventId,EventName,Comment,EvntTs,CreatedOn,ModifiedOn,CASE WHEN EndTime='1900-01-01 00:00:00.000' THEN NULL ELSE EndTime END AS EndTime from [StdtSessEvent] Where EventType='EV' And StudentId=" + sess.StudentId + " AND StdtSessEventType='Medication' " + query4, false);//AND ClassId=" + sess.Classid + "
             }
             else
             Dt = objData.ReturnDataTable("Select StdtSessEventId,EventName,Comment,EvntTs,CreatedOn,ModifiedOn,CASE WHEN EndTime='1900-01-01 00:00:00.000' THEN NULL ELSE EndTime END AS EndTime from [StdtSessEvent] Where EventType='EV' And StudentId=" + sess.StudentId + " AND StdtSessEventType='Medication' ", false);//AND ClassId=" + sess.Classid + "
@@ -313,7 +313,7 @@ public partial class StudentBinder_Event : System.Web.UI.Page
                 "UNION ALL (SELECT NULL AS LessonPlanId, BIOA.MeasurementId, NULL AS StdtSessEventId, NULL AS StdtSessionHdrId, 'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" + query2 + " AS EventName, " +
                 "NULL AS LessonPlanName, 'Arrow notes' AS StdtSessEventType, NULL AS Comment, CONVERT(CHAR(10), BIOA.CreatedOn,101) AS EvntTs, BIOA.CreatedOn, BIOA.ModifiedOn, " +
                 "BIOA.BehaviorIOAId, BHD.Behaviour FROM BehaviorIOADetails BIOA LEFT JOIN BehaviourDetails BHD ON BIOA.MeasurementId=BHD.MeasurementId " +
-                "WHERE BIOA.StudentId=" + sess.StudentId + " AND IOAPerc IS NOT NULL AND BIOA.ActiveInd='A') )IOA ) " + query3 +"order By ad.CreatedOn DESC";
+                "WHERE BIOA.StudentId=" + sess.StudentId + " AND IOAPerc IS NOT NULL AND BIOA.ActiveInd='A') )IOA ) " + query3 +" AND EventName IS NOT NULL order By ad.CreatedOn DESC";
                 
                       Dt = objData.ReturnDataTable(queryfilter, false);
                  
@@ -339,7 +339,7 @@ public partial class StudentBinder_Event : System.Web.UI.Page
                "UNION ALL (SELECT NULL AS LessonPlanId, BIOA.MeasurementId, NULL AS StdtSessEventId, NULL AS StdtSessionHdrId, 'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" + query2 + " AS EventName, " +
                "NULL AS LessonPlanName, 'Arrow notes' AS StdtSessEventType, NULL AS Comment, CONVERT(CHAR(10), BIOA.CreatedOn,101) AS EvntTs, BIOA.CreatedOn, BIOA.ModifiedOn, " +
                "BIOA.BehaviorIOAId, BHD.Behaviour FROM BehaviorIOADetails BIOA LEFT JOIN BehaviourDetails BHD ON BIOA.MeasurementId=BHD.MeasurementId " +
-               "WHERE BIOA.StudentId=" + sess.StudentId + " AND IOAPerc IS NOT NULL AND BIOA.ActiveInd='A') )IOA ORDER BY  IOA.CreatedOn  DESC", false);
+               "WHERE BIOA.StudentId=" + sess.StudentId + " AND IOAPerc IS NOT NULL AND BIOA.ActiveInd='A') )IOA WHERE EventName IS NOT NULL ORDER BY  IOA.CreatedOn  DESC", false);
 
               
             }
@@ -1080,7 +1080,7 @@ public partial class StudentBinder_Event : System.Web.UI.Page
         Panel1.Visible = false;
         UpdatePanel1.Visible = true;
         btnSave.Visible = true;
-   
+
         Tab1.CssClass = "Clicked";
         Tab2.CssClass = "Initial";
         MainView.ActiveViewIndex = 0;
@@ -1248,19 +1248,19 @@ public partial class StudentBinder_Event : System.Web.UI.Page
         if (RadioButtonevent.SelectedValue == "Medication" || Tab2.CssClass == "Clicked")
         {
             int chk2 = 0;
+            query3 = "ad where ad.LessonPlanId<-1";
             if (txtSdate0.Text != null && txtSdate0.Text != "")
             {
-
-                query3 = query3 + " Convert(date,ad.EvntTs)>=" + "'" + txtSdate0.Text + "'";
+                query4 = " and Convert(date,EvntTs)>=" + "'" + txtSdate0.Text + "'";
                 chk2++;
             }
 
             if (txtEdate1.Text != null && txtEdate1.Text != "")
             {
                 if (chk2 >= 1)
-                    query3 = query3 + " )AND Convert(date,ad.EvntTs)<=" + "'" + txtEdate1.Text + "'";
+                    query4 = query4 + " AND Convert(date,EvntTs)<=" + "'" + txtEdate1.Text + "'";
                 else
-                    query3 = query3 + " Convert(date,ad.EvntTs)<=" + "'" + txtEdate1.Text + "'";
+                    query4 = " AND Convert(date,EvntTs)<=" + "'" + txtEdate1.Text + "'";
 
             }
             ddlLessonplan0.SelectedIndex = 0;
@@ -1270,7 +1270,8 @@ public partial class StudentBinder_Event : System.Web.UI.Page
             MainView.ActiveViewIndex = 1;
             clearFields();
         }
-      
+       if (Convert.ToInt32(ddlLessonplan0.SelectedValue) == -1 && Convert.ToInt32(ddlBehavior1.SelectedValue) == -1)
+           query3 = "ad where ad.LessonPlanId<-1";
 
     }
 }

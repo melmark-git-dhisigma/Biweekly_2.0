@@ -189,7 +189,9 @@ public class clsMathToSamples
         int ansIndex1 = -1;
         for (int i = 0; i < str1.Length; ++i)
         {
-            if (ans.Equals(str1[i]))
+
+            string ansfin = ans.Trim();
+            if (ansfin.Equals(str1[i]))
             {
                 ansIndex1 = i;
                 break;

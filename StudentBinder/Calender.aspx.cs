@@ -49,6 +49,12 @@ public partial class StudentBinder_Calender : System.Web.UI.Page
         if (!IsPostBack)
         {
             LoadData();
+            btnReplicate.Visible = false;
+        }
+        else
+        {
+            Calendar1.SelectedDates.Clear();
+            Calendar2.SelectedDates.Clear();
         }
     }
 
@@ -155,6 +161,7 @@ public partial class StudentBinder_Calender : System.Web.UI.Page
                 {
                     oSession.days_4weeks = Calendar1.SelectedDates;
                     oSession.current_week = Calendar1.SelectedDates;
+                    oSession.selected_week = oSession.current_week;
                     weekview(Calendar1.SelectedDates);
                 }
 
@@ -186,14 +193,14 @@ public partial class StudentBinder_Calender : System.Web.UI.Page
         {
             btnReplicate.Visible = true;
         }
-        if (oSession.current_week.Contains(Calendar1.SelectedDates[1]))
-        {
-            btnReplicate.Visible = false;
-        }
-        else
-        {
-            btnReplicate.Visible = true;
-        }
+        //if (oSession.current_week.Contains(Calendar1.SelectedDates[1]))
+        //{
+        //    btnReplicate.Visible = false;
+        //}
+        //else
+        //{
+        //    btnReplicate.Visible = true;
+        //}
     }
 
     protected void CheckStudList()
@@ -945,35 +952,54 @@ public partial class StudentBinder_Calender : System.Web.UI.Page
         }
         checkResident();
     }
+    protected void Calendartest_SelectionChanged(object sender, EventArgs e)
+    {
+        oSession.days_4weeks = Calendar1.SelectedDates;
+        ScriptManager.RegisterStartupScript(this, this.GetType(), Guid.NewGuid().ToString(), "showLoader();", true);
+    }
     protected void Calendar1_SelectionChanged(object sender, EventArgs e)
     {
-        SelectedDatesCollection dt = Calendar1.SelectedDates;
         clsSession oSession = (clsSession)HttpContext.Current.Session["UserSession"];
-        if (dt.Count == 1)
-        {
-            if (oSession != null)
+        SelectedDatesCollection dt = oSession.days_4weeks;
+            if (dt.Count == 1)
             {
-                oSession.CrrntDate = Calendar1.SelectedDate.ToString("yyyy-MM-dd");
-                hfDate.Value = oSession.CrrntDate;
-                Calendr(oSession.CrrntDate);
+                if (oSession != null)
+                {
+                    oSession.CrrntDate = Calendar1.SelectedDate.ToString("yyyy-MM-dd");
+                    hfDate.Value = oSession.CrrntDate;
+                    Calendr(oSession.CrrntDate);
+                }
             }
-        }
-        else
-        {
-            if (oSession != null)
+            else
             {
-                oSession.days_4weeks = dt;
-                weekview(dt);
+                if (oSession != null)
+                {
+                    weekview(dt);
+                    Calendar1.SelectedDate = oSession.days_4weeks[0].Date;
+                    Calendar1.SelectionMode = CalendarSelectionMode.DayWeek;
+                    DayOfWeek today = oSession.days_4weeks[0].Date.DayOfWeek;
+                    DateTime Date = oSession.days_4weeks[0].Date;
+                    int i = 1, j = 1;
+                    while (today != DayOfWeek.Sunday)
+                    {
+                        Date = oSession.days_4weeks[i].Date.AddDays(i);
+                        today = oSession.days_4weeks[i].Date.DayOfWeek;
+                        i++;
+                    }
+
+                    while (today != DayOfWeek.Monday)
+                    {
+                        if (i != j)
+                        Calendar1.SelectedDates.Add(oSession.days_4weeks[0].Date.AddDays(i - j));
+                        today = oSession.days_4weeks[0].Date.AddDays(i - j).DayOfWeek;
+                        j++;
+                    }
+                }
             }
-        }
-        if (oSession.current_week.Contains(Calendar1.SelectedDates[1]))
-        {
-            btnReplicate.Visible = false;
-        }
-        else
-        {
-            btnReplicate.Visible = true;
-        }
+        btnReplicate.Visible = true;
+
+            ScriptManager.RegisterStartupScript(this, this.GetType(), Guid.NewGuid().ToString(), "hideLoader();", true);       
+        
     }
     protected void Calendar1_DayRender(object sender, DayRenderEventArgs e)
     {
@@ -1008,6 +1034,98 @@ public partial class StudentBinder_Calender : System.Web.UI.Page
             {
                 oSession.days_4weeks = dt;
                 weekview(dt);
+            }
+        }
+    }
+    protected void Calendar2test_SelectionChanged(object sender, EventArgs e)
+    {
+        oSession.selected_week = Calendar2.SelectedDates;
+        ScriptManager.RegisterStartupScript(this, this.GetType(), Guid.NewGuid().ToString(), "showLoader2();", true);
+    }
+    protected void Calendar2_SelectionChanged(object sender, EventArgs e)
+    {
+        clsSession oSession = (clsSession)HttpContext.Current.Session["UserSession"];
+        SelectedDatesCollection dt = oSession.selected_week;
+        if (dt.Count == 1)
+        {
+            if (oSession != null)
+            {
+                oSession.CrrntDate = Calendar2.SelectedDate.ToString("yyyy-MM-dd");
+
+                //hfDate.Value = oSession.CrrntDate;
+                //Calendr(oSession.CrrntDate);
+            }
+        }
+        else
+        {
+            if (oSession != null)
+            {
+                btnCopyWeek.Text = "Copy To Selected Week";
+                weekview(dt); 
+                Calendar2.SelectedDate = oSession.selected_week[0].Date;
+                Calendar2.SelectionMode = CalendarSelectionMode.DayWeek;
+                DayOfWeek today = oSession.selected_week[0].Date.DayOfWeek;
+                DateTime Date = oSession.selected_week[0].Date;
+                int i = 1, j = 1;
+                while (today != DayOfWeek.Sunday)
+                {
+                    Date = oSession.selected_week[i].Date.AddDays(i);
+                    today = oSession.selected_week[i].Date.DayOfWeek;
+                    i++;
+                }
+
+                while (today != DayOfWeek.Monday)
+                {
+                    if (i != j)
+                        Calendar2.SelectedDates.Add(oSession.selected_week[0].Date.AddDays(i - j));
+                    today = oSession.selected_week[0].Date.AddDays(i - j).DayOfWeek;
+                    j++;
+                }
+            }
+        }
+        //if (oSession.current_week.Contains(Calendar2.SelectedDates[1]))
+        //{
+        //    btnReplicate.Visible = false;
+        //}
+        //else
+        //{
+        //    btnReplicate.Visible = true;
+        //}
+        ScriptManager.RegisterStartupScript(this, this.GetType(), Guid.NewGuid().ToString(), "hideLoader();", true);
+    }
+    protected void Calendar2_DayRender(object sender, DayRenderEventArgs e)
+    {
+        if (Calendar2.SelectionMode == CalendarSelectionMode.DayWeek)
+        {
+            e.Day.IsSelectable = false;
+        }
+        else
+        {
+            e.Day.IsSelectable = true;
+            if (e.Day.IsSelected == true)
+                e.Day.IsSelectable = false;
+        }
+    }
+    protected void Calendar2_VisibleMonthChanged(object sender, MonthChangedEventArgs e)
+    {
+        SelectedDatesCollection dt = Calendar2.SelectedDates;
+        oSession = (clsSession)Session["UserSession"];
+        if (dt.Count == 1)
+        {
+            if (oSession != null)
+            {
+                lblDate.Text = Calendar2.SelectedDate.DayOfWeek.ToString() + " / " + Calendar2.SelectedDate.ToString("dd / MMM");
+                oSession.CrrntDate = Calendar2.SelectedDate.ToString("yyyy-MM-dd");
+                hfDate.Value = oSession.CrrntDate;
+                Calendr(oSession.CrrntDate);
+            }
+        }
+        else
+        {
+            if (oSession != null)
+            {
+                oSession.selected_week = dt;
+                weekview(oSession.selected_week);
             }
         }
     }
@@ -1110,6 +1228,11 @@ public partial class StudentBinder_Calender : System.Web.UI.Page
     }
     protected void btnReplicate_Click(object sender, EventArgs e)
     {
+        ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "CallJS", "view1(this);", true);
+        weekview(oSession.days_4weeks);
+    }
+    protected void btnCopyWeek_Click(object sender, EventArgs e)
+    {
         oSession = (clsSession)Session["UserSession"];
         if (oSession != null)
         {
@@ -1135,31 +1258,37 @@ public partial class StudentBinder_Calender : System.Web.UI.Page
                                 {
                                     check = Convert.ToInt32(oData.FetchValue("SELECT StdtLPSchedId FROM StdtLPSched WHERE StartTime='" + drEvnt["StartTime"].ToString() + "'AND " +
                                         "EndTime='" + drEvnt["EndTime"].ToString() + "' AND LPId=" + drEvnt["LPId"].ToString() + " AND StdtId=" + studID + " AND " +
-                                        "Day='" + oSession.current_week[index].Date.ToString("yyyy-MM-dd") + "' AND SchOtherDesc= '" + drEvnt["SchOtherDesc"].ToString() + "'"));
+                                        "Day='" + oSession.selected_week[index].Date.ToString("yyyy-MM-dd") + "' AND SchOtherDesc= '" + drEvnt["SchOtherDesc"].ToString() + "'"));
                                 }
                                 else {
                                     check = Convert.ToInt32(oData.FetchValue("SELECT StdtLPSchedId FROM StdtLPSched WHERE StartTime='" + drEvnt["StartTime"].ToString() + "'AND " +
                                         "EndTime='" + drEvnt["EndTime"].ToString() + "' AND LPId=" + drEvnt["LPId"].ToString() + " AND StdtId=" + studID + " AND " +
-                                        "Day='" + oSession.current_week[index].Date.ToString("yyyy-MM-dd") + "'"));
+                                        "Day='" + oSession.selected_week[index].Date.ToString("yyyy-MM-dd") + "'"));
                                 }
                                  if (check == 0){
                                     
                                     if (LPId==0)
                                     oData.Execute("INSERT INTO StdtLPSched(SchoolId,StdtId,StartTime,EndTime,LPId,Day,CreatedBy,CreatedOn,SchOtherDesc) " +
                                         "VALUES(" + oSession.SchoolId + "," + studID + ",'" + drEvnt["StartTime"].ToString() + "','" + drEvnt["EndTime"].ToString() + "'," +
-                                        "" + drEvnt["LPId"].ToString() + ",'" + oSession.current_week[index].Date.ToString("yyyy-MM-dd") + "',1," +
+                                        "" + drEvnt["LPId"].ToString() + ",'" + oSession.selected_week[index].Date.ToString("yyyy-MM-dd") + "',1," +
                                         "(SELECT convert(varchar, getdate(), 100)),'" + drEvnt["SchOtherDesc"].ToString() + "')");
                                     else
                                         oData.Execute("INSERT INTO StdtLPSched(SchoolId,StdtId,StartTime,EndTime,LPId,Day,CreatedBy,CreatedOn) " +
                                         "VALUES(" + oSession.SchoolId + "," + studID + ",'" + drEvnt["StartTime"].ToString() + "','" + drEvnt["EndTime"].ToString() + "'," +
-                                        "" + drEvnt["LPId"].ToString() + ",'" + oSession.current_week[index].Date.ToString("yyyy-MM-dd") + "',1," +
+                                        "" + drEvnt["LPId"].ToString() + ",'" + oSession.selected_week[index].Date.ToString("yyyy-MM-dd") + "',1," +
                                         "(SELECT convert(varchar, getdate(), 100)))");
                                 }
                             }
                     }
                     //weekview(oSession.days_4weeks);
                     //weekview(oSession.current_week);
+                    ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "CallJS", "hideSel();", true);
+                    Calendar2.VisibleDate = DateTime.Now;
+                    Calendar2.SelectedDate = DateTime.Now;
+                    Calendar2.SelectionMode = CalendarSelectionMode.DayWeek;
+                    btnCopyWeek.Text = "Copy To Current Week";
                     LoadData();
+                    btnReplicate.Visible = false;
                 }
             }
             if (hfMode.Value == "Day")
@@ -1186,7 +1315,7 @@ public partial class StudentBinder_Calender : System.Web.UI.Page
                                             "(SELECT convert(varchar, getdate(), 100)))");
                                 }
                         }
-                    Calendr(oSession.CrrntDate);
+                    Calendr(oSession.selected_week[0].Date.ToString());
                 }
             }
         }

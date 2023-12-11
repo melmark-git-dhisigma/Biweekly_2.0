@@ -83,7 +83,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 BtnAddNewLessonPlan.Visible = false;
                 mBxContainer.Visible = false;
                 MainDiv.Style.Add("width", "100%");
-                idLessonType.Visible = false;
+                //idLessonType.Visible = false;
                 BtnAddNewLessonPlan.Visible = false;
                 panelContent.Visible = false;
                 panelButtons.Visible = false;
@@ -257,6 +257,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         FillRejectedLessons();
         FillMaintenanceLessonData();
         FillInactiveLessonData();
+        FillYears();
         ButtonVisibility(visible);
         LoadLPforSorting();
         LoadEmailforSorting();
@@ -363,8 +364,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         if (visibility == false)
         {
 
-            lblLessonType.Visible = false;                // Visual  lesson plan link
-            idOption.Visible = false;
+            //lblLessonType.Visible = false;                // Visual  lesson plan link
+            //idOption.Visible = false;
 
             BtnUpdate.Visible = false;
             BtnAddMeasure.Visible = false;
@@ -413,8 +414,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         else
         {
 
-            lblLessonType.Visible = true;                // Visual  lesson plan link
-            idOption.Visible = true;
+            //lblLessonType.Visible = true;                // Visual  lesson plan link
+            //idOption.Visible = true;
 
             if (ViewState["HeaderId"] != null)
             {
@@ -1224,7 +1225,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         objData = new clsData();
         sess = (clsSession)Session["UserSession"];
         string selctQuerry = "";
-
+        string yearQry = getYears();
         try
         {
             if (sess != null)
@@ -1237,7 +1238,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                        " FROM (StdtLessonPlan StdtLP INNER JOIN  " +
                                            " (DSTempHdr DTmp  INNER JOIN LookUp LU ON LU.LookupId=DTmp.StatusId) " +
                                                         " ON DTmp.LessonPlanId=StdtLP.LessonPlanId AND DTmp.StudentId=StdtLP.StudentId)   " +
-                                                        "   INNER JOIN LessonPlan LP ON StdtLP.LessonPlanId=LP.LessonPlanId WHERE StdtLP.StudentId=" + sess.StudentId + " AND  " +
+                                                        "   INNER JOIN LessonPlan LP ON StdtLP.LessonPlanId=LP.LessonPlanId WHERE " + yearQry + " StdtLP.StudentId=" + sess.StudentId + " AND  " +
                                                      "  StdtLP.ActiveInd='A' AND LU.LookupName<>'Expired' AND LU.LookupName = 'Approved'" +
                                                   "  GROUP BY DTmp.DSTemplateName,DTmp.VerNbr,StdtLP.GoalId, DTmp.DSTempHdrId,DTmp.StatusId,LU.LookupName,DTmp.LessonOrder) data WHERE frow=1 order by LessonOrder";
 
@@ -1259,7 +1260,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         objData = new clsData();
         sess = (clsSession)Session["UserSession"];
         string selctQuerry = "";
-
+        string yearQry = getYears();
         try
         {
             if (sess != null)
@@ -1272,7 +1273,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                        " FROM (StdtLessonPlan StdtLP INNER JOIN  " +
                                            " (DSTempHdr DTmp  INNER JOIN LookUp LU ON LU.LookupId=DTmp.StatusId) " +
                                                         " ON DTmp.LessonPlanId=StdtLP.LessonPlanId AND DTmp.StudentId=StdtLP.StudentId)   " +
-                                                        "   INNER JOIN LessonPlan LP ON StdtLP.LessonPlanId=LP.LessonPlanId WHERE StdtLP.StudentId=" + sess.StudentId + " AND  " +
+                                                        "   INNER JOIN LessonPlan LP ON StdtLP.LessonPlanId=LP.LessonPlanId WHERE " + yearQry + " StdtLP.StudentId=" + sess.StudentId + " AND  " +
                                                      "  StdtLP.ActiveInd='A' AND LU.LookupName<>'Expired' AND LU.LookupName = 'Maintenance'" +
                                                   "  GROUP BY DTmp.DSTemplateName,DTmp.VerNbr,StdtLP.GoalId, DTmp.DSTempHdrId,DTmp.StatusId,LU.LookupName,DTmp.LessonOrder) data WHERE frow=1 order by LessonOrder";
 
@@ -1293,7 +1294,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         objData = new clsData();
         sess = (clsSession)Session["UserSession"];
         string selctQuerry = "";
-
+        string yearQry = getYears();
         try
         {
             if (sess != null)
@@ -1306,7 +1307,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                        " FROM (StdtLessonPlan StdtLP INNER JOIN  " +
                                            " (DSTempHdr DTmp  INNER JOIN LookUp LU ON LU.LookupId=DTmp.StatusId) " +
                                                         " ON DTmp.LessonPlanId=StdtLP.LessonPlanId AND DTmp.StudentId=StdtLP.StudentId)   " +
-                                                        "   INNER JOIN LessonPlan LP ON StdtLP.LessonPlanId=LP.LessonPlanId WHERE StdtLP.StudentId=" + sess.StudentId + " AND  " +
+                                                        "   INNER JOIN LessonPlan LP ON StdtLP.LessonPlanId=LP.LessonPlanId WHERE " + yearQry + " StdtLP.StudentId=" + sess.StudentId + " AND  " +
                                                      "  StdtLP.ActiveInd='A' AND LU.LookupName<>'Expired' AND LU.LookupName = 'Inactive'" +
                                                   "  GROUP BY DTmp.DSTemplateName,DTmp.VerNbr,StdtLP.GoalId, DTmp.DSTempHdrId,DTmp.StatusId,LU.LookupName,DTmp.LessonOrder) data WHERE frow=1 order by LessonOrder";
 
@@ -1328,7 +1329,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         objData = new clsData();
         sess = (clsSession)Session["UserSession"];
         string selctQuerry = "";
-
+        string yearQry = getYears();
         try
         {
             if (sess != null)
@@ -1341,7 +1342,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                        " FROM (StdtLessonPlan StdtLP INNER JOIN  " +
                                            " (DSTempHdr DTmp  INNER JOIN LookUp LU ON LU.LookupId=DTmp.StatusId) " +
                                                         " ON DTmp.LessonPlanId=StdtLP.LessonPlanId AND DTmp.StudentId=StdtLP.StudentId)   " +
-                                                        "   INNER JOIN LessonPlan LP ON StdtLP.LessonPlanId=LP.LessonPlanId WHERE StdtLP.StudentId=" + sess.StudentId + " AND  " +
+                                                        "   INNER JOIN LessonPlan LP ON StdtLP.LessonPlanId=LP.LessonPlanId WHERE " + yearQry + " StdtLP.StudentId=" + sess.StudentId + " AND  " +
                                                      "  StdtLP.ActiveInd='A' AND LU.LookupName = 'Expired'" +
                                                   "  GROUP BY DTmp.DSTemplateName,DTmp.VerNbr,StdtLP.GoalId, DTmp.DSTempHdrId,DTmp.StatusId,LU.LookupName,DTmp.LessonOrder) data WHERE frow=1 order by LessonOrder";
 
@@ -1368,6 +1369,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         Pagepath = "CustomizeTemplateEditor:FillData";
         sess = clsGeneral.sessioncheck(curesesid, preid, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
         string selectQuerry = "";
+        string yearQry = getYears();
         try
         {
             if (sess != null)
@@ -1380,7 +1382,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                    " FROM (StdtLessonPlan StdtLP INNER JOIN  " +
                                    " (DSTempHdr DTmp LEFT JOIN MailedLP mlp on mlp.dstemphdrid=DTmp.DSTempHdrId INNER JOIN LookUp LU ON LU.LookupId=DTmp.StatusId) " +
                                    " ON DTmp.LessonPlanId=StdtLP.LessonPlanId AND DTmp.StudentId=StdtLP.StudentId)   " +
-                                   "   INNER JOIN LessonPlan LP ON StdtLP.LessonPlanId=LP.LessonPlanId WHERE StdtLP.StudentId=" + sess.StudentId + " AND  " +
+                                   "   INNER JOIN LessonPlan LP ON StdtLP.LessonPlanId=LP.LessonPlanId WHERE " + yearQry + " StdtLP.StudentId=" + sess.StudentId + " AND  " +
                                    "  StdtLP.ActiveInd='A' AND LU.LookupName<>'Expired' AND LU.LookupName<>'Approved' AND LU.LookupName = 'In Progress' AND mlp.MailStatus is null or mlp.MailStatus=0" +
                                    "  GROUP BY DTmp.DSTemplateName,DTmp.VerNbr,StdtLP.GoalId, DTmp.DSTempHdrId,DTmp.StatusId,LU.LookupName,DTmp.LessonOrder) data WHERE frow=1 order by LessonOrder";
 
@@ -1401,17 +1403,16 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                    " FROM (StdtLessonPlan StdtLP INNER JOIN  " +
                                    " (DSTempHdr DTmp LEFT JOIN MailedLP mlp on mlp.dstemphdrid=DTmp.DSTempHdrId INNER JOIN LookUp LU ON LU.LookupId=DTmp.StatusId) " +
                                    " ON DTmp.LessonPlanId=StdtLP.LessonPlanId AND DTmp.StudentId=StdtLP.StudentId)   " +
-                                   "   INNER JOIN LessonPlan LP ON StdtLP.LessonPlanId=LP.LessonPlanId WHERE StdtLP.StudentId=" + sess.StudentId + " AND  " +
+                                   "   INNER JOIN LessonPlan LP ON StdtLP.LessonPlanId=LP.LessonPlanId WHERE " + yearQry + " StdtLP.StudentId=" + sess.StudentId + " AND  " +
                                    "  StdtLP.ActiveInd='A' AND LU.LookupName<>'Expired' AND LU.LookupName<>'Approved' AND LU.LookupName = 'In Progress' AND mlp.MailStatus=1" +
                                    "  GROUP BY DTmp.DSTemplateName,DTmp.VerNbr,StdtLP.GoalId, DTmp.DSTempHdrId,DTmp.StatusId,LU.LookupName,DTmp.LessonOrder) data WHERE frow=1 order by LessonOrder";
 
 
                 dtList = objData.ReturnDataTable(selectQuerry, false);
+                dlLPMailed.DataSource = null;
+                dlLPMailed.DataBind();
                 if (Convert.ToInt32(dtList.Rows.Count) > 0)
                 {
-                    dlLPMailed.DataSource = null;
-                    dlLPMailed.DataBind();
-
                     dlLPMailed.DataSource = dtList;                                               // Fill the subtype lesson for te specified goal.
                     dlLPMailed.DataBind();
                 }
@@ -1432,6 +1433,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         oLessons = new clsLessons();
         sess = (clsSession)Session["UserSession"];
         string selectQuerry = "";
+        string yearQry = getYears();
         try
         {
             if (sess != null)
@@ -1446,7 +1448,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                              " FROM (StdtLessonPlan StdtLP INNER JOIN  " +
                              " (DSTempHdr DTmp  INNER JOIN LookUp LU ON LU.LookupId=DTmp.StatusId) " +
                              " ON DTmp.LessonPlanId=StdtLP.LessonPlanId AND DTmp.StudentId=StdtLP.StudentId)   " +
-                             "   INNER JOIN LessonPlan LP ON StdtLP.LessonPlanId=LP.LessonPlanId WHERE StdtLP.StudentId=" + sess.StudentId + " AND  " +
+                             "   INNER JOIN LessonPlan LP ON StdtLP.LessonPlanId=LP.LessonPlanId WHERE " + yearQry + " StdtLP.StudentId=" + sess.StudentId + " AND  " +
                              "  StdtLP.ActiveInd='A' AND LU.LookupName<>'Expired' AND LU.LookupName = 'Pending Approval'" +
                              "  GROUP BY DTmp.DSTemplateName,DTmp.VerNbr,StdtLP.GoalId, DTmp.DSTempHdrId,DTmp.StatusId,LU.LookupName,DTmp.LessonOrder) data WHERE frow=1 order by LessonOrder";
 
@@ -1462,7 +1464,49 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
     }
 
+    private string getYears()
+    {
+        string years = "";
+        foreach (System.Web.UI.WebControls.ListItem item in ddlIepYear.Items)
+        {
+            if (item.Selected == true)
+            {
+                years += item.Text + ",";
+            }
+        }
+        if (years != "")
+            years = "YEAR(DTmp.LessonSDate) IN (" + years.Substring(0, years.Length - 1) + ") AND ";
+        return years;
+    }
 
+    private void FillYears()
+    {
+        ddlIepYear.Items.Clear();
+        string qry = "SELECT DISTINCT YEAR(LessonSDate) from DSTempHdr where StudentId = " + sess.StudentId + " AND LessonSDate is not null " +  
+                     "AND StatusId NOT IN (SELECT LookupId FROM LookUp WHERE LookupName = 'Expired') " + 
+                     "AND LessonPlanId IN (SELECT LessonPlanId FROM StdtLessonPlan WHERE ActiveInd = 'A')";
+        DataTable dtYear = new DataTable();
+        dtYear = objData.ReturnDataTable(qry, false);
+        if(dtYear!=null)
+            foreach (DataRow Dr in dtYear.Rows)
+            {
+                System.Web.UI.WebControls.ListItem li = new System.Web.UI.WebControls.ListItem(Dr[0].ToString());
+                ddlIepYear.Items.Add(li);
+            }
+    }
+    protected void ddlIepYear_SelectedIndexChanged(object sender, System.EventArgs e)
+    {
+        FillData();
+        FillApprovedLessonData();
+        FillCompltdLessonPlans();
+        FillRejectedLessons();
+        FillMaintenanceLessonData();
+        FillInactiveLessonData();
+    }
+    protected void Button_Search_Click(object sender, System.EventArgs e)
+    {
+       
+    }
     private void fillStepAndSet(int TempId)
     {
         string strQuery = "";
@@ -3217,76 +3261,76 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         {
             isValue = Convert.ToInt32(objVal);
         }
-        if (isValue != 0)
-        {
-            lblLessonType.Text = "VisualTool";
-            btnconvrtLessonPlan.Text = "Convert To NonVisualTool";
+        //if (isValue != 0)
+        //{
+        //    lblLessonType.Text = "VisualTool";
+        //    btnconvrtLessonPlan.Text = "Convert To NonVisualTool";
 
-        }
-        else
-        {
-            lblLessonType.Text = "Non-VisualTool";
-            btnconvrtLessonPlan.Text = "Convert To VisualTool";
-            //  imgApproveStatus.Visible = false;
-        }
+        //}
+        //else
+        //{
+        //    lblLessonType.Text = "Non-VisualTool";
+        //    btnconvrtLessonPlan.Text = "Convert To VisualTool";
+        //    //  imgApproveStatus.Visible = false;
+        //}
 
 
     }
 
 
 
-    protected void EnableEdit(int tempId)
-    {
-        objData = new clsData();
-        string selctQuerry;
-        string selctIsVT;
-        object checkVT;
-        int isVt = 0;
-        selctQuerry = "SELECT VTLessonId FROM DSTempHdr WHERE DSTempHdrId = " + tempId;
-        checkVT = objData.FetchValue(selctQuerry);
-        if (tempId == 0)
-        {
-            btneditMode.Visible = false;
-            btnreasignNewLsn.Visible = false;
-        }
-        else
-        {
-            if (checkVT.ToString() != "")
-            {
-                isVt = Convert.ToInt32(checkVT);
-                selctIsVT = "SELECT IsST_Edit FROM LE_Lesson WHERE LessonId = " + isVt;
-                int studentAssgn = Convert.ToInt32(objData.FetchValue(selctIsVT));
+    //protected void EnableEdit(int tempId)
+    //{
+    //    objData = new clsData();
+    //    string selctQuerry;
+    //    string selctIsVT;
+    //    object checkVT;
+    //    int isVt = 0;
+    //    selctQuerry = "SELECT VTLessonId FROM DSTempHdr WHERE DSTempHdrId = " + tempId;
+    //    checkVT = objData.FetchValue(selctQuerry);
+    //    //if (tempId == 0)
+    //    //{
+    //    //    btneditMode.Visible = false;
+    //    //    btnreasignNewLsn.Visible = false;
+    //    //}
+    //    else
+    //    {
+    //        if (checkVT.ToString() != "")
+    //        {
+    //            isVt = Convert.ToInt32(checkVT);
+    //            selctIsVT = "SELECT IsST_Edit FROM LE_Lesson WHERE LessonId = " + isVt;
+    //            int studentAssgn = Convert.ToInt32(objData.FetchValue(selctIsVT));
 
-                if ((isVt > 0) && (studentAssgn == 1))
-                {
-                    btneditMode.Visible = true;
-                    btnreasignNewLsn.Visible = true;
+    //            if ((isVt > 0) && (studentAssgn == 1))
+    //            {
+    //                btneditMode.Visible = true;
+    //                btnreasignNewLsn.Visible = true;
 
-                    // lnkEditVT.Visible = true;
-                    //  imgReasign.Visible = true;
-                }
-                else if (isVt > 0)
-                {
-                    btnreasignNewLsn.Visible = true;
-                }
-                else
-                {
-                    btneditMode.Visible = false;
-                    btnreasignNewLsn.Visible = false;
-                    //  lnkEditVT.Visible = false;
-                    //  imgReasign.Visible = false;
-                }
-            }
-            else
-            {
-                btneditMode.Visible = false;
-                btnreasignNewLsn.Visible = false;
-                // lnkEditVT.Visible = false;
-                // imgReasign.Visible = false;
-            }
-        }
+    //                // lnkEditVT.Visible = true;
+    //                //  imgReasign.Visible = true;
+    //            }
+    //            else if (isVt > 0)
+    //            {
+    //                btnreasignNewLsn.Visible = true;
+    //            }
+    //            else
+    //            {
+    //                btneditMode.Visible = false;
+    //                btnreasignNewLsn.Visible = false;
+    //                //  lnkEditVT.Visible = false;
+    //                //  imgReasign.Visible = false;
+    //            }
+    //        }
+    //        else
+    //        {
+    //            btneditMode.Visible = false;
+    //            btnreasignNewLsn.Visible = false;
+    //            // lnkEditVT.Visible = false;
+    //            // imgReasign.Visible = false;
+    //        }
+    //    }
 
-    }
+    //}
 
 
 
@@ -3311,7 +3355,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         fillStepAndSet(headerId);
 
         FindType(headerId);                       //Check Is Visual Lesson or not
-        EnableEdit(headerId);
+        //EnableEdit(headerId);
 
         GetStatus(headerId);                    // Button Permissions
         //  SetLessonProcedure(headerId);                       // Fill Lesson Procedure Data
@@ -3724,8 +3768,17 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 if (dtNew.Rows.Count > 0)
                 {
                     txtLessonName.Text = dtNew.Rows[0]["LessonPlanName"].ToString();
-                    txtNoofTimesTried.Text = dtNew.Rows[0]["NoofTimesTried"].ToString();
-                    noofTimesTriedPer.SelectedValue = dtNew.Rows[0]["NoofTimesTriedPer"].ToString();
+                    if (NoofTimesTried != null && NoofTimesTried.Rows.Count > 0)
+                    {
+                        txtNoofTimesTried.Text = NoofTimesTried.Rows[0]["NoofTimesTried"].ToString();
+                        noofTimesTriedPer.SelectedValue = NoofTimesTried.Rows[0]["NoofTimesTriedPer"].ToString();
+                    }
+                    else
+                    {
+                        txtNoofTimesTried.Text = "";
+                        noofTimesTriedPer.SelectedIndex = 0;
+                    }
+                    
                     txtFramework.Text = dtNew.Rows[0]["FrameandStrand"].ToString();
                     txtSpecStandrd.Text = dtNew.Rows[0]["SpecStandard"].ToString();
                     txtSpecEntrypoint.Text = dtNew.Rows[0]["SpecEntryPoint"].ToString();
@@ -14280,56 +14333,56 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
 
 
-    protected void btnconvrtLessonPlan_Click(object sender, EventArgs e)
-    {
-        //Convert LessonPlan Method
-        int studId = 0;
-        int dsHeadrId = 0;
-        int lessonPlanId = 0;
-        string updateHeader = "";
-        int indexId = 0;
-        objData = new clsData();
-        oData = new DataClass();
-        ObjTempSess = (ClsTemplateSession)Session["BiweeklySession"];
-        sess = (clsSession)Session["UserSession"];
-        curesesid = this.Session.SessionID.ToString();
-        Pagepath = "CustomizeTemplateEditor:btnconvrtLessonPlan_Click";
-        sess = clsGeneral.sessioncheck(curesesid, preid, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
+    //protected void btnconvrtLessonPlan_Click(object sender, EventArgs e)
+    //{
+    //    //Convert LessonPlan Method
+    //    int studId = 0;
+    //    int dsHeadrId = 0;
+    //    int lessonPlanId = 0;
+    //    string updateHeader = "";
+    //    int indexId = 0;
+    //    objData = new clsData();
+    //    oData = new DataClass();
+    //    ObjTempSess = (ClsTemplateSession)Session["BiweeklySession"];
+    //    sess = (clsSession)Session["UserSession"];
+    //    curesesid = this.Session.SessionID.ToString();
+    //    Pagepath = "CustomizeTemplateEditor:btnconvrtLessonPlan_Click";
+    //    sess = clsGeneral.sessioncheck(curesesid, preid, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
 
-        if (ViewState["HeaderId"] != null)
-        {
-            dsHeadrId = Convert.ToInt32(ViewState["HeaderId"]);
-            ObjTempSess.TemplateId = dsHeadrId;                     // current lessonId keeps in a session for accessing visual lessons
+    //    if (ViewState["HeaderId"] != null)
+    //    {
+    //        dsHeadrId = Convert.ToInt32(ViewState["HeaderId"]);
+    //        ObjTempSess.TemplateId = dsHeadrId;                     // current lessonId keeps in a session for accessing visual lessons
 
-            studId = sess.StudentId;
-            if (btnconvrtLessonPlan.Text == "Convert To VisualTool")           // If LessonPlan COnvert to VIsual Lp, it will redirect to Visual Lesson List.
-            {
-                Response.Redirect("~/VisualTool/VisualLessonsList.aspx");
-            }
-            else if (btnconvrtLessonPlan.Text == "Convert To NonVisualTool")
-            {
-                // Convert VIsual Lesson to NonVisual Lesson                               
+    //        studId = sess.StudentId;
+    //        if (btnconvrtLessonPlan.Text == "Convert To VisualTool")           // If LessonPlan COnvert to VIsual Lp, it will redirect to Visual Lesson List.
+    //        {
+    //            Response.Redirect("~/VisualTool/VisualLessonsList.aspx");
+    //        }
+    //        else if (btnconvrtLessonPlan.Text == "Convert To NonVisualTool")
+    //        {
+    //            // Convert VIsual Lesson to NonVisual Lesson                               
 
-                //  dsHeadrId = Convert.ToInt32(ObjTempSess.TemplateId);
-                //   lessonPlanId = Convert.ToInt32(ObjTempSess.LessonPlanId);
-                updateHeader = "UPDATE DSTempHdr SET IsVisualTool = 0 WHERE DSTempHdrId = " + dsHeadrId;
-                int index = objData.Execute(updateHeader);
-                try
-                {
-                    string selctQuerry = "sp_DeleteForNonVT";                            // SP to delete all the   new set rows,step rows, column rows before assigning a non- visual lesson.          
-                    indexId = oData.Execute_SpDeletion(selctQuerry, dsHeadrId);
+    //            //  dsHeadrId = Convert.ToInt32(ObjTempSess.TemplateId);
+    //            //   lessonPlanId = Convert.ToInt32(ObjTempSess.LessonPlanId);
+    //            updateHeader = "UPDATE DSTempHdr SET IsVisualTool = 0 WHERE DSTempHdrId = " + dsHeadrId;
+    //            int index = objData.Execute(updateHeader);
+    //            try
+    //            {
+    //                string selctQuerry = "sp_DeleteForNonVT";                            // SP to delete all the   new set rows,step rows, column rows before assigning a non- visual lesson.          
+    //                indexId = oData.Execute_SpDeletion(selctQuerry, dsHeadrId);
 
-                    btnconvrtLessonPlan.Text = "NonVisualTool";
-                    Response.Redirect("CustomizeTemplateEditor.aspx?vLessonId=" + dsHeadrId + "");
-                }
-                catch (Exception Ex)
-                {
-                    throw Ex;
-                }
-            }
+    //                btnconvrtLessonPlan.Text = "NonVisualTool";
+    //                Response.Redirect("CustomizeTemplateEditor.aspx?vLessonId=" + dsHeadrId + "");
+    //            }
+    //            catch (Exception Ex)
+    //            {
+    //                throw Ex;
+    //            }
+    //        }
 
-        }
-    }
+    //    }
+    //}
     protected void btnreasignNewLsn_Click(object sender, EventArgs e)
     {
         int dsHeadrId = 0;
@@ -17322,7 +17375,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             fillStepAndSet(headerId);
             FillDocSmall(headerId);                 //fill Doc
             FindType(headerId);                       //Check Is Visual Lesson or not
-            EnableEdit(headerId);
+            //EnableEdit(headerId);
 
 
             CheckAsigned(headerId);
@@ -18051,7 +18104,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             objData = new clsData();
             int headerid = Convert.ToInt32(ViewState["HeaderId"]);
 
-            LessonPlanName = objData.FetchValue("select DSTemplateName FROM DstempHdr where DSTempHdrId=" + headerid).ToString();
+            LessonPlanName = objData.FetchValue("select DSTemplateName+' '+isnull(VerNbr,'') FROM DstempHdr where DSTempHdrId=" + headerid).ToString();
             LessonPlanId = Convert.ToInt32(objData.FetchValue("select LessonPlanId FROM DstempHdr where DSTempHdrId=" + headerid));
 
             //string selctStudentName = "SELECT StudentLname + StudentFname As StudentName FROm Student WHERE StudentId = " + sess.StudentId;
@@ -18099,7 +18152,10 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 //message.To.Add(new MailAddress("test@gmail.com"));
                 message.Subject = LessonPlanName + " for " + StudentName + " sent for review";
                 message.IsBodyHtml = true; //to make message body as html
-                message.Body = "<p style='font-family: Arial, Helvetica, sans-serif;font-size: 11px;font-weight: normal;'>" + OptMessage.Text + "</p>";
+                message.Body = "<p style='font-family: Arial, Helvetica, sans-serif;font-size: 11px;font-weight: normal;'>" + sess.UserName + " is emailing the following lesson for your review:</p>" +
+                    "<p style='font-family: Arial, Helvetica, sans-serif;font-size: 11px;font-weight: normal;'>Student: " + StudentName + "</p>" +
+                    "<p style='font-family: Arial, Helvetica, sans-serif;font-size: 11px;font-weight: normal;'>Lesson: " + LessonPlanName + "</p>" +
+                    "<p style='font-family: Arial, Helvetica, sans-serif;font-size: 11px;font-weight: normal;'>Notes:<br>" + OptMessage.Text.Replace("\r\n","<BR>") + "</p>";
                 smtp.UseDefaultCredentials = false;
                 smtp.Port = SMTPPort;
                 smtp.Host = SMTPServer;//"smtp.gmail.com"; //for gmail host  
@@ -18117,6 +18173,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                 "Values(" + headerid + "," + sess.SchoolId + "," + LessonPlanId + ",'" + LessonPlanName + "','1'," + sess.LoginId + ",getdate()," + sess.LoginId + ",getdate()) ";
                     int promptId = objData.Execute(strQuery);
                 }
+                emailFullReset(sender, e);
                 LoadData();
                 ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "alertMessage('Mail Send Successfully','green');", true);
                 if (buttonId.Equals("BtnEmailApproveSend"))
@@ -18130,6 +18187,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         {
             ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "alertMessage('Mail Send Failed','red');", true);
             //tdReadMsg.InnerHtml = clsGeneral.sucessMsg("Mail Send Failed");
+            emailFullReset(sender,e);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), Guid.NewGuid().ToString(), "uncheckEmailSelection();", true);
         }
     }
 

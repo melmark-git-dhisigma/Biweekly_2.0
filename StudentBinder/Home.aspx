@@ -2764,7 +2764,7 @@
                 title = "Customize Goals And Lessons";
             }
             if (dname.indexOf('divCTER') >= 0) {
-                title = "Customize Template Editor";
+                title = "";
             }
             if (dname.indexOf('divCCIEP') >= 0) {
                 title = "Customize IEP";
