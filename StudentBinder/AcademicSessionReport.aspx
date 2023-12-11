@@ -13,10 +13,48 @@
     <script src="../Administration/JS/jsDatePick.min.1.3.js"></script>
     <script src="../Administration/JS/jquery.min.js"></script>
     <script src="../Administration/JS/jquery-ui-1.8.19.custom.min.js"></script>
+     <script src="../Scripts/highcharts/7.1.2/highcharts.js"></script>
+   <script src="../Scripts/highcharts/7.1.2/modules/accessibility.js"></script>
+    <script src="../Scripts/highcharts/7.1.2/grouped-categories.js"></script>
+     <script src="../Scripts/highcharts/7.1.2/modules/xrange.js"></script>
+    <script src="../Scripts/highcharts/7.1.2/modules/exporting.js"></script>
+        <script src="../Scripts/html2canvas.min.js"></script>
+            <script src="../Scripts/es6-promise.auto.min.js"></script>
+        <script src="../Scripts/es6-promise.min.js"></script>
     <meta http-equiv="X-UA-Compatible" content="IE=10,9" />
 
 
     <style type="text/css">
+         .popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.popup-content {
+    background-color: white;
+    position: absolute;
+    top: 3%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 10px;
+    cursor: pointer;
+}
+
         .styleBorder {
             border:none;
         }
@@ -191,7 +229,23 @@
             }
         }
 
+        function showPopup() {
+            $('#graphPopup').hide();
+            $('#overlay').hide();
+            var hchart = document.getElementById('<%= HighchartGraph.ClientID %>');
+             hchart.style.display = 'none';
+             var popup = document.getElementById('popup');
+             popup.style.display = 'block';
+         }
 
+         function closePopup() {
+             var popup = document.getElementById('popup');
+             popup.style.display = 'none';
+             var hchart = document.getElementById('<%= HighchartGraph.ClientID %>');
+             hchart.style.display = 'block';
+             $('#graphPopup').hide();
+             $('#overlay').hide();
+         }
         function loadWait() {
             $('.loading').fadeIn('fast');//, function () { });
         }
@@ -332,6 +386,11 @@
                 Please Wait...
             </div>
         </div>
+        <div id="popup" class="popup" >
+    <div class="popup-content" id="popup-content">
+        <p>Please wait...</p>
+    </div>
+</div>
         <div id="fullContents" style="width: 98%; margin-left: 1%">
             <asp:ScriptManager ID="ScriptManager1" runat="server">
             </asp:ScriptManager>
@@ -396,12 +455,14 @@
                 <table style="width: 100%">
                     <tr>
                         <td style="text-align: right">
-                            
-                             <asp:Button ID="btnPrevious1" runat="server" CssClass="NFButton" Style="float: left; margin: 0 1px 0px 250px" Visible="false" Text="Previous" OnClick="btnPrevious1_Click" />
-                             <asp:DropDownList ID="ddlLessonplan1" runat="server" CssClass="drpClass" Style="float: left; margin: 0 1px 0px 10px" Height="26px" Width="290px" Visible="false" AutoPostBack="true" OnSelectedIndexChanged="ddlLessonplan1_SelectedIndexChanged" >
+                              <asp:UpdatePanel ID="dropdownpanel" runat="server">
+                                    <ContentTemplate>
+                             <asp:Button ID="btnPrevious1" runat="server" CssClass="NFButton" Style="float: left; margin: 0 1px 0px 250px" Visible="false" Text="Previous" OnClick="btnPrevious1_Click" OnClientClick="javascript:showPopup();" />
+                             <asp:DropDownList ID="ddlLessonplan1" runat="server" CssClass="drpClass" Style="float: left; margin: 0 1px 0px 10px" Height="26px" Width="290px" Visible="false" AutoPostBack="true" OnSelectedIndexChanged="ddlLessonplan1_SelectedIndexChanged" onchange="showPopup()">
                              </asp:DropDownList>
-                            <asp:Button ID="btnNext1" runat="server" CssClass="NFButton" Style="float: left; margin: 0 1px 0 10px" Visible="false" Text="Next" OnClick="btnNext1_Click"  />
-                           
+                            <asp:Button ID="btnNext1" runat="server" CssClass="NFButton" Style="float: left; margin: 0 1px 0 10px" Visible="false" Text="Next" OnClick="btnNext1_Click" OnClientClick="javascript:showPopup();" />
+                           </ContentTemplate>
+                                </asp:UpdatePanel> 
                             <input type="button" id="btnRefresh" style="float: right; margin: 0 1px 0 1px" class="refresh" runat="server" onclick="HideAndDisplay()" />
                             <asp:Button ID="RefreshMaintenance" style="float: right; margin: 0 1px 0 1px" class="refresh" runat="server" OnClick="RefreshMaintenance_Click" />
                             <asp:Button ID="btnMaintenanceGraph" runat="server" class="showgraph" Style="float: right; margin: 0 1px 0 1px" Text="" CssClass="showgraph" Visible="false" OnClick="btnMaintenanceGraph_Click"/>
@@ -435,7 +496,7 @@
         </div>
         <div id="overlay" class="web_dialog_overlay">
         </div>
-        <div id="graphPopup" class="web_dialog" style="width: 73%">
+        <div id="graphPopup" runat="server" class="web_dialog" style="width: 73%">
             <div>
 
                 <a id="close_x" class="close sprited1" href="#" style="margin-top: -13px; margin-right: -14px;">
@@ -493,6 +554,8 @@
                         </td>
                         <td style="text-align: left; margin-left: 1880px" rowspan="2">
                             <asp:Button ID="btnsubmit" runat="server" Text="" ToolTip="Show Graph" CssClass="showgraph" OnClick="btnsubmit_Click" OnClientClick="javascript:loadWait();" />
+                            <asp:Button ID="btnsubmith" runat="server" Text="" ToolTip="Show Graph" CssClass="showgraph" Style="display: none;" OnClick="btnsubmit_Click" OnClientClick="showPopup();" />
+
                         </td>
 
                     </tr>
@@ -510,6 +573,8 @@
                                     <asp:ListItem Value="Residence">Residence</asp:ListItem>
                                     <asp:ListItem Value="Day,Residence" Selected="True">Both</asp:ListItem>
                                 </asp:RadioButtonList>
+                                <asp:CheckBox id="highcheck" runat="server" onchange="btnsubmitVisibility();" Text=""></asp:CheckBox>
+
                             </div>
                         </td>
 
@@ -588,12 +653,12 @@
                     <tr>
                         <td style="text-align: right">
 
-                            <asp:Button ID="btnDownload" runat="server" Text="Download" CssClass="NFButton" OnClick="btnDownload_Click" OnClientClick="HideWait();" />
+                                    <asp:Button ID="btnDownload" runat="server" Text="Download" CssClass="NFButton" OnClick="btnDownload_Click" OnClientClick="CloseDownload();" />
 
                         </td>
                         <td style="text-align: left">
-                             <input type="button" value="Done" class="NFButton" id="btnDone" onclick="CloseDownload();" />
-                         <%--   <asp:Button ID="btnDone" runat="server" Text="Done" CssClass="NFButton" OnClientClick="CloseDownload();" />--%>
+                             <%--<input type="button" value="Done" class="NFButton" id="btnDone" onclick="CloseDownload();" />--%>
+                            <asp:Button ID="btnDone" runat="server" Text="Done" CssClass="NFButton" OnClientClick="CloseDownload();"  onClick="btnDone_Click"/>
 
                         </td>
                     </tr>
@@ -601,9 +666,2039 @@
 
             </div>
         </div>
+        <asp:UpdatePanel ID="highchartupdate" runat="server">
+                                    <ContentTemplate>
+         <div id="HighchartGraph" runat="server">
+            <center>
+            <asp:label id="sname" runat="server" text="" Font-Bold="true" style="font-family: Arial; font-size: 12px; color: #000000;"></asp:label>
+                <br />
+            <asp:label id="lnam" runat="server" text="" Font-Bold="true" style="font-family: Arial; font-size: 12px; color: #000000;"></asp:label>
+                <br />
+            <asp:label id="daterang" runat="server" text="" Font-Bold="true" style="font-family: Arial; font-size: 12px; color: #000000;"></asp:label>
+                </center>
+            <br />
+            <center>
+                 <asp:label runat="server" text="" id="mednodata"  Font-Bold="true" font-size="15px"></asp:label>
+           <div id = "medcont" runat="server"  style = "width: 935.43pt; margin: 0 auto"></div>
+                <br />
+            <asp:label runat="server" text="" id="lbgraph"  Font-Bold="true" font-size="15px"></asp:label>
+                <span id="lbgraphSpan"></span>
+                <br />
+           
+            <div id = "cont" runat="server"  style = "width: 1000px; height: 750px; margin: 0 auto"></div>
+            <br /><br /><br />
+        </center>
+           <asp:label id="deftxt" runat="server" text="" style ="font-family: Arial; font-size: 12px;color:black;margin-left:150px;"  Font-Bold="true" ></asp:label>
+                <br />
+       <asp:label id="mel" runat="server" text="" style ="font-family: Arial; font-size: 12px;color:black;margin-left:1200px;" Font-Bold="true"></asp:label>
+                </div>
+                </div>
+        
+        </div>
 
+                                         </ContentTemplate>
+                                </asp:UpdatePanel> 
         <asp:hiddenfield id="hdnExport" runat="server" value="" />
         <asp:HiddenField ID="hdnType" runat="server" Value="" />
+        <script>
+            function btnsubmitVisibility() {
+                var checkbox = document.getElementById('<%= highcheck.ClientID %>');
+                 var button1 = document.getElementById('<%= btnsubmit.ClientID %>');
+                 var button2 = document.getElementById('<%= btnsubmith.ClientID %>');
+                 if (checkbox.checked) {
+                     button1.style.display = 'none';
+                     button2.style.display = 'block';
+                 } else {
+                     button1.style.display = 'block';
+                     button2.style.display = 'none';
+                 }
+             }
+            function loadchart( sDate , eDate , sid , lid , scid , evnt , trend , ioa , cls ,med,lpstatus, medno ,reptype, inctype,lname){
+                var treatment = '';
+                //medication report size start
+                if (medno == "false" || medno == "False") {
+                var meddiv = document.getElementById('medcont');
+                    if (med == "true" || med== "True") {
+                        if (reptype == "true" || reptype == "True") {
+                            meddiv.style.width = '671.976pt';
+                            meddiv.style.height = '87.807911808pt';
+
+                        }
+                        else {
+                         meddiv.style.width = '935.43307pt';
+                            meddiv.style.height = '164.05358746pt';
+                     }
+                 }
+                }
+                // medication report size end
+                // set cont size start
+                var myDiv = document.getElementById('cont');
+                if (reptype == "true" || reptype == "True") {
+                     myDiv.style.width = '671.976pt';
+                     myDiv.style.height = '510.2364pt';
+                } else {
+                    myDiv.style.width = '935.43307pt';
+                     myDiv.style.height = '688.901215752pt';
+                }
+                // set cont size End
+                var lplan = lid;
+                var stid = sid;
+                var jsonData = JSON.stringify({ lplan: lplan, studid: stid });
+                $.ajax({
+                    type: "POST",
+                    url: "AcademicSessionReport.aspx/getSessionReportNext",
+                    data: jsonData,
+                    contentType: "application/json; charset=utf-8",
+                    async: false,
+                    dataType: "json",
+                    success: function (response) {
+                        var inputsDate = sDate;
+                        inputsDate = inputsDate.replace(/-/g, '/');
+                        var inputeDate = eDate;
+                        inputeDate = inputeDate.replace(/-/g, '/');
+                        var obj = JSON.parse(response.d);
+                        $.map(obj, function (item, index) {
+                            document.getElementById('sname').innerHTML = item['StudentName'];
+                            document.getElementById('lnam').innerHTML = lname;
+                            document.getElementById('daterang').innerHTML = convertDateFormat(inputsDate) + "-" + convertDateFormat(inputeDate);
+                            document.getElementById('mel').innerHTML = 'Melmark New England';
+                            if (item['Deftn'] != null) {
+                                document.getElementById('deftxt').innerHTML = 'Definition:    ' + item['Deftn'];
+                            }
+                            else {
+                                document.getElementById('deftxt').innerHTML = 'Definition:    ';
+                            }
+                            treatment = item['Treatment']+'<br><br>';
+                        });
+                    },
+                    error: OnErrorCall_
+                });
+                function OnErrorCall_(response) {
+
+                    alert("something went wrong!");
+                }
+                var sdate = sDate;
+                var edate = eDate;
+                var sid = sid;
+                var lid = lid;
+                var scid = scid;
+                var evnt = evnt;
+                var trend = trend;
+                var ioa = ioa;
+                var cls = cls;
+                var medjson=JSON.stringify({ StartDate: sdate, enddate: edate, studid: sid,SchoolId: scid});
+
+                if ((med == "true" || med == "True") && (medno == "false" || medno == "False")) {
+                    $.ajax({
+                        type: "POST",
+                        url: "AcademicSessionReport.aspx/getmedAcademicReport",
+                        data: medjson,
+                        contentType: "application/json; charset=utf-8",
+                        async: false,
+                        dataType: "json",
+                        success: function (response) {
+                            var resp = JSON.parse(response.d);
+                            var medicData = []; var val = 0;
+                            resp.forEach(function (item) {
+                                item.duration = extractdate(item.EndTime) - extractdate(item.EvntTs);
+                            });
+                            resp.sort(function (a, b) {
+                                return b.duration - a.duration;
+                            });
+                            $.map(resp, function (item, index) {
+                                var meddata = {};
+                                meddata['name'] = item['EventName'] + item['Comment'];
+                                meddata['x'] = extractdate(item['EvntTs']);
+                                meddata['x2'] = extractdate(item['EndTime']);
+                                meddata['y'] = val;
+                                medicData.push(meddata);
+                                val = val + 1
+                            });
+                            Highcharts.chart('medcont', {
+                                chart: {
+                                    type: 'xrange',
+                                    plotBorderWidth: 2,
+                                    plotBorderColor: 'black',
+                                    spacingTop: 20,
+                                    spacingRight: 20,
+                                    spacingBottom: 20,
+                                    spacingLeft: 20,
+                                },
+                                title: {
+                                    text: ''
+                                },
+                                subtitle: {
+                                    text: ' Medication Details',
+                                    align: 'left',
+                                    useHTML: true,
+                                    style: {
+                                        fontWeight: 'bold',
+                                        color: 'black',
+                                        fontSize: '12px',
+                                        fontFamily: 'Arial'
+                                    }
+                                },
+                                xAxis: {
+
+                                    //visible: false,
+                                    type: 'datetime',
+                                    //linkedTo: 0,
+                                    min: extractdateOther(sdate.replace('/', '-')),
+                                    max: extractdateOther(edate.replace('/', '-')),
+                                    tickInterval: 2 * 24 * 3600 * 1000,
+                                    tickPositioner: function () {
+                                        var ticks = [];
+                                        var interval = this.options.tickInterval;
+                                        var currentTick = this.min;
+
+                                        while (currentTick <= this.max) {
+                                            ticks.push(currentTick);
+                                            currentTick += interval;
+                                        }
+
+                                        return ticks;
+                                    },
+                                    lineWidth: 0,
+                                    minorGridLineWidth: 0,
+                                    lineColor: 'transparent',
+                                    minorTickLength: 0,
+                                    tickLength: 0,
+                                    startOnTick: true,
+                                    endOnTick: true,
+                                    labels: {
+                                        enabled: false,
+                                        //  rotation: -90,
+                                        //formatter: function () {
+                                        //    return Highcharts.dateFormat('%m/%d/%Y', this.value);
+                                        //}
+                                    }
+                                },
+                                credits: {
+                                    enabled: false
+                                },
+                                yAxis: {
+                                    gridLineWidth: 0,
+                                    offset: 60,
+                                    title: {
+                                        text: ''
+                                    },
+                                    labels: {
+                                        enabled: false
+                                    },
+                                    reversed: true
+                                },
+                                tooltip: {
+                                    formatter: function () {
+                                        return Highcharts.dateFormat('%m/%d/%Y', this.point.x) + '-' + Highcharts.dateFormat('%m/%d/%Y', this.point.x2);
+
+                                    }
+                                },
+                                series: [{
+                                    data: medicData,
+                                    showInLegend: false,
+                                    dataLabels: {
+                                        enabled: true,
+                                        formatter: function () {
+                                            return this.point.name;
+                                        }
+                                    },
+
+                                }]
+                            });
+                        },
+                        error: OnErrorCal
+                    });
+                    function OnErrorCal(response) {
+
+                        alert("Something went wrong! Error: ");
+
+                    }
+                }
+
+                var jsonData = JSON.stringify({ StartDate: sdate, enddate: edate, studid: sid, AllLesson: lid, SchoolId: scid, Events: evnt, Trendtype: trend, IncludeIOA: ioa, Clstype: cls });
+                $.ajax({
+                    type: "POST",
+                    url: "AcademicSessionReport.aspx/getSessionReport",
+                    data: jsonData,
+                    contentType: "application/json; charset=utf-8",
+                    async: false,
+                    dataType: "json",
+                    success: function (response) {
+                        var res = JSON.parse(response.d);
+                        if (res.length === 0) {
+                            var hchart = document.getElementById('<%= cont.ClientID %>');
+                            if (hchart) {
+                                hchart.style.display = 'none';
+                            }
+                            var hchart2 = document.getElementById('<%= medcont.ClientID %>');
+                            if (hchart2) {
+                                hchart2.style.display = 'none';
+                            }
+                            var hchart4 = document.getElementById('<%= deftxt.ClientID %>');
+                            if (hchart4) {
+                                hchart4.style.display = 'none';
+                            }
+                            var hchart5 = document.getElementById('<%= mel.ClientID %>');
+                            if (hchart5) {
+                                hchart5.style.display = 'none';
+                            }
+                            var hchart6 = document.getElementById('<%= mednodata.ClientID %>');
+                            if (hchart6) {
+                                hchart6.style.display = 'none';
+                            }
+                            var span = document.getElementById('lbgraphSpan');
+                            span.innerHTML = "No Data Available";
+                            $('#sname').css("display", "none");
+                            $('#cont').css("display", "none");
+                            $('#lnam').css("display", "none");
+                            $('#daterang').css("display", "none");
+                            $('#mel').css("display", "none");
+                            $('#deftxt').css("display", "none");
+                        }
+                        else {
+                            var hchart = document.getElementById('<%= cont.ClientID %>');
+                            if (hchart) {
+                                hchart.style.display = 'block';
+                            }
+                            var hchart2 = document.getElementById('<%= medcont.ClientID %>');
+                            if (hchart2) {
+                                hchart2.style.display = 'block';
+                            }
+                            var hchart4 = document.getElementById('<%= deftxt.ClientID %>');
+                            if (hchart4) {
+                                hchart4.style.display = 'block';
+                            }
+                            var hchart5 = document.getElementById('<%= mel.ClientID %>');
+                            if (hchart5) {
+                                hchart5.style.display = 'block';
+                            }
+                            var hchart6 = document.getElementById('<%= mednodata.ClientID %>');
+                            if (hchart6) {
+                                hchart6.style.display = 'block';
+                            }
+                            var leftmax, rightmax;
+                            leftmax = res[0].MaxScore;
+                            rightmax = res[0].MaxDummyScore;
+                            res.sort(sortByDate);
+                            var secstatus = true;
+                            // primary and secondary y axis start.
+                            var leftY = res[0].LeftYaxis;
+                            var rightY = res[0].RightYAxis;
+                            if (rightY == null) {
+                                secstatus = false;
+                            }
+                            // primary and secondary y axis end.
+
+
+                            // remove all null session (incident) start
+                            if (inctype == "True" || inctype== "true") {
+                                for (var i = res.length - 1; i >= 0; i--) {
+                                    if (res[i].Rownum == null) {
+                                        res.splice(i, 1);
+                                    }
+                                }
+                            }
+                            // remove all null session (incident) end
+                            // check 1 session for event start
+                           
+                            // check 1 session for event start
+                            //start newrow correction
+                            var prevRow = minumumSession(res);
+                            $.map(res, function (item, index) {
+                                if (item['NewRow'] != null) {
+                                        item['NewRow'] = item['NewRow'];
+                                        prevRow = item['NewRow'];
+                                    }
+                                    else {
+                                        $.map(res, function (ite, index) {
+                                            if (ite['NewRow'] != null && ite['NewRow'] >= prevRow + 1) {
+                                                ite['NewRow'] = ite['NewRow'] + 1;
+                                            }
+                                        });
+                                        item['NewRow'] = prevRow + 1;
+                                        prevRow = item['NewRow']
+                                    }
+                            });
+                                //end newrow correction
+                                //x category start // regular graph category start
+                                var catarr = [];
+                                var processedNames = [];
+                                var xval = 0;
+                                var xvalarr = [];
+
+                                $.map(res, function (item, index) {
+                                    var ssdate = extractTimestamp(item['SessionDate']);
+                                    var name = formatDate(ssdate);
+
+                                    var isDuplicate = false;
+                                    for (var i = 0; i < processedNames.length; i++) {
+                                        if (processedNames[i] === name) {
+                                            isDuplicate = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (!isDuplicate) {
+                                        var catdata = new Object;
+                                        catdata['name'] = name;
+                                        var carray = [];
+
+                                        $.map(res, function (ite, index) {
+                                            if (ssdate === extractTimestamp(ite['SessionDate'])) {
+                                                if (ite['Rownum'] == null && ite['CalcType'] == 'Event') {
+                                                    ite['Rownum'] = "";
+                                                    xvalarr.push(xval);
+                                                }
+                                                if (!CheckforRow(carray, ite['Rownum'])) {
+                                                    carray.push(ite['Rownum']);
+                                                    xval = xval + 1;
+                                                }
+                                            }
+                                        });
+                                        catdata['categories'] = carray;
+                                        catarr.push(catdata);
+                                        processedNames.push(name);
+                                    }
+                                });
+                                
+                                var finalsort = catarr.map(function (order, key) {
+                                    var oldname = order.name.split('/');
+                                    var newname = oldname[0] + '-' + oldname[1];
+                                    var narr = {
+
+                                        "name": newname,
+                                        "categories": order.categories
+
+                                    }
+
+                                    return narr;
+                                });
+                            // regular graph category end
+                            var incCat = [];
+                            // incident graph category start
+                            if (inctype == "True" || inctype == "true") {
+                                $.map(res, function (item, index) {
+                                    var existsInArray = false;
+                                    for (var i = 0; i < res.length; i++) {
+                                        if (incCat[i] === item['Rownum']) {
+                                            existsInArray = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (!existsInArray) {
+                                        incCat.push(item['Rownum']);
+                                    }
+                                });
+                            }
+                                // incident graph category end
+                                // x category end
+                                // Plot Data Start
+                                var data = [];
+                                var yAxis = [];
+                                var color = [];
+                                var symbol = [];
+                                var yAxisAr = [];
+                                var colorAr = [];
+                                var symbolAr = [];
+                                var arrowArray = [];
+                                var arrowNull = [];
+                                var calc = []; var perc = []; var nonperc = [];
+                                var dummy = [];
+                                var prevtype;
+                                $.map(res, function (item, index) {
+                                    if (item['CalcType'] != 'Event') {
+                                        var yax;
+
+                                        if (item['LeftYaxis'] != null && item['RightYAxis'] == null || item['LeftYaxis'] == null && item['RightYAxis'] != null) {
+                                            yax = 0;
+                                        }
+                                        else if (item['CalcType'] != "Total Duration" && item['CalcType'] != "Total Correct" && item['CalcType'] != "Total Incorrect" && item['CalcType'] != "Frequency" && item['CalcType'] != "Avg Duration" && item['CalcType'] != "Customize" && item['CalcType'] != "Event" && item['CalcType'] != item['RightYAxis']) {
+                                            yax = 0;
+                                        }
+                                        else {
+                                            yax = 1;
+                                        }
+
+                                        if (yax == 0 || item['RptLabel'] == item['LeftYaxis']) {
+                                            var catdata = {};
+                                            var symb = {};
+
+                                            catdata['date'] = item['NewRow'] - 1;
+                                            catdata['name'] = item['ColName'] + '-' + item['RptLabel'];
+                                            catdata['Color'] = item['Color'];
+                                            catdata['IOAPerc'] = item['IOAPerc'];
+                                            catdata['dateval'] = extractdate(item['SessionDate']);
+                                            symb['symbol'] = item['Shape'].toLowerCase();
+                                            symb['enabled'] = true;
+                                            symb['states'] = { hover: { enabled: true } }
+                                            catdata['symbol'] = symb;
+                                            catdata['yAxis'] = 0;
+                                            catdata['value'] = (item['Score']);
+                                            data.push(catdata);
+                                            yAxis[catdata['name']] = catdata['yAxis'];
+                                            color[catdata['name']] = catdata['Color'];
+                                            symbol[catdata['name']] = catdata['symbol'];
+                                            calc[catdata['name']] = catdata['CalcType'];
+                                        }
+                                        else {
+                                            var catdata = {};
+                                            var symb = {};
+
+                                            catdata['date'] = item['NewRow'] - 1;
+                                            catdata['name'] = item['ColName'] + '-' + item['RptLabel'];
+                                            catdata['Color'] = item['Color'];
+                                            catdata['IOAPerc'] = item['IOAPerc'];
+                                            catdata['dateval'] = extractdate(item['SessionDate']);
+                                            symb['symbol'] = item['Shape'].toLowerCase();
+                                            symb['enabled'] = true;
+                                            symb['states'] = { hover: { enabled: true } }
+                                            catdata['symbol'] = symb;
+                                            catdata['yAxis'] = 1;
+                                            catdata['value'] = (item['DummyScore']);
+                                            data.push(catdata);
+                                            yAxis[catdata['name']] = catdata['yAxis'];
+                                            color[catdata['name']] = catdata['Color'];
+                                            symbol[catdata['name']] = catdata['symbol'];
+                                            calc[catdata['name']] = catdata['CalcType'];
+                                        }
+                                    }
+                                    
+                                });
+                           
+                            // score and dummy score start
+                                var newData = []; var names = [];
+                                data.forEach(function (item) {
+                                    if (!names[item.name]) {
+                                        names[item.name] = true;
+                                        newData.push(item.name);
+                                    }
+                                });
+                                var ser = newData.map(function (name) {
+                                    return {
+                                        name: name,
+                                        yAxis: yAxis[name],
+                                        color: color[name],
+                                        marker: symbol[name],
+                                        dataGrouping: { enabled: true },
+                                        data: data.filter(function (item) {
+                                            return item.name === name;
+                                        }).map(function (item) {
+                                            return {
+                                                x: item.date,
+                                                y: item.value,
+                                                IOAPerc: item.IOAPerc,
+                                                dateval:item.dateval
+                                            };
+                                        })
+                                    };
+
+                                });
+                             // score and dummy score start
+                           
+                                //set duplicate series (case:no series) start
+                                dupdata = [];
+                                if (data.length === 0) {
+                                    var samdata = {};
+                                    var sd = rownum[0]; var ed = rownum[rownum.length - 1];
+                                    samdata['data'] = [{ x: sd, y: null }, { x: ed, y: null }];
+                                    samdata['showInLegend'] = false;
+                                    dupdata.push(samdata);
+                                    ser = dupdata;
+                                    leftmax = 1; rightmax = 1;
+                                }
+                                //set duplicate series (case:no series) end
+                                //trend start
+                                var arrData = []; var yAxis1 = []; var color1 = []; var symbol1 = [];
+                                $.map(res, function (item, index) {
+                                   
+                                    if (item['CalcType'] != 'Event' && trend == "Quarter") {
+                                        var yax;
+
+                                        if (item['LeftYaxis'] != null && item['RightYAxis'] == null || item['LeftYaxis'] == null && item['RightYAxis'] != null) {
+                                            yax = 0;
+                                        }
+                                        else if (item['CalcType'] != "Total Duration" && item['CalcType'] != "Total Correct" && item['CalcType'] != "Total Incorrect" && item['CalcType'] != "Frequency" && item['CalcType'] != "Avg Duration" && item['CalcType'] != "Customize" && item['CalcType'] != "Event" && item['CalcType'] != item['RightYAxis']) {
+                                            yax = 0;
+                                        }
+                                        else {
+                                            yax = 1;
+                                        }
+                                        if (yax == 0 || item['RptLabel'] == item['LeftYaxis'] || (item['RptLabel'] != item['LeftYaxis'] && secstatus == false)) {
+                                            var trnddata = {};
+                                            var symbarr = {};
+                                            trnddata['date'] = (item['NewRow'] - 1);
+                                            trnddata['name'] = item['ColName'] + '-' + item['CalcType'] + 'trend';
+                                            trnddata['value'] = item['Trend'];
+                                            trnddata['Color'] = "Gray";
+                                            symbarr['enabled'] = false;
+                                            trnddata['symbol'] = symbarr;
+                                            trnddata['yAxis1'] = 0;
+                                            arrData.push(trnddata);
+                                            yAxis1[trnddata['name']] = trnddata['yAxis1'];
+                                            color1[trnddata['name']] = trnddata['Color'];
+                                            symbol1[trnddata['name']] = trnddata['symbol'];
+                                        }
+                                        else {
+                                            var trnddata = {};
+                                            var symbarr = {};
+                                            trnddata['date'] = (item['NewRow'] - 1);
+                                            trnddata['name'] = item['ColName'] + '-' + item['CalcType'] + 'trend';
+                                            trnddata['value'] = item['Trend'];
+                                            trnddata['Color'] = "Gray";
+                                            symbarr['enabled'] = false;
+                                            trnddata['symbol'] = symbarr;
+                                            trnddata['yAxis1'] = 1;
+                                            arrData.push(trnddata);
+                                            yAxis1[trnddata['name']] = trnddata['yAxis1'];
+                                            color1[trnddata['name']] = trnddata['Color'];
+                                            symbol1[trnddata['name']] = trnddata['symbol'];
+
+                                        }
+                                    }
+                                });
+                                var newData1 = []; var name1 = [];
+                                // var newdata1 = [...new Set(arrData.map(item => item.name))];
+                                arrData.forEach(function (item) {
+                                    if (!name1[item.name]) {
+                                        name1[item.name] = true;
+                                        newData1.push(item.name);
+                                    }
+                                });
+                                var ser1 = newData1.map(function (name) {
+                                    return {
+                                        name: "",
+                                        yAxis: yAxis1[name],
+                                        color: color1[name],
+                                        marker: symbol1[name],
+                                        dashStyle: "DashDotDot",
+                                        lineWidth: 2,
+                                        showInLegend: false,
+                                        data: arrData.filter(function (item) {
+                                            return item.name === name;
+                                        }).map(function (item) {
+                                            return {
+                                                x: item.date,
+                                                y: item.value
+                                            };
+                                        })
+                                    };
+                                });
+                            //trend  end
+                                ser = ser.concat(ser1);
+                                //Event plot Start
+                                var plotdata = [];
+                                var maxYPosition = 300;
+                                var currentYPosition = 0;
+                                $.map(res, function (item, index) {
+                                    var style; var wid;
+                                    if (item['CalcType'] == "Event" && item['EventType'] != null && item['EventType'] != 'Arrow notes') {
+                                       
+                                            if (item['EventType'] == "Major") {
+                                                style = 'solid';
+                                                wid = 1;
+                                            }
+                                            else {
+                                                style = 'dot';
+                                                wid = 2;
+                                            }
+
+                                            var plotdict = new Object;
+                                            plotdict['color'] = "black";
+                                            plotdict['dashStyle'] = style;
+
+                                            plotdict['value'] = (item['NewRow'] - 1);
+                                            plotdict['width'] = wid;
+                                            if (item['EventName'] == null)
+                                            {
+                                                item['EventName'] = "";
+                                            }
+                                            var str = item['EventName'];
+                                        var txtal; var xax;
+                                        var valign;
+                                        if (item['EventType'] == "Major") {
+                                            txtal = 'right';
+                                            xax = -2;
+                                            valign='middle'
+                                            }
+                                        else {
+                                            txtal = 'left';
+                                            xax = 9;
+                                            valign='middle';
+                                            }
+                                            plotdict['label'] = {
+                                                text: str,
+                                                //textAlign: txtal,
+                                                formatter: function () {
+                                                    var labelText = this.options.text; 
+                                                    labelText = labelText.replace(/↑/g, '<span style="font-size: larger;">↑</span>')
+                                                                       .replace(/↓/g, '<span style="font-size: larger;">↓</span>');
+                                                    return labelText; 
+                                                },
+                                                useHTML: true,
+                                                style: {
+                                                    fontWeight: 'normal',
+                                                    color: 'black',
+                                                    fontSize: '12px',
+                                                    fontFamily: 'Arial',
+                                                    textShadow: 'none',
+                                                },
+                                               // align: 'right',
+                                                x: xax,
+                                                verticalAlign:valign,
+                                                rotation: -90
+                                            };
+                                            plotdict['label']['overflow'] = 'justify';
+                                            plotdict['label']['crop'] = false;
+                                            plotdata.push(plotdict);
+                                        }
+                                });
+                                //arrow start( null session)
+                                var arrows = [];
+                                var plotarr = new Object;
+                                var plotNew
+                                plotarr['type'] = 'scatter';
+                                plotarr['name'] = ser[0].name;
+                                plotarr['showInLegend'] = true;
+                                if (inctype== "True" || inctype == "true") {
+                                    plotarr['color'] = 'black',
+                                    plotarr['marker'] = {
+                                        symbol: 'square',
+                                        radius: 4,
+                                    }
+                                }
+                                else {
+                                    plotarr['marker'] = {
+                                        symbol: 'url(../Scripts/arrownote.png)',
+                                        width: 6,
+                                        height: 8,
+                                    }
+                                }
+                                $.map(res, function (item, index) {
+                                    if (item['ArrowNote'] != null) {
+
+                                        arrows.push({ x: (item['NewRow'] - 1), y: item['Score'], arrowval: item['ArrowNote'] });
+
+                                    }
+                                });
+                                var mergedarr = [];
+                                var mergedKeys = {};
+
+                                for (var i = 0; i < arrows.length; i++) {
+                                    var key = arrows[i].x + '-' + arrows[i].y;
+                                    if (!mergedKeys[key]) {
+                                        mergedarr.push(arrows[i]);
+                                        mergedKeys[key] = true;
+                                    } else {
+                                        for (var j = 0; j < mergedarr.length; j++) {
+                                            if (mergedarr[j].x === arrows[i].x && mergedarr[j].y === arrows[i].y) {
+                                                mergedarr[j].arrowval += ',' + arrows[i].arrowval;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                plotarr['data'] = mergedarr;
+                                if (plotarr['data'].length != 0) {
+                                    ser.push(plotarr);
+                                }
+                                var rownum = JSON.parse(JSON.stringify(finalsort));
+                                var minxvalue = minx(res)-1;
+                                var maxxvalue = maxx(res)-1;
+                                if (inctype == "True" || inctype == "true") {
+                                    drawGraphInc(treatment, secstatus, leftY, rightY, ser, plotdata, incCat, leftmax, rightmax, minxvalue, maxxvalue)
+                                }
+                                else {
+                                    drawGraph(treatment, secstatus, leftY, rightY, ser, plotdata, rownum, leftmax, rightmax, minxvalue, maxxvalue)
+                                }
+
+                            }
+                    },
+                    error: OnErrorCall_
+                });
+
+                function OnErrorCall_(response) {
+                    alert("something went wrong!");
+
+                }
+                closePopup();
+                HideWait();
+
+            }
+            
+            function drawGraph(treatment, secstatus, leftY, rightY, ser, plotdata, rownum, leftmax, rightmax, minxvalue, maxxvalue) {
+                            var chart = Highcharts.chart('cont', {
+                                chart: {
+                                    plotBorderWidth: 2,
+                                    plotBorderColor: 'black',
+                                    spacingTop: 20,
+                                    spacingRight: 20,
+                                    spacingBottom: 20,
+                                    spacingLeft: 20,
+                                    marginTop:100,
+                                },
+
+                                title: {
+                                    text: '',
+                                },
+                                subtitle: {
+                                    text: treatment,
+                                    align: 'left',
+                                    useHTML: true,
+                                    style: {
+                                        fontWeight: 'bold',
+                                        color: 'black',
+                                        fontSize: '12px',
+                                        fontFamily: 'Arial'
+                                    }
+                                },
+                                credits: {
+                                    enabled: false
+                                },
+                                yAxis:
+                          [{ // Primary yAxis 
+                              min: 0,
+                              gridLineWidth: 0,
+                            //  tickInterval: lintrvl,
+                              softMin: 0,
+                              max: leftmax,
+                              title: {
+                                  text: leftY,
+                                  useHTML: true,
+                                  style: {
+                                      fontWeight: 'bold',
+                                      color: 'black',
+                                      fontSize: '12px',
+                                      fontFamily: 'Arial'
+                                  }
+                              },
+                              labels: {
+                                  style: {
+                                      color: 'black',
+                                      fontSize: '12px',
+                                      fontWeight: 'normal',
+                                      fontFamily: 'Arial'
+                                  }
+                              }
+
+                          }, { // Secondary yAxis
+                              visible: secstatus,
+                              gridLineWidth: 0,
+                          //    tickInterval: rintrvl,
+                              min: 0,
+                              softMin: 0,
+                              max: rightmax,
+                              title: {
+                                  text: rightY,
+                                  useHTML: true,
+                                  style: {
+                                      fontWeight: 'bold',
+                                      color: 'black',
+                                      fontSize: '12px',
+                                      fontFamily: 'Arial'
+                                  }
+                              },
+                              labels: {
+                                  style: {
+                                      color: 'black',
+                                      fontSize: '12px',
+                                      fontWeight: 'noraml',
+                                      fontFamily: 'Arial'
+                                  }
+                              },
+                              opposite: true,
+                          }],
+
+                                xAxis: {
+                                    plotLines:
+                                        plotdata,
+
+                                    //  categories: rownum,
+                                    categories: rownum,
+                                    min: minxvalue,
+                                    max:maxxvalue,
+                                    title: {
+                                        text: 'Dates',
+                                        useHTML: true,
+                                    style: {
+                                        color: 'black',
+                                        fontWeight: 'bold',
+                                        fontSize: '12px',
+                                        fontFamily: 'Arial'
+
+                                    }
+
+                                },
+                                    labels: {
+                                        style: {
+                                            color: 'black',
+                                            fontSize: '12px',
+                                            fontWeight: 'normal',
+                                            fontFamily: 'Arial'
+                                        }
+                                    },
+                                },
+                                    legend: {
+                                        layout: 'horizontal',
+                                        align: 'right',
+                                        verticalAlign: 'bottom',
+                                        labelFormatter: function () {
+                                            return '<span style="color: black; font-weight: normal;font-size: 12px; font-family:Arial">' + this.name + '</span>';
+                                        }
+                                    },
+                                    plotOptions: {
+                                        series: {
+                                            turboThreshold: 5000,
+                                            dataLabels: {
+                                                allowOverlap: true,
+                                                enabled: true,
+                                                rotation: -90,
+                                                align: 'top',
+                                                y: -5,
+                                                overflow: 'justify',
+                                                crop: false,
+                                                style: {
+                                                    textOutline: '1px contrast'
+                                                },
+
+                                                formatter: function () {
+                                                    var point = this.point;
+                                                    if (point.IOAPerc) {
+                                                        if (point.y > 0) {
+                                                            var words = point.IOAPerc.split(' ');
+                                                            var newpoint = '';
+                                                            for (var i = 0; i < words.length; i++) {
+                                                                if (words[i].endsWith('%') && i < words.length - 1) {
+                                                                    newpoint += '<span style="font-size: 12px; font-family: Arial; color: black; font-weight:normal">' + words[i] + '</span><br> ';
+                                                                } else {
+                                                                    newpoint += '<span style="font-size: 12px; font-family: Arial; color: black; font-weight:normal">' + words[i] + '</span> ';
+                                                            }
+                                                        }
+                                                            return '<div style="white-space: nowrap; font-weight: normal;font-size: 12px; font-family: Arial; color: black">' + newpoint + '</div>';
+                                                        }
+                                                        else {
+                                                            return '<span style="transform: rotate(-45deg); display: block; white-space: nowrap;font-size: 12px;font-family:Arial;color:black;text-shadow: none;font-weight:normal;">' + point.IOAPerc + '</span>';
+                                                        }
+                                                    }
+                                                    else if (point.arrowval) {
+                                                        return '<span style="transform: rotate(-45deg); display: block; white-space: nowrap;font-size: 12px; font-family:Arial;font-color:black;text-shadow: none;font-weight:normal;">' + point.arrowval;
+                                                    }
+                                                    else {
+                                                        return '';
+                                                    }
+                                                },
+                                            },
+                                        },
+                                    },
+                                
+                                    tooltip: {
+                                        formatter: function () {
+                                            return '<b>' + Highcharts.dateFormat('%m/%d/%Y', new Date(this.point.dateval)) + '</b>: ' + this.y;
+                                        }
+                                    },
+                                series: ser,
+                            });
+            }
+                
+
+            //incident graph start
+            function drawGraphInc(treatment, secstatus, leftY, rightY, ser, plotdata, incCat,leftmax, rightmax, minxvalue, maxxvalue) {
+                var chart = Highcharts.chart('cont', {
+                    chart: {
+                        type:'scatter',
+                        plotBorderWidth: 2,
+                        plotBorderColor: 'black',
+                        spacingTop: 20,
+                        spacingRight: 20,
+                        spacingBottom: 20,
+                        spacingLeft: 20,
+                        marginTop: 100,
+                    },
+
+                    title: {
+                        text: '',
+                    },
+                    subtitle: {
+                        text: treatment,
+                        align: 'left',
+                        useHTML: true,
+                        style: {
+                            fontWeight: 'bold',
+                            color: 'black',
+                            fontSize: '12px',
+                            fontFamily: 'Arial'
+
+                        }
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    yAxis:
+              [{ // Primary yAxis 
+                  min: 0,
+                  gridLineWidth: 0,
+                 //   tickInterval: lintrvl,
+                  softMin: 0,
+                  max: leftmax,
+                  title: {
+                      text: leftY,
+                      useHTML: true,
+                      style: {
+                          fontWeight: 'bold',
+                          color: 'black',
+                          fontSize: '12px',
+                          fontFamily: 'Arial'
+
+                      }
+                  },
+                  labels: {
+                      style: {
+                          color: 'black',
+                          fontSize: '12px',
+                          fontWeight: 'normal',
+                          fontFamily: 'Arial'
+                      }
+                  },
+
+              }, { // Secondary yAxis
+                  visible: secstatus,
+                  gridLineWidth: 0,
+                //    tickInterval: rintrvl,
+                  min: 0,
+                  softMin: 0,
+                  max: rightmax,
+                  title: {
+                      text: rightY,
+                      useHTML: true,
+                      style: {
+                          fontWeight: 'bold',
+                          color: 'black',
+                          fontSize: '12px',
+                          fontFamily: 'Arial'
+
+                      }
+                  },
+                  labels: {
+                      style: {
+                          color: 'black',
+                          fontSize: '12px',
+                          fontWeight: 'normal',
+                          fontFamily: 'Arial'
+                      }
+                  },
+                  opposite: true,
+              }],
+
+                    xAxis: {
+                        categories: incCat,
+                        min: minxvalue,
+                        max: maxxvalue,
+                        plotLines:
+                            plotdata,
+                        title: {
+                            text: 'Dates',
+                            useHTML: true,
+                            style: {
+                                fontWeight: 'bold',
+                                color: 'black',
+                                fontSize: '12px',
+                                fontFamily: 'Arial'
+
+                            }
+                        },
+                        labels: {
+                            style: {
+                                color: 'black',
+                                fontSize: '12px',
+                                fontWeight: 'normal',
+                                fontFamily: 'Arial'
+                            }
+                        },
+
+                    },
+                    legend: {
+                        layout: 'horizontal',
+                        align: 'right',
+                        verticalAlign: 'bottom',
+                        labelFormatter: function () {
+                            return '<span style="color: black; font-weight: normal;font-size: 12px; font-family:Arial">' + this.name + '</span>';
+                        }
+                    },
+                    plotOptions: {
+                        series: {
+                            turboThreshold: 5000,
+                            dataLabels: {
+                                allowOverlap: true,
+                                enabled: true,
+                                rotation: -90,
+                                align: 'top',
+                                y: -5,
+                                overflow: 'justify',
+                                crop: false,
+                                style: {
+                                    textOutline: '1px contrast'
+                                },
+
+                                formatter: function () {
+                                    var point = this.point;
+                                    if (point.IOAPerc) {
+                                        if (point.y > 0) {
+                                            var words = point.IOAPerc.split(' ');
+                                            var newpoint = '';
+                                            for (var i = 0; i < words.length; i++) {
+                                                if (words[i].endsWith('%') && i < words.length - 1) {
+                                                    newpoint += '<span style="font-size: 12px; font-family: Arial; color: black; font-weight:normal">' + words[i] + '</span><br> ';
+                                                } else {
+                                                    newpoint += '<span style="font-size: 12px; font-family: Arial; color: black; font-weight:normal">' + words[i] + '</span> ';
+                                            }
+                                        }
+                                            return '<div style="white-space: nowrap; font-weight: normal;font-size: 12px; font-family: Arial; color: black">' + newpoint + '</div>';
+                                        }
+                                        else {
+                                            return '<span style="transform: rotate(-45deg); display: block; white-space: nowrap;font-size: 12px;font-family:Arial;color:black;text-shadow: none;font-weight:normal;">' + point.IOAPerc + '</span>';
+                                        }
+                                    }
+                                    else if (point.arrowval) {
+                                        return '<span style="transform: rotate(-45deg); display: block; white-space: nowrap;font-size: 12px; font-family:Arial;font-color:black;text-shadow: none;font-weight:normal;">' + point.arrowval;
+                                    }
+                                    else {
+                                        return '';
+                                    }
+                                },
+                            },
+                        },
+                    },
+
+                    tooltip: {
+                        formatter: function () {
+                            return '<b>' + Highcharts.dateFormat('%m/%d/%Y', new Date(this.point.dateval)) + '</b>: ' + this.y; 
+                        }
+                    },
+                    series: ser,
+                });
+            }
+
+            //incident graph end
+            function formatDate(ssdate) {
+                var date = new Date(ssdate);
+                var month = zerolead(date.getMonth() + 1);
+                var day = zerolead(date.getDate());
+                var year = date.getFullYear();
+                return month + '/' + day + '/' + year;
+            }
+            function zerolead(number) {
+                return number < 10 ? '0' + number : number;
+            }
+            function extractTimestamp(dateString) {
+                var timestampRegex = /\/Date\((\d+)\)\//;
+                var match = dateString.match(timestampRegex);
+                if (match && match.length >= 2) {
+                    return parseInt(match[1], 10);
+                }
+                return null;
+            }
+            function CheckforRow(arr, item) {
+                if (arr.length != 0) {
+                    for (var i = 0; i < arr.length; i++) {
+                        if (arr[i] == item) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                else {
+                    return false;
+                }
+            }
+            function extractdate(dateString) {
+                var regex = /\/Date\((\d+)\)\//;
+                var match = dateString.match(regex);
+                var milliseconds = parseInt(match[1]);
+                var date = new Date(milliseconds);
+                var year = date.getFullYear();
+                var month = date.getMonth();
+                var day = date.getDate();
+                return Date.UTC(year, month, day);
+            }
+            function extractdateOther(dateString) {
+                var dateParts = dateString.split("-");
+                var year = parseInt(dateParts[0]);
+                var month = parseInt(dateParts[1]) - 1;
+                var day = parseInt(dateParts[2]);
+                var sdateval = Date.UTC(year, month, day);
+                return sdateval
+            }
+            function sortByDate(a, b) {
+                var timestampA = parseInt(a.SessionDate.match(/\d+/)[0]);
+                var timestampB = parseInt(b.SessionDate.match(/\d+/)[0]);
+                if (timestampA < timestampB) return -1;
+                if (timestampA > timestampB) return 1;
+
+                // If the dates are equal, sort by the number field in descending order
+                return a.Rownum - b.Rownum;
+            }
+            function minumumSession(arr)
+            {
+                
+                var minValue = arr[0].Rownum;
+                for (var i = 1; i < arr.length; i++) {
+                    if (arr[i].Rownum != null) {
+                        if (arr[i].Rownum < minValue) {
+                            minValue = arr[i].Rownum;
+                        }
+                    }
+                }
+                return minValue;
+
+            }
+            function minx(arr)
+            {
+                var minValue = arr[0].NewRow;
+                for (var i = 1; i < arr.length; i++) {
+                    if (arr[i].NewRow < minValue) {
+                        minValue = arr[i].NewRow;
+                    }
+                }
+                return minValue;
+            }
+            function maxx(arr) {
+                var maxValue = arr[0].NewRow;
+                for (var i = 1; i < arr.length; i++) {
+                    if (arr[i].NewRow > maxValue) {
+                        maxValue = arr[i].NewRow;
+                    }
+                }
+                return maxValue;
+            }
+            function plotlinedata(plotdata) {
+                var combinedArray = [];
+
+                for (var i = 0; i < plotdata.length; i++) {
+                    var item = plotdata[i];
+                    var existingItem = findExistingItem(combinedArray, item);
+
+                    if (existingItem) {
+                        existingItem.label += ',<br>' + item.label;
+                    } else {
+                        combinedArray.push(item);
+                    }
+                }
+                return combinedArray;
+
+                function findExistingItem(arr, item) {
+                    for (var j = 0; j < arr.length; j++) {
+                        var combinedItem = arr[j];
+                        if (
+                            combinedItem.color === item.color &&
+                            combinedItem.dashStyle === item.dashStyle &&
+                            combinedItem.value === item.value &&
+                            combinedItem.width === item.width
+                        ) {
+                            return combinedItem;
+                        }
+                    }
+                    return null;
+                }
+            }
+            function convertDateFormat(inputDate) {
+                var parts = inputDate.split('/');
+                var year = parseInt(parts[0], 10);
+                var month = parseInt(parts[1], 10);
+                var day = parseInt(parts[2], 10);
+                var formattedDate = (
+(month < 10 ? "0" : "") + month + '/' +
+(day < 10 ? "0" : "") + day + '/' +
+year
+);
+                return formattedDate;
+            }
+            var charts1, charts2;
+            var lessnamegroup = "<%=lname%>";
+            var lessnm = [];
+            var currentItem = '';
+            var insideQuotes = false;
+            for (var i = 0; i < lessnamegroup.length; i++) {
+                if (lessnamegroup[i] === '"') {
+                    insideQuotes = !insideQuotes; 
+                } else if (lessnamegroup[i] === ',' && !insideQuotes) {
+                    lessnm.push(currentItem);
+                    currentItem = '';
+                } else {
+                    currentItem += lessnamegroup[i];
+                }
+            }
+            if (currentItem) {
+                lessnm.push(currentItem);
+            }
+            var lessnamenum = lessnm.length;
+            var j = 0;
+            var lessgroup = "<%=lid%>";
+                var less = lessgroup.split(",").map(Number);
+                var lessnum = less.length;
+                var i = 0;
+                function exportChart() {
+                        processNextChart();
+                }
+                function processNextChart() {
+                    if (i < lessnum && j < lessnamenum) {
+                        generateHighchart(less[i],lessnm[j], function () {
+                            captureAndSend(less[i], function () {
+                                i++;
+                                j++;
+                                processNextChart();
+                            });
+                        });
+                    }
+                    else {
+                         DownloadPopup();
+                        closePopup();
+                    }
+                }
+                function generateHighchart(lessid, lessnameid, callback) {
+                    var hchart = document.getElementById('<%= HighchartGraph.ClientID %>');
+                    hchart.style.display = 'block';
+                    var span = document.getElementById('lbgraphSpan');
+                    span.innerHTML = "";
+                    $('#sname').css("display", "block");
+                    $('#cont').css("display", "block");
+                    $('#lnam').css("display", "block");
+                    $('#daterang').css("display", "block");
+                    $('#mel').css("display", "block");
+                    $('#deftxt').css("display", "block");
+                    var treatment = '';
+                    //medication report size start
+                    if ("<%=medno%>" == "false" || "<%=medno%>" == "False") {
+                        var meddiv = document.getElementById('medcont');
+                        if ("<%=med%>" == "true" || "<%=med%>" == "True") {
+                    if ("<%=reptype%>" == "true" || "<%=reptype%>" == "True") {
+                            meddiv.style.width = '671.976pt';
+                            meddiv.style.height = '87.807911808pt';
+
+                        }
+                        else {
+                            meddiv.style.width = '900pt';
+                            meddiv.style.height = '200pt';
+
+                        }
+                    }
+                }
+                    // medication report size end
+                    // set cont size start
+                var myDiv = document.getElementById('cont');
+                if ("<%=reptype%>" == "true" || "<%=reptype%>" == "True") {
+                    myDiv.style.width = '671.976pt';
+                    myDiv.style.height = '510.2364pt';
+                } else {
+                    myDiv.style.width = '900pt';
+                    myDiv.style.height = '400pt';
+                }
+                    // set cont size End
+                var lplan = lessid;
+                    var stid = "<%=sid%>";
+                    var jsonData = JSON.stringify({ lplan: lplan, studid: stid });
+                    $.ajax({
+                        type: "POST",
+                        url: "AcademicSessionReport.aspx/getSessionReportNext",
+                        data: jsonData,
+                        contentType: "application/json; charset=utf-8",
+                        async: false,
+                        dataType: "json",
+                        success: function (response) {
+                            var inputsDate = "<%=sDate%>";
+                        inputsDate = inputsDate.replace(/-/g, '/');
+                        var inputeDate = "<%=eDate%>";
+                        inputeDate = inputeDate.replace(/-/g, '/');
+                        var obj = JSON.parse(response.d);
+                        $.map(obj, function (item, index) {
+                            document.getElementById('sname').innerHTML = item['StudentName'];
+                            document.getElementById('lnam').innerHTML = lessnameid;
+                            document.getElementById('daterang').innerHTML = convertDateFormat(inputsDate) + "-" + convertDateFormat(inputeDate);
+                            document.getElementById('mel').innerHTML = 'Melmark New England';
+                            if (item['Deftn'] != null) {
+                                document.getElementById('deftxt').innerHTML = 'Definition:    ' + item['Deftn'];
+                            }
+                            else {
+                                document.getElementById('deftxt').innerHTML = 'Definition:    ';
+                            }
+                            treatment = item['Treatment'] + '<br><br>';
+                        });
+                    },
+                    error: OnErrorCall_
+                });
+                function OnErrorCall_(response) {
+
+                    alert("something went wrong!");
+                }
+                var sdate = "<%=sDate%>";
+                var edate = "<%=eDate%>";
+                    var sid = "<%=sid%>";
+                    var lid = lessid;
+                    var scid = "<%=scid%>";
+                    var evnt = "<%=evnt%>";
+                    var trend = "<%=trend%>";
+                    var ioa = "<%=ioa%>";
+                    var cls = "<%=cls%>";
+                    var medjson = JSON.stringify({ StartDate: sdate, enddate: edate, studid: sid, SchoolId: scid });
+
+                    if (("<%=med%>" == "true" || "<%=med%>" == "True") && ("<%=medno%>" == "false" || "<%=medno%>" == "False")) {
+                    $.ajax({
+                        type: "POST",
+                        url: "AcademicSessionReport.aspx/getmedAcademicReport",
+                        data: medjson,
+                        contentType: "application/json; charset=utf-8",
+                        async: false,
+                        dataType: "json",
+                        success: function (response) {
+                            var resp = JSON.parse(response.d);
+                            var medicData = []; var val = 0;
+                            resp.forEach(function (item) {
+                                item.duration = extractdate(item.EndTime) - extractdate(item.EvntTs);
+                            });
+                            resp.sort(function (a, b) {
+                                return b.duration - a.duration;
+                            });
+                            $.map(resp, function (item, index) {
+                                var meddata = {};
+                                meddata['name'] = item['EventName'] + item['Comment'];
+                                meddata['x'] = extractdate(item['EvntTs']);
+                                meddata['x2'] = extractdate(item['EndTime']);
+                                meddata['y'] = val;
+                                medicData.push(meddata);
+                                val = val + 1
+                            });
+                            Highcharts.chart('medcont', {
+                                chart: {
+                                    type: 'xrange',
+                                    plotBorderWidth: 2,
+                                    plotBorderColor: 'black',
+                                    spacingTop: 20,
+                                    spacingRight: 20,
+                                    spacingBottom: 20,
+                                    spacingLeft: 20,
+                                },
+                                title: {
+                                    text: ''
+                                },
+                                subtitle: {
+                                    text: ' Medication Details',
+                                    align: 'left',
+                                    useHTML: true,
+                                    style: {
+                                        fontWeight: 'bold',
+                                        color: 'black',
+                                        fontSize: '12px',
+                                        fontFamily: 'Arial'
+                                    }
+                                },
+                                xAxis: {
+
+                                    //visible: false,
+                                    type: 'datetime',
+                                    //linkedTo: 0,
+                                    min: extractdateOther(sdate.replace('/', '-')),
+                                    max: extractdateOther(edate.replace('/', '-')),
+                                    tickInterval: 2 * 24 * 3600 * 1000,
+                                    tickPositioner: function () {
+                                        var ticks = [];
+                                        var interval = this.options.tickInterval;
+                                        var currentTick = this.min;
+
+                                        while (currentTick <= this.max) {
+                                            ticks.push(currentTick);
+                                            currentTick += interval;
+                                        }
+
+                                        return ticks;
+                                    },
+                                    lineWidth: 0,
+                                    minorGridLineWidth: 0,
+                                    lineColor: 'transparent',
+                                    minorTickLength: 0,
+                                    tickLength: 0,
+                                    startOnTick: true,
+                                    endOnTick: true,
+                                    labels: {
+                                        enabled: false,
+                                        //  rotation: -90,
+                                        //formatter: function () {
+                                        //    return Highcharts.dateFormat('%m/%d/%Y', this.value);
+                                        //}
+                                    }
+                                },
+                                credits: {
+                                    enabled: false
+                                },
+                                yAxis: {
+                                    gridLineWidth: 0,
+                                    offset: 60,
+                                    title: {
+                                        text: ''
+                                    },
+                                    labels: {
+                                        enabled: false
+                                    },
+                                    reversed: true
+                                },
+                                tooltip: {
+                                    formatter: function () {
+                                        return Highcharts.dateFormat('%m/%d/%Y', this.point.x) + '-' + Highcharts.dateFormat('%m/%d/%Y', this.point.x2);
+
+                                    }
+                                },
+                                series: [{
+                                    data: medicData,
+                                    showInLegend: false,
+                                    dataLabels: {
+                                        enabled: true,
+                                        formatter: function () {
+                                            return this.point.name;
+                                        }
+                                    },
+
+                                }]
+                            });
+                        },
+                        error: OnErrorCal
+                    });
+                    function OnErrorCal(response) {
+
+                        alert("Something went wrong! Error: ");
+
+                    }
+                }
+                var jsonData = JSON.stringify({ StartDate: sdate, enddate: edate, studid: sid, AllLesson: lid, SchoolId: scid, Events: evnt, Trendtype: trend, IncludeIOA: ioa, Clstype: cls });
+                $.ajax({
+                    type: "POST",
+                    url: "AcademicSessionReport.aspx/getSessionReport",
+                    data: jsonData,
+                    contentType: "application/json; charset=utf-8",
+                    async: false,
+                    dataType: "json",
+                    success: function (response) {
+                        var res = JSON.parse(response.d);
+                        if (res.length === 0) {
+                            var hchart = document.getElementById('<%= cont.ClientID %>');
+                            if (hchart) {
+                                hchart.style.display = 'none';
+                            }
+                            var hchart2 = document.getElementById('<%= medcont.ClientID %>');
+                            if (hchart2) {
+                                hchart2.style.display = 'none';
+                            }
+                            var hchart4 = document.getElementById('<%= deftxt.ClientID %>');
+                            if (hchart4) {
+                                hchart4.style.display = 'none';
+                            }
+                            var hchart5 = document.getElementById('<%= mel.ClientID %>');
+                            if (hchart5) {
+                                hchart5.style.display = 'none';
+                            }
+                            var hchart6 = document.getElementById('<%= mednodata.ClientID %>');
+                            if (hchart6) {
+                                hchart6.style.display = 'none';
+                            }
+                            var span = document.getElementById('lbgraphSpan');
+                            span.innerHTML = "No Data Available";
+                            $('#sname').css("display", "none");
+                            $('#cont').css("display", "none");
+                            $('#lnam').css("display", "none");
+                            $('#daterang').css("display", "none");
+                            $('#mel').css("display", "none");
+                            $('#deftxt').css("display", "none");
+                        }
+                        else {
+                            var hchart = document.getElementById('<%= cont.ClientID %>');
+                            if (hchart) {
+                                hchart.style.display = 'block';
+                            }
+                            var hchart2 = document.getElementById('<%= medcont.ClientID %>');
+                            if (hchart2) {
+                                hchart2.style.display = 'block';
+                            }
+                            var hchart4 = document.getElementById('<%= deftxt.ClientID %>');
+                            if (hchart4) {
+                                hchart4.style.display = 'block';
+                            }
+                            var hchart5 = document.getElementById('<%= mel.ClientID %>');
+                            if (hchart5) {
+                                hchart5.style.display = 'block';
+                            }
+                            var hchart6 = document.getElementById('<%= mednodata.ClientID %>');
+                            if (hchart6) {
+                                hchart6.style.display = 'block';
+                            }
+                            var leftmax, rightmax;
+                            leftmax = res[0].MaxScore;
+                            rightmax = res[0].MaxDummyScore;
+                            res.sort(sortByDate);
+                            var secstatus = true;
+                            // primary and secondary y axis start.
+                            var leftY = res[0].LeftYaxis;
+                            var rightY = res[0].RightYAxis;
+                            if (rightY == null) {
+                                secstatus = false;
+                            }
+                            // primary and secondary y axis end.
+
+
+                            // remove all null session (incident) start
+                            if ("<%=inctype%>" == "True" || "<%=inctype%>" == "true") {
+                                for (var i = res.length - 1; i >= 0; i--) {
+                                    if (res[i].Rownum == null) {
+                                        res.splice(i, 1);
+                                    }
+                                }
+                            }
+                            // remove all null session (incident) end
+                            // check 1 session for event start
+
+                            // check 1 session for event start
+                            //start newrow correction
+                            var prevRow = minumumSession(res);
+                            $.map(res, function (item, index) {
+                                if (item['NewRow'] != null) {
+                                    item['NewRow'] = item['NewRow'];
+                                    prevRow = item['NewRow'];
+                                }
+                                else {
+                                    $.map(res, function (ite, index) {
+                                        if (ite['NewRow'] != null && ite['NewRow'] >= prevRow + 1) {
+                                            ite['NewRow'] = ite['NewRow'] + 1;
+                                        }
+                                    });
+                                    item['NewRow'] = prevRow + 1;
+                                    prevRow = item['NewRow']
+                                }
+                            });
+                            //end newrow correction
+                            //x category start // regular graph category start
+                            var catarr = [];
+                            var processedNames = [];
+                            var xval = 0;
+                            var xvalarr = [];
+
+                            $.map(res, function (item, index) {
+                                var ssdate = extractTimestamp(item['SessionDate']);
+                                var name = formatDate(ssdate);
+
+                                var isDuplicate = false;
+                                for (var i = 0; i < processedNames.length; i++) {
+                                    if (processedNames[i] === name) {
+                                        isDuplicate = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!isDuplicate) {
+                                    var catdata = new Object;
+                                    catdata['name'] = name;
+                                    var carray = [];
+
+                                    $.map(res, function (ite, index) {
+                                        if (ssdate === extractTimestamp(ite['SessionDate'])) {
+                                            if (ite['Rownum'] == null && ite['CalcType'] == 'Event') {
+                                                ite['Rownum'] = "";
+                                                xvalarr.push(xval);
+                                            }
+                                            if (!CheckforRow(carray, ite['Rownum'])) {
+                                                carray.push(ite['Rownum']);
+                                                xval = xval + 1;
+                                            }
+                                        }
+                                    });
+                                    catdata['categories'] = carray;
+                                    catarr.push(catdata);
+                                    processedNames.push(name);
+                                }
+                            });
+
+                            var finalsort = catarr.map(function (order, key) {
+                                var oldname = order.name.split('/');
+                                var newname = oldname[0] + '-' + oldname[1];
+                                var narr = {
+
+                                    "name": newname,
+                                    "categories": order.categories
+
+                                }
+
+                                return narr;
+                            });
+                            // regular graph category end
+                            var incCat = [];
+                            // incident graph category start
+                            if ("<%=inctype%>" == "True" || "<%=inctype%>" == "true") {
+                                $.map(res, function (item, index) {
+                                    var existsInArray = false;
+                                    for (var i = 0; i < res.length; i++) {
+                                        if (incCat[i] === item['Rownum']) {
+                                            existsInArray = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (!existsInArray) {
+                                        incCat.push(item['Rownum']);
+                                    }
+                                });
+                            }
+                            // incident graph category end
+                            // x category end
+                            // Plot Data Start
+                            var data = [];
+                            var yAxis = [];
+                            var color = [];
+                            var symbol = [];
+                            var yAxisAr = [];
+                            var colorAr = [];
+                            var symbolAr = [];
+                            var arrowArray = [];
+                            var arrowNull = [];
+                            var calc = []; var perc = []; var nonperc = [];
+                            var dummy = [];
+                            var prevtype;
+                            $.map(res, function (item, index) {
+                                if (item['CalcType'] != 'Event') {
+                                    var yax;
+
+                                    if (item['LeftYaxis'] != null && item['RightYAxis'] == null || item['LeftYaxis'] == null && item['RightYAxis'] != null) {
+                                        yax = 0;
+                                    }
+                                    else if (item['CalcType'] != "Total Duration" && item['CalcType'] != "Total Correct" && item['CalcType'] != "Total Incorrect" && item['CalcType'] != "Frequency" && item['CalcType'] != "Avg Duration" && item['CalcType'] != "Customize" && item['CalcType'] != "Event" && item['CalcType'] != item['RightYAxis']) {
+                                        yax = 0;
+                                    }
+                                    else {
+                                        yax = 1;
+                                    }
+
+                                    if (yax == 0 || item['RptLabel'] == item['LeftYaxis']) {
+                                        var catdata = {};
+                                        var symb = {};
+
+                                        catdata['date'] = item['NewRow'] - 1;
+                                        catdata['name'] = item['ColName'] + '-' + item['RptLabel'];
+                                        catdata['Color'] = item['Color'];
+                                        catdata['IOAPerc'] = item['IOAPerc'];
+                                        catdata['dateval'] = extractdate(item['SessionDate']);
+                                        symb['symbol'] = item['Shape'].toLowerCase();
+                                        symb['enabled'] = true;
+                                        symb['states'] = { hover: { enabled: true } }
+                                        catdata['symbol'] = symb;
+                                        catdata['yAxis'] = 0;
+                                        catdata['value'] = (item['Score']);
+                                        data.push(catdata);
+                                        yAxis[catdata['name']] = catdata['yAxis'];
+                                        color[catdata['name']] = catdata['Color'];
+                                        symbol[catdata['name']] = catdata['symbol'];
+                                        calc[catdata['name']] = catdata['CalcType'];
+                                    }
+                                    else {
+                                        var catdata = {};
+                                        var symb = {};
+
+                                        catdata['date'] = item['NewRow'] - 1;
+                                        catdata['name'] = item['ColName'] + '-' + item['RptLabel'];
+                                        catdata['Color'] = item['Color'];
+                                        catdata['IOAPerc'] = item['IOAPerc'];
+                                        catdata['dateval'] = extractdate(item['SessionDate']);
+                                        symb['symbol'] = item['Shape'].toLowerCase();
+                                        symb['enabled'] = true;
+                                        symb['states'] = { hover: { enabled: true } }
+                                        catdata['symbol'] = symb;
+                                        catdata['yAxis'] = 1;
+                                        catdata['value'] = (item['DummyScore']);
+                                        data.push(catdata);
+                                        yAxis[catdata['name']] = catdata['yAxis'];
+                                        color[catdata['name']] = catdata['Color'];
+                                        symbol[catdata['name']] = catdata['symbol'];
+                                        calc[catdata['name']] = catdata['CalcType'];
+                                    }
+                                }
+
+                            });
+
+                            // score and dummy score start
+                            var newData = []; var names = [];
+                            data.forEach(function (item) {
+                                if (!names[item.name]) {
+                                    names[item.name] = true;
+                                    newData.push(item.name);
+                                }
+                            });
+                            var ser = newData.map(function (name) {
+                                return {
+                                    name: name,
+                                    yAxis: yAxis[name],
+                                    color: color[name],
+                                    marker: symbol[name],
+                                    dataGrouping: { enabled: true },
+                                    data: data.filter(function (item) {
+                                        return item.name === name;
+                                    }).map(function (item) {
+                                        return {
+                                            x: item.date,
+                                            y: item.value,
+                                            IOAPerc: item.IOAPerc,
+                                            dateval: item.dateval
+                                        };
+                                    })
+                                };
+
+                            });
+                            // score and dummy score start
+
+                            //set duplicate series (case:no series) start
+                            dupdata = [];
+                            if (data.length === 0) {
+                                var samdata = {};
+                                var sd = rownum[0]; var ed = rownum[rownum.length - 1];
+                                samdata['data'] = [{ x: sd, y: null }, { x: ed, y: null }];
+                                samdata['showInLegend'] = false;
+                                dupdata.push(samdata);
+                                ser = dupdata;
+                                leftmax = 1; rightmax = 1;
+                            }
+                            //set duplicate series (case:no series) end
+                            //trend start
+                            var arrData = []; var yAxis1 = []; var color1 = []; var symbol1 = [];
+                            $.map(res, function (item, index) {
+
+                                if (item['CalcType'] != 'Event' && "<%=trend%>" == "Quarter") {
+                                        var yax;
+
+                                        if (item['LeftYaxis'] != null && item['RightYAxis'] == null || item['LeftYaxis'] == null && item['RightYAxis'] != null) {
+                                            yax = 0;
+                                        }
+                                        else if (item['CalcType'] != "Total Duration" && item['CalcType'] != "Total Correct" && item['CalcType'] != "Total Incorrect" && item['CalcType'] != "Frequency" && item['CalcType'] != "Avg Duration" && item['CalcType'] != "Customize" && item['CalcType'] != "Event" && item['CalcType'] != item['RightYAxis']) {
+                                            yax = 0;
+                                        }
+                                        else {
+                                            yax = 1;
+                                        }
+                                        if (yax == 0 || item['RptLabel'] == item['LeftYaxis'] || (item['RptLabel'] != item['LeftYaxis'] && secstatus == false)) {
+                                            var trnddata = {};
+                                            var symbarr = {};
+                                            trnddata['date'] = (item['NewRow'] - 1);
+                                            trnddata['name'] = item['ColName'] + '-' + item['CalcType'] + 'trend';
+                                            trnddata['value'] = item['Trend'];
+                                            trnddata['Color'] = "Gray";
+                                            symbarr['enabled'] = false;
+                                            trnddata['symbol'] = symbarr;
+                                            trnddata['yAxis1'] = 0;
+                                            arrData.push(trnddata);
+                                            yAxis1[trnddata['name']] = trnddata['yAxis1'];
+                                            color1[trnddata['name']] = trnddata['Color'];
+                                            symbol1[trnddata['name']] = trnddata['symbol'];
+                                        }
+                                        else {
+                                            var trnddata = {};
+                                            var symbarr = {};
+                                            trnddata['date'] = (item['NewRow'] - 1);
+                                            trnddata['name'] = item['ColName'] + '-' + item['CalcType'] + 'trend';
+                                            trnddata['value'] = item['Trend'];
+                                            trnddata['Color'] = "Gray";
+                                            symbarr['enabled'] = false;
+                                            trnddata['symbol'] = symbarr;
+                                            trnddata['yAxis1'] = 1;
+                                            arrData.push(trnddata);
+                                            yAxis1[trnddata['name']] = trnddata['yAxis1'];
+                                            color1[trnddata['name']] = trnddata['Color'];
+                                            symbol1[trnddata['name']] = trnddata['symbol'];
+
+                                        }
+                                    }
+                                });
+                                var newData1 = []; var name1 = [];
+                            // var newdata1 = [...new Set(arrData.map(item => item.name))];
+                                arrData.forEach(function (item) {
+                                    if (!name1[item.name]) {
+                                        name1[item.name] = true;
+                                        newData1.push(item.name);
+                                    }
+                                });
+                                var ser1 = newData1.map(function (name) {
+                                    return {
+                                        name: "",
+                                        yAxis: yAxis1[name],
+                                        color: color1[name],
+                                        marker: symbol1[name],
+                                        dashStyle: "DashDotDot",
+                                        lineWidth: 2,
+                                        showInLegend: false,
+                                        data: arrData.filter(function (item) {
+                                            return item.name === name;
+                                        }).map(function (item) {
+                                            return {
+                                                x: item.date,
+                                                y: item.value
+                                            };
+                                        })
+                                    };
+                                });
+                            //trend  end
+                                ser = ser.concat(ser1);
+                            //Event plot Start
+                                var plotdata = [];
+                                var maxYPosition = 300;
+                                var currentYPosition = 0;
+                                $.map(res, function (item, index) {
+                                    var style; var wid;
+                                    if (item['CalcType'] == "Event" && item['EventType'] != null && item['EventType'] != 'Arrow notes') {
+
+                                        if (item['EventType'] == "Major") {
+                                            style = 'solid';
+                                            wid = 1;
+                                        }
+                                        else {
+                                            style = 'dot';
+                                            wid = 2;
+                                        }
+
+                                        var plotdict = new Object;
+                                        plotdict['color'] = "black";
+                                        plotdict['dashStyle'] = style;
+
+                                        plotdict['value'] = (item['NewRow'] - 1);
+                                        plotdict['width'] = wid;
+                                        if (item['EventName'] == null) {
+                                            item['EventName'] = "";
+                                        }
+                                        var str = item['EventName'];
+                                        var txtal; var xax;
+                                        var valign;
+                                        if (item['EventType'] == "Major") {
+                                            txtal = 'right';
+                                            xax = -2;
+                                            valign = 'middle'
+                                        }
+                                        else {
+                                            txtal = 'left';
+                                            xax = 9;
+                                            valign = 'middle';
+                                        }
+                                        plotdict['label'] = {
+                                            text: str,
+                                            //textAlign: txtal,
+                                            formatter: function () {
+                                                var labelText = this.options.text;
+                                                labelText = labelText.replace(/↑/g, '<span style="font-size: larger;">↑</span>')
+                                                                   .replace(/↓/g, '<span style="font-size: larger;">↓</span>');
+                                                return labelText;
+                                            },
+                                            useHTML: true,
+                                            style: {
+                                                fontWeight: 'normal',
+                                                color: 'black',
+                                                fontSize: '12px',
+                                                fontFamily: 'Arial',
+                                                textShadow: 'none',
+                                            },
+                                            // align: 'right',
+                                            x: xax,
+                                            verticalAlign: valign,
+                                            rotation: -90
+                                        };
+                                        plotdict['label']['overflow'] = 'justify';
+                                        plotdict['label']['crop'] = false;
+                                        plotdata.push(plotdict);
+                                    }
+                                });
+                            //arrow start( null session)
+                                var arrows = [];
+                                var plotarr = new Object;
+                                var plotNew
+                                plotarr['type'] = 'scatter';
+                                plotarr['name'] = ser[0].name;
+                                plotarr['showInLegend'] = true;
+                                if ("<%=inctype%>" == "True" || "<%=inctype%>" == "true") {
+                                    plotarr['color'] = 'black',
+                                    plotarr['marker'] = {
+                                        symbol: 'square',
+                                        radius: 4,
+                                    }
+                                }
+                                else {
+                                    plotarr['marker'] = {
+                                        symbol: 'url(../Scripts/arrownote.png)',
+                                        width: 6,
+                                        height: 8,
+                                    }
+                                }
+                                $.map(res, function (item, index) {
+                                    if (item['ArrowNote'] != null) {
+
+                                        arrows.push({ x: (item['NewRow'] - 1), y: item['Score'], arrowval: item['ArrowNote'] });
+
+                                    }
+                                });
+                                var mergedarr = [];
+                                var mergedKeys = {};
+
+                                for (var i = 0; i < arrows.length; i++) {
+                                    var key = arrows[i].x + '-' + arrows[i].y;
+                                    if (!mergedKeys[key]) {
+                                        mergedarr.push(arrows[i]);
+                                        mergedKeys[key] = true;
+                                    } else {
+                                        for (var j = 0; j < mergedarr.length; j++) {
+                                            if (mergedarr[j].x === arrows[i].x && mergedarr[j].y === arrows[i].y) {
+                                                mergedarr[j].arrowval += ',' + arrows[i].arrowval;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                plotarr['data'] = mergedarr;
+                                if (plotarr['data'].length != 0) {
+                                    ser.push(plotarr);
+                                }
+                                var rownum = JSON.parse(JSON.stringify(finalsort));
+                                var minxvalue = minx(res) - 1;
+                                var maxxvalue = maxx(res) - 1;
+                                if ("<%=inctype%>" == "True" || "<%=inctype%>" == "true") {
+                                    drawGraphInc(treatment, secstatus, leftY, rightY, ser, plotdata, incCat, leftmax, rightmax, minxvalue, maxxvalue)
+                                }
+                                else {
+                                    drawGraph(treatment, secstatus, leftY, rightY, ser, plotdata, rownum, leftmax, rightmax, minxvalue, maxxvalue)
+                                }
+
+                            }
+                    },
+                    error: OnErrorCall_
+                });
+
+                    function OnErrorCall_(response) {
+                        alert("something went wrong!");
+
+                    }
+                    setTimeout(callback, 1000);
+                }
+            function captureAndSend(lessid, callback) {
+                html2canvas($("#HighchartGraph")[0]).then(function (canvas) {
+                    base64 = canvas.toDataURL();
+                    var dataToSend = {
+                        base64: base64, chartId: lessid
+                    };
+                    $.ajax({
+                        type: "POST",
+                        url: "AcademicSessionReport.aspx/getgraphs",
+                        data: JSON.stringify(dataToSend),
+                        contentType: "application/json; charset=utf-8",
+                        async: false,
+                        dataType: "json",
+                        success: function (response) {
+
+                        },
+                        error: function (error) {
+                            console.error("Error sending images to the server: " + error);
+                        },
+
+                    });
+                });
+                setTimeout(callback, 1000);
+            
+            }
+        </script>
     </form>
 </body>
 </html>
