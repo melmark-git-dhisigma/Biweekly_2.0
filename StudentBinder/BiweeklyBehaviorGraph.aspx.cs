@@ -1092,5 +1092,9 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
         string LessonId = ddlLessonplan.SelectedValue.ToString();
         fillGraph(LessonId);
     }
+    protected void EvntCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+        ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "showEvents();", true); 
+    }
 
 }
