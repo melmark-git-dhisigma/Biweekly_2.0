@@ -564,6 +564,7 @@ public class clsSession : ISerializable
     //private SelectedDatesCollection days4weeks;
     private string StartDateString;
     private string CurrentDateString;
+    private string SelectedDateString;
     //private System.Int64 StartDate;
     private int DateCount;
     public SelectedDatesCollection days_4weeks
@@ -592,7 +593,7 @@ public class clsSession : ISerializable
             } 
         }
     }
-    public SelectedDatesCollection current_week
+    public SelectedDatesCollection selected_week
     {
         get
         {
@@ -616,6 +617,34 @@ public class clsSession : ISerializable
             {
                 DateTime SDate = value[0];
                 CurrentDateString = SDate.ToShortDateString();
+                DateCount = value.Count;
+            }
+        }
+    }
+    public SelectedDatesCollection current_week
+    {
+        get
+        {
+
+            ArrayList dateList = new ArrayList();
+            DateTime sDate = DateTime.Parse(SelectedDateString);
+            //DateTime SDate = DateTime.FromBinary(StartDate);
+            for (int i = 0; i < DateCount; i++)
+            {
+                DateTime tempDate = sDate.AddDays(i);
+                dateList.Add(tempDate);
+            }
+            SelectedDatesCollection dateCollction = new SelectedDatesCollection(dateList);
+
+            return dateCollction;
+        }
+        set
+        {
+
+            if (value != null && value.Count > 0)
+            {
+                DateTime SDate = value[0];
+                SelectedDateString = SDate.ToShortDateString();
                 DateCount = value.Count;
             }
         }
