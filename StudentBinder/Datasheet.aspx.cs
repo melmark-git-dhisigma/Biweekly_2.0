@@ -584,7 +584,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             if (dt.Rows.Count > 0)
                             {
                                 string ansString = dt.Rows[0]["StepName"].ToString();
-                                ansString = ansString.Replace(", ", ",").ToString(); // Space Removal May 5 2020
+                                do
+                                {
+                                  ansString = ansString.Replace(", ", ",").ToString();
+                                } while (ansString.Contains(", "));
+                                
+                               // ansString = ansString.Replace(", ", ",").ToString(); // Space Removal May 5 2020
                                 string[] ansList = clsMathToSamples.GetAnsList(ansString);
                                 string[] Questions = new string[dt.Rows.Count];
                                 QuestnAary = new string[dt.Rows.Count];
@@ -595,6 +600,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 {
                                     string tempString = dt.Rows[i]["StepName"].ToString();
                                     tempString = tempString.Replace(", ", ",").ToString(); // Space Removal May 5 2020
+                                    do
+                                    {
+                                        tempString = tempString.Replace(", ", ",").ToString();
+                                    } while (tempString.Contains(", "));
+                               
 
                                     if(distractorSamples!=null)
                                     {
@@ -608,8 +618,14 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 }
                                 if (matchToSampleType == "Randomized")
                                 {
-                                    //steps = clsMathToSamples.FormStepsWithAns(ansList, Questions.Length, Questions);
-                                    steps = clsMathToSamples.FormStepsWithAnsNew(ansList, Questions.Length, Questions);
+                                    if (ansList.Length > 1)
+                                    {
+                                        steps = clsMathToSamples.FormStepsWithAnsNew(ansList, Questions.Length, Questions);
+                                    }
+                                    else
+                                    {
+                                        steps = clsMathToSamples.FormStepsWithAns(ansList, Questions.Length, Questions);
+                                    }
                                 }
                                 else
                                 {
@@ -938,7 +954,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         if (dt.Rows.Count > 0)
                         {
                             string ansString = dt.Rows[0]["StepName"].ToString();
-                            ansString = ansString.Replace(", ", ",").ToString(); // Space Removal May 5 2020
+                           // ansString = ansString.Replace(", ", ",").ToString(); // Space Removal May 5 2020
+                            do
+                            {
+                                ansString = ansString.Replace(", ", ",").ToString();
+                            } while (ansString.Contains(", "));
+                               
                             string[] ansList = clsMathToSamples.GetAnsList(ansString); 
                             string[] Questions = new string[dt.Rows.Count];
                             QuestnAary = new string[dt.Rows.Count];
@@ -949,7 +970,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             for (int i = 0; i < dt.Rows.Count; i++)
                             {
                                 string tempString = dt.Rows[i]["StepName"].ToString();
-                                tempString = tempString.Replace(", ", ",").ToString(); // Space Removal May 5 2020
+                                do
+                                {
+                                    tempString = tempString.Replace(", ", ",").ToString();
+                                } while (tempString.Contains(", "));
+                               
+                                //tempString = tempString.Replace(", ", ",").ToString(); // Space Removal May 5 2020
 
                                 if (distractorSamples != null)
                                 {
@@ -967,8 +993,14 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             }
                             if (matchToSampleType == "Randomized")
                             {
-                                //steps = clsMathToSamples.FormStepsWithAns(ansList, Questions.Length, Questions);
-                                steps = clsMathToSamples.FormStepsWithAnsNew(ansList, Questions.Length, Questions);
+                                if (ansList.Length > 1)
+                                {
+                                    steps = clsMathToSamples.FormStepsWithAnsNew(ansList, Questions.Length, Questions);
+                                }
+                                else
+                                {
+                                    steps = clsMathToSamples.FormStepsWithAns(ansList, Questions.Length, Questions);
+                                }
                             }
                             else
                             {
