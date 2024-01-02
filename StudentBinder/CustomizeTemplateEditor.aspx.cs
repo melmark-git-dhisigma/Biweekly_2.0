@@ -992,14 +992,14 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
                 if (totalTasktype != "1")
                 {
-                    sqlStr = "select DSTempHdrId,DSTempStepId,StepCd,StepName,SortOrder from DSTempStep where DSTempHdrId=" + oTemp.TemplateId + " and DSTempSetId=" + setid + " and ActiveInd = 'A' AND IsDynamic=0 order by SortOrder";
+                    sqlStr = "select DSTempHdrId,DSTempStepId,StepCd,StepName,SortOrder from DSTempStep where DSTempHdrId=" + oTemp.TemplateId + " and DSTempSetId=" + setid + " and ActiveInd = 'A' AND IsDynamic=0 AND SortOrder IS NOT NULL order by SortOrder";
 
                 }
                 else
                 {
                     //sqlStr = "select dsts.DSTempHdrId,dsts.DSTempStepId,dsts.StepCd,dsts.StepName,dsts.SortOrder, sdsss.PromptId from DSTempStep as dsts LEFT JOIN StdtDSStepStat sdsss on dsts.DSTempStepId = sdsss.DSTempStepId where dsts.DSTempHdrId=" + Session["OldTempId"] + " and dsts.DSTempSetId=" + Session["oldSetId"] + " and dsts.ActiveInd = 'A' AND IsDynamic=0 order by dsts.SortOrder";
                     //DToldTempData = oData_ov.ReturnDataTable(sqlStr, false);
-                    sqlStr = "select dsts.DSTempHdrId,dsts.DSTempStepId,dsts.StepCd,dsts.StepName,dsts.SortOrder, sdsss.PromptId from DSTempStep as dsts LEFT JOIN StdtDSStepStat sdsss on dsts.DSTempStepId = sdsss.DSTempStepId where dsts.DSTempHdrId=" + oTemp.TemplateId + " and dsts.DSTempSetId=" + setid + " and dsts.ActiveInd = 'A' AND IsDynamic=0 order by dsts.SortOrder";
+                    sqlStr = "select dsts.DSTempHdrId,dsts.DSTempStepId,dsts.StepCd,dsts.StepName,dsts.SortOrder, sdsss.PromptId from DSTempStep as dsts LEFT JOIN StdtDSStepStat sdsss on dsts.DSTempStepId = sdsss.DSTempStepId where dsts.DSTempHdrId=" + oTemp.TemplateId + " and dsts.DSTempSetId=" + setid + " and dsts.ActiveInd = 'A' AND IsDynamic=0 AND SortOrder IS NOT NULL order by dsts.SortOrder";
 
                 }
                 if (type == "Backward chain")
@@ -1008,7 +1008,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     {
 
                         sqlStr = "SELECT [DSTempHdrId],[DSTempStepId],[StepCd],[StepName],RANK() OVER(ORDER BY SortOrder ASC) as StepId  FROM [dbo].[DSTempStep] " +
-                                 "WHERE DSTempHdrId=" + oTemp.TemplateId + " AND DsTempSetId=" + setid + " AND ActiveInd='A' AND IsDynamic=0 ORDER BY [SortOrder] DESC";
+                                 "WHERE DSTempHdrId=" + oTemp.TemplateId + " AND DsTempSetId=" + setid + " AND ActiveInd='A' AND IsDynamic=0 AND [SortOrder] IS NOT NULL ORDER BY [SortOrder] DESC";
 
                     }
                     else
@@ -1020,7 +1020,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
                         sqlStr = "SELECT dsts.DSTempHdrId,dsts.DSTempStepId,dsts.StepCd,dsts.StepName,RANK() OVER(ORDER BY dsts.SortOrder ASC) as StepId,dsts.SortOrder, sdsss.PromptId " +
                                  "FROM [DSTempStep] as dsts LEFT JOIN StdtDSStepStat sdsss ON dsts.DSTempStepId = sdsss.DSTempStepId " +
-                                 "WHERE dsts.DSTempHdrId= " + oTemp.TemplateId + " AND dsts.DsTempSetId=" + setid + " AND dsts.ActiveInd='A' AND IsDynamic=0 ORDER BY dsts.SortOrder DESC";
+                                 "WHERE dsts.DSTempHdrId= " + oTemp.TemplateId + " AND dsts.DsTempSetId=" + setid + " AND dsts.ActiveInd='A' AND IsDynamic=0 AND dsts.SortOrder IS NOT NULL ORDER BY dsts.SortOrder DESC";
                     }
                 }
                 DataTable dt = oData_ov.ReturnDataTable(sqlStr, false);
@@ -5342,7 +5342,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
                     foreach (clsMathToSamples.Step step in steps)
                     {
-                        if (step != null)
+                        if (step != null && step.Questions != "")
                         {
                             order++;
                             samples = step.TrialText + " ";
@@ -18032,10 +18032,12 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
     }
     protected void drp_teachingFormat_SelectedIndexChanged(object sender, EventArgs e)
     {
+        int TemplateId = Convert.ToInt32(ViewState["HeaderId"]);
 		int parentLookupId = Convert.ToInt16(drp_teachingFormat.SelectedValue);
 		drpTeachingProc.Items.Clear();
 		objData = new clsData();
 		objData.ReturnDropDown("Select LookupId as Id , LookupName as Name from dbo.LookUp where ParentLookupId=" + parentLookupId, drpTeachingProc);
+        objData.Execute("UPDATE DSTempStep SET ActiveInd = 'D' WHERE IsDynamic = 0 AND DSTempHdrId = " + TemplateId);
 		hideAllOptions();
     }
     protected void LoadEmailforSorting()
