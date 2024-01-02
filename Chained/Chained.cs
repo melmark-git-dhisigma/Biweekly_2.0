@@ -582,7 +582,7 @@ namespace Chained
             {
                 if (sArray[i] != -9999)
                 {
-                        if ((SuccessCount && (sArray[i] < sCheckFor / 100)) || (!SuccessCount && (sArray[i] > sCheckFor / 100)))
+                        if ((SuccessCount && (sArray[i] < sCheckFor / 100)) || (!SuccessCount && (sArray[i] >= sCheckFor / 100)))
                         {
                             if (tempCount > maxCount)
                                 maxCount = tempCount;
@@ -594,6 +594,47 @@ namespace Chained
                 }
                 //else
                 //    tempCount++;
+            }
+            if (tempCount > maxCount)
+                maxCount = tempCount;
+            return maxCount;
+        }
+
+        public static int ConsecutiveCountfreqd(float[] sArray, float sCheckFor, bool SuccessCount)
+        {
+            int maxCount = 0;
+            int tempCount = 0;
+            for (int i = sArray.Length - 1; i >= 0; i--)
+            {
+                if (sArray[i] != -9999)
+                {
+                    if (SuccessCount)
+                    {
+                        if (sArray[i] == 0)
+                        {
+                            if (tempCount > maxCount)
+                                maxCount = tempCount;
+                            tempCount = 0;
+                            break;
+                        }
+                        else
+                        {
+                            tempCount++;
+                        }
+                    }
+                    else
+                        if (sArray[i] == 1)
+                        {
+                            if (tempCount > maxCount)
+                                maxCount = tempCount;
+                            tempCount = 0;
+                            break;
+                        }
+                        else
+                        {
+                            tempCount++;
+                        }
+                }
             }
             if (tempCount > maxCount)
                 maxCount = tempCount;
@@ -738,7 +779,7 @@ namespace Chained
             int tempCount = 0;
             for (int i = sArray.Length - 1; i >= 0; i--)
             {
-                if ((SuccessCount && (sArray[i] < sCheckFor) || sArray[i] == 0) || (!SuccessCount && (sArray[i] > sCheckFor) || sArray[i] == 0))
+                if ((SuccessCount && (sArray[i] < sCheckFor) || sArray[i] == 0) || (!SuccessCount && (sArray[i] >= sCheckFor) || sArray[i] == 0))
                 {
                     if (tempCount > maxCount)
                         maxCount = tempCount;
@@ -760,7 +801,7 @@ namespace Chained
             int tempCount = 0;
             for (int i = sArray.Length - 1; i >= 0; i--)
             {
-                if ((SuccessCount && (sArray[i] < sCheckFor) || sArray[i] == 0) || (!SuccessCount && (sArray[i] > sCheckFor) || sArray[i] == 0))
+                if ((SuccessCount && (sArray[i] < sCheckFor) || sArray[i] == 0) || (!SuccessCount && (sArray[i] >= sCheckFor) || sArray[i] == 0))
                 {
                     if (tempCount > maxCount)
                         maxCount = tempCount;
@@ -823,7 +864,29 @@ namespace Chained
             {
                 if (sArray[i] != -9999)
                 {
-                    if ((SuccessCount && (sArray[i] >= sCheckFor / 100)) || (!SuccessCount && (sArray[i] <= sCheckFor / 100)))
+                    if ((SuccessCount && (sArray[i] >= sCheckFor / 100)) || (!SuccessCount && (sArray[i] < sCheckFor / 100)))
+                    {
+                        tempCount++;
+                    }
+                }
+                else
+                    tempCount++;
+            }
+            return tempCount;
+        }
+
+        public static int SuccessORFailureCountFrequencyDuration(float[] sArray, float sCheckFor, int iTrialCount, bool SuccessCount)
+        {
+            int tempCount = 0;
+            int iStart = sArray.Length - iTrialCount;
+            if (iStart < 0)
+                iStart = 0;
+
+            for (int i = 0; i < sArray.Length; i++)
+            {
+                if (sArray[i] != -9999)
+                {
+                    if ((SuccessCount && (sArray[i] == 1)) || (!SuccessCount && (sArray[i] == 0)))
                     {
                         tempCount++;
                     }
@@ -875,7 +938,7 @@ namespace Chained
 
             for (int i = iStart; i < sArray.Length; i++)
             {
-                if ((SuccessCount && (sArray[i] >= sCheckFor)) || (!SuccessCount && (((sArray[i] <= sCheckFor) && sArray[i] > 0) || ((sArray[i] == sCheckFor) && sCheckFor == 0))))
+                if ((SuccessCount && (sArray[i] >= sCheckFor)) || (!SuccessCount && (((sArray[i] < sCheckFor)))))
                 {
                     tempCount++;
                 }
@@ -1386,7 +1449,7 @@ namespace Chained
                         } //--- [New Criteria] May 2020 --|PromptFrequencyMoveUp|--(End)-- //
                         else if (data.PromptFrequencyMoveUp.ConsecutiveSuccess)
                         {
-                            int AccConsecutiveCount = ConsecutiveCount(avgPrmFre, data.PromptFrequencyMoveUp.BarCondition, true);
+                            int AccConsecutiveCount = ConsecutiveCountfreqd(avgPrmFre, data.PromptFrequencyMoveUp.BarCondition, true);
                             if (AccConsecutiveCount < data.PromptFrequencyMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -1394,7 +1457,7 @@ namespace Chained
                         }
                         else
                         {
-                            int AccCount = SuccessORFailureCount(avgPrmFre, data.PromptFrequencyMoveUp.BarCondition, data.PromptFrequencyMoveUp.TotalTrial, true);
+                            int AccCount = SuccessORFailureCountFrequencyDuration(avgPrmFre, data.PromptFrequencyMoveUp.BarCondition, data.PromptFrequencyMoveUp.TotalTrial, true);
                             if (AccCount < data.PromptFrequencyMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -1415,7 +1478,7 @@ namespace Chained
                         } //--- [New Criteria] May 2020 --|PromptAvgDurationMoveUp|--(End)-- //
                         else if (data.PromptAvgDurationMoveUp.ConsecutiveSuccess)
                         {
-                            int AccConsecutiveCount = ConsecutiveCount(avgPrmAvgDur, data.PromptAvgDurationMoveUp.BarCondition, true);
+                            int AccConsecutiveCount = ConsecutiveCountfreqd(avgPrmAvgDur, data.PromptAvgDurationMoveUp.BarCondition, true);
                             if (AccConsecutiveCount < data.PromptAvgDurationMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -1423,7 +1486,7 @@ namespace Chained
                         }
                         else
                         {
-                            int AccCount = SuccessORFailureCount(avgPrmAvgDur, data.PromptAvgDurationMoveUp.BarCondition, data.PromptAvgDurationMoveUp.TotalTrial, true);
+                            int AccCount = SuccessORFailureCountFrequencyDuration(avgPrmAvgDur, data.PromptAvgDurationMoveUp.BarCondition, data.PromptAvgDurationMoveUp.TotalTrial, true);
                             if (AccCount < data.PromptAvgDurationMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -1444,7 +1507,7 @@ namespace Chained
                         } //--- [New Criteria] May 2020 --|PromptTotalDurationMoveUp|--(End)-- //
                         else if (data.PromptTotalDurationMoveUp.ConsecutiveSuccess)
                         {
-                            int AccConsecutiveCount = ConsecutiveCount(avgPrmTotDur, data.PromptTotalDurationMoveUp.BarCondition, true);
+                            int AccConsecutiveCount = ConsecutiveCountfreqd(avgPrmTotDur, data.PromptTotalDurationMoveUp.BarCondition, true);
                             if (AccConsecutiveCount < data.PromptTotalDurationMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -1452,7 +1515,7 @@ namespace Chained
                         }
                         else
                         {
-                            int AccCount = SuccessORFailureCount(avgPrmTotDur, data.PromptTotalDurationMoveUp.BarCondition, data.PromptTotalDurationMoveUp.TotalTrial, true);
+                            int AccCount = SuccessORFailureCountFrequencyDuration(avgPrmTotDur, data.PromptTotalDurationMoveUp.BarCondition, data.PromptTotalDurationMoveUp.TotalTrial, true);
                             if (AccCount < data.PromptTotalDurationMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -1551,7 +1614,7 @@ namespace Chained
                         } //--- [New Criteria] May 2020 --|PromptTotalCorrectMoveUp|--(End)-- //
                         else if (data.PromptTotalCorrectMoveUp.ConsecutiveSuccess)
                         {
-                            int TCConsecutiveCount = ConsecutiveCount(avgCorrect, data.PromptTotalCorrectMoveUp.BarCondition, true);
+                            int TCConsecutiveCount = ConsecutiveCountCorrect(avgCorrect, data.PromptTotalCorrectMoveUp.BarCondition, true);
                             if (TCConsecutiveCount < data.PromptTotalCorrectMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -1559,7 +1622,7 @@ namespace Chained
                         }
                         else
                         {
-                            int TCCount = SuccessORFailureCount(avgCorrect, data.PromptTotalCorrectMoveUp.BarCondition, data.PromptTotalCorrectMoveUp.TotalTrial, true);
+                            int TCCount = SuccessORFailureCountCorrect(avgCorrect, data.PromptTotalCorrectMoveUp.BarCondition, data.PromptTotalCorrectMoveUp.TotalTrial, true);
                             if (TCCount < data.PromptTotalCorrectMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -2132,7 +2195,7 @@ namespace Chained
                         } //--- [New Criteria] May 2020 --|StepFrequencyMoveUp|--(End)-- //
                         else if (data.StepFrequencyMoveUp.ConsecutiveSuccess)
                         {
-                            int AccConsecutiveCount = ConsecutiveCount(avgStpFre, data.StepFrequencyMoveUp.BarCondition, true);
+                            int AccConsecutiveCount = ConsecutiveCountfreqd(avgStpFre, data.StepFrequencyMoveUp.BarCondition, true);
                             if (AccConsecutiveCount < data.StepFrequencyMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -2141,7 +2204,7 @@ namespace Chained
                         }
                         else
                         {
-                            int AccCount = SuccessORFailureCount(avgStpFre, data.StepFrequencyMoveUp.BarCondition, data.StepFrequencyMoveUp.TotalTrial, true);
+                            int AccCount = SuccessORFailureCountFrequencyDuration(avgStpFre, data.StepFrequencyMoveUp.BarCondition, data.StepFrequencyMoveUp.TotalTrial, true);
                             if (AccCount < data.StepFrequencyMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -2162,7 +2225,7 @@ namespace Chained
                         } //--- [New Criteria] May 2020 --|StepAvgDurationMoveUp|--(End)-- //
                         else if (data.StepAvgDurationMoveUp.ConsecutiveSuccess)
                         {
-                            int AccConsecutiveCount = ConsecutiveCount(avgStpAvgDur, data.StepAvgDurationMoveUp.BarCondition, true);
+                            int AccConsecutiveCount = ConsecutiveCountfreqd(avgStpAvgDur, data.StepAvgDurationMoveUp.BarCondition, true);
                             if (AccConsecutiveCount < data.StepAvgDurationMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -2170,7 +2233,7 @@ namespace Chained
                         }
                         else
                         {
-                            int AccCount = SuccessORFailureCount(avgStpAvgDur, data.StepAvgDurationMoveUp.BarCondition, data.StepAvgDurationMoveUp.TotalTrial, true);
+                            int AccCount = SuccessORFailureCountFrequencyDuration(avgStpAvgDur, data.StepAvgDurationMoveUp.BarCondition, data.StepAvgDurationMoveUp.TotalTrial, true);
                             if (AccCount < data.StepAvgDurationMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -2191,7 +2254,7 @@ namespace Chained
                         } //--- [New Criteria] May 2020 --|StepTotalDurationMoveUp|--(End)-- //
                         else if (data.StepTotalDurationMoveUp.ConsecutiveSuccess)
                         {
-                            int AccConsecutiveCount = ConsecutiveCount(avgStpTotDur, data.StepTotalDurationMoveUp.BarCondition, true);
+                            int AccConsecutiveCount = ConsecutiveCountfreqd(avgStpTotDur, data.StepTotalDurationMoveUp.BarCondition, true);
                             if (AccConsecutiveCount < data.StepTotalDurationMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -2199,7 +2262,7 @@ namespace Chained
                         }
                         else
                         {
-                            int AccCount = SuccessORFailureCount(avgStpTotDur, data.StepTotalDurationMoveUp.BarCondition, data.StepTotalDurationMoveUp.TotalTrial, true);
+                            int AccCount = SuccessORFailureCountFrequencyDuration(avgStpTotDur, data.StepTotalDurationMoveUp.BarCondition, data.StepTotalDurationMoveUp.TotalTrial, true);
                             if (AccCount < data.StepTotalDurationMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -2354,7 +2417,7 @@ namespace Chained
                         } //--- [New Criteria] May 2020 --|StepTotalCorrectMoveUp|--(End)-- //
                         else if (data.StepTotalCorrectMoveUp.ConsecutiveSuccess)
                         {
-                            int AccConsecutiveCount = ConsecutiveCount(avgCorrect, data.StepTotalCorrectMoveUp.BarCondition, true);
+                            int AccConsecutiveCount = ConsecutiveCountCorrect(avgCorrect, data.StepTotalCorrectMoveUp.BarCondition, true);
                             if (AccConsecutiveCount < data.StepTotalCorrectMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -2362,7 +2425,7 @@ namespace Chained
                         }
                         else
                         {
-                            int AccCount = SuccessORFailureCount(avgCorrect, data.StepTotalCorrectMoveUp.BarCondition, data.StepTotalCorrectMoveUp.TotalTrial, true);
+                            int AccCount = SuccessORFailureCountCorrect(avgCorrect, data.StepTotalCorrectMoveUp.BarCondition, data.StepTotalCorrectMoveUp.TotalTrial, true);
                             if (AccCount < data.StepTotalCorrectMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -2633,7 +2696,7 @@ namespace Chained
                         } //--- [New Criteria] May 2020 --|StepFrequencyMoveUp|--(End)-- //
                         else if (data.StepFrequencyMoveUp.ConsecutiveSuccess)
                         {
-                            int AccConsecutiveCount = ConsecutiveCount(avgStpFre, data.StepFrequencyMoveUp.BarCondition, true);
+                            int AccConsecutiveCount = ConsecutiveCountfreqd(avgStpFre, data.StepFrequencyMoveUp.BarCondition, true);
                             if (AccConsecutiveCount < data.StepFrequencyMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -2641,7 +2704,7 @@ namespace Chained
                         }
                         else
                         {
-                            int AccCount = SuccessORFailureCount(avgStpFre, data.StepFrequencyMoveUp.BarCondition, data.StepFrequencyMoveUp.TotalTrial, true);
+                            int AccCount = SuccessORFailureCountFrequencyDuration(avgStpFre, data.StepFrequencyMoveUp.BarCondition, data.StepFrequencyMoveUp.TotalTrial, true);
                             if (AccCount < data.StepFrequencyMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -2662,7 +2725,7 @@ namespace Chained
                         } //--- [New Criteria] May 2020 --|StepAvgDurationMoveUp|--(End)-- //
                         else if (data.StepAvgDurationMoveUp.ConsecutiveSuccess)
                         {
-                            int AccConsecutiveCount = ConsecutiveCount(avgStpAvgDur, data.StepAvgDurationMoveUp.BarCondition, true);
+                            int AccConsecutiveCount = ConsecutiveCountfreqd(avgStpAvgDur, data.StepAvgDurationMoveUp.BarCondition, true);
                             if (AccConsecutiveCount < data.StepAvgDurationMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -2670,7 +2733,7 @@ namespace Chained
                         }
                         else
                         {
-                            int AccCount = SuccessORFailureCount(avgStpAvgDur, data.StepAvgDurationMoveUp.BarCondition, data.StepAvgDurationMoveUp.TotalTrial, true);
+                            int AccCount = SuccessORFailureCountFrequencyDuration(avgStpAvgDur, data.StepAvgDurationMoveUp.BarCondition, data.StepAvgDurationMoveUp.TotalTrial, true);
                             if (AccCount < data.StepAvgDurationMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -2691,7 +2754,7 @@ namespace Chained
                         } //--- [New Criteria] May 2020 --|StepTotalDurationMoveUp|--(End)-- //
                         else if (data.StepTotalDurationMoveUp.ConsecutiveSuccess)
                         {
-                            int AccConsecutiveCount = ConsecutiveCount(avgStpTotDur, data.StepTotalDurationMoveUp.BarCondition, true);
+                            int AccConsecutiveCount = ConsecutiveCountfreqd(avgStpTotDur, data.StepTotalDurationMoveUp.BarCondition, true);
                             if (AccConsecutiveCount < data.StepTotalDurationMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -2699,7 +2762,7 @@ namespace Chained
                         }
                         else
                         {
-                            int AccCount = SuccessORFailureCount(avgStpTotDur, data.StepTotalDurationMoveUp.BarCondition, data.StepTotalDurationMoveUp.TotalTrial, true);
+                            int AccCount = SuccessORFailureCountFrequencyDuration(avgStpTotDur, data.StepTotalDurationMoveUp.BarCondition, data.StepTotalDurationMoveUp.TotalTrial, true);
                             if (AccCount < data.StepTotalDurationMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -2807,7 +2870,7 @@ namespace Chained
                         } //--- [New Criteria] May 2020 --|StepTotalCorrectMoveUp|--(End)-- //
                         else if (data.StepTotalCorrectMoveUp.ConsecutiveSuccess)
                         {
-                            int TCConsecutiveCount = ConsecutiveCount(avgCorrect, data.StepTotalCorrectMoveUp.BarCondition, true);
+                            int TCConsecutiveCount = ConsecutiveCountCorrect(avgCorrect, data.StepTotalCorrectMoveUp.BarCondition, true);
                             if (TCConsecutiveCount < data.StepTotalCorrectMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -2815,7 +2878,7 @@ namespace Chained
                         }
                         else
                         {
-                            int TCCount = SuccessORFailureCount(avgCorrect, data.StepTotalCorrectMoveUp.BarCondition, data.StepTotalCorrectMoveUp.TotalTrial, true);
+                            int TCCount = SuccessORFailureCountCorrect(avgCorrect, data.StepTotalCorrectMoveUp.BarCondition, data.StepTotalCorrectMoveUp.TotalTrial, true);
                             if (TCCount < data.StepTotalCorrectMoveUp.SuccessNeeded)
                             {
                                 bSuccess = false;
@@ -3292,7 +3355,7 @@ namespace Chained
 
                         if (GetStat == 1)
                         {
-                            if (Convert.ToInt32(data.Sessions[k].Steps[data.CurrentStep - 1].Score) < criteria.BarCondition)
+                            if (Convert.ToInt32(data.Sessions[k].Steps[data.CurrentStep - 1].Score) <= criteria.BarCondition)
                             {
                                 stepScore = "+";
                             }
@@ -3303,7 +3366,7 @@ namespace Chained
                         }
                         else if (GetStat == 0)
                         {
-                            if (Convert.ToInt32(data.Sessions[k].Steps[data.CurrentStep - 1].Score) > criteria.BarCondition)
+                            if (Convert.ToInt32(data.Sessions[k].Steps[data.CurrentStep - 1].Score) >= criteria.BarCondition)
                             {
                                 stepScore = "+";
                             }
@@ -3360,13 +3423,13 @@ namespace Chained
                     } //--- [New Criteria] May 2020 --|avgAcc|--(End)-- //
                     else if (criteria.ConsecutiveFailures)
                     {
-                        int AccConsecutiveCount = ConsecutiveCount(avgAcc, criteria.BarCondition, false);
+                        int AccConsecutiveCount = ConsecutiveCountfreqd(avgAcc, criteria.BarCondition, false);
                         if (AccConsecutiveCount < criteria.FailureNeeded)
                             return false;
                     }
                     else
                     {
-                        int AccCount = SuccessORFailureCount(avgAcc, criteria.BarCondition, criteria.TotalTrial, false);
+                        int AccCount = SuccessORFailureCountFrequencyDuration(avgAcc, criteria.BarCondition, criteria.TotalTrial, false);
                         //if (AccCount < criteria.FailureNeeded)
                         //    return false;
                         if (criteria.FailureNeeded < criteria.TotalTrial)
@@ -3405,7 +3468,7 @@ namespace Chained
 
                         if (GetStat == 1)
                         {
-                            if (Convert.ToInt32(getTime) < criteria.BarCondition)
+                            if (Convert.ToInt32(getTime) <= criteria.BarCondition)
                             {
                                 stepScore = "+";
                             }
@@ -3416,7 +3479,7 @@ namespace Chained
                         }
                         else if (GetStat == 0)
                         {
-                            if (Convert.ToInt32(getTime) > criteria.BarCondition)
+                            if (Convert.ToInt32(getTime) >= criteria.BarCondition)
                             {
                                 stepScore = "+";
                             }
@@ -3472,13 +3535,13 @@ namespace Chained
                     } //--- [New Criteria] May 2020 --|avgAcc|--(End)-- //
                     else if (criteria.ConsecutiveFailures)
                     {
-                        int AccConsecutiveCount = ConsecutiveCount(avgAcc, criteria.BarCondition, false);
+                        int AccConsecutiveCount = ConsecutiveCountfreqd(avgAcc, criteria.BarCondition, false);
                         if (AccConsecutiveCount < criteria.FailureNeeded)
                             return false;
                     }
                     else
                     {
-                        int AccCount = SuccessORFailureCount(avgAcc, criteria.BarCondition, criteria.TotalTrial, false);
+                        int AccCount = SuccessORFailureCountFrequencyDuration(avgAcc, criteria.BarCondition, criteria.TotalTrial, false);
                         //if (AccCount < criteria.FailureNeeded)
                         //    return false;
                         if (criteria.FailureNeeded < criteria.TotalTrial)
@@ -3864,13 +3927,13 @@ namespace Chained
                         }//--- [New Criteria] May 2020 --|FrequencyMoveUp|--(End)-- //
                         else if (data.FrequencyMoveUp.ConsecutiveSuccess)
                         {
-                            int AccConsecutiveCount = ConsecutiveCount(avgSetFre, data.FrequencyMoveUp.BarCondition, true);
+                            int AccConsecutiveCount = ConsecutiveCountfreqd(avgSetFre, data.FrequencyMoveUp.BarCondition, true);
                             if (AccConsecutiveCount < data.FrequencyMoveUp.SuccessNeeded)
                                 bSuccess = false;
                         }
                         else
                         {
-                            int AccCount = SuccessORFailureCount(avgSetFre, data.FrequencyMoveUp.BarCondition, data.FrequencyMoveUp.TotalTrial, true);
+                            int AccCount = SuccessORFailureCountFrequencyDuration(avgSetFre, data.FrequencyMoveUp.BarCondition, data.FrequencyMoveUp.TotalTrial, true);
                             if (AccCount < data.FrequencyMoveUp.SuccessNeeded)
                                 bSuccess = false;
                         }
@@ -3889,13 +3952,13 @@ namespace Chained
                         }//--- [New Criteria] May 2020 --|AvgDurationMoveUp|--(End)-- //
                         else if (data.AvgDurationMoveUp.ConsecutiveSuccess)
                         {
-                            int AccConsecutiveCount = ConsecutiveCount(avgSetAvgDur, data.AvgDurationMoveUp.BarCondition, true);
+                            int AccConsecutiveCount = ConsecutiveCountfreqd(avgSetAvgDur, data.AvgDurationMoveUp.BarCondition, true);
                             if (AccConsecutiveCount < data.AvgDurationMoveUp.SuccessNeeded)
                                 bSuccess = false;
                         }
                         else
                         {
-                            int AccCount = SuccessORFailureCount(avgSetAvgDur, data.AvgDurationMoveUp.BarCondition, data.AvgDurationMoveUp.TotalTrial, true);
+                            int AccCount = SuccessORFailureCountFrequencyDuration(avgSetAvgDur, data.AvgDurationMoveUp.BarCondition, data.AvgDurationMoveUp.TotalTrial, true);
                             if (AccCount < data.AvgDurationMoveUp.SuccessNeeded)
                                 bSuccess = false;
                         }
@@ -3914,13 +3977,13 @@ namespace Chained
                         }//--- [New Criteria] May 2020 --|TotalDurationMoveUp|--(End)-- //
                         else if (data.TotalDurationMoveUp.ConsecutiveSuccess)
                         {
-                            int AccConsecutiveCount = ConsecutiveCount(avgSetTotDur, data.TotalDurationMoveUp.BarCondition, true);
+                            int AccConsecutiveCount = ConsecutiveCountfreqd(avgSetTotDur, data.TotalDurationMoveUp.BarCondition, true);
                             if (AccConsecutiveCount < data.TotalDurationMoveUp.SuccessNeeded)
                                 bSuccess = false;
                         }
                         else
                         {
-                            int AccCount = SuccessORFailureCount(avgSetTotDur, data.TotalDurationMoveUp.BarCondition, data.TotalDurationMoveUp.TotalTrial, true);
+                            int AccCount = SuccessORFailureCountFrequencyDuration(avgSetTotDur, data.TotalDurationMoveUp.BarCondition, data.TotalDurationMoveUp.TotalTrial, true);
                             if (AccCount < data.TotalDurationMoveUp.SuccessNeeded)
                                 bSuccess = false;
                         }
@@ -5210,7 +5273,7 @@ namespace Chained
                             }//--- [New Criteria] May 2020 --|PromptPercentAccuracy|--(End)-- //
                             else if (data.PromptFrequencyMoveUp.ConsecutiveSuccess)
                             {
-                                int AccConsecutiveCount = ConsecutiveCount(avgPrmFre, 1, true);
+                                int AccConsecutiveCount = ConsecutiveCountfreqd(avgPrmFre, 1, true);
                                 if (AccConsecutiveCount < data.PromptFrequencyMoveUp.SuccessNeeded)
                                 {
                                     bSuccess = false;
@@ -5218,7 +5281,7 @@ namespace Chained
                             }
                             else
                             {
-                                int AccCount = SuccessORFailureCount(avgPrmFre, 1, data.PromptFrequencyMoveUp.TotalTrial, true);
+                                int AccCount = SuccessORFailureCountFrequencyDuration(avgPrmFre, 1, data.PromptFrequencyMoveUp.TotalTrial, true);
                                 if (AccCount < data.PromptFrequencyMoveUp.SuccessNeeded)
                                 {
                                     bSuccess = false;
@@ -5237,7 +5300,7 @@ namespace Chained
                             }//--- [New Criteria] May 2020 --|PromptPercentAccuracy|--(End)-- //
                             else if (data.PromptAvgDurationMoveUp.ConsecutiveSuccess)
                             {
-                                int AccConsecutiveCount = ConsecutiveCount(avgPrmAvgDur, 1, true);
+                                int AccConsecutiveCount = ConsecutiveCountfreqd(avgPrmAvgDur, 1, true);
                                 if (AccConsecutiveCount < data.PromptAvgDurationMoveUp.SuccessNeeded)
                                 {
                                     bSuccess = false;
@@ -5245,7 +5308,7 @@ namespace Chained
                             }
                             else
                             {
-                                int AccCount = SuccessORFailureCount(avgPrmAvgDur, 1, data.PromptAvgDurationMoveUp.TotalTrial, true);
+                                int AccCount = SuccessORFailureCountFrequencyDuration(avgPrmAvgDur, 1, data.PromptAvgDurationMoveUp.TotalTrial, true);
                                 if (AccCount < data.PromptAvgDurationMoveUp.SuccessNeeded)
                                 {
                                     bSuccess = false;
@@ -5264,7 +5327,7 @@ namespace Chained
                             }//--- [New Criteria] May 2020 --|PromptPercentAccuracy|--(End)-- //
                             else if (data.PromptTotalDurationMoveUp.ConsecutiveSuccess)
                             {
-                                int AccConsecutiveCount = ConsecutiveCount(avgPrmTotDur, 1, true);
+                                int AccConsecutiveCount = ConsecutiveCountfreqd(avgPrmTotDur, 1, true);
                                 if (AccConsecutiveCount < data.PromptTotalDurationMoveUp.SuccessNeeded)
                                 {
                                     bSuccess = false;
@@ -5272,7 +5335,7 @@ namespace Chained
                             }
                             else
                             {
-                                int AccCount = SuccessORFailureCount(avgPrmTotDur, 1, data.PromptTotalDurationMoveUp.TotalTrial, true);
+                                int AccCount = SuccessORFailureCountFrequencyDuration(avgPrmTotDur, 1, data.PromptTotalDurationMoveUp.TotalTrial, true);
                                 if (AccCount < data.PromptTotalDurationMoveUp.SuccessNeeded)
                                 {
                                     bSuccess = false;
@@ -5576,13 +5639,13 @@ namespace Chained
                             }//--- [New Criteria] May 2020 --|MoveBackPromptPercentAccuracy|--(End)-- //
                             else if (data.PromptFrequencyMoveDown.ConsecutiveFailures)
                             {
-                                int AccConsecutiveCount = ConsecutiveCount(avgPrmFre, 0, false);
+                                int AccConsecutiveCount = ConsecutiveCountfreqd(avgPrmFre, 0, false);
                                 if (AccConsecutiveCount < data.PromptFrequencyMoveDown.FailureNeeded)
                                     bStepPromptMoveBack = false;
                             }
                             else
                             {
-                                int AccCount = SuccessORFailureCount(avgPrmFre, 0, data.PromptFrequencyMoveDown.TotalTrial, false);
+                                int AccCount = SuccessORFailureCountFrequencyDuration(avgPrmFre, 0, data.PromptFrequencyMoveDown.TotalTrial, false);
                                 if (AccCount < data.PromptFrequencyMoveDown.FailureNeeded)
                                     bStepPromptMoveBack = false;
                             }
@@ -5600,13 +5663,13 @@ namespace Chained
                             }//--- [New Criteria] May 2020 --|MoveBackPromptPercentAccuracy|--(End)-- //
                             else if (data.PromptAvgDurationMoveDown.ConsecutiveFailures)
                             {
-                                int AccConsecutiveCount = ConsecutiveCount(avgPrmAvgDur, 0, false);
+                                int AccConsecutiveCount = ConsecutiveCountfreqd(avgPrmAvgDur, 0, false);
                                 if (AccConsecutiveCount < data.PromptAvgDurationMoveDown.FailureNeeded)
                                     bStepPromptMoveBack = false;
                             }
                             else
                             {
-                                int AccCount = SuccessORFailureCount(avgPrmAvgDur, 0, data.PromptAvgDurationMoveDown.TotalTrial, false);
+                                int AccCount = SuccessORFailureCountFrequencyDuration(avgPrmAvgDur, 0, data.PromptAvgDurationMoveDown.TotalTrial, false);
                                 if (AccCount < data.PromptAvgDurationMoveDown.FailureNeeded)
                                     bStepPromptMoveBack = false;
                             }
@@ -5624,13 +5687,13 @@ namespace Chained
                             }//--- [New Criteria] May 2020 --|MoveBackPromptPercentAccuracy|--(End)-- //
                             else if (data.PromptTotalDurationMoveDown.ConsecutiveFailures)
                             {
-                                int AccConsecutiveCount = ConsecutiveCount(avgPrmTotDur, 0, false);
+                                int AccConsecutiveCount = ConsecutiveCountfreqd(avgPrmTotDur, 0, false);
                                 if (AccConsecutiveCount < data.PromptTotalDurationMoveDown.FailureNeeded)
                                     bStepPromptMoveBack = false;
                             }
                             else
                             {
-                                int AccCount = SuccessORFailureCount(avgPrmTotDur, 0, data.PromptTotalDurationMoveDown.TotalTrial, false);
+                                int AccCount = SuccessORFailureCountFrequencyDuration(avgPrmTotDur, 0, data.PromptTotalDurationMoveDown.TotalTrial, false);
                                 if (AccCount < data.PromptTotalDurationMoveDown.FailureNeeded)
                                     bStepPromptMoveBack = false;
                             }
@@ -5976,7 +6039,7 @@ namespace Chained
                         }//--- [New Criteria] May 2020 --|PromptPercentAccuracy|--(End)-- //
                         else if (data.PromptFrequencyMoveUp.ConsecutiveSuccess)
                         {
-                            int AccConsecutiveCount = ConsecutiveCount(avgSetFre, data.PromptFrequencyMoveUp.BarCondition, true);
+                            int AccConsecutiveCount = ConsecutiveCountfreqd(avgSetFre, data.PromptFrequencyMoveUp.BarCondition, true);
                             if (AccConsecutiveCount < data.PromptFrequencyMoveUp.SuccessNeeded)
                             {
                                 bPromptSuccess = false;
@@ -5984,7 +6047,7 @@ namespace Chained
                         }
                         else
                         {
-                            int AccCount = SuccessORFailureCount(avgSetFre, data.PromptFrequencyMoveUp.BarCondition, data.PromptFrequencyMoveUp.TotalTrial, true);
+                            int AccCount = SuccessORFailureCountFrequencyDuration(avgSetFre, data.PromptFrequencyMoveUp.BarCondition, data.PromptFrequencyMoveUp.TotalTrial, true);
                             if (AccCount < data.PromptFrequencyMoveUp.SuccessNeeded)
                             {
                                 bPromptSuccess = false;
@@ -6005,7 +6068,7 @@ namespace Chained
                         }//--- [New Criteria] May 2020 --|PromptPercentAccuracy|--(End)-- //
                         else if (data.PromptAvgDurationMoveUp.ConsecutiveSuccess)
                         {
-                            int AccConsecutiveCount = ConsecutiveCount(avgSetAvgDur, data.PromptAvgDurationMoveUp.BarCondition, true);
+                            int AccConsecutiveCount = ConsecutiveCountfreqd(avgSetAvgDur, data.PromptAvgDurationMoveUp.BarCondition, true);
                             if (AccConsecutiveCount < data.PromptAvgDurationMoveUp.SuccessNeeded)
                             {
                                 bPromptSuccess = false;
@@ -6013,7 +6076,7 @@ namespace Chained
                         }
                         else
                         {
-                            int AccCount = SuccessORFailureCount(avgSetAvgDur, data.PromptAvgDurationMoveUp.BarCondition, data.PromptAvgDurationMoveUp.TotalTrial, true);
+                            int AccCount = SuccessORFailureCountFrequencyDuration(avgSetAvgDur, data.PromptAvgDurationMoveUp.BarCondition, data.PromptAvgDurationMoveUp.TotalTrial, true);
                             if (AccCount < data.PromptAvgDurationMoveUp.SuccessNeeded)
                             {
                                 bPromptSuccess = false;
@@ -6034,7 +6097,7 @@ namespace Chained
                         }//--- [New Criteria] May 2020 --|PromptPercentAccuracy|--(End)-- //
                         else if (data.PromptTotalDurationMoveUp.ConsecutiveSuccess)
                         {
-                            int AccConsecutiveCount = ConsecutiveCount(avgSetTotDur, data.PromptTotalDurationMoveUp.BarCondition, true);
+                            int AccConsecutiveCount = ConsecutiveCountfreqd(avgSetTotDur, data.PromptTotalDurationMoveUp.BarCondition, true);
                             if (AccConsecutiveCount < data.PromptTotalDurationMoveUp.SuccessNeeded)
                             {
                                 bPromptSuccess = false;
@@ -6042,7 +6105,7 @@ namespace Chained
                         }
                         else
                         {
-                            int AccCount = SuccessORFailureCount(avgSetTotDur, data.PromptTotalDurationMoveUp.BarCondition, data.PromptTotalDurationMoveUp.TotalTrial, true);
+                            int AccCount = SuccessORFailureCountFrequencyDuration(avgSetTotDur, data.PromptTotalDurationMoveUp.BarCondition, data.PromptTotalDurationMoveUp.TotalTrial, true);
                             if (AccCount < data.PromptTotalDurationMoveUp.SuccessNeeded)
                             {
                                 bPromptSuccess = false;
@@ -6361,13 +6424,13 @@ namespace Chained
                         }//--- [New Criteria] May 2020 --|MoveBackPromptPercentAccuracy|--(End)-- //
                         else if (data.PromptFrequencyMoveDown.ConsecutiveFailures)
                         {
-                            int AccConsecutiveCount = ConsecutiveCount(avgSetFre, data.PromptFrequencyMoveDown.BarCondition, false);
+                            int AccConsecutiveCount = ConsecutiveCountfreqd(avgSetFre, data.PromptFrequencyMoveDown.BarCondition, false);
                             if (AccConsecutiveCount < data.PromptFrequencyMoveDown.FailureNeeded)
                                 bPromptMoveBack = false;
                         }
                         else
                         {
-                            int AccCount = SuccessORFailureCount(avgSetFre, data.PromptFrequencyMoveDown.BarCondition, data.PromptFrequencyMoveDown.TotalTrial, false);
+                            int AccCount = SuccessORFailureCountFrequencyDuration(avgSetFre, data.PromptFrequencyMoveDown.BarCondition, data.PromptFrequencyMoveDown.TotalTrial, false);
                             if (AccCount < data.PromptFrequencyMoveDown.FailureNeeded)
                                 bPromptMoveBack = false;
                         }
@@ -6384,13 +6447,13 @@ namespace Chained
                         }//--- [New Criteria] May 2020 --|MoveBackPromptPercentAccuracy|--(End)-- //
                         else if (data.PromptAvgDurationMoveDown.ConsecutiveFailures)
                         {
-                            int AccConsecutiveCount = ConsecutiveCount(avgSetAvgDur, data.PromptAvgDurationMoveDown.BarCondition, false);
+                            int AccConsecutiveCount = ConsecutiveCountfreqd(avgSetAvgDur, data.PromptAvgDurationMoveDown.BarCondition, false);
                             if (AccConsecutiveCount < data.PromptAvgDurationMoveDown.FailureNeeded)
                                 bPromptMoveBack = false;
                         }
                         else
                         {
-                            int AccCount = SuccessORFailureCount(avgSetAvgDur, data.PromptAvgDurationMoveDown.BarCondition, data.PromptAvgDurationMoveDown.TotalTrial, false);
+                            int AccCount = SuccessORFailureCountFrequencyDuration(avgSetAvgDur, data.PromptAvgDurationMoveDown.BarCondition, data.PromptAvgDurationMoveDown.TotalTrial, false);
                             if (AccCount < data.PromptAvgDurationMoveDown.FailureNeeded)
                                 bPromptMoveBack = false;
                         }
@@ -6407,13 +6470,13 @@ namespace Chained
                         }//--- [New Criteria] May 2020 --|MoveBackPromptPercentAccuracy|--(End)-- //
                         else if (data.PromptTotalDurationMoveDown.ConsecutiveFailures)
                         {
-                            int AccConsecutiveCount = ConsecutiveCount(avgSetTotDur, data.PromptTotalDurationMoveDown.BarCondition, false);
+                            int AccConsecutiveCount = ConsecutiveCountfreqd(avgSetTotDur, data.PromptTotalDurationMoveDown.BarCondition, false);
                             if (AccConsecutiveCount < data.PromptTotalDurationMoveDown.FailureNeeded)
                                 bPromptMoveBack = false;
                         }
                         else
                         {
-                            int AccCount = SuccessORFailureCount(avgSetTotDur, data.PromptTotalDurationMoveDown.BarCondition, data.PromptTotalDurationMoveDown.TotalTrial, false);
+                            int AccCount = SuccessORFailureCountFrequencyDuration(avgSetTotDur, data.PromptTotalDurationMoveDown.BarCondition, data.PromptTotalDurationMoveDown.TotalTrial, false);
                             if (AccCount < data.PromptTotalDurationMoveDown.FailureNeeded)
                                 bPromptMoveBack = false;
                         }
@@ -6766,7 +6829,7 @@ namespace Chained
                                 }//--- [New Criteria] May 2020 --|PercentAccuracy|--(End)-- //
                                 else if (data.FrequencyMoveUp.ConsecutiveSuccess)
                                 {
-                                    int AccConsecutiveCount = ConsecutiveCount(avgSetFre, data.FrequencyMoveUp.BarCondition, true);
+                                    int AccConsecutiveCount = ConsecutiveCountfreqd(avgSetFre, data.FrequencyMoveUp.BarCondition, true);
                                     if (AccConsecutiveCount < data.FrequencyMoveUp.SuccessNeeded)
                                     {
                                         bSetSuccess = false;
@@ -6774,7 +6837,7 @@ namespace Chained
                                 }
                                 else
                                 {
-                                    int AccCount = SuccessORFailureCount(avgSetFre, data.FrequencyMoveUp.BarCondition, data.FrequencyMoveUp.TotalTrial, true);
+                                    int AccCount = SuccessORFailureCountFrequencyDuration(avgSetFre, data.FrequencyMoveUp.BarCondition, data.FrequencyMoveUp.TotalTrial, true);
                                     if (AccCount < data.FrequencyMoveUp.SuccessNeeded)
                                     {
                                         bSetSuccess = false;
@@ -6793,7 +6856,7 @@ namespace Chained
                                 }//--- [New Criteria] May 2020 --|PercentAccuracy|--(End)-- //
                                 else if (data.AvgDurationMoveUp.ConsecutiveSuccess)
                                 {
-                                    int AccConsecutiveCount = ConsecutiveCount(avgSetAvgDur, data.AvgDurationMoveUp.BarCondition, true);
+                                    int AccConsecutiveCount = ConsecutiveCountfreqd(avgSetAvgDur, data.AvgDurationMoveUp.BarCondition, true);
                                     if (AccConsecutiveCount < data.AvgDurationMoveUp.SuccessNeeded)
                                     {
                                         bSetSuccess = false;
@@ -6801,7 +6864,7 @@ namespace Chained
                                 }
                                 else
                                 {
-                                    int AccCount = SuccessORFailureCount(avgSetAvgDur, data.AvgDurationMoveUp.BarCondition, data.AvgDurationMoveUp.TotalTrial, true);
+                                    int AccCount = SuccessORFailureCountFrequencyDuration(avgSetAvgDur, data.AvgDurationMoveUp.BarCondition, data.AvgDurationMoveUp.TotalTrial, true);
                                     if (AccCount < data.AvgDurationMoveUp.SuccessNeeded)
                                     {
                                         bSetSuccess = false;
@@ -6820,7 +6883,7 @@ namespace Chained
                                 }//--- [New Criteria] May 2020 --|PercentAccuracy|--(End)-- //
                                 else if (data.TotalDurationMoveUp.ConsecutiveSuccess)
                                 {
-                                    int AccConsecutiveCount = ConsecutiveCount(avgSetTotDur, data.TotalDurationMoveUp.BarCondition, true);
+                                    int AccConsecutiveCount = ConsecutiveCountfreqd(avgSetTotDur, data.TotalDurationMoveUp.BarCondition, true);
                                     if (AccConsecutiveCount < data.TotalDurationMoveUp.SuccessNeeded)
                                     {
                                         bSetSuccess = false;
@@ -6828,7 +6891,7 @@ namespace Chained
                                 }
                                 else
                                 {
-                                    int AccCount = SuccessORFailureCount(avgSetTotDur, data.TotalDurationMoveUp.BarCondition, data.TotalDurationMoveUp.TotalTrial, true);
+                                    int AccCount = SuccessORFailureCountFrequencyDuration(avgSetTotDur, data.TotalDurationMoveUp.BarCondition, data.TotalDurationMoveUp.TotalTrial, true);
                                     if (AccCount < data.TotalDurationMoveUp.SuccessNeeded)
                                     {
                                         bSetSuccess = false;
@@ -6990,7 +7053,7 @@ namespace Chained
                                 }//--- [New Criteria] May 2020 --|PercentAccuracy|--(End)-- //
                                 else if (data.FrequencyMoveUp.ConsecutiveSuccess)
                                 {
-                                    int AccConsecutiveCount = ConsecutiveCount(avgSetFre, data.FrequencyMoveUp.BarCondition, true);
+                                    int AccConsecutiveCount = ConsecutiveCountfreqd(avgSetFre, data.FrequencyMoveUp.BarCondition, true);
                                     if (AccConsecutiveCount < data.FrequencyMoveUp.SuccessNeeded)
                                     {
                                         bSetSuccess = false;
@@ -6998,7 +7061,7 @@ namespace Chained
                                 }
                                 else
                                 {
-                                    int AccCount = SuccessORFailureCount(avgSetFre, data.FrequencyMoveUp.BarCondition, data.FrequencyMoveUp.TotalTrial, true);
+                                    int AccCount = SuccessORFailureCountFrequencyDuration(avgSetFre, data.FrequencyMoveUp.BarCondition, data.FrequencyMoveUp.TotalTrial, true);
                                     if (AccCount < data.FrequencyMoveUp.SuccessNeeded)
                                     {
                                         bSetSuccess = false;
@@ -7017,7 +7080,7 @@ namespace Chained
                                 }//--- [New Criteria] May 2020 --|PercentAccuracy|--(End)-- //
                                 else if (data.AvgDurationMoveUp.ConsecutiveSuccess)
                                 {
-                                    int AccConsecutiveCount = ConsecutiveCount(avgSetAvgDur, data.AvgDurationMoveUp.BarCondition, true);
+                                    int AccConsecutiveCount = ConsecutiveCountfreqd(avgSetAvgDur, data.AvgDurationMoveUp.BarCondition, true);
                                     if (AccConsecutiveCount < data.AvgDurationMoveUp.SuccessNeeded)
                                     {
                                         bSetSuccess = false;
@@ -7025,7 +7088,7 @@ namespace Chained
                                 }
                                 else
                                 {
-                                    int AccCount = SuccessORFailureCount(avgSetAvgDur, data.AvgDurationMoveUp.BarCondition, data.AvgDurationMoveUp.TotalTrial, true);
+                                    int AccCount = SuccessORFailureCountFrequencyDuration(avgSetAvgDur, data.AvgDurationMoveUp.BarCondition, data.AvgDurationMoveUp.TotalTrial, true);
                                     if (AccCount < data.AvgDurationMoveUp.SuccessNeeded)
                                     {
                                         bSetSuccess = false;
@@ -7044,7 +7107,7 @@ namespace Chained
                                 }//--- [New Criteria] May 2020 --|PercentAccuracy|--(End)-- //
                                 else if (data.TotalDurationMoveUp.ConsecutiveSuccess)
                                 {
-                                    int AccConsecutiveCount = ConsecutiveCount(avgSetTotDur, data.TotalDurationMoveUp.BarCondition, true);
+                                    int AccConsecutiveCount = ConsecutiveCountfreqd(avgSetTotDur, data.TotalDurationMoveUp.BarCondition, true);
                                     if (AccConsecutiveCount < data.TotalDurationMoveUp.SuccessNeeded)
                                     {
                                         bSetSuccess = false;
@@ -7052,7 +7115,7 @@ namespace Chained
                                 }
                                 else
                                 {
-                                    int AccCount = SuccessORFailureCount(avgSetTotDur, data.TotalDurationMoveUp.BarCondition, data.TotalDurationMoveUp.TotalTrial, true);
+                                    int AccCount = SuccessORFailureCountFrequencyDuration(avgSetTotDur, data.TotalDurationMoveUp.BarCondition, data.TotalDurationMoveUp.TotalTrial, true);
                                     if (AccCount < data.TotalDurationMoveUp.SuccessNeeded)
                                     {
                                         bSetSuccess = false;
@@ -7177,7 +7240,7 @@ namespace Chained
                             }//--- [New Criteria] May 2020 --|PercentAccuracy|--(End)-- //
                             else if (data.PercentAccuracy.ConsecutiveSuccess)
                             {
-                                int AccConsecutiveCount = ConsecutiveCount(avgSetFre, data.FrequencyMoveUp.BarCondition, true);
+                                int AccConsecutiveCount = ConsecutiveCountfreqd(avgSetFre, data.FrequencyMoveUp.BarCondition, true);
                                 if (AccConsecutiveCount < data.FrequencyMoveUp.SuccessNeeded)
                                 {
                                     bSetSuccess = false;
@@ -7185,7 +7248,7 @@ namespace Chained
                             }
                             else
                             {
-                                int AccCount = SuccessORFailureCount(avgSetFre, data.FrequencyMoveUp.BarCondition, data.FrequencyMoveUp.TotalTrial, true);
+                                int AccCount = SuccessORFailureCountFrequencyDuration(avgSetFre, data.FrequencyMoveUp.BarCondition, data.FrequencyMoveUp.TotalTrial, true);
                                 if (AccCount < data.FrequencyMoveUp.SuccessNeeded)
                                 {
                                     bSetSuccess = false;
@@ -7204,7 +7267,7 @@ namespace Chained
                             }//--- [New Criteria] May 2020 --|PercentAccuracy|--(End)-- //
                             else if (data.AvgDurationMoveUp.ConsecutiveSuccess)
                             {
-                                int AccConsecutiveCount = ConsecutiveCount(avgSetAvgDur, data.AvgDurationMoveUp.BarCondition, true);
+                                int AccConsecutiveCount = ConsecutiveCountfreqd(avgSetAvgDur, data.AvgDurationMoveUp.BarCondition, true);
                                 if (AccConsecutiveCount < data.AvgDurationMoveUp.SuccessNeeded)
                                 {
                                     bSetSuccess = false;
@@ -7212,7 +7275,7 @@ namespace Chained
                             }
                             else
                             {
-                                int AccCount = SuccessORFailureCount(avgSetAvgDur, data.AvgDurationMoveUp.BarCondition, data.AvgDurationMoveUp.TotalTrial, true);
+                                int AccCount = SuccessORFailureCountFrequencyDuration(avgSetAvgDur, data.AvgDurationMoveUp.BarCondition, data.AvgDurationMoveUp.TotalTrial, true);
                                 if (AccCount < data.AvgDurationMoveUp.SuccessNeeded)
                                 {
                                     bSetSuccess = false;
@@ -7231,7 +7294,7 @@ namespace Chained
                             }//--- [New Criteria] May 2020 --|PercentAccuracy|--(End)-- //
                             else if (data.TotalDurationMoveUp.ConsecutiveSuccess)
                             {
-                                int AccConsecutiveCount = ConsecutiveCount(avgSetTotDur, data.TotalDurationMoveUp.BarCondition, true);
+                                int AccConsecutiveCount = ConsecutiveCountfreqd(avgSetTotDur, data.TotalDurationMoveUp.BarCondition, true);
                                 if (AccConsecutiveCount < data.TotalDurationMoveUp.SuccessNeeded)
                                 {
                                     bSetSuccess = false;
@@ -7239,7 +7302,7 @@ namespace Chained
                             }
                             else
                             {
-                                int AccCount = SuccessORFailureCount(avgSetTotDur, data.TotalDurationMoveUp.BarCondition, data.TotalDurationMoveUp.TotalTrial, true);
+                                int AccCount = SuccessORFailureCountFrequencyDuration(avgSetTotDur, data.TotalDurationMoveUp.BarCondition, data.TotalDurationMoveUp.TotalTrial, true);
                                 if (AccCount < data.TotalDurationMoveUp.SuccessNeeded)
                                 {
                                     bSetSuccess = false;
@@ -7427,13 +7490,13 @@ namespace Chained
                             }//--- [New Criteria] May 2020 --|MoveBackPercentAccuracy|--(End)-- //
                             else if (data.FrequencyMoveDown.ConsecutiveFailures)
                             {
-                                int AccConsecutiveCount = ConsecutiveCount(avgSetFre, data.FrequencyMoveDown.BarCondition, false);
+                                int AccConsecutiveCount = ConsecutiveCountfreqd(avgSetFre, data.FrequencyMoveDown.BarCondition, false);
                                 if (AccConsecutiveCount < data.FrequencyMoveDown.FailureNeeded)
                                     bMoveBack = false;
                             }
                             else
                             {
-                                int AccCount = SuccessORFailureCount(avgSetFre, data.FrequencyMoveDown.BarCondition, data.FrequencyMoveDown.TotalTrial, false);
+                                int AccCount = SuccessORFailureCountFrequencyDuration(avgSetFre, data.FrequencyMoveDown.BarCondition, data.FrequencyMoveDown.TotalTrial, false);
                                 if (AccCount < data.FrequencyMoveDown.FailureNeeded)
                                     bMoveBack = false;
                             }
@@ -7449,13 +7512,13 @@ namespace Chained
                             }//--- [New Criteria] May 2020 --|MoveBackPercentAccuracy|--(End)-- //
                             else if (data.AvgDurationMoveDown.ConsecutiveFailures)
                             {
-                                int AccConsecutiveCount = ConsecutiveCount(avgSetAvgDur, data.AvgDurationMoveDown.BarCondition, false);
+                                int AccConsecutiveCount = ConsecutiveCountfreqd(avgSetAvgDur, data.AvgDurationMoveDown.BarCondition, false);
                                 if (AccConsecutiveCount < data.AvgDurationMoveDown.FailureNeeded)
                                     bMoveBack = false;
                             }
                             else
                             {
-                                int AccCount = SuccessORFailureCount(avgSetAvgDur, data.AvgDurationMoveDown.BarCondition, data.AvgDurationMoveDown.TotalTrial, false);
+                                int AccCount = SuccessORFailureCountFrequencyDuration(avgSetAvgDur, data.AvgDurationMoveDown.BarCondition, data.AvgDurationMoveDown.TotalTrial, false);
                                 if (AccCount < data.AvgDurationMoveDown.FailureNeeded)
                                     bMoveBack = false;
                             }
@@ -7471,13 +7534,13 @@ namespace Chained
                             }//--- [New Criteria] May 2020 --|MoveBackPercentAccuracy|--(End)-- //
                             else if (data.TotalDurationMoveDown.ConsecutiveFailures)
                             {
-                                int AccConsecutiveCount = ConsecutiveCount(avgSetTotDur, data.TotalDurationMoveDown.BarCondition, false);
+                                int AccConsecutiveCount = ConsecutiveCountfreqd(avgSetTotDur, data.TotalDurationMoveDown.BarCondition, false);
                                 if (AccConsecutiveCount < data.TotalDurationMoveDown.FailureNeeded)
                                     bMoveBack = false;
                             }
                             else
                             {
-                                int AccCount = SuccessORFailureCount(avgSetTotDur, data.TotalDurationMoveDown.BarCondition, data.TotalDurationMoveDown.TotalTrial, false);
+                                int AccCount = SuccessORFailureCountFrequencyDuration(avgSetTotDur, data.TotalDurationMoveDown.BarCondition, data.TotalDurationMoveDown.TotalTrial, false);
                                 if (AccCount < data.TotalDurationMoveDown.FailureNeeded)
                                     bMoveBack = false;
                             }
