@@ -806,7 +806,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         btnSubmitAndRepeat1.Visible = false;
                         btnSubmitAndRepeat2.Visible = false;
                         btnSubmitAndRepeat3.Visible = false;
-                        btnDiscardDatasheet.Visible = false;
+                        btnDiscardDatasheet.Visible = true;
                     }
                     else
                     {
@@ -3965,7 +3965,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             btnSubmitAndRepeat1.Visible = false;
             btnSubmitAndRepeat2.Visible = false;
             btnSubmitAndRepeat3.Visible = false;
-            btnDiscardDatasheet.Visible = false;
+            btnDiscardDatasheet.Visible = true;
         }
         catch (Exception ex)
         {
@@ -27727,7 +27727,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             btnSubmitAndRepeat1.Visible = false;
             btnSubmitAndRepeat2.Visible = false;
             btnSubmitAndRepeat3.Visible = false;
-            btnDiscardDatasheet.Visible = false;
+            btnDiscardDatasheet.Visible = true;
             //generateSheet();
         }
         else
@@ -31198,7 +31198,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             {
                 foreach (DataRow dr in dis.Rows)
                 {
-                    string ioacheck = " select * from stdtSessionHdr where DSTempHdrId=" + Convert.ToInt32(dr["DSTempHdrId"]) + "AND LessonPlanId=" + Convert.ToInt32(dr["LessonPlanId"]) + "AND StudentId=" + Convert.ToInt32(dr["StudentId"]) + " AND SessionStatusCd='D' AND IOAInd='Y' AND StdtSessionHdrId>" + ViewState["StdtSessHdr"];
+                    string ioacheck = " select * from stdtSessionHdr where DSTempHdrId=" + Convert.ToInt32(dr["DSTempHdrId"]) + "AND LessonPlanId=" + Convert.ToInt32(dr["LessonPlanId"]) + "AND StudentId=" + Convert.ToInt32(dr["StudentId"]) + " AND SessionStatusCd='D' AND IOAInd='Y' AND StdtSessionHdrId>=" + ViewState["StdtSessHdr"];
 
                     DataTable db = new DataTable();
                     db = oData.ReturnDataTable(ioacheck, false);
@@ -31206,8 +31206,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     {
                         if (db.Rows.Count > 0)
                         {
-
-                            ioastatu = "IOA";
+                            foreach (DataRow dr2 in db.Rows)
+                            {
+                                if (dr2["StdtSessionHdrId"].ToString() == ViewState["StdtSessHdr"].ToString())
+                                    ioastatu = "NoIOA";
+                                else
+                                    ioastatu = "IOA";
+                            }
                         }
 
                     }
