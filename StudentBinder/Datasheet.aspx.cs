@@ -522,7 +522,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                     //SqlDataReader reader = oData.ReturnDataReader("SELECT StdtSessionStepId FROM StdtSessionStep WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString(), true);
                     string sqlQry = "SELECT * FROM StdtSessionStep Step INNER JOIN DSTempStep Stp ON Stp.DSTempStepId=Step.DSTempStepId WHERE StdtSessionHdrId="
-                        + ViewState["StdtSessHdr"].ToString() + " and ActiveInd='A' AND (Stp.DSTempSetId=" + oDS.CrntSet + ") AND IsDynamic=0 ORDER BY Stp.SortOrder";
+                        + ViewState["StdtSessHdr"].ToString() + " and ActiveInd='A' AND (Stp.DSTempSetId=" + oDS.CrntSet + ") AND IsDynamic=0 AND Stp.SortOrder IS NOT NULL ORDER BY Stp.SortOrder";
 
                     if (SkillType == "Discrete")
                     {
@@ -530,8 +530,25 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     }
                     DataTable dtstepIDs = new DataTable();
                     dtstepIDs = oData.ReturnDataTable(sqlQry, false);
-                    DataTable dtstps = oDS.dtSteps;
-
+                    //DataTable dtstps = oDS.dtSteps;
+                    DataTable dtstps = oDS.dtSteps.Clone();
+                    if (dtstepIDs.Rows.Count != 0)
+                    {
+                        for (int i = 0; i < dtstepIDs.Rows.Count; i++)
+                        {
+                            for (int j = 0; j < oDS.dtSteps.Rows.Count; j++)
+                            {
+                                //int dtstepID = Convert.ToInt32(dtstepIDs.Rows[i]["DSTempStepId"]);
+                                //int oDsStepId = Convert.ToInt32(oDS.dtSteps.Rows[j]["DSTempStepId"]);
+                                if (Convert.ToInt32(dtstepIDs.Rows[i]["DSTempStepId"]) == Convert.ToInt32(oDS.dtSteps.Rows[j]["DSTempStepId"]))
+                                {
+                                    DataRow dr = dtstps.NewRow(); 
+                                    dr.ItemArray = oDS.dtSteps.Rows[j].ItemArray;
+                                    dtstps.Rows.Add(dr);
+                                }
+                            }
+                        }
+                    }
                     if (dtstps.Rows.Count == 0)
                     {
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('This set does not have any steps attached, please modify the lesson to assign steps...');", true);
@@ -546,7 +563,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         //                        " WHERE DSTempHdrId=" + oTemp.TemplateId + " AND DsTempSetId=" + oDS.CrntSet + " AND ActiveInd='A' ORDER BY [SortOrder]";
 
                         string sqlStr = "SELECT Step.StdtSessionStepId as SessStepID, TempStep.[DSTempStepId],TempStep.[StepName] as StepCd,TempStep.[StepName],TempStep.SortOrder as StepId  FROM [dbo].[DSTempStep] TempStep  INNER JOIN StdtSessionStep Step " +
-                                         " ON TempStep.DSTempStepId=Step.DSTempStepId  WHERE TempStep.DSTempHdrId=" + oTemp.TemplateId + " AND TempStep.DsTempSetId=" + oDS.CrntSet + " AND TempStep.ActiveInd='A' AND IsDynamic=0 AND  Step.StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString() + " ORDER BY NEWID()";
+                                         " ON TempStep.DSTempStepId=Step.DSTempStepId  WHERE TempStep.DSTempHdrId=" + oTemp.TemplateId + " AND TempStep.DsTempSetId=" + oDS.CrntSet + " AND TempStep.ActiveInd='A' AND IsDynamic=0 AND TempStep.SortOrder IS NOT NULL AND  Step.StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString() + " ORDER BY NEWID()";
 
 
                         dt = oData.ReturnDataTable(sqlStr, false);
@@ -560,7 +577,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             if (IsTrial != "")
                             {
                                 sqlStr = "SELECT Step.StdtSessionStepId as SessStepID, TempStep.[DSTempStepId],TempStep.[StepName] as StepCd,TempStep.[StepName],TempStep.SortOrder as StepId  FROM [dbo].[DSTempStep] TempStep  INNER JOIN StdtSessionStep Step " +
-                                             " ON TempStep.DSTempStepId=Step.DSTempStepId  WHERE TempStep.DSTempStepId IN (" + IsTrial + ") ORDER BY NEWID()";
+                                             " ON TempStep.DSTempStepId=Step.DSTempStepId  WHERE TempStep.DSTempStepId IN (" + IsTrial + ") AND SortOrder IS NOT NULL ORDER BY NEWID()";
                                 DataTable dtTrialSample = oData.ReturnDataTable(sqlStr, false);
 
                                 foreach (DataRow dr in dtTrialSample.Rows)
@@ -747,7 +764,8 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                         grdDataSht.DataSource = null;
                         grdDataSht.DataBind();
-                        grdDataSht.DataSource = oDS.dtSteps;
+                        //grdDataSht.DataSource = oDS.dtSteps;
+                        grdDataSht.DataSource = dtstps;
                         grdDataSht.DataBind();
                     }
                     string selPrmpt = "";
@@ -28506,13 +28524,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 //}
                 if (totalTasktype != "1")
                 {
-                    sqlStr = "select DSTempHdrId,DSTempStepId,StepCd,StepName,SortOrder from DSTempStep where DSTempHdrId=" + oTemp.TemplateId + " and DSTempSetId=" + setid + " and ActiveInd = 'A' AND IsDynamic=0 order by SortOrder";
+                    sqlStr = "select DSTempHdrId,DSTempStepId,StepCd,StepName,SortOrder from DSTempStep where DSTempHdrId=" + oTemp.TemplateId + " and DSTempSetId=" + setid + " and ActiveInd = 'A' AND IsDynamic=0 AND SortOrder IS NOT NULL order by SortOrder";
 
                     //sqlStr = "select DSTempHdrId,DSTempStepId,StepCd,StepName,SortOrder from DSTempStep where DSTempHdrId=" + oTemp.TemplateId + " and (DSTempSetId=" + setid + " OR DSTempSetId=0) and ActiveInd = 'A' order by SortOrder";
                 }
                 else
                 {
-                    sqlStr = "select dsts.DSTempHdrId,dsts.DSTempStepId,dsts.StepCd,dsts.StepName,dsts.SortOrder, sdsss.PromptId from DSTempStep as dsts LEFT JOIN StdtDSStepStat sdsss on dsts.DSTempStepId = sdsss.DSTempStepId where dsts.DSTempHdrId=" + oTemp.TemplateId + " and dsts.DSTempSetId=" + setid + " and dsts.ActiveInd = 'A' AND IsDynamic=0 order by dsts.SortOrder";
+                    sqlStr = "select dsts.DSTempHdrId,dsts.DSTempStepId,dsts.StepCd,dsts.StepName,dsts.SortOrder, sdsss.PromptId from DSTempStep as dsts LEFT JOIN StdtDSStepStat sdsss on dsts.DSTempStepId = sdsss.DSTempStepId where dsts.DSTempHdrId=" + oTemp.TemplateId + " and dsts.DSTempSetId=" + setid + " and dsts.ActiveInd = 'A' AND IsDynamic=0 AND SortOrder IS NOT NULL order by dsts.SortOrder";
 
                     //sqlStr = "select dsts.DSTempHdrId,dsts.DSTempStepId,dsts.StepCd,dsts.StepName,dsts.SortOrder, sdsss.PromptId from DSTempStep as dsts LEFT JOIN StdtDSStepStat sdsss on dsts.DSTempStepId = sdsss.DSTempStepId where dsts.DSTempHdrId=" + oTemp.TemplateId + " and (dsts.DSTempSetId=" + setid + " OR dsts.DSTempSetId=0) and dsts.ActiveInd = 'A' order by dsts.SortOrder";
                 }
@@ -28523,7 +28541,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         //sqlStr = "SELECT [DSTempHdrId],[DSTempStepId],[StepCd],[StepName],RANK() OVER(ORDER BY SortOrder ASC) as StepId  FROM [dbo].[DSTempStep] " +
                         //         "WHERE DSTempHdrId=" + oTemp.TemplateId + " AND (DsTempSetId=0 OR DsTempSetId=" + setid + ") AND ActiveInd='A' ORDER BY [SortOrder] DESC";
                         sqlStr = "SELECT [DSTempHdrId],[DSTempStepId],[StepCd],[StepName],RANK() OVER(ORDER BY SortOrder ASC) as StepId  FROM [dbo].[DSTempStep] " +
-                                 "WHERE DSTempHdrId=" + oTemp.TemplateId + " AND DsTempSetId=" + setid + " AND ActiveInd='A' AND IsDynamic=0 ORDER BY [SortOrder] DESC";
+                                 "WHERE DSTempHdrId=" + oTemp.TemplateId + " AND DsTempSetId=" + setid + " AND ActiveInd='A' AND IsDynamic=0 AND SortOrder IS NOT NULL ORDER BY [SortOrder] DESC";
 
                     }
                     else
@@ -28534,7 +28552,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                         sqlStr = "SELECT dsts.DSTempHdrId,dsts.DSTempStepId,dsts.StepCd,dsts.StepName,RANK() OVER(ORDER BY dsts.SortOrder ASC) as StepId,dsts.SortOrder, sdsss.PromptId " +
                                  "FROM [DSTempStep] as dsts LEFT JOIN StdtDSStepStat sdsss ON dsts.DSTempStepId = sdsss.DSTempStepId " +
-                                 "WHERE dsts.DSTempHdrId= " + oTemp.TemplateId + " AND dsts.DsTempSetId=" + setid + " AND dsts.ActiveInd='A' AND IsDynamic=0 ORDER BY dsts.SortOrder DESC";
+                                 "WHERE dsts.DSTempHdrId= " + oTemp.TemplateId + " AND dsts.DsTempSetId=" + setid + " AND dsts.ActiveInd='A' AND IsDynamic=0 AND SortOrder IS NOT NULL ORDER BY dsts.SortOrder DESC";
                     }
                 }
                 DataTable dt = oData.ReturnDataTable(sqlStr, false);
@@ -28575,7 +28593,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             if (type == "Backward chain")
             {
                 string sqlStr1 = "select ROW_NUMBER() OVER(ORDER BY SortOrder desc) as numRow,SortOrder from DSTempStep where DSTempHdrId=" + oTemp.TemplateId + " "
-                                        + "and DSTempSetId=" + setid + " AND IsDynamic=0 ORDER BY SortOrder";
+                                        + "and DSTempSetId=" + setid + " AND IsDynamic=0 AND SortOrder IS NOT NULL ORDER BY SortOrder";
                 DataTable dt = oData.ReturnDataTable(sqlStr1, false);
                 foreach (DataRow dr in dt.Rows)
                 {
@@ -28590,7 +28608,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             else
             {
                 string sqlStr1 = "select ROW_NUMBER() OVER(ORDER BY SortOrder ) as numRow,SortOrder from DSTempStep where DSTempHdrId=" + oTemp.TemplateId + " "
-                                        + "and DSTempSetId=" + setid + " AND IsDynamic=0 ORDER BY SortOrder desc";
+                                        + "and DSTempSetId=" + setid + " AND IsDynamic=0 AND SortOrder IS NOT NULL ORDER BY SortOrder desc";
                 DataTable dt = oData.ReturnDataTable(sqlStr1, false);
                 foreach (DataRow dr in dt.Rows)
                 {
@@ -28602,7 +28620,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 }
             }
             string sqlStr = "select DSTempStepId from DSTempStep where DSTempHdrId=" + oTemp.TemplateId + " "
-                + "and DSTempSetId=" + setid + " and SortOrder=" + iCurrentStep + " AND IsDynamic=0 order by SortOrder";
+                + "and DSTempSetId=" + setid + " and SortOrder=" + iCurrentStep + " AND IsDynamic=0 AND SortOrder IS NOT NULL order by SortOrder";
             iCurrentStep = Convert.ToInt32(oData.FetchValue(sqlStr));
             for (int i = 0; i < RadioButtonListSteps.Items.Count; i++)
             {
