@@ -12243,7 +12243,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         objData = new clsData();
         string strQry2 = "select DSTemplateName,LessonSDate,LessonEDate from DSTempHdr where DSTempHdrId= " + TemplateId + "";
         DataTable dtCheck2 = objData.ReturnDataTable(strQry2, false);
-        if (dtCheck2 != null)
+        if (dtCheck2 != null && dtSetId.Rows.Count != 0)
         {
             if (dtCheck2.Rows.Count > 0)
             {
@@ -12277,6 +12277,9 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 }
             }
         }
+        else
+            message += "Sets";
+
         tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting. " + message + " are missing");
         alertmsg = "Please complete template details before submitting. " + message + " are missing";
         // FUnction to asign sets and steps If the lesson plan is a visual lesson 
@@ -12323,7 +12326,15 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         }
                     }
 
-                    if (skilltype == "Chained")
+                    if (drp_teachingFormat.SelectedIndex == 0 || drpTeachingProc.SelectedIndex == 0)
+                    {
+                        tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting. Skill type is missing");
+                        alertmsg = "Please complete template details before submitting. Skill type is missing";
+                        FillTypeOfInstruction(TemplateId);
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
+                        return;
+                    }
+                    else if (skilltype == "Chained")
                     {
                         //hdrid = Convert.ToString(objData.FetchValue("SELECT DSTempHdrId FROM [dbo].[DSTempSet] WHERE ActiveInd = 'A' INTERSECT SELECT DSTempHdrId FROM [dbo].[DSTempStep] WHERE ActiveInd = 'A' INTERSECT SELECT DSTempHdrId FROM [dbo].[DSTempSetCol] WHERE DSTempHdrId='" + TemplateId + "'"));
 
@@ -12463,7 +12474,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                     }
                                     else
                                     {
-                                        if (Convert.ToInt32(dt.Rows[0]["STEP"]) > 0)
+                                        if (Convert.ToInt32(dt.Rows[0]["STEP"]) > 0 && StepValidation(TemplateId))
                                         {
                                             string msg = "";
                                             bool flag = true;
@@ -13057,7 +13068,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                 }
                                 else
                                 {
-                                    if (Convert.ToInt32(dt.Rows[0]["STEP"]) > 0)
+                                    if (Convert.ToInt32(dt.Rows[0]["STEP"]) > 0 && StepValidation(TemplateId))
                                     {
                                         string msg = "";
                                         bool flag = true;
@@ -13506,7 +13517,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         int countStep = 0;
         object objVal = null;
         string selQuerry = "";
-        selQuerry = "SELECT COUNT(DSTempStepId) FROM DSTempStep WHERE DSTempHdrId = " + templateId + " AND ActiveInd = 'A' AND IsDynamic=0";
+        selQuerry = "SELECT COUNT(DSTempStepId) FROM DSTempStep WHERE DSTempHdrId = " + templateId + " AND ActiveInd = 'A' AND IsDynamic=0 AND DSTempParentStepId IS NOT NULL";
         objVal = objData.FetchValue(selQuerry);
         if (objVal != null)
         {
@@ -18161,7 +18172,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 smtp.UseDefaultCredentials = false;
                 smtp.Port = SMTPPort;
                 smtp.Host = SMTPServer;//"smtp.gmail.com"; //for gmail host  
-                smtp.EnableSsl = true;
+                smtp.EnableSsl = false;
                 smtp.Credentials = new NetworkCredential(UserEmail, UserPassword);
                 smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
                 smtp.Send(message);
@@ -18244,13 +18255,612 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
     protected void LoadEmail_Click(object sender, EventArgs e)
     {
-        emailFullReset(sender, e);
-        LoadEmailforSorting();
-        if (dlEmailforSorting_Copy.Visible == true && dlEmailforSorting.Visible == false)
-        {
-            dlEmailforSorting.Visible = true;
-            dlEmailforSorting_Copy.Visible = false;
-        }
+            Hdfsavemeasure.Value = "";
+            textBoxDisableEnable(true);
+            btndoc.Style.Add("display", "None");
+            objData = new clsData();
+            string hdrid = "";
+            int TemplateId = 0;
+            string setMatch = "";
+            string matchSelctd = "";
+            int length = 0;
+            bool validSet = false;
+            bool flag1 = true;
+            bool validStep = false;
+            int setCriteria = 0;
+            int stepCriteria = 0;
+            object objTeach = null;
+            string teachName = "";
+            string message = "";
+            string strQuerry = "";
+            string skilltype = "";
+            int teachId = 0;
+            tdReadMsg.InnerHtml = "";
+            bool IsVTValid = true;
+            bool validonSub = true;
+            DataTable dt = new DataTable();
+            string alertmsg = "";
+            tdReadMsg.Visible = false;
+
+            if (ViewState["HeaderId"] != null)
+            {
+                TemplateId = Convert.ToInt32(ViewState["HeaderId"]);
+            }
+            string txtCommentLessonInfoP = txtCommentLessonInfo.Text.Trim().Replace("'", "''");
+            string txtCommentTypeofInstrP = txtCommentTypeofInstr.Text.Trim().Replace("'", "''");
+            string txtMeasurementSystemsP = txtMeasurementSystems.Text.Trim().Replace("'", "''");
+            string txtcommentsetP = txtcommentset.Text.Trim().Replace("'", "''");
+            string txtcommentStepP = txtcommentStep.Text.Trim().Replace("'", "''");
+            string txtcommentPromptP = txtcommentPrompt.Text.Trim().Replace("'", "''");
+            string txtcommentLessonProcedureP = txtcommentLessonProcedure.Text.Trim().Replace("'", "''");
+
+            string qString = "select DSTempSetId from DSTempSet where DSTempHdrId=" + TemplateId + " and ActiveInd='A'";        //get set ids
+            DataTable dtSetId = objData.ReturnDataTable(qString, false);
+            objData = new clsData();
+            string strQry2 = "select DSTemplateName,LessonSDate,LessonEDate from DSTempHdr where DSTempHdrId= " + TemplateId + "";
+            DataTable dtCheck2 = objData.ReturnDataTable(strQry2, false);
+            if (dtCheck2 != null && dtSetId.Rows.Count != 0)
+            {
+                if (dtCheck2.Rows.Count > 0)
+                {
+                    if (dtCheck2.Rows[0]["DSTemplateName"].ToString() == "0")
+                    {
+                        message += "Lesson plan Name ,";
+                        flag1 = false;
+                    }
+                    if (dtCheck2.Rows[0]["LessonSDate"].ToString() == "")
+                    {
+                        message += "IEP/ISP/LP Start Date ,";
+                        flag1 = false;
+                    }
+                    if (dtCheck2.Rows[0]["LessonEDate"].ToString() == "")
+                    {
+                        message += "IEP/ISP/LP End Date ";
+                        flag1 = false;
+                    }
+                    if (lessonSDate.Text != "" && lessonEDate.Text != "")
+                    {
+                        DateTime dtst = new DateTime();
+                        DateTime dted = new DateTime();
+                        dtst = DateTime.ParseExact(lessonSDate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                        dted = DateTime.ParseExact(lessonEDate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                        if (dtst > dted)
+                        {
+                            message += "Start date is must before the End date ,";
+                            flag1 = false;
+                        }
+                        if (message.Length > 0) message = message.Substring(0, message.Length - 1);
+                    }
+                }
+            }
+            else
+                message += "Sets";
+            tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting. " + message + " are missing");
+            alertmsg = "Please complete template details before submitting. " + message + " are missing";
+            if (message == "")
+            {
+                IsVTValid = FunInsrtSetStepVT();
+
+                if (IsVTValid == true)
+                {
+                    try
+                    {
+                        strQuerry = "SELECT SkillType,TeachingProcId FROM [dbo].[DSTempHdr] WHERE StudentId='" + sess.StudentId + "' and DSTempHdrId=" + TemplateId;
+                        DataTable dtNew = objData.ReturnDataTable(strQuerry, false);
+                        if (dtNew != null)
+                        {
+                            if (dtNew.Rows.Count > 0)
+                            {
+                                skilltype = dtNew.Rows[0]["SkillType"].ToString();
+                                try
+                                {
+                                    teachId = Convert.ToInt32(dtNew.Rows[0]["TeachingProcId"]);
+                                }
+                                catch
+                                {
+                                    teachId = 0;
+                                }
+                                if (teachId > 0)
+                                {
+                                    try
+                                    {
+                                        strQuerry = "SELECT LookupDesc FROM LookUp WHERE LookupId = " + teachId;
+                                        objTeach = objData.FetchValue(strQuerry);
+                                        if (objTeach != null)
+                                        {
+                                            teachName = objTeach.ToString();
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        throw ex;
+                                    }
+                                }
+                            }
+                        }
+                        if (drp_teachingFormat.SelectedIndex == 0 ||  drpTeachingProc.SelectedIndex == 0)
+                        {
+                            tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting. Skill type is missing");
+                            alertmsg = "Please complete template details before submitting. Skill type is missing";
+                            FillTypeOfInstruction(TemplateId);
+                            ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
+                            return;
+                        }
+                        else if (skilltype == "Chained")
+                        {
+                            //hdrid = Convert.ToString(objData.FetchValue("SELECT DSTempHdrId FROM [dbo].[DSTempSet] WHERE ActiveInd = 'A' INTERSECT SELECT DSTempHdrId FROM [dbo].[DSTempStep] WHERE ActiveInd = 'A' INTERSECT SELECT DSTempHdrId FROM [dbo].[DSTempSetCol] WHERE DSTempHdrId='" + TemplateId + "'"));
+
+                            hdrid = Convert.ToString(objData.FetchValue("SELECT  DSTempHdrId FROM [dbo].[DSTempStep] WHERE ActiveInd = 'A' AND IsDynamic=0 INTERSECT SELECT DSTempHdrId FROM  [dbo].[DSTempSetCol] WHERE DSTempHdrId =" + TemplateId + ""));
+                            if (hdrid != "")
+                            {
+                                dt = objData.ReturnDataTable("SELECT COUNT(rul.DSTempHdrId),(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] WHERE RuleType='STEP' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT DSTempSetColId " +
+                                                  "FROM DSTempSetCol WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS STEP,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] WHERE RuleType='SET' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId " +
+                                                  "FROM DSTempSetCol WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS SET1 FROM [dbo].[DSTempSetCol] col INNER JOIN [dbo].[DSTempRule] rul on " +
+                                                    "col.DSTempSetColId=rul.DSTempSetColId WHERE col.DSTempHdrId=" + hdrid + "", false);
+                            }
+                        }
+                        else if (skilltype == "Discrete")
+                        {
+                            hdrid = Convert.ToString(objData.FetchValue("SELECT DSTempHdrId FROM [dbo].[DSTempSet]  WHERE ActiveInd = 'A' INTERSECT SELECT DSTempHdrId FROM [dbo].[DSTempSetCol] WHERE DSTempHdrId='" + TemplateId + "'"));
+                            if (hdrid != "")
+                            {
+                                dt = objData.ReturnDataTable("SELECT COUNT(rul.DSTempHdrId),(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] WHERE RuleType='SET' AND ActiveInd = 'A' AND  DSTempSetColId IN (SELECT DSTempSetColId " +
+                                                              "FROM DSTempSetCol WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS SET1 FROM [dbo].[DSTempSetCol] col INNER JOIN [dbo].[DSTempRule] rul on " +
+
+                                                                       "col.DSTempSetColId=rul.DSTempSetColId WHERE col.DSTempHdrId=" + hdrid + "", false);
+                            }
+                        }
+                        else
+                        {
+                            tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting. Skill type is missing");
+                            alertmsg = "Please complete template details before submitting. Skill type is missing";
+                            FillTypeOfInstruction(TemplateId);
+                            ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
+                            return;
+                        }
+                        if (hdrid != "")
+                        {
+                            if (dt != null)
+                            {
+
+                                int colcnt = dt.Columns.Count;  // colcnt=2 for Discrete and colcnt=3 for chained
+                                if (colcnt > 0)
+                                {
+                                    if (colcnt == 3)
+                                    {
+                                        if (teachName == "Total Task")
+                                        {
+                                            if (Convert.ToInt32(dt.Rows[0]["SET1"]) > 0)
+                                            {
+                                                string msg = "";
+                                                bool flag = true;
+                                                string strQry = "SELECT COUNT(rul.DSTempHdrId),(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
+                                                                "WHERE RuleType='SET' AND CriteriaType='MOVE UP' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
+                                                                "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS SETUP,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
+                                                                "WHERE RuleType='SET' AND CriteriaType='MOVE DOWN' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
+                                                                "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS SETDOWN,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
+                                                                "WHERE RuleType='PROMPT' AND CriteriaType='MOVE UP' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
+                                                                "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS PROMPTUP,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
+                                                                "WHERE RuleType='PROMPT' AND CriteriaType='MOVE DOWN' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
+                                                                "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS PROMPTDOWN FROM [dbo].[DSTempSetCol] col " +
+                                                                "INNER JOIN [dbo].[DSTempRule] rul on col.DSTempSetColId=rul.DSTempSetColId WHERE col.DSTempHdrId=" + hdrid + "";
+                                                DataTable dtCheck = objData.ReturnDataTable(strQry, false);
+
+                                                if (dtCheck != null)
+                                                {
+                                                    if (dtCheck.Rows.Count > 0)
+                                                    {
+                                                        if (dtCheck.Rows[0]["SETUP"].ToString() == "0")
+                                                        {
+                                                            msg += "Set Moveup ,";
+                                                            flag = false;
+                                                        }
+                                                        if (dtCheck.Rows[0]["SETDOWN"].ToString() == "0")
+                                                        {
+                                                            msg += "Set Movedown ,";
+                                                            flag = false;
+                                                        }
+                                                        string PrmptPrcdur = ddlPromptProcedure.SelectedValue;
+                                                        int SelecItms = lstSelectedPrompts.Items.Count;
+                                                        if ((PrmptPrcdur != "141") && (SelecItms > 0))
+                                                        {
+                                                            string getPromptCriteria = "SELECT COUNT(DSTempPromptId) FROM DSTempPrompt WHERE DSTempHdrId = " + hdrid + "";
+                                                            DataTable dtPromptCheck = objData.ReturnDataTable(getPromptCriteria, false);
+                                                            if (dtPromptCheck != null)
+                                                            {
+                                                                if (dtPromptCheck.Rows.Count > 0)
+                                                                {
+                                                                    if (dtCheck.Rows[0]["PROMPTUP"].ToString() == "0")
+                                                                    {
+                                                                        msg += "Prompt Moveup ,";
+                                                                        flag = false;
+                                                                    }
+                                                                    if (dtCheck.Rows[0]["PROMPTDOWN"].ToString() == "0")
+                                                                    {
+                                                                        msg += "Prompt Movedown ,";
+                                                                        flag = false;
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                        if (msg.Length > 0) msg = msg.Substring(0, msg.Length - 1);
+                                                    }
+                                                }
+
+
+                                                if (flag)
+                                                    tdReadMsg.InnerHtml = clsGeneral.sucessMsg("Template Editor Successfully Submitted...");
+                                                else
+                                                {
+                                                    tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting. " + msg + " criterias are missing");
+                                                    alertmsg = "Please complete template details before submitting. " + msg + " criterias are missing";
+                                                }
+                                            }
+                                            else
+                                            {
+                                                setCriteria = Convert.ToInt32(dt.Rows[0]["SET1"]);
+                                                if (setCriteria == 0)
+                                                {
+                                                    message = "Set criteria details are missing";
+                                                    tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting.." + message + "");
+                                                    alertmsg = "Please complete template details before submitting.." + message + "";
+                                                }
+                                                else
+                                                {
+                                                    tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting..Undefined error.");
+                                                    alertmsg = "Please complete template details before submitting..Undefined error.";
+                                                }
+
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (Convert.ToInt32(dt.Rows[0]["STEP"]) > 0 && StepValidation(TemplateId))
+                                            {
+                                                string msg = "";
+                                                bool flag = true;
+                                                string strQry = "SELECT COUNT(rul.DSTempHdrId),(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] WHERE RuleType='STEP' AND CriteriaType='MOVE UP' " +
+                                                                "AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT DSTempSetColId FROM DSTempSetCol " +
+                                                                "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS STEPUP,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
+                                                                "WHERE RuleType='STEP'  AND CriteriaType='MOVE DOWN' " +
+                                                                "AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT DSTempSetColId FROM DSTempSetCol " +
+                                                                "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS STEPDOWN,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
+                                                                "WHERE RuleType='SET' AND CriteriaType='MOVE UP' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
+                                                                "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS SETUP,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
+                                                                "WHERE RuleType='SET' AND CriteriaType='MOVE DOWN' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
+                                                                "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS SETDOWN,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
+                                                                "WHERE RuleType='PROMPT' AND CriteriaType='MOVE UP' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
+                                                                "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS PROMPTUP,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
+                                                                "WHERE RuleType='PROMPT' AND CriteriaType='MOVE DOWN' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
+                                                                "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS PROMPTDOWN FROM [dbo].[DSTempSetCol] col " +
+                                                                "INNER JOIN [dbo].[DSTempRule] rul on col.DSTempSetColId=rul.DSTempSetColId WHERE col.DSTempHdrId=" + hdrid + "";
+                                                DataTable dtCheck = objData.ReturnDataTable(strQry, false);
+                                                if (dtCheck != null)
+                                                {
+                                                    if (dtCheck.Rows.Count > 0)
+                                                    {
+                                                        if (dtCheck.Rows[0]["STEPUP"].ToString() == "0")
+                                                        {
+                                                            msg += "Step Moveup ,";
+                                                            flag = false;
+                                                        }
+                                                        if (dtCheck.Rows[0]["STEPDOWN"].ToString() == "0")
+                                                        {
+                                                            msg += "Step Movedown ,";
+                                                            flag = false;
+                                                        }
+                                                        if (dtCheck.Rows[0]["SETUP"].ToString() == "0")
+                                                        {
+                                                            msg += "Set Moveup ,";
+                                                            flag = false;
+                                                        }
+                                                        if (dtCheck.Rows[0]["SETDOWN"].ToString() == "0")
+                                                        {
+                                                            msg += "Set Movedown ,";
+                                                            flag = false;
+                                                        }
+
+
+                                                        string PrmptPrcdur = ddlPromptProcedure.SelectedValue;
+                                                        int SelecItms = lstSelectedPrompts.Items.Count;
+                                                        if ((PrmptPrcdur != "141") && (SelecItms > 0))
+                                                        {
+                                                            string getPromptCriteria = "SELECT COUNT(DSTempPromptId) FROM DSTempPrompt WHERE DSTempHdrId = " + hdrid + "";
+                                                            DataTable dtPromptCheck = objData.ReturnDataTable(getPromptCriteria, false);
+                                                            if (dtPromptCheck != null)
+                                                            {
+                                                                if (dtPromptCheck.Rows.Count > 0)
+                                                                {
+                                                                    if (dtCheck.Rows[0]["PROMPTUP"].ToString() == "0")
+                                                                    {
+                                                                        msg += "Prompt Moveup ,";
+                                                                        flag = false;
+                                                                    }
+                                                                    if (dtCheck.Rows[0]["PROMPTDOWN"].ToString() == "0")
+                                                                    {
+                                                                        msg += "Prompt Movedown ,";
+                                                                        flag = false;
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                        if (msg.Length > 0) msg = msg.Substring(0, msg.Length - 1);
+                                                    }
+                                                }
+
+                                                if (flag)
+                                                    tdReadMsg.InnerHtml = clsGeneral.sucessMsg("Template Editor Successfully Submitted...");
+                                                else
+                                                {
+                                                    tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting. " + msg + " criterias are missing");
+                                                    alertmsg = "Please complete template details before submitting. " + msg + " criterias are missing";
+                                                }
+                                            }
+                                            else
+                                            {
+                                                stepCriteria = Convert.ToInt32(dt.Rows[0]["STEP"]);
+                                                if (stepCriteria == 0)
+                                                {
+                                                    message = "Step criteria details are missing";
+                                                    tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting. " + message + "");
+                                                    alertmsg = "Please complete template details before submitting. " + message + "";
+                                                }
+                                                else
+                                                {
+                                                    tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting");
+                                                    alertmsg = "Please complete template details before submitting";
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else if (colcnt == 2)
+                                    {
+                                        if (Convert.ToInt32(dt.Rows[0]["SET1"]) > 0)
+                                        {
+                                            validonSub = WriteVTData();
+
+                                            if (validonSub == true)
+                                            {
+
+                                                string msg = "";
+                                                bool flag = true;
+                                                string strQry = "SELECT COUNT(rul.DSTempHdrId),(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
+                                                                "WHERE RuleType='SET' AND CriteriaType='MOVE UP' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
+                                                                "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS SETUP,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
+                                                                "WHERE RuleType='SET' AND CriteriaType='MOVE DOWN' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
+                                                                "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS SETDOWN,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
+                                                                "WHERE RuleType='PROMPT' AND CriteriaType='MOVE UP' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
+                                                                "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS PROMPTUP,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
+                                                                "WHERE RuleType='PROMPT' AND CriteriaType='MOVE DOWN' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
+                                                                "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS PROMPTDOWN FROM [dbo].[DSTempSetCol] col " +
+                                                                "INNER JOIN [dbo].[DSTempRule] rul on col.DSTempSetColId=rul.DSTempSetColId WHERE col.DSTempHdrId=" + hdrid + "";
+                                                DataTable dtCheck = objData.ReturnDataTable(strQry, false);
+                                                if (dtCheck != null)
+                                                {
+                                                    if (dtCheck.Rows.Count > 0)
+                                                    {
+                                                        if (dtCheck.Rows[0]["SETUP"].ToString() == "0")
+                                                        {
+                                                            msg += "Set Moveup ,";
+                                                            flag = false;
+                                                        }
+                                                        if (dtCheck.Rows[0]["SETDOWN"].ToString() == "0")
+                                                        {
+                                                            msg += "Set Movedown ,";
+                                                            flag = false;
+                                                        }
+                                                        string PrmptPrcdur = ddlPromptProcedure.SelectedValue;
+                                                        int SelecItms = lstSelectedPrompts.Items.Count;
+                                                        if ((PrmptPrcdur != "141") && (SelecItms > 0))
+                                                        {
+                                                            string getPromptCriteria = "SELECT COUNT(DSTempPromptId) FROM DSTempPrompt WHERE DSTempHdrId = " + hdrid + "";
+                                                            DataTable dtPromptCheck = objData.ReturnDataTable(getPromptCriteria, false);
+                                                            if (dtPromptCheck != null)
+                                                            {
+                                                                if (dtPromptCheck.Rows.Count > 0)
+                                                                {
+                                                                    if (dtCheck.Rows[0]["PROMPTUP"].ToString() == "0")
+                                                                    {
+                                                                        msg += "Prompt Moveup ,";
+                                                                        flag = false;
+                                                                    }
+                                                                    if (dtCheck.Rows[0]["PROMPTDOWN"].ToString() == "0")
+                                                                    {
+                                                                        msg += "Prompt Movedown ,";
+                                                                        flag = false;
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                        if (msg.Length > 0) msg = msg.Substring(0, msg.Length - 1);
+                                                    }
+                                                }
+
+                                                //-----
+                                                //-----
+                                                clsMathToSamples.Step[] steps = null;
+                                                bool tempval = true;
+                                                if (IsMatchToSample(TemplateId) == true)        //if match to sample
+                                                {
+                                                    if (matchSelctd != null)
+                                                    {
+
+                                                        string setId = "";
+                                                        for (int i = 0; i < dtSetId.Rows.Count; i++)
+                                                        {
+                                                            setId = dtSetId.Rows[i]["DSTempSetId"].ToString();
+                                                            steps = null;
+                                                            int setIdint = Convert.ToInt32(setId);
+                                                            lstMatchSamples.Items.Clear();
+                                                            matchSelctd = "";
+                                                            setMatch = "";
+                                                            EditSetData(setIdint);
+                                                            string[] arryMatchValue = new string[lstMatchSamples.Items.Count];
+                                                            if (lstMatchSamples.Items.Count > 0)
+                                                            {
+                                                                for (int index = 0; index < lstMatchSamples.Items.Count; index++)
+                                                                {
+                                                                    arryMatchValue[index] = lstMatchSamples.Items[index].Value.ToString();
+                                                                }
+                                                                for (int arryInt = 0; arryInt < lstMatchSamples.Items.Count; arryInt++)
+                                                                {
+                                                                    setMatch += arryMatchValue[arryInt].ToString() + ",";
+                                                                }
+                                                                length = setMatch.Length;
+                                                                matchSelctd = setMatch.ToString().Substring(0, length - 1);
+                                                                steps = MatchSampDef2(TemplateId, matchSelctd, setIdint);      //get steps
+                                                            }
+                                                            if (steps == null)
+                                                            {
+                                                                tempval = false;
+                                                                flag = false;
+                                                                msg = "Samples for some sets are missing";
+                                                            }
+                                                        }
+
+                                                    }
+                                                }
+                                                //-----
+                                                //-----
+
+                                                if (flag)
+                                                    tdReadMsg.InnerHtml = clsGeneral.sucessMsg("Template Editor Successfully Submitted...");
+                                                else
+                                                {
+                                                    if (tempval == false && flag == false)
+                                                    {
+                                                        tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting. Samples for some sets are missing");
+                                                        alertmsg = "Please complete template details before submitting. Samples for some sets are missing";
+                                                    }
+                                                    else
+                                                    {
+                                                        tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting. " + msg + " criterias are missing");
+                                                        alertmsg = "Please complete template details before submitting. " + msg + " criterias are missing";
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                tdReadMsg.InnerHtml = clsGeneral.warningMsg("Sorry..Lesson plan submitting failed..Please try again ");
+                                                alertmsg = "Sorry..Lesson plan submitting failed..Please try again ";
+                                            }
+                                        }
+                                        else
+                                        {
+                                            setCriteria = Convert.ToInt32(dt.Rows[0]["SET1"]);
+                                            if (setCriteria == 0)
+                                            {
+                                                message = "Set criteria details are missing";
+                                                tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting.." + message + "");
+                                                alertmsg = "Please complete template details before submitting.." + message + "";
+                                            }
+                                            else
+                                            {
+                                                tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting.");
+                                                alertmsg = "Please complete template details before submitting.";
+                                            }
+
+                                        }
+                                    }
+                                    else
+                                    {
+                                        tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting.");
+                                        alertmsg = "Please complete template details before submitting.";
+
+                                    }
+                                }
+                                else
+                                {
+                                    tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting.");
+                                    alertmsg = "Please complete template details before submitting.";
+
+                                }
+
+                            }
+                            else
+                            {
+                                tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting.");
+                                alertmsg = "Please complete template details before submitting.";
+
+                            }
+                        }
+                        else
+                        {
+                            validSet = SetValidation(TemplateId);
+                            validStep = StepValidation(TemplateId);
+
+                            if (skilltype == "Chained")
+                            {
+                                if (validStep == false)
+                                {
+                                    message = "Steps are missing.";
+                                    tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting.." + message + "");
+                                    alertmsg = "Please complete template details before submitting.." + message + "";
+                                }
+                                else
+                                {
+                                    tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting");
+                                    alertmsg = "Please complete template details before submitting";
+                                }
+                            }
+                            else
+                            {
+                                if (validSet == false)
+                                {
+                                    message = "Sets are missing.";
+                                    tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting..." + message + "");
+                                    alertmsg = "Please complete template details before submitting..." + message + "";
+                                }
+                                else
+                                {
+                                    tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting");
+                                    alertmsg = "Please complete template details before submitting";
+                                }
+                            }
+
+                        }
+                    }
+                    catch (Exception Ex)
+                    {
+                        throw Ex;
+                    }
+                }
+                else
+                {
+                    tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting");
+                    alertmsg = "Please complete template details before submitting";
+                }
+
+
+            }
+            if (tdReadMsg.InnerHtml == "<div class='valid_box'>Template Editor Successfully Submitted....</div>")
+            {
+                //tdReadMsg.Visible = true;
+                //drpTasklist_SelectedIndexChanged1(sender, e);
+                //int prevTempId = getPrevVersion();
+                //BtnApproval_hdn.Visible = false;
+                //Approvalcheck();
+                //BtnEmail.Visible = false;
+                //loadSetsOverride(prevTempId, TemplateId);
+                //BtnUpdate_Click(sender, e);
+
+                //lessonSDate.Enabled = false;
+                //lessonEDate.Enabled = false;
+                //ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AddCriteriaPopup();", true);
+                emailFullReset(sender, e);
+                LoadEmailforSorting();
+                if (dlEmailforSorting_Copy.Visible == true && dlEmailforSorting.Visible == false)
+                {
+                    dlEmailforSorting.Visible = true;
+                    dlEmailforSorting_Copy.Visible = false;
+                }
+                ClientScript.RegisterStartupScript(this.GetType(), "", "loadEmailOrder(this.id);", true);
+                //ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "loadEmailOrder('BtnEmail')", true);
+            }
+            else
+            {
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
+            }
     }
 
     protected void BtnAdminPreview_Click(object sender, EventArgs e)             // Submit Template
@@ -18477,7 +19087,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                 }
                                 else
                                 {
-                                    if (Convert.ToInt32(dt.Rows[0]["STEP"]) > 0)
+                                    if (Convert.ToInt32(dt.Rows[0]["STEP"]) > 0 && StepValidation(TemplateId))
                                     {
                                         string msg = "";
                                         bool flag = true;
