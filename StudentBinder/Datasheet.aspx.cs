@@ -29865,6 +29865,17 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         //+ "&lessonId=" + dtLPDetail.Rows[0]["LessonPlanId"] + "&goalId=" + dtLPDetail.Rows[0]["GoalId"] + "&delLpID=" + dtLPDetail.Rows[0]["StdtLessonplanId"];
 
     }
+     [WebMethod]
+    public static string ViewSupportStrategyData(string Id)
+    {
+        objData = new clsData();
+        DataTable dtLPDetail = objData.ReturnDataTable("SELECT DSTempHdrId,StudentId,LessonPlanId,(SELECT GoalId FROM StdtLessonplan SLP WHERE SLP.StdtLessonplanId=DSTempHdr.StdtLessonplanId) GoalId,StdtLessonplanId FROM DSTempHdr WHERE DSTempHdrId=(SELECT DSTempHdrId FROM StdtSessionHdr WHERE StdtSessionHdrId='" + Id + "')", false);
+
+        return "SupportStrategyAttributes.aspx?pageid=" + dtLPDetail.Rows[0]["DSTempHdrId"] + "&studid=" + dtLPDetail.Rows[0]["StudentId"] + "&ViewPopUp=" + 1;
+        //+ "&lessonId=" + dtLPDetail.Rows[0]["LessonPlanId"] + "&goalId=" + dtLPDetail.Rows[0]["GoalId"] + "&delLpID=" + dtLPDetail.Rows[0]["StdtLessonplanId"];
+
+    }
+    
     protected void btnVLP_Click(object sender, EventArgs e)
     {
     }
