@@ -262,7 +262,7 @@ public class clsSubmenu
         {
 
             DataRow dr = dtSubmenu.NewRow();
-            dr["Name"] = "<div id='LessonPlanTab' onclick='PopupLessonPlans(this.id);' >All Lessons</div>";
+            dr["Name"] = "<div id='LessonPlanTab' onclick='PopupLessonPlans(this.id);' >All Plans</div>";
             dr["Url"] = "Lesson Plans";
             dr["ID"] = "0";
             dtSubmenu.Rows.Add(dr);
@@ -272,7 +272,7 @@ public class clsSubmenu
             //dtSubmenu = oLessons.getDSLessonPlans(studID, "LP.LessonPlanName as Name,'LessonPlanAttributes.aspx' as Url, DTmp.DSTempHdrId As ID", "LU.LookupName='Approved'");
 
             DataRow drex = dtSubmenu.NewRow();
-            drex["Name"] = "<div id='EXPTab'> Export Lessons</div>";
+            drex["Name"] = "<div id='EXPTab'> Export Plans</div>";
             drex["Url"] = "ExportLessons.aspx";
             drex["ID"] = "0";
             dtSubmenu.Rows.Add(drex);

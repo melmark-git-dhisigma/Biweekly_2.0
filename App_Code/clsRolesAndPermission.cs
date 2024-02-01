@@ -349,7 +349,7 @@ public class clsRoles
             }
             if (Item == "Ieps-Menu")
             {
-                lis[2] = "<li class='alpha1'><a href='#' id='IEPS' onclick='selMenu(this);'><span><img src='../Administration/images/ieps.PNG' alt='' align='left'>IEPS</span></a></li>";
+                lis[2] = "<li class='alpha1'><a href='#' id='IEPS' onclick='selMenu(this);'><span><img src='../Administration/images/ieps.PNG' alt='' align='left'>IEP/ISP</span></a></li>";
             }
             if (Item == "BSP Forms-Menu")
             {
@@ -357,7 +357,7 @@ public class clsRoles
             }
             if (Item == "Lesson Plans-Menu")
             {
-                lis[4] = " <li class='alpha1'><a href='#' id='LESSON PLANS' onclick='selMenu(this);'><span><img src='../Administration/images/lessonplan.PNG' alt='' align='left'>LESSON&nbsp;PLANS</span></a></li>";
+                lis[4] = " <li class='alpha1'><a href='#' id='LESSON PLANS' onclick='selMenu(this);'><span><img src='../Administration/images/lessonplan.PNG' alt='' align='left'>PLANS</span></a></li>";
             }
             if (Item == "Datasheets-Menu")
             {

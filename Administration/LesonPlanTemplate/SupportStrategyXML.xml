@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<States>
+  <State Name="NE">
+    <Mappings>
+      <Mapping Column="GoalName" PlaceHolder="tplGoal"/>
+      <Mapping Column="Name" PlaceHolder="stdtName"/>
+      <Mapping Column="IEPDate" PlaceHolder="stdtIEPDate"/>
+      <Mapping Column="Objective3" PlaceHolder="tplObjectieve"/>
+      <Mapping Column="SpecEntryPoint" PlaceHolder="tplSpecificSkills"/>
+      <Mapping Column="FrameandStrand" PlaceHolder="tplFramework"/>
+      <Mapping Column="SpecStandard" PlaceHolder="tplSpecificStanders"/>
+      <Mapping Column="TypeOfInstruction" PlaceHolder="tplTypeOfInstruction"/>
+      <Mapping Column="Settings" PlaceHolder="tplSettings"/>
+      <Mapping Column="PreReq" PlaceHolder="tplPreRequestSkills"/>
+      <Mapping Column="Materials" PlaceHolder="tplMaterials"/>
+      <Mapping Column="Measurement" PlaceHolder="tplMeasurement"/>
+      <Mapping Column="CorrRespDesc" PlaceHolder="tplCorrectResponse"/> 
+      <Mapping Column="LessonDefInst" PlaceHolder="tplLessonDeliveryInstruction"/>
+      <Mapping Column="StudCorrRespDef" PlaceHolder="tplCorrect"/>
+      <Mapping Column="StudIncorrRespDef" PlaceHolder="tplInCorrect"/>
+      <Mapping Column="ReinforcementProc" PlaceHolder="tplReinforcemntDetail"/>
+      <Mapping Column="InCorrRespDesc" PlaceHolder="tplIncorrectResponse"/>
+      <Mapping Column="CorrectionProc" PlaceHolder="tplCorrProcedure"/>
+      <Mapping Column="MistrialResponse" PlaceHolder="tplMistrialResponse"/>
+      <Mapping Column="Mistrial" PlaceHolder="tplMistrialProcedure"/>
+      <Mapping Column="SetDetail" PlaceHolder="tplSetDescriptions"/>
+      <Mapping Column="StepDetail" PlaceHolder="tplStepDescriptions"/>
+      <Mapping Column="Advance" PlaceHolder="tplAdvance"/>
+      <Mapping Column="MoveBack" PlaceHolder="tplMoveBack"/>
+      <Mapping Column="Modification" PlaceHolder="tplModification"/>
+      <Mapping Column="BaselineProc" PlaceHolder="tplBaselineProcedure"/>
+      <Mapping Column="LessonPlanName" PlaceHolder="tplLessonPlanName"/>
+      <Mapping Column="QustionOne" PlaceHolder="tplq1"/>
+      <Mapping Column="QustionTwo" PlaceHolder="tplq2"/>
+      <Mapping Column="QustionThree" PlaceHolder="tplq3"/>
+      <Mapping Column="GeneralProcedure" PlaceHolder="tplGeneralProcedure"/>
+      <Mapping Column="LessonPlanGoal" PlaceHolder="tplLessonPlanGoal"/>
+	  <Mapping Column="NewVersionDate" PlaceHolder="tplNewVersionDate"/>
+	  <Mapping Column="NewVersionReason" PlaceHolder="tplNewVersionReason"/>
+      
+  
+    </Mappings>
+  </State>
+  <State Name="MA">
+    <Mappings>
+      <Mapping Column="Column11" PlaceHolder="Placeholder1"/>
+      <Mapping Column="Column14" PlaceHolder="Placeholder2"/>
+      <Mapping Column="Column12" PlaceHolder="Placeholder3"/>
+      <Mapping Column="Column5" PlaceHolder="Placeholder4"/>
+      <Mapping Column="Column1" PlaceHolder="Placeholder5"/>
+    </Mappings>
+  </State>
+  <State Name="AZ">
+    <Mappings>
+      <Mapping Column="Column10" PlaceHolder="Placeholder1"/>
+      <Mapping Column="Column14" PlaceHolder="Placeholder2"/>
+      <Mapping Column="Column11" PlaceHolder="Placeholder3"/>
+      <Mapping Column="Column5" PlaceHolder="Placeholder4"/>
+      <Mapping Column="Column1" PlaceHolder="Placeholder5"/>
+    </Mappings>
+  </State>
+</States>

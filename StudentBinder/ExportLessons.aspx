@@ -74,7 +74,7 @@
         .auto-style14 {
             font-family: Calibri;
             color: #000;
-            line-height: 22px; /*font-weight: bold;*/;
+            line-height: 22px; /*font-weight: bold;*/
             font-size: 15px;
             padding-right: 1px;
             text-align: right;
@@ -96,20 +96,26 @@
             
             function checkPostbackExport()
             {
-             alert("Please wait it will take less than few minutes....");
+                var e = document.getElementById("ddlFormat");
+                    var value = e.selectedIndex;
+                    if (value == 0) {
+                        alert('Please select a format.');
+                        return false;
+                    }
+                alert("Please wait it will take less than few minutes....");
             }
 
         </script>
 
     <form id="form1" runat="server">    
                                 
-            <div id="LessonPlanExportOpt" style="width:907px"> 
+            <div id="LessonPlanExportOpt" style="width:1200px"> 
 
                 <br />                                
                 <table>
                                                                                 
                 <tr>
-                <td class="HeaderStyleLE" style="font-family:Calibri" colspan="5">Lesson Export</td>
+                <td class="HeaderStyleLE" style="font-family:Calibri" colspan="5">Export</td>
                 </tr>
                                             
                 <tr>
@@ -144,9 +150,16 @@
                         <asp:ListItem>------- Select Version--------</asp:ListItem>                       
                     </asp:DropDownList>
                 </td>
-
+                    <td class="auto-style10" style="font-family:Calibri">Format&nbsp;&nbsp;&nbsp;</td>
+                    <td style="padding:10px" class="auto-style3">
+                        <asp:DropDownList ID="ddlFormat" runat="server" AutoPostBack="true" CssClass="drpClassFormat" style="width:250px;">
+                            <asp:ListItem Value="0">......Select Format......</asp:ListItem>
+                            <asp:ListItem Selected="True">Lesson Plan</asp:ListItem>
+                            <asp:ListItem>Support Strategy</asp:ListItem>
+                        </asp:DropDownList>
+                    </td>
                 <td class="auto-style8">
-                <asp:Button ID="btn1" runat="server" ToolTip="Export To Word" CssClass="ExportWord" Text="" OnClick="btnExportWord_Click" OnClientClick="checkPostbackExport();" Height="35px" Width="37px"/>
+                <asp:Button ID="btn1" runat="server" ToolTip="Export To Word" CssClass="ExportWord" Text="" OnClick="btnExportWord_Click" OnClientClick="return checkPostbackExport();" Height="35px" Width="37px"/>
                 <asp:Button ID="btn2" runat="server" visible="false" ToolTip="Export To Word" CssClass="ExportWord" Text="" OnClick="btnExportWord_Click1" OnClientClick="checkPostbackExport();" Height="35px" Width="37px"/>
                 </td>
                 </tr>
