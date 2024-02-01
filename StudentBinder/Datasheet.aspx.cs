@@ -517,6 +517,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         if ((oTemp != null) && (oDS != null))
             try
             {
+                bool updatestatus = false;
                 if (ViewState["StdtSessHdr"] != null)
                 {
 
@@ -532,23 +533,28 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     dtstepIDs = oData.ReturnDataTable(sqlQry, false);
                     //DataTable dtstps = oDS.dtSteps;
                     DataTable dtstps = oDS.dtSteps.Clone();
-                    if (dtstepIDs.Rows.Count != 0)
+                    if (SkillType != "Discrete" || oDS.TeachProc == "Match-to-Sample")
                     {
-                        for (int i = 0; i < dtstepIDs.Rows.Count; i++)
+                        if (dtstepIDs.Rows.Count != 0)
                         {
-                            for (int j = 0; j < oDS.dtSteps.Rows.Count; j++)
+                            for (int i = 0; i < dtstepIDs.Rows.Count; i++)
                             {
-                                //int dtstepID = Convert.ToInt32(dtstepIDs.Rows[i]["DSTempStepId"]);
-                                //int oDsStepId = Convert.ToInt32(oDS.dtSteps.Rows[j]["DSTempStepId"]);
-                                if (Convert.ToInt32(dtstepIDs.Rows[i]["DSTempStepId"]) == Convert.ToInt32(oDS.dtSteps.Rows[j]["DSTempStepId"]))
+                                for (int j = 0; j < oDS.dtSteps.Rows.Count; j++)
                                 {
-                                    DataRow dr = dtstps.NewRow(); 
-                                    dr.ItemArray = oDS.dtSteps.Rows[j].ItemArray;
-                                    dtstps.Rows.Add(dr);
+                                    //int dtstepID = Convert.ToInt32(dtstepIDs.Rows[i]["DSTempStepId"]);
+                                    //int oDsStepId = Convert.ToInt32(oDS.dtSteps.Rows[j]["DSTempStepId"]);
+                                    if (Convert.ToInt32(dtstepIDs.Rows[i]["DSTempStepId"]) == Convert.ToInt32(oDS.dtSteps.Rows[j]["DSTempStepId"]))
+                                    {
+                                        DataRow dr = dtstps.NewRow();
+                                        dr.ItemArray = oDS.dtSteps.Rows[j].ItemArray;
+                                        dtstps.Rows.Add(dr);
+                                    }
                                 }
                             }
                         }
                     }
+                    else
+                        dtstps = oDS.dtSteps;
                     if (dtstps.Rows.Count == 0)
                     {
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('This set does not have any steps attached, please modify the lesson to assign steps...');", true);
@@ -559,16 +565,69 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                     if (oDS.TeachProc == "Match-to-Sample")
                     {
+                        int[] orderarray = { };
+                        string ordervalue = "";
+                        string[] Sampleorderarray = { };
+                        string Sampleordervalue = "";
+                        string[] Sampleoptions = { };
                         //string sqlStr = "SELECT [DSTempStepId],[StepName] as StepCd,[StepName],SortOrder as StepId  FROM [dbo].[DSTempStep] " +
                         //                        " WHERE DSTempHdrId=" + oTemp.TemplateId + " AND DsTempSetId=" + oDS.CrntSet + " AND ActiveInd='A' ORDER BY [SortOrder]";
 
                         string sqlStr = "SELECT Step.StdtSessionStepId as SessStepID, TempStep.[DSTempStepId],TempStep.[StepName] as StepCd,TempStep.[StepName],TempStep.SortOrder as StepId  FROM [dbo].[DSTempStep] TempStep  INNER JOIN StdtSessionStep Step " +
                                          " ON TempStep.DSTempStepId=Step.DSTempStepId  WHERE TempStep.DSTempHdrId=" + oTemp.TemplateId + " AND TempStep.DsTempSetId=" + oDS.CrntSet + " AND TempStep.ActiveInd='A' AND IsDynamic=0 AND TempStep.SortOrder IS NOT NULL AND  Step.StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString() + " ORDER BY NEWID()";
+                        
+                        string currstatus = "select * from StdtSessionHdr where StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
 
-
+                        DataTable dtcstatus = new DataTable();
+                        dtcstatus = oData.ReturnDataTable(currstatus, false);
+                        string orderStatus = "";
+                        if (dtcstatus != null && dtcstatus.Rows.Count > 0)
+                        {
+                            if (dtcstatus.Rows[0]["SessionStatusCd"].ToString() == "S")
+                            {
+                                if ((dtcstatus.Rows[0]["StepOrder"] != null && dtcstatus.Rows[0]["SampleOrder"]!=null) && (dtcstatus.Rows[0]["StepOrder"].ToString() != "" && dtcstatus.Rows[0]["SampleOrder"].ToString() != ""))
+                                {
+                                    ordervalue = dtcstatus.Rows[0]["stepOrder"].ToString();
+                                    Sampleordervalue = dtcstatus.Rows[0]["SampleOrder"].ToString();
+                                    orderStatus = "Saved With Order";
+                                }
+                                else
+                                {
+                                    orderStatus = "Saved without Order";
+                                }
+                            }
+                            if (dtcstatus.Rows[0]["SessionStatusCd"].ToString() == "D")
+                            {
+                                
+                                oSession = (clsSession)Session["UserSession"];
+                                string s1 = "SELECT TOP 1 * FROM StdtSessionHdr WHERE StudentId=" + oSession.StudentId + " AND SchoolId=" + oSession.SchoolId + /*" AND StdtClassId=" + oSession.Classid +*/ " AND DSTempHdrId=" + oTemp.TemplateId + " AND SessionStatusCd='D' AND IsMaintanace ='" + hdn_isMaintainance.Value + "' AND IOAInd='N'";
+                                string s2 = "SELECT TOP 1 * FROM StdtSessionHdr WHERE StudentId=" + oSession.StudentId + " AND SchoolId=" + oSession.SchoolId + " AND DSTempHdrId=" + oTemp.TemplateId + " AND SessionStatusCd='D' AND IsMaintanace ='" + hdn_isMaintainance.Value + "' AND IOAInd='Y'";
+                                DataTable dtHdrs = oData.ReturnDataTable(s1, false);
+                                DataTable dtHdrsIOA = oData.ReturnDataTable(s2, false);
+                                dtHdrs.Merge(dtHdrsIOA, true);
+                                //find - IOA session or existing  end
+                                //if existing,IOA
+                                if (dtHdrs != null)
+                                {
+                                    if (dtHdrs.Rows.Count > 0)
+                                    {
+                                        string idqry = "SELECT  StepOrder,SampleOrder FROM StdtSessionHdr WHERE StdtSessionHdrId=" + dtHdrs.Rows[0]["StdtSessionHdrId"].ToString();
+                                        DataTable idqryTable = oData.ReturnDataTable(idqry, false);
+                                        ordervalue = idqryTable.Rows[0]["stepOrder"].ToString();
+                                        Sampleordervalue = idqryTable.Rows[0]["SampleOrder"].ToString();
+                                        if (dtHdrs.Rows.Count > 1)
+                                        {
+                                            if (dtHdrs.Rows[1]["StepOrder"].ToString() == "" || dtHdrs.Rows[1]["SampleOrder"].ToString() == "")
+                                            {
+                                                string upqry = "Update StdtSessionHdr set StepOrder='" + idqryTable.Rows[0]["StepOrder"].ToString() + "' , SampleOrder='" + clsGeneral.convertQuotes(idqryTable.Rows[0]["SampleOrder"].ToString()) + "' where StdtSessionHdrId=" + dtHdrs.Rows[1]["StdtSessionHdrId"].ToString();
+                                                oData.Execute(upqry);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                         dt = oData.ReturnDataTable(sqlStr, false);
-
-
                         string[] distractorSamples = getDistractors(oTemp.TemplateId,oDS.CrntSet);
 
                         if (ViewState["StdtSessHdr"] != null && ViewState["StdtSessHdr"] != "")
@@ -633,11 +692,82 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     Questions[i] = clsMathToSamples.GetQuestion(tempString);
                                         QuestnAary[i] = clsMathToSamples.GetQuestion(tempString);
                                 }
-                                if (matchToSampleType == "Randomized")
+                                if (matchToSampleType == "Randomized" && orderStatus != "Saved Without Order")
                                 {
                                     if (ansList.Length > 1)
                                     {
-                                        steps = clsMathToSamples.FormStepsWithAnsNew(ansList, Questions.Length, Questions);
+                                        if (Convert.ToBoolean(ViewState["IsHistory"]) != true)
+                                        {
+                                            if (ordervalue == "" || Sampleordervalue == "")
+                                            {
+                                                updatestatus = true;
+                                                steps = clsMathToSamples.FormStepsWithAnsNew(ansList, Questions.Length, Questions);
+                                                for (int i = 0; i < steps.Length; i++)
+                                                {
+                                                    Sampleordervalue = Sampleordervalue + "\n" + steps[i].TrialText;
+                                                    Sampleordervalue = Sampleordervalue.Trim('\n');
+                                                }
+                                            }
+                                            else
+                                            {
+                                                orderarray = ordervalue.Split(',').Select(int.Parse).ToArray();
+                                                SortstepTable(dt, orderarray);
+                                                if (Sampleordervalue != "")
+                                                {
+                                                    Sampleorderarray = Sampleordervalue.Split('\n');
+                                                }
+                                                int dtleng = dt.Rows.Count;
+                                                steps = new clsMathToSamples.Step[dtleng];
+                                                for (int i = 0; i < dt.Rows.Count; i++)
+                                                {
+                                                    steps[i] = new clsMathToSamples.Step();
+                                                    string[] ques = Sampleorderarray[i].Split(':');
+                                                    string order = ques[1].Trim('[').Trim(']');
+                                                    string[] odarr = order.Split(',');
+
+                                                    steps[i].AnswerIndex = dtleng;
+                                                    steps[i].Options = odarr;
+                                                    steps[i].Questions = ques[0];
+                                                    steps[i].TrialText = Sampleorderarray[i];
+                                                    dtleng = dtleng - 1;
+                                                }
+                                            }
+                                        }
+                                        else {
+                                            int dtleng = dt.Rows.Count;
+                                            steps = new clsMathToSamples.Step[dtleng];
+                                            string idqry = "SELECT  StepOrder,SampleOrder FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
+                                            DataTable idqryTable = oData.ReturnDataTable(idqry, false);
+                                            ordervalue = idqryTable.Rows[0]["stepOrder"].ToString();
+                                            Sampleordervalue = idqryTable.Rows[0]["SampleOrder"].ToString();
+                                            if (ordervalue != "")
+                                            {
+                                                orderarray = ordervalue.Split(',').Select(int.Parse).ToArray();
+                                                SortstepTable(dt, orderarray);
+                                                if (Sampleordervalue != "")
+                                                {
+                                                    Sampleorderarray = Sampleordervalue.Split('\n');
+                                                }
+                                                steps = new clsMathToSamples.Step[dtleng];
+                                                for (int i = 0; i < dt.Rows.Count; i++)
+                                                {
+                                                    steps[i] = new clsMathToSamples.Step();
+                                                    string[] ques = Sampleorderarray[i].Split(':');
+                                                    string order = ques[1].Trim('[').Trim(']');
+                                                    string[] odarr = order.Split(',');
+
+                                                    steps[i].AnswerIndex = dtleng;
+                                                    steps[i].Options = odarr;
+                                                    steps[i].Questions = ques[0];
+                                                    steps[i].TrialText = Sampleorderarray[i];
+                                                    dtleng = dtleng - 1;
+                                                }
+                                               
+                                            }
+                                            else {
+                                                steps = clsMathToSamples.FormStepsWithAnsNew(ansList, Questions.Length, Questions);
+                                            }
+                                        }
                                     }
                                     else
                                     {
@@ -646,16 +776,92 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 }
                                 else
                                 {
-                                    steps = clsMathToSamples.FormStepsInOrderWithAns(ansList, Questions.Length, Questions);
+                                    if (matchToSampleType == "Randomized" && orderStatus == "Saved Without Order")
+                                    {
+                                        steps = clsMathToSamples.FormStepsWithAnsNew(ansList, Questions.Length, Questions);
+                                    }
+                                    else
+                                    {
+                                        if (Convert.ToBoolean(ViewState["IsHistory"]) != true)
+                                        {
+                                            if (ordervalue == "" || Sampleordervalue == "")
+                                            {
+                                                steps = clsMathToSamples.FormStepsInOrderWithAns(ansList, Questions.Length, Questions);
+                                                for (int i = 0; i < dt.Rows.Count; i++)
+                                                {
+                                                    ordervalue = ordervalue + "," + dt.Rows[i]["StepId"].ToString();
+                                                }
+                                                ordervalue = ordervalue.Trim(',');
+                                                for (int i = 0; i < steps.Length; i++)
+                                                {
+                                                    Sampleordervalue = Sampleordervalue + "\n" + clsGeneral.convertQuotes(steps[i].TrialText);
+                                                }
+                                                Sampleordervalue = Sampleordervalue.Trim('\n');
+                                                string qry = "Update StdtSessionHdr set StepOrder='" + ordervalue + "' , SampleOrder='" + Sampleordervalue + "' where StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
+                                                oData.Execute(qry);
+                                            }
+                                            else
+                                            {
+                                                orderarray = ordervalue.Split(',').Select(int.Parse).ToArray();
+                                                SortstepTable(dt, orderarray);
+                                                if (Sampleordervalue != "")
+                                                {
+                                                    Sampleorderarray = Sampleordervalue.Split('\n');
+                                                }
+                                                int dtleng = dt.Rows.Count;
+                                                steps = new clsMathToSamples.Step[dtleng];
+                                                for (int i = 0; i < dt.Rows.Count; i++)
+                                                {
+                                                    steps[i] = new clsMathToSamples.Step();
+                                                    string[] ques = Sampleorderarray[i].Split(':');
+                                                    string order = ques[1].Trim('[').Trim(']');
+                                                    string[] odarr = order.Split(',');
+
+                                                    steps[i].AnswerIndex = dtleng;
+                                                    steps[i].Options = odarr;
+                                                    steps[i].Questions = ques[0];
+                                                    steps[i].TrialText = Sampleorderarray[i];
+                                                    dtleng = dtleng - 1;
+                                                }
+
+                                            }
+                                        }
+                                        else
+                                        {
+                                            int dtleng = dt.Rows.Count;
+                                            if (ordervalue != "")
+                                            {
+                                                orderarray = ordervalue.Split(',').Select(int.Parse).ToArray();
+                                                SortstepTable(dt, orderarray);
+                                                if (Sampleordervalue != "")
+                                                {
+                                                    Sampleorderarray = Sampleordervalue.Split('\n');
+                                                }
+                                                steps = new clsMathToSamples.Step[dtleng];
+                                                for (int i = 0; i < dt.Rows.Count; i++)
+                                                {
+                                                    steps[i] = new clsMathToSamples.Step();
+                                                    string[] ques = Sampleorderarray[i].Split(':');
+                                                    string order = ques[1].Trim('[').Trim(']');
+                                                    string[] odarr = order.Split(',');
+
+                                                    steps[i].AnswerIndex = dtleng;
+                                                    steps[i].Options = odarr;
+                                                    steps[i].Questions = ques[0];
+                                                    steps[i].TrialText = Sampleorderarray[i];
+                                                    dtleng = dtleng - 1;
+                                                }
+
+                                            }
+                                            else
+                                            {
+                                                steps = clsMathToSamples.FormStepsInOrderWithAns(ansList, Questions.Length, Questions);
+                                            }
+                                        }
+                                    }
                                 }
-
-
-
-
-                            }
-
-
-
+                            }   
+                         
                             if (dt.Rows.Count > 0)
                             {
                                 if (dtstps != null)
@@ -735,10 +941,48 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 }
                             }
                         }
-
+                        if (updatestatus == true)
+                        {
+                            if (dt != null && dt.Rows.Count > 0)
+                            {
+                                for (int i = 0; i < dt.Rows.Count; i++)
+                                {
+                                    ordervalue = ordervalue + "," + dt.Rows[i]["StepId"].ToString();
+                                }
+                                ordervalue = ordervalue.Trim(',');
+                            }
+                            string qry = "Update StdtSessionHdr set StepOrder='" + ordervalue + "' , SampleOrder='" + clsGeneral.convertQuotes(Sampleordervalue) + "' where StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
+                            oData.Execute(qry);
+                        }
                     }
 
                     ///Code Ended Here. Arun.
+
+                    //sort step
+                    if ((Session["totalRandom"] != null && Session["totalRandom"].ToString() == "Randomized") || matchToSampleType == "Randomized")
+                    {
+                        int[] sortOrder = new int[dtstps.Rows.Count];
+                        for (int j = 0; j < dtstps.Rows.Count; j++)
+                        {
+                            sortOrder[j] = Convert.ToInt32(dtstps.Rows[j]["DSTempStepId"]);
+                        }
+                        DataTable sortedTable = dtstepIDs.Clone();
+
+                        foreach (int id in sortOrder)
+                        {
+                            foreach (DataRow row in dtstepIDs.Rows)
+                            {
+                                if (Convert.ToInt32(row["DSTempStepId"]) == id)
+                                {
+                                    sortedTable.ImportRow(row);
+                                    break;
+                                }
+                            }
+                        }
+                        dtstepIDs.Rows.Clear();
+                        dtstepIDs.Merge(sortedTable);
+                        Session["totalRandom"] = "";
+                    }
 
                     if (dtstps != null)
                     {
@@ -858,6 +1102,8 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 throw ex;
             }
     }
+
+   
     //protected void fillSteps(int TempHdrId, int NbrOfTrials, string SkillTyp, int SetId, string TeachingProc, int VTLessonId, string ChainType)
     //{
     //    oData = new clsData();
@@ -1077,23 +1323,95 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 }
                 else
                 {
+                    DataTable dtHdrs = new DataTable();
+                    DataTable dtHdrsIOA = new DataTable();
+                    int[] orderarray={};
+                    string ordervalue = "";
                     //string sqlStr = "SELECT [DSTempStepId],[StepCd]+' - '+[StepName] as StepCd,[StepName],SortOrder as StepId  FROM [dbo].[DSTempStep] " +
                     //" WHERE DSTempHdrId=" + oTemp.TemplateId + " AND  DsTempSetId=" + SetId + " AND ActiveInd='A' AND IsDynamic=0 ORDER BY [SortOrder]";
-                    string sqlStr = "SELECT [DSTempStepId],[StepCd]+' - '+[StepName] as StepCd,[StepName],RANK() OVER(ORDER BY SortOrder) as StepId  FROM [dbo].[DSTempStep] " +
+                    string sqlStr = "SELECT [DSTempStepId],[StepCd]+' - '+[StepName] as StepCd,[StepName],RANK() OVER(ORDER BY SortOrder) as StepId   FROM [dbo].[DSTempStep] " +
                    " WHERE DSTempHdrId=" + oTemp.TemplateId + " AND  DsTempSetId=" + SetId + " AND ActiveInd='A' AND IsDynamic=0 ORDER BY [SortOrder]";
+                   
                     if (TeachingProc == "Total Task")
                     {
                         if (totalTaskType == "Randomized")
                         {
+                            Session["totalRandom"] = "Randomized";
+                            if (ViewState["StdtSessHdr"] != null)
+                            {
                             if (Convert.ToBoolean(ViewState["IsHistory"]) != true)
                             {
+                                    string currstatus = "select * from StdtSessionHdr where StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
+                                    DataTable dtcstatus = new DataTable();
+                                    dtcstatus = oData.ReturnDataTable(currstatus, false);
+                                    if (dtcstatus != null && dtcstatus.Rows.Count > 0)
+                                    {
+                                        if (dtcstatus.Rows[0]["SessionStatusCd"].ToString() == "S")
+                                        {
+                                            ordervalue = dtcstatus.Rows[0]["stepOrder"].ToString();
+                                        }
+                                        if (dtcstatus.Rows[0]["SessionStatusCd"].ToString() == "D")
+                                        {
+                                            oSession = (clsSession)Session["UserSession"];
+                                            string s1 = "SELECT TOP 1 * FROM StdtSessionHdr WHERE StudentId=" + oSession.StudentId + " AND SchoolId=" + oSession.SchoolId + /*" AND StdtClassId=" + oSession.Classid +*/ " AND DSTempHdrId=" + oTemp.TemplateId + " AND SessionStatusCd='D' AND IsMaintanace ='" + hdn_isMaintainance.Value + "' AND IOAInd='N'";
+                                            string s2 = "SELECT TOP 1 * FROM StdtSessionHdr WHERE StudentId=" + oSession.StudentId + " AND SchoolId=" + oSession.SchoolId + " AND DSTempHdrId=" + oTemp.TemplateId + " AND SessionStatusCd='D' AND IsMaintanace ='" + hdn_isMaintainance.Value + "' AND IOAInd='Y'";
+                                            dtHdrs = oData.ReturnDataTable(s1, false);
+                                            dtHdrsIOA = oData.ReturnDataTable(s2, false);
+                                            dtHdrs.Merge(dtHdrsIOA, true);
+                                            if (dtHdrs != null)
+                                            {
+                                                if (dtHdrs.Rows.Count > 0)
+                                                {
+                                                    string idqry = "SELECT  StepOrder FROM StdtSessionHdr WHERE StdtSessionHdrId=" + dtHdrs.Rows[0]["StdtSessionHdrId"].ToString();
+                                                    DataTable idqryTable = oData.ReturnDataTable(idqry, false);
+                                                    ordervalue = idqryTable.Rows[0]["stepOrder"].ToString();
+                                                    Session["steporder"] = ordervalue;
+                                                    if (dtHdrs.Rows.Count > 1)
+                                                    {
+                                                        if (dtHdrs.Rows[1]["StepOrder"].ToString() == "")
+                                                        {
+                                                            string upqry = "Update StdtSessionHdr set StepOrder='" + idqryTable.Rows[0]["StepOrder"].ToString() + "' where StdtSessionHdrId=" + dtHdrs.Rows[1]["StdtSessionHdrId"].ToString();
+                                                            oData.Execute(upqry);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
 
+                                        if (ordervalue != "")
+                                        {
+                                            orderarray = ordervalue.Split(',').Select(int.Parse).ToArray();
+
+                                        }
+                                        else
+                                        {
                                 sqlStr = "SELECT [DSTempStepId],[StepCd]+' - '+[StepName] as StepCd,[StepName],SortOrder as StepId  FROM [dbo].[DSTempStep] " +
                             " WHERE DSTempHdrId=" + oTemp.TemplateId + " AND DsTempSetId=" + SetId + " AND ActiveInd='A'  AND IsDynamic=0 ORDER BY NEWID()";
                             }
+                                    }
+                                }
                             else
+                                {
+                                    string prior = "SELECT  StepOrder FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
+                                    DataTable priortable = oData.ReturnDataTable(prior, false);
+                                    ordervalue = priortable.Rows[0]["stepOrder"].ToString();
+                                    if (ordervalue != "")
+                                    {
+                                        orderarray = ordervalue.Split(',').Select(int.Parse).ToArray();
+                                    }
+                                    else
+                                    {
                                 sqlStr = "SELECT [DSTempStepId],[StepCd]+' - '+[StepName] as StepCd,[StepName],SortOrder as StepId  FROM [dbo].[DSTempStep] " +
                                 " WHERE DSTempHdrId=" + oTemp.TemplateId + " AND  DsTempSetId=" + SetId + "  AND ActiveInd='A'  AND IsDynamic=0 ORDER BY SortOrder";
+                        }
+                    }
+
+                            }
+                            else {
+
+                                sqlStr = "SELECT [DSTempStepId],[StepCd]+' - '+[StepName] as StepCd,[StepName],SortOrder as StepId  FROM [dbo].[DSTempStep] " +
+                                            " WHERE DSTempHdrId=" + oTemp.TemplateId + " AND DsTempSetId=" + SetId + " AND ActiveInd='A'  AND IsDynamic=0 ORDER BY NEWID()";
+                            }
                         }
                     }
 
@@ -1103,11 +1421,34 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                  "WHERE DSTempHdrId=" + oTemp.TemplateId + " AND DsTempSetId=" + SetId + " AND ActiveInd='A'  AND IsDynamic=0 ORDER BY [SortOrder] ";
 
                     }
-
                     dt = oData.ReturnDataTable(sqlStr, false);
+                    if (ordervalue != "")
+                    {
+                        SortstepTable(dt, orderarray);
+                        
+                }
+                    else
+                    {
+                        string steporder = "";
+                        if (dt != null)
+                        {
+                            if (dt.Rows.Count > 0)
+                            {
+                                foreach (DataRow drr in dt.Rows)
+                                {
+                                    steporder = steporder + "," + clsGeneral.convertQuotes(drr["StepId"].ToString());
+                                }
+                                if (ViewState["StdtSessHdr"] == null)
+                                {
+                                    Session["random"] = "total task random";
+                                    Session["steporder"] = steporder.Trim(',');
+                                }
+                            }
+                        }
+                    }
                 }
                 dtUpdated = dt.Clone();
-
+                
                 if (dt != null)
                 {
                     if (dt.Rows.Count > 0)
@@ -1144,7 +1485,26 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             }
         }
     }
+    protected void SortstepTable(DataTable sorttable, int[] sortOrder)
+    {
+        DataTable sortedTable = sorttable.Clone();
 
+        foreach (int id in sortOrder)
+        {
+            foreach (DataRow row in sorttable.Rows)
+            {
+                if (Convert.ToInt32(row["StepId"]) == id)
+                {
+                    sortedTable.ImportRow(row);
+                    break;
+                }
+            }
+        }
+
+        sorttable.Rows.Clear();
+        sorttable.Merge(sortedTable);
+    }
+    
     private string getTeachingMethod(string TeachingProc)
     {
         string sqlStr = "SELECT LookupDesc FROM LookUp WHERE LookupName = '" + TeachingProc + "'";
@@ -1460,6 +1820,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         }
                     }
                     //
+                    NewSessionStep();
                 }
                 else
                 {
@@ -1565,6 +1926,19 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             clError.WriteToLog(ex.ToString());
             throw ex;
         }
+    }
+    protected void NewSessionStep() {
+        if (Session["random"] != null)
+        {
+            if (Session["random"].ToString() == "total task random")
+            {
+                string qry = "Update StdtSessionHdr set StepOrder='" + Session["steporder"].ToString() + "' where StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
+                oData.Execute(qry);
+                Session["random"] = null;
+                Session["steporder"] = null;
+            }
+        }
+        
     }
     protected void getStepPrompts()
     {
@@ -3976,10 +4350,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     oData.RollBackTransation(trans, con);
                     con.Close();
                 }
-
-
+                if (Session["steporder"] != null)
+                { 
+                string qry = "Update StdtSessionHdr set StepOrder='" + Session["steporder"].ToString() + "' where StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
+                oData.Execute(qry);
+                Session["steporder"] = null;
             }
-
+            }
             btnSubmitAndRepeat1.Visible = false;
             btnSubmitAndRepeat2.Visible = false;
             btnSubmitAndRepeat3.Visible = false;
@@ -31006,6 +31383,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 }
 
                 var list = new List<string>(nondistractors);
+                var Randlist = new List<string>();
                 int tescnt = 0;
                 for (int i = 0; i < nondistractors.Length; i++)
                 {
@@ -31036,6 +31414,15 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     if (distractorSamplesArry.Contains(firstpart))
                     {
                         disindex = disrand.Next(nondistractorsExceptional.Length);
+                        if (!Randlist.Contains(disindex.ToString()))
+                            Randlist.Add(disindex.ToString());
+                        else
+                        { 
+                            do{
+                                disindex = disrand.Next(nondistractorsExceptional.Length);
+                            }while(!Randlist.Contains(disindex.ToString()));
+                            Randlist.Add(disindex.ToString());
+                        }
                         disindexString = nondistractorsExceptional[disindex].ToString();
                         disStringnew = disindexString + ": " + lastpart;
                         tempString = disStringnew;
@@ -31054,6 +31441,16 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         {
                             LoopInc++;
                             disindex = disrand.Next(nondistractors.Length);
+                            if (!Randlist.Contains(disindex.ToString()))
+                                Randlist.Add(disindex.ToString());
+                            else
+                            {
+                                do
+                                {
+                                    disindex = disrand.Next(nondistractorsExceptional.Length);
+                                } while (!Randlist.Contains(disindex.ToString()));
+                                Randlist.Add(disindex.ToString());
+                            }
                             disindexString = nondistractors[disindex].ToString();
                             if (preSampleString != disindexString)
                             {
@@ -31086,6 +31483,16 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             {
                                 LoopInc++;
                                 disindex = disrand.Next(nondistractors.Length);
+                                if (!Randlist.Contains(disindex.ToString()))
+                                    Randlist.Add(disindex.ToString());
+                                else
+                                {
+                                    do
+                                    {
+                                        disindex = disrand.Next(nondistractorsExceptional.Length);
+                                    } while (!Randlist.Contains(disindex.ToString()));
+                                    Randlist.Add(disindex.ToString());
+                                }
                                 disindexString = nondistractors[disindex].ToString();
                                 if (preSampleString != disindexString)
                                 {
@@ -31124,6 +31531,16 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 {
                                     LoopInc++;
                                     disindex = disrand.Next(nondistractors.Length);
+                                    if (!Randlist.Contains(disindex.ToString()))
+                                        Randlist.Add(disindex.ToString());
+                                    else
+                                    {
+                                        do
+                                        {
+                                            disindex = disrand.Next(nondistractorsExceptional.Length);
+                                        } while (!Randlist.Contains(disindex.ToString()));
+                                        Randlist.Add(disindex.ToString());
+                                    }
                                     disindexString = nondistractors[disindex].ToString();
                                     if (preSampleString != disindexString)
                                     {
@@ -31157,6 +31574,16 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         do
                         {
                             disindex = disrand.Next(nondistractorsExceptional.Length);
+                            if (!Randlist.Contains(disindex.ToString()))
+                                Randlist.Add(disindex.ToString());
+                            else
+                            {
+                                do
+                                {
+                                    disindex = disrand.Next(nondistractorsExceptional.Length);
+                                } while (!Randlist.Contains(disindex.ToString()));
+                                Randlist.Add(disindex.ToString());
+                            }
                             disindexString = nondistractorsExceptional[disindex].ToString();
                             if (preSampleString != disindexString)
                             {
@@ -31174,6 +31601,16 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             do
                             {
                                 disindex = disrand.Next(nondistractorsExceptional.Length);
+                                if (!Randlist.Contains(disindex.ToString()))
+                                    Randlist.Add(disindex.ToString());
+                                else
+                                {
+                                    do
+                                    {
+                                        disindex = disrand.Next(nondistractorsExceptional.Length);
+                                    } while (!Randlist.Contains(disindex.ToString()));
+                                    Randlist.Add(disindex.ToString());
+                                }
                                 disindexString = nondistractorsExceptional[disindex].ToString();
                                 if (preSampleString != disindexString)
                                 {
