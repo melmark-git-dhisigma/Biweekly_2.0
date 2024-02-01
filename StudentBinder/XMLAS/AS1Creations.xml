@@ -8,7 +8,10 @@
       <Mapping Column="GoalArea" PlaceHolder="PlcGoalArea"/>
       <Mapping Column="Goal" PlaceHolder="PlcGoal"/>
       <Mapping Column="Benchmarks" PlaceHolder="plcBenchmarkGoal"/>
-
+      
+      <Mapping Column="Curr" PlaceHolder="PlcCurrent"/>
+      
+  
       <Mapping Column="Period1" PlaceHolder="PlcPeriod1"/>
       <Mapping Column="Period2" PlaceHolder="PlcPrd2"/>
       <Mapping Column="Period3" PlaceHolder="PlcPeriod3"/>

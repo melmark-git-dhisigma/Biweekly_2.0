@@ -12,6 +12,7 @@ using System.IO.Packaging;
 using Microsoft.Office.Interop.Word;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using System.Threading;
@@ -21,8 +22,8 @@ using System.Configuration;
 using System.Web.UI.HtmlControls;
 using System.Globalization;
 using System.Data.SqlClient;
-
-
+using OpenXmlPowerTools;
+using Xceed.Words.NET;
 public partial class StudentBinder_ACSheet : System.Web.UI.Page
 {
     static string[] columns;
@@ -30,6 +31,8 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
     static string[] placeHolders;
 
     System.Data.DataTable Dt = null;
+    System.Data.DataTable Dtcheck = null;
+    System.Data.DataTable Dtcheck2 = null;
     clsData objData = null;
     clsSession sess = null;
 
@@ -68,6 +71,9 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 btnImport.Visible = false;
                 btnDelete.Visible = false;
                 rbtnLsnClassTypeAc.Visible = false;
+                tdMsg1.Visible = false;
+                tdMsg2.Visible = false;
+                tdreview2.Visible = false;
                 //btnBack.Visible = false;
                 //    btnLoadData.Visible = false;
             }
@@ -88,6 +94,9 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 btnImport.Visible = false;
                 btnDelete.Visible = false;
                 rbtnLsnClassTypeAc.Visible = false;
+                tdMsg1.Visible = false;
+                tdMsg2.Visible = false;
+                tdreview2.Visible = false;
                 btnSaveNew.Visible = false;
                 btnUpdateNew.Visible = false;
                 //btnBack.Visible = true;
@@ -428,6 +437,9 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 btnSave.Visible = true;
                 btnSaveNew.Visible = true;
                 rbtnLsnClassTypeAc.Visible = true;
+                tdMsg1.Visible = true;
+                tdMsg2.Visible = true;
+                tdreview2.Visible = true;
                 btnUpdate.Visible = false;
                 btnUpdateNew.Visible = false;
                 btnImport.Visible = false;
@@ -441,6 +453,9 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 btnSave.Visible = false;
                 btnSaveNew.Visible = false;
                 rbtnLsnClassTypeAc.Visible = false;
+                tdMsg1.Visible = false;
+                tdMsg2.Visible = false;
+                tdreview2.Visible = false;
                 btnUpdate.Visible = false;
                 btnUpdateNew.Visible = false;
                 btnImport.Visible = false;
@@ -455,6 +470,9 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             btnSave.Visible = false;
             btnSaveNew.Visible = false;
             rbtnLsnClassTypeAc.Visible = false;
+            tdMsg1.Visible = false;
+            tdMsg2.Visible = false;
+            tdreview2.Visible = false;
             btnUpdate.Visible = false;
             btnUpdateNew.Visible = false;
             btnImport.Visible = false;
@@ -470,6 +488,9 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
         string dateVal = "";
         tdMsg.InnerHtml = "";
         rbtnLsnClassTypeAc.Visible = true;
+        tdMsg1.Visible = true;
+        tdMsg2.Visible = true;
+        tdreview2.Visible = true;
         rbtnLsnClassTypeAc.SelectedValue = "Day,Residence";
         ///LinkButton lnkDate = (LinkButton)sender;
         try
@@ -504,6 +525,8 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             endDate = date.Split('-')[1];
         }
         Dt = new System.Data.DataTable();
+        Dtcheck = new System.Data.DataTable();
+        Dtcheck2 = new System.Data.DataTable();
         //        string qry = "select StdtAcdSheet.AccSheetId,StdtAcdSheet.StudentId,StdtAcdSheet.DateOfMeeting,StdtAcdSheet.EndDate,StdtAcdSheet.GoalArea,StdtAcdSheet.Goal,StdtAcdSheet.Benchmarks,StdtAcdSheet.FeedBack,StdtAcdSheet.PreposalDiss, StdtAcdSheet.PersonResNdDeadline,StdtAcdSheet.TypeOfInstruction,"+
         //"StdtAcdSheet.Period1,StdtAcdSheet.Set1,StdtAcdSheet.Prompt1,StdtAcdSheet.IOA1,StdtAcdSheet.NoOfTimes1,StdtAcdSheet.Period2,StdtAcdSheet.Set2,StdtAcdSheet.Prompt2,StdtAcdSheet.IOA2,StdtAcdSheet.NoOfTimes2,StdtAcdSheet.Period3,StdtAcdSheet.Set3,StdtAcdSheet.Prompt3,StdtAcdSheet.IOA3,"+
         //"StdtAcdSheet.NoOfTimes3,StdtAcdSheet.Period4,StdtAcdSheet.Set4,StdtAcdSheet.Prompt4,StdtAcdSheet.IOA4,StdtAcdSheet.NoOfTimes4,StdtAcdSheet.Period5,StdtAcdSheet.Set5,StdtAcdSheet.Prompt5,StdtAcdSheet.IOA5,StdtAcdSheet.NoOfTimes5,StdtAcdSheet.Period6,StdtAcdSheet.Set6,StdtAcdSheet.Prompt6,"+
@@ -520,7 +543,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                   "StdtAcdSheet.NoOfTimes4,StdtAcdSheet.Mistrial4,StdtAcdSheet.Step4 AS stepId4,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step4) step4,StdtAcdSheet.Period5,StdtAcdSheet.Set5,StdtAcdSheet.Prompt5,StdtAcdSheet.IOA5,StdtAcdSheet.NoOfTimes5,StdtAcdSheet.Mistrial5,StdtAcdSheet.Step5 AS stepId5," +
                   "(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step5) step5,StdtAcdSheet.Period6,StdtAcdSheet.Set6,StdtAcdSheet.Prompt6,StdtAcdSheet.IOA6,StdtAcdSheet.NoOfTimes6,StdtAcdSheet.Mistrial6,StdtAcdSheet.Step6 AS stepId6,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step6) step6,StdtAcdSheet.Period7,StdtAcdSheet.Set7" +
                   ",StdtAcdSheet.Prompt7,StdtAcdSheet.IOA7,StdtAcdSheet.NoOfTimes7,StdtAcdSheet.Mistrial7,StdtAcdSheet.Step7 AS stepId7,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step7) step7,StdtAcdSheet.LessonPlanId,(SELECT TOP 1 LessonOrder FROM DSTempHdr WHERE DSTempHdr.LessonPlanId" +
-                  "=StdtAcdSheet.LessonPlanId AND DSTempHdr.StudentId=" + sess.StudentId + ") LessonOrder  from StdtAcdSheet " +
+                  "=StdtAcdSheet.LessonPlanId AND DSTempHdr.StudentId=" + sess.StudentId + ") LessonOrder,StdtAcdSheet.MetObjective,StdtAcdSheet.MetGoal,StdtAcdSheet.NotMaintaining  from StdtAcdSheet " +
                   "WHERE StdtAcdSheet.StudentId=" + sess.StudentId + " and StdtAcdSheet.LessonPlanId in (select s.LessonPlanId from StdtSessionHdr s join Class c on c.ClassId=s.StdtClassId where c.ResidenceInd=0) and CONVERT(char(10),DateOfMeeting,101)='" + stDate + "' AND CONVERT(char(10),EndDate,101)" +
                   "='" + endDate + "') STDTACSHT ORDER BY LessonOrder";
         }
@@ -534,7 +557,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                   "StdtAcdSheet.NoOfTimes4,StdtAcdSheet.Mistrial4,StdtAcdSheet.Step4 AS stepId4,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step4) step4,StdtAcdSheet.Period5,StdtAcdSheet.Set5,StdtAcdSheet.Prompt5,StdtAcdSheet.IOA5,StdtAcdSheet.NoOfTimes5,StdtAcdSheet.Mistrial5,StdtAcdSheet.Step5 AS stepId5," +
                   "(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step5) step5,StdtAcdSheet.Period6,StdtAcdSheet.Set6,StdtAcdSheet.Prompt6,StdtAcdSheet.IOA6,StdtAcdSheet.NoOfTimes6,StdtAcdSheet.Mistrial6,StdtAcdSheet.Step6 AS stepId6,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step6) step6,StdtAcdSheet.Period7,StdtAcdSheet.Set7" +
                   ",StdtAcdSheet.Prompt7,StdtAcdSheet.IOA7,StdtAcdSheet.NoOfTimes7,StdtAcdSheet.Mistrial7,StdtAcdSheet.Step7 AS stepId7,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step7) step7,StdtAcdSheet.LessonPlanId,(SELECT TOP 1 LessonOrder FROM DSTempHdr WHERE DSTempHdr.LessonPlanId" +
-                  "=StdtAcdSheet.LessonPlanId AND DSTempHdr.StudentId=" + sess.StudentId + ") LessonOrder  from StdtAcdSheet " +
+                  "=StdtAcdSheet.LessonPlanId AND DSTempHdr.StudentId=" + sess.StudentId + ") LessonOrder,StdtAcdSheet.MetObjective,StdtAcdSheet.MetGoal,StdtAcdSheet.NotMaintaining  from StdtAcdSheet " +
                   "WHERE StdtAcdSheet.StudentId=" + sess.StudentId + " and StdtAcdSheet.LessonPlanId in (select s.LessonPlanId from StdtSessionHdr s join Class c on c.ClassId=s.StdtClassId where c.ResidenceInd=1) and CONVERT(char(10),DateOfMeeting,101)='" + stDate + "' AND CONVERT(char(10),EndDate,101)" +
                   "='" + endDate + "') STDTACSHT ORDER BY LessonOrder";
         }
@@ -548,7 +571,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                   "StdtAcdSheet.NoOfTimes4,StdtAcdSheet.Mistrial4,StdtAcdSheet.Step4 AS stepId4,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step4) step4,StdtAcdSheet.Period5,StdtAcdSheet.Set5,StdtAcdSheet.Prompt5,StdtAcdSheet.IOA5,StdtAcdSheet.NoOfTimes5,StdtAcdSheet.Mistrial5,StdtAcdSheet.Step5 AS stepId5," +
                   "(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step5) step5,StdtAcdSheet.Period6,StdtAcdSheet.Set6,StdtAcdSheet.Prompt6,StdtAcdSheet.IOA6,StdtAcdSheet.NoOfTimes6,StdtAcdSheet.Mistrial6,StdtAcdSheet.Step6 AS stepId6,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step6) step6,StdtAcdSheet.Period7,StdtAcdSheet.Set7" +
                   ",StdtAcdSheet.Prompt7,StdtAcdSheet.IOA7,StdtAcdSheet.NoOfTimes7,StdtAcdSheet.Mistrial7,StdtAcdSheet.Step7 AS stepId7,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step7) step7,StdtAcdSheet.LessonPlanId,(SELECT TOP 1 LessonOrder FROM DSTempHdr WHERE DSTempHdr.LessonPlanId" +
-                  "=StdtAcdSheet.LessonPlanId AND DSTempHdr.StudentId=" + sess.StudentId + ") LessonOrder  from StdtAcdSheet " +
+                  "=StdtAcdSheet.LessonPlanId AND DSTempHdr.StudentId=" + sess.StudentId + ") LessonOrder,StdtAcdSheet.MetObjective,StdtAcdSheet.MetGoal,StdtAcdSheet.NotMaintaining  from StdtAcdSheet " +
                   "WHERE StdtAcdSheet.StudentId=" + sess.StudentId + " and CONVERT(char(10),DateOfMeeting,101)='" + stDate + "' AND CONVERT(char(10),EndDate,101)" +
                   "='" + endDate + "') STDTACSHT ORDER BY LessonOrder";
         }
@@ -566,6 +589,19 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
 //"='" + endDate + "') STDTACSHT ORDER BY LessonOrder";
         string strQuery = qry;
         Dt = objData.ReturnDataTable(strQuery, false);
+        string strQuery2 = "select Top 1 Attendees,IEPYear,IEPSigDate,Reviewed,MetObjective,MetGoal,NotMaintaining from StdtAcdSheet WHERE StudentId=" + sess.StudentId + " and CONVERT(char(10),DateOfMeeting,101)='" + stDate + "' AND CONVERT(char(10),EndDate,101)='" + endDate + "'";
+        Dtcheck = objData.ReturnDataTable(strQuery2, false);
+        string strQuery3 = "select  MetObjective,MetGoal,NotMaintaining from StdtAcdSheet WHERE StudentId=" + sess.StudentId + " and CONVERT(char(10),DateOfMeeting,101)='" + stDate + "' AND CONVERT(char(10),EndDate,101)='" + endDate + "'";
+        Dtcheck2 = objData.ReturnDataTable(strQuery3, false);
+        AttendeesText.Text = Dtcheck.Rows[0]["Attendees"].ToString();
+        Iepyeartxt.Text = Dtcheck.Rows[0]["IEPYear"].ToString();
+        Ieptxt.Text = Dtcheck.Rows[0]["IEPSigDate"].ToString();
+        ReviewbydateUpdate.Text = Dtcheck.Rows[0]["Reviewed"].ToString();
+
+        DataTable ac = new DataTable();
+        string strQueryfind = "select Top 1 AccSheetId from StdtAcdSheet WHERE StudentId=" + sess.StudentId + " and CONVERT(char(10),DateOfMeeting,101)='" + stDate + "' AND CONVERT(char(10),EndDate,101)='" + endDate + "'";
+        ac = objData.ReturnDataTable(strQueryfind, false);
+        ViewState["CurrentAccId"] = ac.Rows[0]["AccSheetId"];
         if (Dt != null)
         {
             if (Dt.Rows.Count > 0)
@@ -584,9 +620,58 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 btnImport.Visible = true;
                 btnDelete.Visible = true;
                 rbtnLsnClassTypeAc.Visible = true;
+                tdMsg1.Visible = true;
+                tdMsg2.Visible = true;
+                tdreview2.Visible = true;
                 btnSave.Visible = false;
                 btnSaveNew.Visible = false;
+                int i = 0;
+                        foreach (GridViewRow row in GridViewAccSheetedit.Rows)
+                        {
+                            if (Dt.Rows[i]["MetObjective"] != null && Dt.Rows[i]["MetGoal"] != null && Dt.Rows[i]["NotMaintaining"] != null&& i<Dt.Rows.Count)
+                            {
 
+                                HtmlInputCheckBox checkbox1 = row.FindControl("Checkbox1") as HtmlInputCheckBox;
+                                HtmlInputCheckBox checkbox2 = row.FindControl("Checkbox2") as HtmlInputCheckBox;
+                                HtmlInputCheckBox checkbox3 = row.FindControl("Checkbox3") as HtmlInputCheckBox;
+                                int ch1 = Convert.ToInt32(Dt.Rows[i]["MetObjective"]);
+                            int ch2 = Convert.ToInt32(Dt.Rows[i]["MetGoal"]);
+                            int ch3 = Convert.ToInt32(Dt.Rows[i]["NotMaintaining"]);
+                            if (ch1 == 1)
+                            {
+                                checkbox1.Checked = true;
+                                HtmlGenericControl c1 = row.FindControl("ch1") as HtmlGenericControl;
+                                if (c1 != null)
+                                {
+                                    c1.Style["color"] = "Green";
+                                    c1.Style["font-weight"] = "bold";
+                                }
+                            }
+                            if (ch2 == 1)
+                            {
+                                checkbox2.Checked = true;
+                                HtmlGenericControl c2 = row.FindControl("ch2") as HtmlGenericControl;
+                                if (c2 != null)
+                                {
+                                    c2.Style["color"] = "Green";
+                                    c2.Style["font-weight"] = "bold";
+
+                                }
+                            }
+                            if (ch3 == 1)
+                            {
+                                checkbox3.Checked = true;
+                                HtmlGenericControl c3 = row.FindControl("ch3") as HtmlGenericControl;
+                                if (c3 != null)
+                                {
+                                    c3.Style["color"] = "Red";
+                                    c3.Style["font-weight"] = "bold";
+                                }
+                            }
+                            }
+                            i = i + 1;
+                        }
+                    
 
             }
             else
@@ -597,6 +682,9 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 btnImport.Visible = false;
                 btnDelete.Visible = false;
                 rbtnLsnClassTypeAc.Visible = false;
+                tdMsg1.Visible = false;
+                tdMsg2.Visible = false;
+                tdreview2.Visible = false;
                 btnUpdate.Visible = false;
                 btnUpdateNew.Visible = false;
                 btnSave.Visible = false;
@@ -809,6 +897,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 CreateQuery("NE", "XMLAS\\AS1Creations.xml");
                 Dt = objExport.getAccSheet(sess.StudentId, sess.SchoolId, dateVal);
                 int pageCount = 0;
+                int dtl = Dt.Rows.Count - 1;
                 foreach (DataRow dr in Dt.Rows)
                 {
                     for (int i = 0; i < placeHolders.Length; i++)
@@ -853,7 +942,6 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                         {
                             if (columns[5] != "")
                             {
-
                                 replaceWithTextsSingle(theDoc.MainDocumentPart, "plcBenchmarkGoal", columns[5]);
 
                             }
@@ -861,10 +949,12 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                             {
                                 replaceWithTextsSingle(theDoc.MainDocumentPart, "plcBenchmarkGoal", "");
                             }
+                            
                         }
                         SearchAndReplace(NewPath);
                     }
-
+                     
+                  
                     pageCount++;
                 }
 
@@ -879,6 +969,12 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                      }
                  }
                  */
+
+                string StartPath = Server.MapPath("~\\StudentBinder\\ASTemplates\\ASTemplateStart.docx");
+                string EndPath = Server.MapPath("~\\StudentBinder\\ASTemplates\\ASTemplateEnd.docx");
+              
+                // Replace placeholders with data
+                bool dse = findStartandEnd(StartPath, EndPath, columns[0], columns[1], columns[2]);
 
                 bool iepDoneFlg = MergeFiles();
 
@@ -904,6 +1000,102 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             tdMsg.InnerHtml = clsGeneral.failedMsg("Failed !");
             throw eX;
         }
+    }
+   
+
+    private bool findStartandEnd(string StartPath, string EndPath, string sname,string iepdate,string dateofmeet)
+    {
+        bool retVal = false;
+        
+        try
+        {
+            objData = new clsData();
+            string Acid = ViewState["CurrentAccId"].ToString();
+            string strQueryfind = "select Attendees,IEPYear,IEPSigDate,Reviewed  from StdtAcdSheet WHERE AccSheetId=" + Acid;
+            DataTable ac = objData.ReturnDataTable(strQueryfind, false);
+            ViewState["dtable"] = ac;
+            string Temp = Server.MapPath("~\\StudentBinder") + "\\ACStartTemp";
+
+            const string DOC_URL = "/word/document.xml";
+
+            if (!Directory.Exists(Temp))
+            {
+                Directory.CreateDirectory(Temp);
+            }
+
+            string output = Temp + "\\AcademicSheet_" + sess.StudentName + "_{0:ddMMyy}-{0:HHmmss}.doc";
+            string FIRST_PAGE = Server.MapPath("~\\StudentBinder\\ASTemplates\\Dummy1.docx");
+
+            string fileName = string.Format(output, DateTime.Now);
+            File.Copy(StartPath, fileName);
+
+
+            string Temp2 = Server.MapPath("~\\StudentBinder") + "\\ACEndTemp";
+
+            if (!Directory.Exists(Temp2))
+            {
+                Directory.CreateDirectory(Temp2);
+            }
+
+            string output2 = Temp2 + "\\AcademicSheet_" + sess.StudentName + "_{0:ddMMyy}-{0:HHmmss}.doc";
+            string FIRST_PAGE2 = Server.MapPath("~\\StudentBinder\\ASTemplates\\Dummy2.docx");
+
+            string fileName2 = string.Format(output2, DateTime.Now);
+            File.Copy(EndPath, fileName2);
+
+            using (WordprocessingDocument theDoc = WordprocessingDocument.Open(fileName, true))   
+            {
+                replaceWithTextsSingle(theDoc.MainDocumentPart, "PlcStudentName", sname);
+                replaceWithTextsSingle(theDoc.MainDocumentPart, "PlcIEPDate", iepdate);
+                replaceWithTextsSingle(theDoc.MainDocumentPart, "PlcMeetingDate", dateofmeet);
+            if (ac.Rows[0]["Attendees"] != "")
+            {
+                replaceWithTextsSingle(theDoc.MainDocumentPart, "PlcAttendees", ac.Rows[0]["Attendees"].ToString());
+            }
+            else
+            {
+                replaceWithTextsSingle(theDoc.MainDocumentPart, "PlcAttendees", "");
+            }
+            if (ac.Rows[0]["IEPYear"] != "")
+            {
+                replaceWithTextsSingle(theDoc.MainDocumentPart, "PlcIEPYear", ac.Rows[0]["IEPYear"].ToString());
+            }
+            else
+            {
+                replaceWithTextsSingle(theDoc.MainDocumentPart, "PlcIEPYear", "");
+            }
+            if (ac.Rows[0]["IEPSigDate"] != "")
+            {
+                replaceWithTextsSingle(theDoc.MainDocumentPart, "PlcIEPSignatureandDate", ac.Rows[0]["IEPSigDate"].ToString());
+            }
+            else
+            {
+                replaceWithTextsSingle(theDoc.MainDocumentPart, "PlcIEPSignatureandDate", "");
+            }
+            }
+            //Replace end - start
+            using (WordprocessingDocument theDoc = WordprocessingDocument.Open(fileName2, true))
+            {
+                if (ac.Rows[0]["Reviewed"] != "")
+                {
+                    replaceWithTextsSingle(theDoc.MainDocumentPart, "PlcReviewed", ac.Rows[0]["Reviewed"].ToString());
+                }
+                else
+                {
+                    replaceWithTextsSingle(theDoc.MainDocumentPart, "PlcReviewed", "");
+                }
+            }
+            //Replace end - end
+            ViewState["StartingPage"] = fileName;
+            ViewState["EndingPage"] = fileName2;
+        retVal = true;
+
+        return retVal;
+    }
+    catch (Exception ex)
+    {
+        return false;
+    }
     }
 
 
@@ -932,9 +1124,25 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             string OUTPUT_FILE = Temp1 + "\\AcademicSheet_" + sess.StudentName + "_{0:ddMMyy}-{0:HHmmss}.doc";
             string FIRST_PAGE = Server.MapPath("~\\StudentBinder\\ASTemplates\\Dummy.docx");
 
+            string start = ViewState["StartingPage"].ToString();
+            string end = ViewState["EndingPage"].ToString();
+
             string fileName = string.Format(OUTPUT_FILE, DateTime.Now);
             File.Copy(FIRST_PAGE, fileName);
 
+           
+            AppendStartingPage(fileName, start, end);
+            
+            string tempstart=Server.MapPath("~\\StudentBinder") + "\\ACStartTemp";
+            string tempend = Server.MapPath("~\\StudentBinder") + "\\ACEndTemp";
+            if (Directory.Exists(tempstart))
+            {
+                Directory.Delete(tempstart, true);
+            }
+            if (Directory.Exists(tempend))
+            {
+                Directory.Delete(tempend, true);
+            }
             var filePaths = Directory.GetFiles(Temp).Select(f => new FileInfo(f)).OrderByDescending(f => f.CreationTime);
             int i = 1;
 
@@ -948,7 +1156,6 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 makeWord(a.ToString(), fileName, i);
                 i++;
             }
-
             ViewState["FileName"] = fileName;
             if (Directory.Exists(Temp))
             {
@@ -966,6 +1173,45 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
         }
 
     }
+    
+   
+
+   
+
+    private void AppendStartingPage(string mainDocument, string startingPagePath, string endingpagepath)
+    {
+
+        DocX doc1 = DocX.Load(startingPagePath);
+        DocX doc2 = DocX.Load(mainDocument);
+        doc2.InsertDocument(doc1, false);
+        doc2.SaveAs(mainDocument);
+
+        using (WordprocessingDocument oneDocument = WordprocessingDocument.Open(startingPagePath, false))
+        using (WordprocessingDocument twoDocument = WordprocessingDocument.Open(mainDocument, true))
+        using (WordprocessingDocument threeDocument = WordprocessingDocument.Open(endingpagepath, false))
+        {
+            // Get the MainDocumentPart of each document
+            MainDocumentPart oneMainPart = oneDocument.MainDocumentPart;
+            MainDocumentPart twoMainPart = twoDocument.MainDocumentPart;
+            MainDocumentPart threeMainPart = threeDocument.MainDocumentPart;
+
+            Body oneBodyClone = new Body(oneMainPart.Document.Body.OuterXml);
+            Body threeBodyClone = new Body(threeMainPart.Document.Body.OuterXml);
+
+            //foreach (var additionalBodyElement in oneDocument.MainDocumentPart.Document.Body.Elements())
+            //{
+            //    twoDocument.MainDocumentPart.Document.Body.AppendChild(additionalBodyElement.CloneNode(true));
+            //}
+        //    //twoMainPart.Document.Body.InsertBeforeSelf(oneBodyClone);
+            twoMainPart.Document.Body.InsertAfterSelf(threeBodyClone);
+            twoMainPart.Document.Save();
+
+        }
+       
+    
+     }
+
+
     public void makeWord(string filenamePass, string fileName1, int i)
     {
 
@@ -1114,12 +1360,30 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 TextBox txtPersDissc = row.Controls[0].FindControl("txtPersDissc") as TextBox;
                 TextBox txtResAndDeadline = row.Controls[0].FindControl("txtResAndDeadline") as TextBox;
                 string txtBenchText = clsGeneral.HtmlToString(txtbenchaMark.InnerHtml); ///Html to db string --jis
-
-
+                int c1, c2, c3;
+                HtmlInputCheckBox checkbox1 = row.FindControl("Checkbox4") as HtmlInputCheckBox;
+                HtmlInputCheckBox checkbox2 = row.FindControl("Checkbox5") as HtmlInputCheckBox;
+                HtmlInputCheckBox checkbox3 = row.FindControl("Checkbox6") as HtmlInputCheckBox;
+                if (checkbox1.Checked)
+                {
+                    c1 = 1;
+                }
+                else { c1 = 0; }
+                if (checkbox2.Checked)
+                {
+                    c2 = 1;
+                }
+                else { c2 = 0; }
+                if (checkbox3.Checked)
+                {
+                    c3 = 1;
+                }
+                else { c3 = 0; }
+                
                 string sqlQry = "INSERT INTO [dbo].[StdtAcdSheet] ([StudentId],[DateOfMeeting],[EndDate],[GoalArea],[Goal],[Benchmarks]" +
                     ",[TypeOfInstruction],[Period1],[Set1],[Prompt1],[IOA1],[NoOfTimes1],[Period2],[Set2],[Prompt2],[IOA2]," +
                     "[NoOfTimes2],[Period3],[Set3],[Prompt3],[IOA3],[NoOfTimes3],[Period4],[Set4],[Prompt4],[IOA4],[NoOfTimes4],[Period5],[Set5]," +
-                "[Prompt5],[IOA5],[NoOfTimes5],[Period6],[Set6],[Prompt6],[IOA6],[NoOfTimes6],[Period7],[Set7],[Prompt7],[IOA7],[NoOfTimes7],[LessonPlanId],[Mistrial1],[Mistrial2],[Mistrial3],[Mistrial4],[Mistrial5],[Mistrial6],[Mistrial7],[Step1],[Step2],[Step3],[Step4],[Step5],[Step6],[Step7]) " +
+                "[Prompt5],[IOA5],[NoOfTimes5],[Period6],[Set6],[Prompt6],[IOA6],[NoOfTimes6],[Period7],[Set7],[Prompt7],[IOA7],[NoOfTimes7],[LessonPlanId],[Mistrial1],[Mistrial2],[Mistrial3],[Mistrial4],[Mistrial5],[Mistrial6],[Mistrial7],[Step1],[Step2],[Step3],[Step4],[Step5],[Step6],[Step7],[Attendees],[IEPYear],[IEPSigDate],[Reviewed],[MetObjective],[MetGoal],[NotMaintaining]) " +
                 "VALUES(" + sess.StudentId + ",'" + dtst.ToString("MM/dd/yyyy") + "','" + dted.ToString("MM/dd/yyyy") + "'," +
                 "'" + lblGoalArea.Text + "'," +
                 "'" + lblGoal.Text + "'," +
@@ -1187,7 +1451,14 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 "'" + hdnstep4.Value + "'," +
                 "'" + hdnstep5.Value + "'," +
                 "'" + hdnstep6.Value + "'," +
-                "'" + hdnstep7.Value + "'" +
+                "'" + hdnstep7.Value + "'," +
+                "'" + AttendeesText.Text + "'," +
+                "'" + Iepyeartxt.Text + "'," +
+                "'" + Ieptxt.Text + "'," +
+                "'" + ReviewbydateSave.Text + "'," +
+                "'" + c1 + "'," +
+                "'" + c2 + "'," +
+                "'" + c3 + "'" +
                 ")";
 
 
@@ -1286,6 +1557,9 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                     btnImport.Visible = true;
                     btnDelete.Visible = true;
                     rbtnLsnClassTypeAc.Visible = true;
+                    tdMsg1.Visible = true;
+                    tdMsg2.Visible = true;
+                    tdreview2.Visible = true;
                     rbtnLsnClassTypeAc.SelectedValue = "Day,Residence";
                     btnSave.Visible = false;
                     btnSaveNew.Visible = false;
@@ -1350,6 +1624,8 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             lblperiod5.Text = dateNow5.AddDays(1).ToString("MM'/'dd'/'yyyy") + " - " + dateNow6.ToString("MM'/'dd'/'yyyy");
             lblperiod6.Text = dateNow6.AddDays(1).ToString("MM'/'dd'/'yyyy") + " - " + dateNow7.ToString("MM'/'dd'/'yyyy");
             lblperiod7.Text = dateNow7.AddDays(1).ToString("MM'/'dd'/'yyyy") + " - " + dateNow8.ToString("MM'/'dd'/'yyyy");
+
+           
         }
 
         if (e.Row.RowType == DataControlRowType.DataRow)
@@ -1363,6 +1639,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             gvC.DataBind();
         }
     }
+    
     protected void btnPreAccSheet1_Click(object sender, EventArgs e)
     {
         btnUpdateNew.Visible = false;
@@ -1371,7 +1648,9 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
         txtSdate.Text = Sdate.Date.ToString("MM'/'dd'/'yyyy");
         string popup = " $(document).ready(function () { $('#overlay').fadeIn('fast',function () { $('#dialog').css('top', '5%'); $('#dialog').show(); }); $('#CancalGen').click(function () { $('#dialog').animate({ top: '-300%' }, function () { $('#overlay').fadeOut('slow'); }); }); });";
         ScriptManager.RegisterClientScriptBlock(this, typeof(System.Web.UI.Page), Guid.NewGuid().ToString(), popup, true);
-
+        AttendeesText.Text = "";
+        Iepyeartxt.Text = "";
+        Ieptxt.Text = "";
         // FillStudent();
     }
     protected void btnGenACD_Click(object sender, EventArgs e)
@@ -1393,10 +1672,12 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             btnImport.Visible = false;
             btnDelete.Visible = false;
             rbtnLsnClassTypeAc.Visible = false;
+            tdMsg1.Visible = false;
+            tdMsg2.Visible = false;
+            tdreview2.Visible = false;
             //btnBack.Text = "Cancel";
 
             string testIfPresent = "select AccSheetId from StdtAcdSheet where StudentId=" + sess.StudentId + " AND CONVERT(datetime,DateOfMeeting)=CONVERT(datetime,'" + dtst.ToString("MM/dd/yyyy") + "') AND CONVERT(datetime,EndDate)=CONVERT(datetime,'" + dted.ToString("MM/dd/yyyy") + "')";
-
             if (objData.IFExists(testIfPresent) == false)
             {
                 LoadPMeetingGVNew();
@@ -1407,6 +1688,9 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 LoadMeetingsNew(dateOfMtng);
                 loadExtraData();
                 rbtnLsnClassTypeAc.Visible = true;
+                tdMsg1.Visible = true;
+                tdMsg2.Visible = true;
+                tdreview2.Visible = true;
                 rbtnLsnClassTypeAc.SelectedValue = "Day,Residence";
             }
             else
@@ -1602,6 +1886,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             TextBox txtNoOfPos5 = row.Controls[0].FindControl("txtNoOfPos12") as TextBox;
             TextBox txtNoOfPos6 = row.Controls[0].FindControl("txtNoOfPos13") as TextBox;
             TextBox txtNoOfPos7 = row.Controls[0].FindControl("txtNoOfPos14") as TextBox;
+
             //bool result=true;
             //result= ValidateDenominator(txtNoOfPos1);
             //if (result == false) break;
@@ -1625,8 +1910,31 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             string NumPos5 = lblNoOfPos5.Text + "/" + txtNoOfPos5.Text;
             string NumPos6 = lblNoOfPos6.Text + "/" + txtNoOfPos6.Text;
             string NumPos7 = lblNoOfPos7.Text + "/" + txtNoOfPos7.Text;
+            string attendees = AttendeesText.Text;
+            string IEPyear = Iepyeartxt.Text;
+            string IEPDate = Ieptxt.Text;
+            string review = ReviewbydateUpdate.Text;
+            int c1, c2, c3;
+            HtmlInputCheckBox checkbox1 = row.FindControl("Checkbox1") as HtmlInputCheckBox;
+            HtmlInputCheckBox checkbox2 = row.FindControl("Checkbox2") as HtmlInputCheckBox;
+            HtmlInputCheckBox checkbox3 = row.FindControl("Checkbox3") as HtmlInputCheckBox;
+            if (checkbox1.Checked)
+            {
+                c1 = 1;
+            }
+            else { c1 = 0; }
+            if (checkbox2.Checked)
+            {
+                c2 = 1;
+            }
+            else { c2 = 0; }
+            if (checkbox3.Checked)
+            {
+                c3 = 1;
+            }
+            else { c3 = 0; }
 
-            string UpdateAcdsht = "UPDATE StdtAcdSheet SET NoOfTimes1='" + NumPos1 + "',NoOfTimes2='" + NumPos2 + "',NoOfTimes3='" + NumPos3 + "',NoOfTimes4='" + NumPos4 + "',NoOfTimes5='" + NumPos5 + "',NoOfTimes6='" + NumPos6 + "',NoOfTimes7='" + NumPos7 + "' WHERE AccSheetId=" + AccShtId + "";
+            string UpdateAcdsht = "UPDATE StdtAcdSheet SET NoOfTimes1='" + NumPos1 + "',NoOfTimes2='" + NumPos2 + "',NoOfTimes3='" + NumPos3 + "',NoOfTimes4='" + NumPos4 + "',NoOfTimes5='" + NumPos5 + "',NoOfTimes6='" + NumPos6 + "',NoOfTimes7='" + NumPos7 + "',Attendees='" + attendees + "',IEPYear='" + IEPyear + "',IEPSigDate='" + IEPDate + "',Reviewed='" + review + "',MetObjective='" + c1 + "',MetGoal='" + c2 + "',NotMaintaining='"+c3+"' WHERE AccSheetId=" + AccShtId + "";
             objData.Execute(UpdateAcdsht);
 
             int personResp = 0;
@@ -2605,6 +2913,9 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 btnImport.Visible = false;
                 btnDelete.Visible = false;
                 rbtnLsnClassTypeAc.Visible = false;
+                tdMsg1.Visible = false;
+                tdMsg2.Visible = false;
+                tdreview2.Visible = false;
                 btnUpdate.Visible = false;
                 btnUpdateNew.Visible = false;
                 FillData(); 
@@ -2629,8 +2940,9 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             Loadlesson();
         }
         rbtnLsnClassTypeAc.Visible = true;
-        
-
+        tdMsg1.Visible = true;
+        tdMsg2.Visible = true;
+        tdreview2.Visible = true;
     }
     protected void Loadlesson()
     {
@@ -2780,6 +3092,9 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 btnSave.Visible = true;
                 btnSaveNew.Visible = true;
                 rbtnLsnClassTypeAc.Visible = true;
+                tdMsg1.Visible = true;
+                tdMsg2.Visible = true;
+                tdreview2.Visible = true;
                 
             }
             else
@@ -2794,6 +3109,9 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 btnSave.Visible = true;
                 btnSaveNew.Visible = true;
                 rbtnLsnClassTypeAc.Visible = true;
+                tdMsg1.Visible = true;
+                tdMsg2.Visible = true;
+                tdreview2.Visible = true;
             }
         }
         else
@@ -2808,6 +3126,36 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             btnSave.Visible = true;
             btnSaveNew.Visible = true;
             rbtnLsnClassTypeAc.Visible = true;
+            tdMsg1.Visible = true;
+            tdMsg2.Visible = true;
+            tdreview2.Visible = true;
         }
-    }    
+    }
+    protected void TextBox1_TextChanged(object sender, EventArgs e)
+    {
+
+    }
+
+   
+
+    //protected void CheckBoxList1_SelectedIndexChanged(object sender, EventArgs e)
+    //{
+    //    if (CheckBoxList1.SelectedValue == "Met Objective" || CheckBoxList1.SelectedValue == "Met Goal")
+    //    {
+    //        //CheckBoxList1.SelectedItem.Attributes["style"] = "color:green";
+    //         CheckBoxList1.SelectedItem.Attributes.Add("style", "color: green; font-weight: bold");
+    //    }
+       
+    //    if (CheckBoxList1.SelectedValue == "Not Maintaining")
+    //    {
+    //        CheckBoxList1.SelectedItem.Attributes.Add("style", "color: red; font-weight: bold");
+    //    }
+    //    //LoadPMeetingGVNew();
+    //    //LoadCMeetingGVNew();
+    //    //loadDataListFilter();
+    //    //string dateOfMtng = ViewState["CurrentDate"].ToString();
+    //    //LoadMeetingsNew(dateOfMtng);
+    //    //loadExtraData();     
+
+    //}
 }
