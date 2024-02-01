@@ -126,11 +126,18 @@ public partial class Home : System.Web.UI.Page
 
             HostName = Dns.GetHostName();
             userAgent = HttpContext.Current.Request.UserAgent.ToString();
+            string ip = clsGeneral.GetIPAddress();
             ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
-            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + sess.SessionID + ',' + curesesid + ',' + "Student Binder:Home" + ',' + sess.Classid + ',' + sess.StudentId + ',' + HostName + ',' + userAgent);
-
-            Pagepath = "Home:Page  load";
-            sess = clsGeneral.sessioncheck(curesesid, preid, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
+            Pagepath = "Home:Page_Load";
+            if (Prevsess != null)
+            {
+                sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + Prevsess.Classid + ',' + sess.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+            }
+            else
+            {
+                sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + "PrevSession Null" + ',' + sess.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+            }
+            sess = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
             if (preuser != null)
             {
                 lblLoginName.Text = preuser;
@@ -185,8 +192,19 @@ public partial class Home : System.Web.UI.Page
         clsData objData = new clsData();
         sess = (clsSession)Session["UserSession"];
         curesesid = this.Session.SessionID.ToString();
+        string ip = clsGeneral.GetIPAddress();
+        ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
         Pagepath = "Home:setTitle";
-        sess = clsGeneral.sessioncheck(curesesid, preid, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
+        if (Prevsess != null)
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + Prevsess.Classid + ',' + sess.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+        }
+        else
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + "PrevSession Null" + ',' + sess.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+        }
+        
+        sess = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
         if (sess != null)
         {
             object obj = objData.FetchValue("Select SchoolDesc from School Where SchoolId=" + sess.SchoolId + "");
@@ -201,8 +219,20 @@ public partial class Home : System.Web.UI.Page
         clsData objData = new clsData();
         sess = (clsSession)Session["UserSession"];
         curesesid = this.Session.SessionID.ToString();
-        Pagepath = "home:Loadfillclass";
-        sess = clsGeneral.sessioncheck(curesesid, preid, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
+        string ip = clsGeneral.GetIPAddress();
+        ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
+        Pagepath = "Home:Loadfillclass";
+        if (Prevsess != null)
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + Prevsess.Classid + ',' + sess.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+
+        }
+        else
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + "PrevSession Null" + ',' + sess.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+        } 
+        
+        sess = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
         if (sess == null) return;
         string LblClassName = "";
 
@@ -234,9 +264,20 @@ public partial class Home : System.Web.UI.Page
         clsData oData = new clsData();
 
         sess = (clsSession)Session["UserSession"];
+        string ip = clsGeneral.GetIPAddress();
         curesesid = this.Session.SessionID.ToString();
-        Pagepath = "home:FillStudentList";
-        sess = clsGeneral.sessioncheck(curesesid, preid, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
+        ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
+        Pagepath = "Home:FillStudentList";
+        if (Prevsess != null)
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + Prevsess.Classid + ',' + sess.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+        }
+        else
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + "PrevSession Null" + ',' + sess.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+        } 
+        
+        sess = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
         if (sess != null)
         {
             string name = "";
@@ -348,8 +389,19 @@ public partial class Home : System.Web.UI.Page
         string preuser = HttpContext.Current.Session["Spreuser"].ToString();
         int SessStudentid = Convert.ToInt16(HttpContext.Current.Session["Sprestid"]);
         string Sessstname = HttpContext.Current.Session["Sprestname"].ToString();
-        string Pagepath = "home:SaveBehaviorForStudent";
-        sess = clsGeneral.sessioncheck(curesesid, preid, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
+        string ip = clsGeneral.GetIPAddress();
+        ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
+        string Pagepath = "Home:SaveBehaviorForStudent";
+        if (Prevsess != null)
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + Prevsess.Classid + ',' + sess.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+        }
+        else
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + "PrevSession Null" + ',' + sess.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+        }
+        
+        sess = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
 
         /// ZERO OUT FOR ALL BEHAVIOR EXCEPT INTERVAL BEHAVIOR
         /// 
@@ -391,8 +443,19 @@ public partial class Home : System.Web.UI.Page
     {
         sess = (clsSession)Session["UserSession"];
         curesesid = this.Session.SessionID.ToString();
-        Pagepath = "home:DlClass_ItemCommand";
-        sess = clsGeneral.sessioncheck(curesesid, preid, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
+        string ip = clsGeneral.GetIPAddress();
+        ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
+        Pagepath = "Home:DlClass_ItemCommand";
+        if (Prevsess != null)
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + Prevsess.Classid + ',' + sess.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+        }
+        else
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + "PrevSession Null" + ',' + sess.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+        }
+
+        sess = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
         sess.Classid = Convert.ToInt32(e.CommandArgument);
         Response.Redirect("~/StudentBinder/Home.aspx");
     }
@@ -441,18 +504,25 @@ public partial class Home : System.Web.UI.Page
                 string preuser = HttpContext.Current.Session["Spreuser"].ToString();
                 int SessStudentid = Convert.ToInt16(HttpContext.Current.Session["Sprestid"]);
                 string Sessstname = HttpContext.Current.Session["Sprestname"].ToString();
+                string ip = clsGeneral.GetIPAddress();
                 ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
-                sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + preid.ToString() + ',' + oSession.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + oSession.SessionID +',' + curesesid + ','+ "Student Binder:Home set student" + ',' + oSession.Classid + ',' + oSession.StudentId + ',' + HostName + ',' + userAgent);
+                string Pagepath = "Home:SetStudentID";
+                if (Prevsess != null)
+                {
+                    sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + Prevsess.Classid + ',' + oSession.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+                }
+                else
+                {
+                    sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + "PrevSession Null" + ',' + sess.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+                }
                 preid = Convert.ToInt16(HttpContext.Current.Session["Spreid"]);
                 preuser = HttpContext.Current.Session["Spreuser"].ToString();
                 SessStudentid = Convert.ToInt16(HttpContext.Current.Session["Sprestid"]);
                 Sessstname = HttpContext.Current.Session["Sprestname"].ToString();
                 curesesid = HttpContext.Current.Session.SessionID.ToString();
 
-
-            string Pagepath = "Home : Set student";
-            oSession = clsGeneral.sessioncheck(curesesid, preid, preuser, oSession, Prevsess, SessStudentid, Sessstname, Pagepath);            
-}
+                oSession = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, Sessstname, Pagepath);
+            }
         }
         catch (Exception Ex)
         {
@@ -507,11 +577,21 @@ public partial class Home : System.Web.UI.Page
         int SessStudentid = Convert.ToInt16(HttpContext.Current.Session["Sprestid"]);
         string Sessstname = HttpContext.Current.Session["Sprestname"].ToString();
         string curesesid = HttpContext.Current.Session.SessionID.ToString();
-        string Pagepath = "Home : Fill submenu";
+        string HostName = Dns.GetHostName();
+        string userAgent = HttpContext.Current.Request.UserAgent.ToString();
+        string ip = clsGeneral.GetIPAddress();
+        ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
+        string Pagepath = "Home:FillSubMenu";
+        if (Prevsess != null)
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + Prevsess.Classid + ',' + sess.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+        }
+        else
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + "PrevSession Null" + ',' + sess.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+        }
 
-
-
-            oSession = clsGeneral.sessioncheck(curesesid, preid, preuser, oSession, Prevsess, SessStudentid, Sessstname, Pagepath);
+        oSession = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, Sessstname, Pagepath);
          if (_studID == "")
         {           
             _studID = oSession.StudentId.ToString();
@@ -681,6 +761,26 @@ public partial class Home : System.Web.UI.Page
         sess = (clsSession)HttpContext.Current.Session["UserSession"];
         sess.Classid = ClassId;
         sess.StudentId = -9;
+        int preid = Convert.ToInt16(HttpContext.Current.Session["Spreid"]);
+        string preuser = HttpContext.Current.Session["Spreuser"].ToString();
+        int SessStudentid = Convert.ToInt16(HttpContext.Current.Session["Sprestid"]);
+        string Sessstname = HttpContext.Current.Session["Sprestname"].ToString();
+        string curesesid = HttpContext.Current.Session.SessionID.ToString();
+        string HostName = Dns.GetHostName();
+        string userAgent = HttpContext.Current.Request.UserAgent.ToString();
+        string ip = clsGeneral.GetIPAddress();
+        ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
+        string Pagepath = "Home:ChangeClassId";
+        if (Prevsess != null)
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + Prevsess.Classid + ',' + sess.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+        }
+        else
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + "PrevSession Null" + ',' + sess.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+        }
+        
+        sess = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
     }
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -804,9 +904,21 @@ public partial class Home : System.Web.UI.Page
                 int SessStudentid = Convert.ToInt16(HttpContext.Current.Session["Sprestid"]);
                 string Sessstname = HttpContext.Current.Session["Sprestname"].ToString();
                 string curesesid = HttpContext.Current.Session.SessionID.ToString();
-
-                string Pagepath = "Home:Set TemplateSess";
-                sess = clsGeneral.sessioncheck(curesesid, preid, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
+                string HostName = Dns.GetHostName();
+                string userAgent = HttpContext.Current.Request.UserAgent.ToString();
+                string ip = clsGeneral.GetIPAddress();
+                ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
+                string Pagepath = "Home:setTemplateSess";
+                if (Prevsess != null)
+                {
+                    sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + Prevsess.Classid + ',' + sess.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+                }
+                else
+                {
+                    sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + "PrevSession Null" + ',' + sess.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+                }
+                
+                sess = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
             
             
             }

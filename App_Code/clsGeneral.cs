@@ -74,8 +74,9 @@ public class clsGeneral
         string PageUrl = System.Web.HttpContext.Current.Request.Url.AbsoluteUri;
         return PageUrl;
     }
-    public static clsSession sessioncheck(string curesesid, int preid, string preuser, clsSession sess, clsSession Prevsess, int SessStudentid, string Sessstname, string Pagepath)
+    public static clsSession sessioncheck(string curesesid, int preid, string ip, string preuser, clsSession sess, clsSession Prevsess, int SessStudentid, string Sessstname, string Pagepath)
     {
+        string LogName = "SessionCheck";
         if (curesesid != "" && preid > 0 && preuser != "" && sess.UserName != "" && sess.LoginId > 0)
         {
             if (curesesid == sess.SessionID && curesesid == Prevsess.SessionID)
@@ -83,10 +84,14 @@ public class clsGeneral
                 if (preid != sess.LoginId || preuser != sess.UserName)
                 {
                     ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
-                    sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + sess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + sess.StudentId + ',' + "" + ',' + "");
                     if (Prevsess != null)
                     {
+                        sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + LogName + ',' + sess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + Prevsess.Classid + ',' + sess.StudentId + ',' + Prevsess.StudentId + ',' + "" + ',' + "");
                         sess = Prevsess;
+                    }
+                    else
+                    {
+                        sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + LogName + ',' + sess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + "PrevSession Null" + ',' + sess.StudentId + ',' + "PrevSession Null" + ',' + "" + ',' + "");
                     }
                     sess.LoginId = preid;
                     sess.UserName = preuser;
@@ -696,6 +701,20 @@ public class clsGeneral
         return status;
     }
 
+    public static string GetIPAddress()
+    {
+        System.Web.HttpContext context = System.Web.HttpContext.Current;
+        string ipAddress = context.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
 
+        if (!string.IsNullOrEmpty(ipAddress))
+        {
+            string[] addresses = ipAddress.Split(',');
+            if (addresses.Length != 0)
+            {
+                return addresses[0];
+            }
+        }
 
+        return context.Request.ServerVariables["REMOTE_ADDR"];
+    }
 }
