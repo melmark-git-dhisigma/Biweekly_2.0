@@ -532,23 +532,29 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     dtstepIDs = oData.ReturnDataTable(sqlQry, false);
                     //DataTable dtstps = oDS.dtSteps;
                     DataTable dtstps = oDS.dtSteps.Clone();
-                    if (dtstepIDs.Rows.Count != 0)
+                    if (SkillType != "Discrete" || oDS.TeachProc == "Match-to-Sample")
                     {
-                        for (int i = 0; i < dtstepIDs.Rows.Count; i++)
+                        if (dtstepIDs.Rows.Count != 0)
                         {
-                            for (int j = 0; j < oDS.dtSteps.Rows.Count; j++)
+                            for (int i = 0; i < dtstepIDs.Rows.Count; i++)
                             {
-                                //int dtstepID = Convert.ToInt32(dtstepIDs.Rows[i]["DSTempStepId"]);
-                                //int oDsStepId = Convert.ToInt32(oDS.dtSteps.Rows[j]["DSTempStepId"]);
-                                if (Convert.ToInt32(dtstepIDs.Rows[i]["DSTempStepId"]) == Convert.ToInt32(oDS.dtSteps.Rows[j]["DSTempStepId"]))
+                                for (int j = 0; j < oDS.dtSteps.Rows.Count; j++)
                                 {
-                                    DataRow dr = dtstps.NewRow(); 
-                                    dr.ItemArray = oDS.dtSteps.Rows[j].ItemArray;
-                                    dtstps.Rows.Add(dr);
+                                    //int dtstepID = Convert.ToInt32(dtstepIDs.Rows[i]["DSTempStepId"]);
+                                    //int oDsStepId = Convert.ToInt32(oDS.dtSteps.Rows[j]["DSTempStepId"]);
+                                    if (Convert.ToInt32(dtstepIDs.Rows[i]["DSTempStepId"]) == Convert.ToInt32(oDS.dtSteps.Rows[j]["DSTempStepId"]))
+                                    {
+                                        DataRow dr = dtstps.NewRow();
+                                        dr.ItemArray = oDS.dtSteps.Rows[j].ItemArray;
+                                        dtstps.Rows.Add(dr);
+                                    }
                                 }
                             }
+                            oDS.dtSteps = dtstps;
                         }
                     }
+                    else
+                        dtstps = oDS.dtSteps;
                     if (dtstps.Rows.Count == 0)
                     {
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('This set does not have any steps attached, please modify the lesson to assign steps...');", true);
@@ -764,8 +770,8 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                         grdDataSht.DataSource = null;
                         grdDataSht.DataBind();
-                        //grdDataSht.DataSource = oDS.dtSteps;
-                        grdDataSht.DataSource = dtstps;
+                        grdDataSht.DataSource = oDS.dtSteps;
+                        //grdDataSht.DataSource = dtstps;
                         grdDataSht.DataBind();
                     }
                     string selPrmpt = "";
