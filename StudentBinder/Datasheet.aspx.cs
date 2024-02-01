@@ -2614,7 +2614,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         + "SessMissTrailRsn,AssignedToId,CurrentSetId,CurrentStepId,CurrentPromptId,SessionStatusCd,Comments,IOAInd,IOAUserId,CreatedBy,CreatedOn,IsMaintanace) "
                                         + "VALUES(" + oSession.SchoolId + "," + oSession.StudentId + "," + oTemp.TemplateId + "," + oSession.Classid + "," + oDS.LessonPlanID + ","
                                         + "" + oDS.IOASessHdr + "," + oDS.SessNbr + ",(GETDATE()),'" + sessMistrial + "','" + hdnMissTrialRsn.Value + "',1," + oDS.CrntSet + "," + oDS.CrntStep + "," + oDS.CrntPrompt + ",'"
-                                        + status + "','" + txtNote.Text.Trim() + "','" + IOAInd + "'," + ddlIOAUsers.SelectedValue + "," + oSession.LoginId + ",GETDATE(),'false')";
+                                        + status + "','" + clsGeneral.convertQuotes(txtNote.Text.Trim()) + "','" + IOAInd + "'," + ddlIOAUsers.SelectedValue + "," + oSession.LoginId + ",GETDATE(),'false')";
                         }
                         else
                         {
@@ -2623,7 +2623,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             + "SessMissTrailRsn,AssignedToId,CurrentSetId,CurrentStepId,CurrentPromptId,SessionStatusCd,Comments,IOAInd,IOAUserId,CreatedBy,CreatedOn,IsMaintanace) "
                                             + "VALUES(" + oSession.SchoolId + "," + oSession.StudentId + "," + oTemp.TemplateId + "," + oSession.Classid + "," + oDS.LessonPlanID + ","
                                             + "" + oDS.IOASessHdr + "," + oDS.SessNbr + ",(GETDATE()),'" + sessMistrial + "','" + hdnMissTrialRsn.Value + "',1," + oDS.CrntSet + "," + oDS.CrntStep + "," + oDS.CrntPrompt + ",'"
-                                            + status + "','" + txtNote.Text.Trim() + "','" + IOAInd + "',1," + oSession.LoginId + ",GETDATE(),'true')";
+                                            + status + "','" + clsGeneral.convertQuotes(txtNote.Text.Trim()) + "','" + IOAInd + "',1," + oSession.LoginId + ",GETDATE(),'true')";
                         }
                         if (SesCheck)
                         {
@@ -3042,7 +3042,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         if (Convert.ToBoolean(ViewState["IsHistory"]) == true)
                         {
                             updQry = "update StdtSessionHdr SET AssignedToId=1,SessMissTrailStus='" + sessMistrial + "',SessMissTrailRsn='" + hdnMissTrialRsn.Value + "',"
-                        + "Comments='" + txtNote.Text.Trim() + "',ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE(),IsUpdate=1 WHERE StdtSessionHdrId=" + sessHdrId + "";
+                        + "Comments='" + clsGeneral.convertQuotes( txtNote.Text.Trim()) + "',ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE(),IsUpdate=1 WHERE StdtSessionHdrId=" + sessHdrId + "";
 
                         }
                         else
@@ -3080,7 +3080,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 else
                                     where = "IsUpdate=0";
                                 updQry = "update StdtSessionHdr SET AssignedToId=1,SessionStatusCd='" + status + "',SessMissTrailStus='" + sessMistrial + "',SessMissTrailRsn='" + hdnMissTrialRsn.Value + "',"
-                               + "Comments='" + txtNote.Text.Trim() + "',ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE()," + where + " WHERE StdtSessionHdrId=" + sessHdrId + "";
+                               + "Comments='" + clsGeneral.convertQuotes(txtNote.Text.Trim()) + "',ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE()," + where + " WHERE StdtSessionHdrId=" + sessHdrId + "";
                             }
                         }
                         if (updQry != "")
@@ -3125,7 +3125,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         if (Ismaint)
                             iIsmaintain = 1;
                         updQry = "update StdtSessionHdr SET IsMaintanace=" + iIsmaintain + ", AssignedToId=1,EndTs=GETDATE(),SessionStatusCd='S',SessMissTrailStus='" + sessMistrial + "',SessMissTrailRsn='" + hdnMissTrialRsn.Value + "',"
-                        + "Comments='" + txtNote.Text.Trim() + "',ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE StdtSessionHdrId=" + sessHdrId + "";
+                        + "Comments='" + clsGeneral.convertQuotes(txtNote.Text.Trim()) + "',ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE StdtSessionHdrId=" + sessHdrId + "";
                         int retrn = oData.Execute(updQry);
                         if (retrn > 0) { updateDatas(sessHdrId); valid_Ind = true; }
                         else { tdMsg.InnerHtml = clsGeneral.failedMsg("Submission Failed"); valid_Ind = false; }
@@ -4194,7 +4194,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         if (oDS.IOAInd == "Y")
         {
             int IOAsesshdrId = Convert.ToInt32(oData.FetchValue("SELECT IOASessionHdrId FROM StdtSessionHdr WHERE StdtSessionHdrId=" + sessHdrId));
-            string UpdateIOA = "UPDATE StdtSessionHdr SET EndTs=GETDATE(),SessionStatusCd='S',Comments='" + txtNote.Text.Trim() + "',ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE StdtSessionHdrId=" + sessHdrId;
+            string UpdateIOA = "UPDATE StdtSessionHdr SET EndTs=GETDATE(),SessionStatusCd='S',Comments='" + clsGeneral.convertQuotes(txtNote.Text.Trim()) + "',ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE StdtSessionHdrId=" + sessHdrId;
             int retrn = oData.Execute(UpdateIOA);
             if (retrn > 0)
             {
@@ -4351,7 +4351,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         object objIOA = oData.FetchValue(strIOA);
                         if (objstat != null && objstat.ToString() == "D" && objIOA.ToString() == "Y")
                         {
-                            string UpdateIOA = "UPDATE StdtSessionHdr SET EndTs=GETDATE(),SessionStatusCd='S',Comments='" + txtNote.Text.Trim() + "',ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE StdtSessionHdrId=" + sessHdrId;
+                            string UpdateIOA = "UPDATE StdtSessionHdr SET EndTs=GETDATE(),SessionStatusCd='S',Comments='" + clsGeneral.convertQuotes(txtNote.Text.Trim()) + "',ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE StdtSessionHdrId=" + sessHdrId;
                             oData.Execute(UpdateIOA);
                         }
                     }

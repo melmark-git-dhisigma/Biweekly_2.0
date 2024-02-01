@@ -3070,7 +3070,39 @@
              return dataresult;
          }
     </script>
-</head>
+    <script>
+        function countCharacters() {
+            var textBox = document.getElementById('<%= txtNote.ClientID %>');
+            var charCountSpan = document.getElementById('charCount');
+            var remainingCount = 250 - textBox.value.length;
+
+            charCountSpan.innerText = remainingCount >= 0 ? remainingCount : 0;
+
+            if (remainingCount < 0) {
+                textBox.value = textBox.value.substring(0, 250);
+                charCountSpan.innerText = ' 0  characters remaining';
+            } else {
+                charCountSpan.innerText = remainingCount + '  characters remaining';
+            }
+        }
+        function showCharCount() {
+            var textBox = document.getElementById('<%= txtNote.ClientID %>');
+     var charCountSpan = document.getElementById('charCount');
+
+     if (textBox.value.length > 0) {
+         charCountSpan.style.display = 'inline';
+         charCountSpan.style.color = 'gray';
+         charCountSpan.style.fontSize = '10px';
+     } else {
+         charCountSpan.style.display = 'none';
+     }
+     countCharacters();
+ }
+ function hideCharCount() {
+     var charCountSpan = document.getElementById('charCount');
+     charCountSpan.style.display = 'none';
+ }
+    </script></head>
 <body>
     <form id="form1" runat="server">
         <div>
@@ -3724,9 +3756,11 @@
                             </table>
                         </div>
                         <div class="rfrContainer">
-                            Notes :
+                            Note: (250 characters max)
                             <br />
-                            <asp:TextBox ID="txtNote" runat="server" Width="92%" Height="115px" TextMode="MultiLine"></asp:TextBox>
+                            <span id="charCount"></span>
+                            <br />
+                            <asp:TextBox ID="txtNote" runat="server" Width="92%" Height="115px" TextMode="MultiLine" oninput="showCharCount()" onkeyup="countCharacters()" onfocus="showCharCount()" onblur="hideCharCount()"  MaxLength="250"></asp:TextBox>
                         </div>
 
                     </div>
