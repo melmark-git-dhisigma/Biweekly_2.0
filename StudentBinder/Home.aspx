@@ -2205,6 +2205,14 @@
         }
 
         function selSubmenu(submenu, ID, studentId) {
+            if(submenu.id=="LessonPlanAttributes.aspx"){
+                var e = document.getElementById("ddlFormat");
+                var value = e.selectedIndex;
+                if (value == 0) {
+                    alert('Please select a format.');
+                    return false;
+                }
+            }
             $('.alpha').removeAttr('id');
             $('.fillLessons').hide();
             $('.fillLessons1').hide();
@@ -2299,7 +2307,11 @@
                     divname = "divG" + Id;
                 }
                 else if (x.value == ("LessonPlanAttributes.aspx" + Ids).toString()) {
-                   
+                    if(value==2)
+                    {
+                        var newText = x.value.replace("LessonPlanAttributes.aspx","SupportStrategyAttributes.aspx");
+                        x.value=newText;
+                    }
                     dname = "divT" + Id + "" + MenuIds + ""
                     iname = "divIT" + Id + "" + MenuIds + "";
                     divname = "divT" + Id;
@@ -2683,7 +2695,7 @@
                 document.getElementById('IEPEdit').style.display = "block";
             }
             if (dname.indexOf('divT') >= 0) {
-                title = "Lesson Summary";
+                title = "";//"Lesson Summary";
             }
             if (dname.indexOf('divR') >= 0) {
 
@@ -4514,11 +4526,11 @@
                                 <li class='alpha1'><a href='#' id='ASSESSMENTS' onclick='selMenu(this);'><span>
                                     <img src='../Administration/images/asignment.PNG' alt='' align='left'>ASSESSMENTS</span></a></li>
                                 <li class='alpha1'><a href='#' id='IEPS' onclick='selMenu(this);'><span>
-                                    <img src='../Administration/images/ieps.PNG' alt='' align='left'>IEPS</span></a></li>
+                                    <img src='../Administration/images/ieps.PNG' alt='' align='left'>IEP/ISP</span></a></li>
                                 <li class='alpha1'><a href='#' id='BSP' onclick='selMenu(this);'><span>
                                     <img src='../Administration/images/BSPForms.PNG' alt='' align='left'>BSP FORMS</span></a></li>
                                 <li class='alpha1'><a href='#' id='LESSON PLANS' onclick='selMenu(this);'><span>
-                                    <img src='../Administration/images/lessonplan.PNG' alt='' align='left'>LESSON&nbsp;PLANS</span></a></li>
+                                    <img src='../Administration/images/lessonplan.PNG' alt='' align='left'>PLANS</span></a></li>
                                 <li class='alpha1'><a href='#' id='DATASHEETS' onclick='selMenu(this);'><span>
                                     <img src='../Administration/images/listt.PNG' alt='' align='left'>DATASHEETS</span></a></li>
                                 <li class='alpha1'><a href='#' id='BEHAVIOR' onclick='selMenu(this);'><span>
@@ -4839,7 +4851,7 @@
                             <div class="lessonSearchOptions">
                                 <table style="width: 100%">
                                     <tr>
-                                        <td style="width: 20%">Lesson Plan Name</td>
+                                        <td style="width: 20%;padding-left:12%;">Name</td>
                                         <td style="width: 25%">
                                             <input type="text" id="txtLessonName" /></td>
                                         <td style="width: 5%"></td>
@@ -4875,6 +4887,14 @@
                                                             return true;
                                                         }
                                                     </script>
+                                                </div>
+                                                <div style="float: left;padding-left:15px;">
+                                                    <span>Format</span>
+                                                    <asp:DropDownList ID="ddlFormat" runat="server" CssClass="drpClassFormat">
+                                                        <asp:ListItem Value="0">......Select Format......</asp:ListItem>
+                                                                <asp:ListItem Selected="True">Lesson Plan</asp:ListItem>
+                                                                <asp:ListItem>Support Strategy</asp:ListItem>
+                                                    </asp:DropDownList>
                                                 </div>
                                             </div>
                                         </td>

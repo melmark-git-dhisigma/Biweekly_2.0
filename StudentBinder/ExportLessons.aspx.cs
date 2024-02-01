@@ -333,8 +333,11 @@ public partial class StudentBinder_ExportLessons : System.Web.UI.Page
                     int TemplateId = Convert.ToInt32(objData.FetchValue("SELECT DSTempHdrId FROM DSTempHdr WHERE LessonPlanId = " + lessonId + " and StudentId=" + sess.StudentId + "and StatusId in(select lookupid from [LookUp] where LookupType='TemplateStatus' and LookupName in('Maintenance','Approved'))"));
 
 
+                    if(ddlFormat.SelectedIndex==2)
+                        exportToWordSupportStrat(lessonId, TemplateId);
+                    else
+                        exportToWord(lessonId, TemplateId);
 
-                    exportToWord(lessonId, TemplateId);
                     zip.AddFile(ViewState["FileName5"].ToString(), fil + "-All Lesson");
                    
                 }
@@ -358,7 +361,11 @@ public partial class StudentBinder_ExportLessons : System.Web.UI.Page
                 {
                     if (item.Selected == true)
                     {
-                        exportToWord(lessonId, Convert.ToInt32(item.Value));
+                        if (ddlFormat.SelectedIndex == 2)
+                            exportToWordSupportStrat(lessonId, Convert.ToInt32(item.Value));
+                        else
+                            exportToWord(lessonId, Convert.ToInt32(item.Value));
+
                         zip.AddFile(ViewState["FileName5"].ToString(), fil + "_Versions");
 
                     }
@@ -591,6 +598,214 @@ public partial class StudentBinder_ExportLessons : System.Web.UI.Page
         }
 
     }
+
+    private void exportToWordSupportStrat(int LessonPlanId, int TempId)
+    {
+        /*----------------------------------------------------------------------------*/
+
+        string Path = "";
+        string NewPath = "";
+
+        try
+        {
+            CreateQuery("NE", "..\\Administration\\LesonPlanTemplate\\SupportStrategyXML.xml");
+            Path = Server.MapPath("~\\Administration\\LesonPlanTemplate\\AdultSupportStrategyPlanTemplate.docx");
+            string Path2 = Server.MapPath("~\\Administration\\LessonPlanMerg\\SupportStrategyDummy.docx");
+
+            string path = Server.MapPath("~\\Administration") + "\\TempLessonPlan";
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            int fileCount = Directory.GetFiles(path).Length + 1;
+            string newpathz = Server.MapPath("~\\Administration\\LessonPlanMerg\\");
+            string subname = DateTime.Now.Date.ToShortDateString();
+            if (subname.Contains('/'))
+            {
+                subname = subname.Replace('/', '-');
+            }
+            string LessonPlanName = "";
+            string newFileName = "";
+            object obj = objData.FetchValue("select DSTemplateName from dstemphdr WHERE  DSTempHdrId=" + TempId + "");
+            object obj1 = objData.FetchValue("select VerNbr from dstemphdr WHERE  DSTempHdrId=" + TempId + "");
+            string ver = obj1.ToString();
+            if (obj != null)
+            {
+                LessonPlanName = obj.ToString();
+                LessonPlanName = LessonPlanName.Replace(":", " ");
+                LessonPlanName = LessonPlanName.Replace("*", " ");
+                LessonPlanName = LessonPlanName.Replace(@"\", " ");
+                LessonPlanName = LessonPlanName.Replace("|", " ");
+                LessonPlanName = LessonPlanName.Replace("\"", " ");
+                LessonPlanName = LessonPlanName.Replace("?", " ");
+                LessonPlanName = LessonPlanName.Replace("/", " ");
+                LessonPlanName = LessonPlanName.Replace("<", " ");
+                LessonPlanName = LessonPlanName.Replace(">", " ");
+            }
+
+            if (chk == 1)
+            {
+                newFileName = "LessonPlan" + "_" + LessonPlanName + "_" + sess.StudentId + "-" + subname + "_" + fileCount;
+            }
+            else
+            {
+                newFileName = "LessonPlan" + "_" + LessonPlanName + ver + "_" + sess.StudentId + "-" + subname + "_" + fileCount;
+            }
+            ViewState["FileName2"] = newFileName;
+            FileInfo f1 = new FileInfo(Path2);
+            if (f1.Exists)
+            {
+                if (!Directory.Exists(newpathz))
+                {
+                    Directory.CreateDirectory(newpathz);
+                }
+
+                f1.CopyTo(string.Format("{0}{1}{2}", newpathz, newFileName, f1.Extension));
+            }
+
+            NewPath = CopyTemplate(Path, "1");
+            if (NewPath != "")
+            {
+                Dt = new DataTable();
+                DataTable dt3 = new DataTable();
+                DataTable dt4 = new DataTable();
+                DataTable dt4Reason = new DataTable();
+                dt4.Columns.Add("Date");
+                dt4.Columns.Add("Reason");
+                string reason = "";
+                string createVal = "";
+                try
+                {
+                    objData = new clsData();
+                    int val = 0;
+                    Double versionNum = 0.0;
+                    DataTable Dt2 = new DataTable();
+
+                    sess = (clsSession)Session["UserSession"];
+                    if (sess != null)
+                    {
+
+                        strQuery = "select StimulyActivityId,case when(ActivitiType='STARTED') then ('STARTED') ELSE (case when(ActivitiType='SET') then (Select 'SET - '+SetCd from DSTempSet where  DSTempSetId= Act.ActivityId)"
+                             + "ELSE (case when(ActivitiType='STEP') then (Select 'STEP - '+StepCd from DSTempStep where  DSTempStepId= Act.ActivityId)"
+                             + "ELSE (case when(ActivitiType='MASTERED') then (Select 'SET - '+SetCd+'' from DSTempSet where  DSTempSetId= Act.ActivityId)"
+                             + "ELSE(Select 'PROMPT - '+ LookupName from LookUp where  LookupId= Act.ActivityId)END)END)END)END NAME,"
+                             + "(Convert(VARCHAR(50), StartTime,110))StartDate,(Convert(VARCHAR(50), DateMastered,110))DateMastered,(Convert(VARCHAR(50), DateClosed,110))DateClosed"
+                             + ",Hdr.Reason_New,Hdr.CreatedOn,Hdr.VerNbr,Hdr.DSTempHdrId from StdtSessStimuliActivity ACT INNER JOIN DSTempHdr Hdr ON ACT.DSTempHdrId=Hdr.DSTempHdrId where ACT.StudentId=" + sess.StudentId + " "
+                             + "AND Hdr.LessonPlanId=(SELECT LessonPlanId FROM DSTempHdr WHERE  DSTempHdrId=" + TempId + ")  ORDER BY ACT.DSTempHdrId";
+                        Dt = objData.ReturnDataTable(strQuery, false);
+
+                        val = (Dt.Rows.Count) - 1;
+                        if (Dt != null)
+                        {
+                            if (Dt.Rows.Count > 0)
+                            {
+                                DataRow[] dtRw = Dt.Select("DSTempHdrId =" + TempId);
+                                if (dtRw != null)
+                                {
+                                    if (dtRw.Length > 0)
+                                    {
+                                        if ((dtRw[0]["VerNbr"]) != DBNull.Value)
+                                        {
+                                            versionNum = Convert.ToDouble(dtRw[0]["VerNbr"]);
+                                            DataRow[] dtRw2 = Dt.Select("VerNbr <= '" + versionNum + "'OR VerNbr is null "); //May-29-2020 Fix done
+                                            //DataRow[] dtRw2 = Dt.Select("VerNbr <=" + versionNum + "OR VerNbr is null "); //May-29-2020 Above Fix for Cannot perform '<=' operation on System.String and System.Int32. in this string
+                                            dt3 = dtRw2.CopyToDataTable();
+                                            DataRow[] dtRwReason = dt3.Select("NAME<>'STARTED'");
+                                            dt4Reason = dtRwReason.CopyToDataTable();
+                                            dt4Reason.DefaultView.Sort = "StimulyActivityId";
+                                            dt4Reason = dt4Reason.DefaultView.ToTable();
+                                            dt4Reason.Columns.Remove("StimulyActivityId");
+                                            dt4Reason.Columns.Remove("CreatedOn");
+                                            dt4Reason.Columns.Remove("VerNbr");
+                                            dt4Reason.Columns.Remove("DSTempHdrId");
+                                            dt4Reason.Columns.Remove("Reason_New");
+                                            foreach (DataRow dr in dt3.Rows)
+                                            {
+                                                if (dr["NAME"].ToString() == "STARTED" && dr["Reason_New"].ToString() != "")
+                                                {
+                                                    reason = "(Reason:" + dr["Reason_New"].ToString() + ")";
+                                                    if (reason == "" || reason == "()")
+                                                    {
+                                                        reason = "(No Reason to display)";
+                                                    }
+                                                    createVal = dr["CreatedOn"].ToString();
+                                                    string[] splitVal = createVal.Split(' ');
+                                                    createVal = DateTime.Parse(splitVal[0]).ToString("MM/dd/yyyy").Replace('-', '/');
+                                                    DataRow dr4 = dt4.NewRow();
+                                                    dr4["Date"] = createVal;
+                                                    dr4["Reason"] = reason;
+                                                    dt4.Rows.Add(dr4);
+                                                }
+                                            }
+
+                                        }
+                                        else
+                                        {
+                                            dt3 = dtRw.CopyToDataTable();
+                                            createVal = Dt.Rows[val]["CreatedOn"].ToString();
+                                            string[] splitVal = createVal.Split(' ');
+                                            createVal = splitVal[0];
+                                            if (reason == "")
+                                            {
+                                                reason = "(Reason: Initial version. No reason to display)";
+                                            }
+                                            DataRow dr4 = dt4.NewRow();
+                                            dr4["Date"] = "";
+                                            dr4["Reason"] = reason;
+                                            dt4.Rows.Add(dr4);
+                                            DataRow[] dtRwReason = dt3.Select("NAME<>'STARTED'");
+                                            dt4Reason = dtRwReason.CopyToDataTable();
+                                            dt4Reason.DefaultView.Sort = "StimulyActivityId";
+                                            dt4Reason = dt4Reason.DefaultView.ToTable();
+                                            dt4Reason.Columns.Remove("StimulyActivityId");
+                                            dt4Reason.Columns.Remove("CreatedOn");
+                                            dt4Reason.Columns.Remove("VerNbr");
+                                            dt4Reason.Columns.Remove("DSTempHdrId");
+                                            dt4Reason.Columns.Remove("Reason_New");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //tdMsg.InnerHtml = clsGeneral.warningMsg("Session Expired...Please login again");
+                    }
+                }
+                catch (Exception Ex)
+                {
+                    throw Ex;
+                }
+                fillDataLEssonPlan(LessonPlanId, TempId);
+
+                SearchAndReplace(NewPath);
+
+                AppndTableAssmtTool(NewPath, dt4Reason);
+                AppendDateAndReason(NewPath, dt4);
+
+
+
+                makeWord(NewPath, newpathz);
+            }
+
+            if ((rdoinprogress.Text == "In-progress" || rdoinprogress.Text == "Pending Approval") && chkpgrs == 1)
+            {
+                string popup = " $(document).ready(function () { $('#overlay').fadeIn('fast',function () { $('#PopDownload').css('top', '15%'); $('#PopDownload').show(); }); $('#close_x').click(function () { $('#PopDownload').animate({ top: '-300%' }, function () { $('#overlay').fadeOut('slow'); }); }); });";
+                ScriptManager.RegisterClientScriptBlock(this, typeof(System.Web.UI.Page), Guid.NewGuid().ToString(), popup, true);
+                downloadfile();
+
+            }
+
+
+        }
+        catch (Exception ex)
+        {
+
+        }
+
+    }
+
     public void downloadfile()
     {
         ClsErrorLog err = new ClsErrorLog();
