@@ -8,6 +8,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using System.Net;
 
 public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
 {
@@ -24,6 +25,7 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
     string Sessstname = "";
     string curesesid = "";
     string Pagepath = "";
+    string ip = "";
     protected void Page_Load(object sender, EventArgs e)
     {
         Session["Visibility"] = "0";
@@ -59,8 +61,21 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
         SessStudentid = Convert.ToInt16(Session["Sprestid"]);
         Sessstname = Session["Sprestname"].ToString();
         curesesid = this.Session.SessionID.ToString();
-        Pagepath = "CustomizeTemplateEditor:Page Load";
-        sess = clsGeneral.sessioncheck(curesesid, preid, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
+        string HostName = Dns.GetHostName();
+        string userAgent = HttpContext.Current.Request.UserAgent.ToString();
+        ip = clsGeneral.GetIPAddress();
+        ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
+        Pagepath = "BehaviourMaintanance:Page_Load";
+        if (Prevsess != null)
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + Prevsess.Classid + ',' + sess.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+        }
+        else
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + "PrevSession Null" + ',' + sess.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+        }
+        
+        sess = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
         //---------------------------------------------------------------------
 
         ScriptManager.RegisterClientScriptBlock(UpdatePanel1, UpdatePanel1.GetType(), "", "loadTime();", true);
@@ -112,8 +127,21 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
         lessonPLId = -1;
         sess = (clsSession)Session["UserSession"];
         curesesid = this.Session.SessionID.ToString();
-        Pagepath = "CustomizeTemplateEditor:LoadData";
-        sess = clsGeneral.sessioncheck(curesesid, preid, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
+        string HostName = Dns.GetHostName();
+        string userAgent = HttpContext.Current.Request.UserAgent.ToString();
+        ip = clsGeneral.GetIPAddress();
+        ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
+        Pagepath = "BehaviourMaintanance:LoadData";
+        if (Prevsess != null)
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + Prevsess.Classid + ',' + sess.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+        }
+        else
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + "PrevSession Null" + ',' + sess.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+        }
+        
+        sess = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
         objData = new clsData();
 
 
@@ -301,8 +329,21 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
         bool acceleration = true;
         sess = (clsSession)Session["UserSession"];
         curesesid = this.Session.SessionID.ToString();
-        Pagepath = "CustomizeTemplateEditor:btnSubmitIEP1_Click";
-        sess = clsGeneral.sessioncheck(curesesid, preid, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
+        string HostName = Dns.GetHostName();
+        string userAgent = HttpContext.Current.Request.UserAgent.ToString();
+        ip = clsGeneral.GetIPAddress();
+        ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
+        Pagepath = "BehaviourMaintanance:btnSubmitIEP1_Click";
+        if (Prevsess != null)
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + Prevsess.Classid + ',' + sess.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+        }
+        else
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + "PrevSession Null" + ',' + sess.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+        }
+        
+        sess = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
         objData = new clsData();
 
         tdMsg.InnerHtml = "";
@@ -1426,9 +1467,21 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
             clsData oData = new clsData();
             clsSession oSession = (clsSession)Session["UserSession"];
             curesesid = this.Session.SessionID.ToString();
-            Pagepath = "CustomizeTemplateEditor:SaveGoal";
+            string HostName = Dns.GetHostName();
+            string userAgent = HttpContext.Current.Request.UserAgent.ToString();
+            ip = clsGeneral.GetIPAddress();
+            ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
+            Pagepath = "BehaviourMaintanance:SaveGoal";
+            if (Prevsess != null)
+            {
+                sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + Prevsess.Classid + ',' + sess.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+            }
+            else
+            {
+                sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + "PrevSession Null" + ',' + sess.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+            }
             
-            oSession = clsGeneral.sessioncheck(curesesid, preid, preuser, oSession, Prevsess, SessStudentid, Sessstname, Pagepath);
+            oSession = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, Sessstname, Pagepath);
             object objIEP = "";
             if (oSession != null)
             {
@@ -1564,9 +1617,21 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
             object objIEP = "";
             clsSession oSession = (clsSession)Session["UserSession"];
             curesesid = this.Session.SessionID.ToString();
-            Pagepath = "CustomizeTemplateEditor:SaveLessons";
+            string HostName = Dns.GetHostName();
+            string userAgent = HttpContext.Current.Request.UserAgent.ToString();
+            ip = clsGeneral.GetIPAddress();
+            ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
+            Pagepath = "BehaviourMaintanance:SaveLessons";
+            if (Prevsess != null)
+            {
+                sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + Prevsess.Classid + ',' + sess.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+            }
+            else
+            {
+                sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + "PrevSession Null" + ',' + sess.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+            }
             
-            oSession = clsGeneral.sessioncheck(curesesid, preid, preuser, oSession, Prevsess, SessStudentid, Sessstname, Pagepath);
+            oSession = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, Sessstname, Pagepath);
             if (oSession != null)
             {
                 if (oSession.SchoolId == 2)
@@ -2840,8 +2905,21 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
         objData = new clsData();
         sess = (clsSession)Session["UserSession"];
         curesesid = this.Session.SessionID.ToString();
-        Pagepath = "CustomizeTemplateEditor:EnableAllAlerts";
-        sess = clsGeneral.sessioncheck(curesesid, preid, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
+        string HostName = Dns.GetHostName();
+        string userAgent = HttpContext.Current.Request.UserAgent.ToString();
+        ip = clsGeneral.GetIPAddress();
+        ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
+        Pagepath = "BehaviourMaintanance:EnableAllAlerts";
+        if (Prevsess != null)
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + Prevsess.Classid + ',' + sess.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+        }
+        else
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + "PrevSession Null" + ',' + sess.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+        }
+
+        sess = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
         string StrQuery = "SELECT BehaviourCalcId FROM BehaviourCalc WHERE StudentId=" + sess.StudentId + " AND CONVERT(DATE,[Date])=CONVERT(DATE,GETDATE()) AND ActiveInd='A' AND MeasurmentId=" + MeasurementId;
         DataTable dtbehavior = objData.ReturnDataTable(StrQuery, false);
         SqlTransaction Transs = null;

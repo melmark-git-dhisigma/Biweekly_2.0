@@ -11,6 +11,7 @@ using System.Threading;
 using System.Web.Script.Serialization;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using System.Net;
 
 public partial class StudentBinder_dataSheetTimer : System.Web.UI.Page
 {
@@ -21,6 +22,7 @@ public partial class StudentBinder_dataSheetTimer : System.Web.UI.Page
     string curesesid = "";
     int preid = 0;
     string preuser = "";
+    string ip = "";
     public static DataTable behaviorDT = null;
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -39,12 +41,24 @@ public partial class StudentBinder_dataSheetTimer : System.Web.UI.Page
         preuser = Session["Spreuser"].ToString();
         int SessStudentid = Convert.ToInt16(Session["Sprestid"]);
         string Sessstname = Session["Sprestname"].ToString();
+        string HostName = Dns.GetHostName();
+        string userAgent = HttpContext.Current.Request.UserAgent.ToString();
+        ip = clsGeneral.GetIPAddress();
+        ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
         string Pagepath = "dataSheetTimer:loadDataTabs";
+        if (Prevsess != null)
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + Prevsess.Classid + ',' + sess.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+        }
+        else
+        {
+            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + "PrevSession Null" + ',' + sess.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+        }
 
         curesesid = this.Session.SessionID.ToString();
 
 
-        sess = clsGeneral.sessioncheck(curesesid, preid, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
+        sess = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, sess, Prevsess, SessStudentid, Sessstname, Pagepath);
 
         int sid = sess.StudentId;
         if (Request.QueryString["stid"] != null)
