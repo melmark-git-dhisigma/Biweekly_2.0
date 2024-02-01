@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="ACSheet.aspx.cs" Inherits="StudentBinder_ACSheet" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="ACSheet.aspx.cs" Inherits="StudentBinder_ACSheet"  %>
 
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajax" %>
 <!DOCTYPE html>
@@ -32,7 +32,32 @@
     <script src="../Administration/jsDatePick.jquery.min.1.3.js"></script>
 
     <script src="jsScripts/jq1.js" type="text/javascript" charset="utf-8"></script>     
+<script type="text/javascript">
 
+    function updateColor(el) {
+        el.parentNode.style.color = el.checked ? "green" : "#808080"
+        el.parentNode.style.fontWeight = el.checked ? "bold" : "normal";
+    }
+    function updateColor2(el) {
+        el.parentNode.style.color = el.checked ? "red" : "#808080"
+        el.parentNode.style.fontWeight = el.checked ? "bold" : "normal";
+    }
+    function handleCheckboxChange(checkbox) {
+        console.log("Checkbox ID: " + checkbox.id);
+        var labelId = checkbox.id.replace("Checkbox", "c");
+        var label = document.getElementById(labelId);
+           
+        
+        if (checkbox.checked) {
+            label.style.color = "Green";
+            label.style.fontWeight = "bold";
+        } else {
+            label.style.color = "Gray";
+            label.style.fontWeight = "normal";
+        }
+    }
+</script>
+    
     <script type="text/javascript">
 
         function isNumberKey(evt) {
@@ -121,6 +146,10 @@
              }
 
          }
+
+         
+
+
          $(document).ready(function () {
              $('#CancalGen').click(function () {
                  $('#dialog').animate({ top: "-300%" }, function () {
@@ -202,6 +231,8 @@
             return false;
         }
 
+        
+
     </script>
 
 
@@ -271,7 +302,15 @@
             width: 210px;
         }
 
-    </style>
+        .auto-style3 {
+            height: 93px;
+        }
+        .auto-style4 {
+            height: 93px;
+            width: 411px;
+        }
+
+        </style>
     <script>
         function allowBackSpace(e, obj) {
             var evt = e || window.event;
@@ -279,6 +318,9 @@
                 obj.value = '';
             }
         }
+        
+
+       
     </script>
 
 
@@ -286,6 +328,7 @@
 <body>
     <form id="form1" runat="server">
         <asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>
+       
         <div>
 
             <div class="boxContainerContainer">
@@ -395,20 +438,52 @@
 
                     <div class="righMainContainer large" id="MainDiv" runat="server" visible="true">
 
-                        <table style="width: 100%">
-                            <tr>
-                                <asp:RadioButtonList ID="rbtnLsnClassTypeAc" runat="server" AutoPostBack="true" RepeatDirection="Horizontal" 
-                                    OnSelectedIndexChanged="LessonTypeSelect">
+                        
+                        <tr>
+                                <td class="auto-style4" rowspan="2">
+                                <asp:RadioButtonList ID="rbtnLsnClassTypeAc" runat="server" AutoPostBack="true" 
+                                    OnSelectedIndexChanged="LessonTypeSelect" Width="222px" RepeatDirection="Horizontal">
                                     <asp:ListItem Value="Day">Day</asp:ListItem>
                                     <asp:ListItem Value="Residence">Residence</asp:ListItem>
                                     <asp:ListItem Value="Day,Residence" Selected="True">Both</asp:ListItem>
                                 </asp:RadioButtonList>
+                                &nbsp;</td>
+                                </tr>
+
+                        <table style="width: 100%">
+                            
+                            
+                            
+                            <tr>
+                                <td id="tdMsg1" runat="server" class="auto-style4">
+                                    <asp:Label ID="AttendeesLabel" runat="server" Text="Attendees :"></asp:Label>
+                                    &nbsp;<br />
+                                    <asp:TextBox ID="AttendeesText" runat="server" Height="57px" TextMode="MultiLine" Width="502px"></asp:TextBox>
+                                </td>
+                                <td id="tdMsg2" runat="server" class="auto-style3">
+                                    <asp:Label ID="IepyearLabel" runat="server" Text="IEP Year"></asp:Label>
+                                   &nbsp;:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;<asp:TextBox ID="Iepyeartxt" runat="server" Height="30px"></asp:TextBox>
+                                    <br />
+                                    <br />
+                                    <asp:Label ID="Ieplbl" runat="server" Text="IEP Signature Date"></asp:Label>
+                                    &nbsp;:&nbsp;
+                                    <asp:TextBox ID="Ieptxt" runat="server" Height="30px"></asp:TextBox>
+                                    </td>
+                            </tr>
+                            
+                            
+                            
+                            
+                                <tr>
+                            </tr>
+                                <tr>
+                                <td id="tdMsg" runat="server" colspan="2">                               
+                                    
+                                </td>
                             </tr>
                             <tr>
-                                <td id="tdMsg" runat="server">&nbsp;</td>
-                            </tr>
-                            <tr>
-                                <td>
+                                <td colspan="2">
+
                                     <table style="width: 100%;">
 
                                         <tr>
@@ -450,6 +525,29 @@
                                                                                             <td style="text-align:left" class="bor">
                                                                                                 <div id="txtbenchaMark" style="float:left" runat="server" height="50px" width="640"><%#Eval("Objective3") %></div>
                                                                                             </td>
+                                                                                        </tr>
+                                                                                        <tr>
+                                                                                            <td style="width:90px" class="tdText bor">Benchmarks/ Objectives:</td>
+                                                                                            <asp:UpdatePanel id="checkupdate1" runat="server">
+                                                                                            <ContentTemplate>
+                                                                                            <td id="td1" runat="server" colspan="2">
+                                                                                                <label id="ch4" runat="server" style="color: #808080; ">
+                                                                                                 <input type="Checkbox" runat="server" name="termsChkbx4" id="Checkbox4"  onclick="updateColor(this)"/>
+                                                                                                 <span>Met Objective</span>
+                                                                                                 </label>  
+                                                                                                
+                                                                                                <label id="ch5" runat="server" style="color: #808080; ">
+                                                                                                 <input type="Checkbox" runat="server" name="termsChkbx5" id="Checkbox5" onclick="updateColor(this)"/>
+                                                                                                 <span>Met Goal</span>
+                                                                                                 </label>  
+                                                                                                
+                                                                                                <label id="ch6" runat="server" style="color: #808080; ">
+                                                                                                 <input type="Checkbox" runat="server" name="termsChkbx6" id="Checkbox6" onclick="updateColor2(this)"/>
+                                                                                                 <span>Not Maintaining</span>
+                                                                                                 </label>                                                                                
+                                                                                                    </td>
+                                                                                            </ContentTemplate>
+                                                                                         </asp:UpdatePanel>
                                                                                         </tr>
                                                                                         </table>
                                                                                         <table style="width: 100%;">
@@ -886,12 +984,20 @@
                                                                             </asp:TemplateField>
                                                                         </Columns>
                                                                     </asp:GridView>
-                                                                </td>
+                                            </td>
                                                             </tr>
                                                             <tr>
                                                                 <td>&nbsp;</td>
                                                                 <td>&nbsp;</td>
                                                                 <td>&nbsp;</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan="3" id="tdreview1" style="text-align: left;">
+                                                                    <asp:Label ID="reviewsave" runat="server" Text="Reviewed by and date"></asp:Label>
+                                                                    &nbsp;:&nbsp;&nbsp;
+                                                                    <br />
+                                                                    <asp:TextBox ID="ReviewbydateSave" runat="server" Height="57px" TextMode="MultiLine" Width="502px"></asp:TextBox>
+                                                                </td>
                                                             </tr>
                                                             <tr>
                                                                 <td colspan="3" style="text-align: center;">
@@ -942,6 +1048,26 @@
                                                                                             <td style="text-align:left" class="bor">
                                                                                                  <div id="txtbenchaMark" runat="server" height="50px" width="640"><%#Eval("Benchmarks") %></div>
                                                                                             </td>
+                                                                                        </tr>
+                                                                                        <tr>
+                                                                                            <td style="width:90px" class="tdText bor">Current Progress:</td>
+                                                                                                <td id="tdMsgp" runat="server" colspan="2">
+                                                                                        <label id="ch1" runat="server" style="color: #808080; ">
+                                                                                                 <input type="Checkbox" runat="server" name="termsChkbx1" id="Checkbox1" onclick="updateColor(this)"/>
+                                                                                                 <span>Met Objective</span>
+                                                                                                 </label>  
+                                                                                                
+                                                                                                <label id="ch2" runat="server" style="color: #808080; ">
+                                                                                                 <input type="Checkbox" runat="server" name="termsChkbx2" id="Checkbox2"  onclick="updateColor(this)"/>
+                                                                                                 <span>Met Goal</span>
+                                                                                                 </label>  
+                                                                                                
+                                                                                                <label id="ch3" runat="server" style="color: #808080; ">
+                                                                                                 <input type="Checkbox" runat="server" name="termsChkbx3" id="Checkbox3" onclick="updateColor2(this)"/>
+                                                                                                 <span>Not Maintaining</span>
+                                                                                                 </label>     
+                                                                                        </td>
+
                                                                                         </tr>
                                                                                         </table>
                                                                                         <table style="width: 100%; background-color: #f7f5f5; margin: 5px 0 5px 0;">
@@ -1383,8 +1509,16 @@
                                                                 <td>&nbsp;</td>
                                                             </tr>
                                                             <tr>
+                                                                <td colspan="3" runat="server" id="tdreview2" style="text-align: left;">
+                                                                    <asp:Label ID="reviewLabel" runat="server" Text="Reviewed by and date"></asp:Label>
+                                                                    &nbsp;:&nbsp;&nbsp;
+                                                                    <br />
+                                                                    <asp:TextBox ID="ReviewbydateUpdate" runat="server" Height="57px" TextMode="MultiLine" Width="502px"></asp:TextBox>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
                                                                 <td colspan="3" style="text-align: center;">
-                                                                    <asp:Button ID="btnUpdate" runat="server" CssClass="NFButton" OnClick="btnUpdate_Click" ValidationGroup="Group1" OnClientClick="return scrollToTop();" Text="Update" />
+                                                                    <asp:Button ID="btnUpdate" runat="server" CssClass="NFButton" OnClick="btnUpdate_Click" OnClientClick="return scrollToTop();" Text="Update" ValidationGroup="Group1" />
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1406,13 +1540,13 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>&nbsp;</td>
+                                <td colspan="2">&nbsp;</td>
                             </tr>
                             <tr>
-                                <td style="text-align: center">&nbsp;</td>
+                                <td style="text-align: center" colspan="2">&nbsp;</td>
                             </tr>
                             <tr>
-                                <td>&nbsp;</td>
+                                <td colspan="2">&nbsp;</td>
                             </tr>
                         </table>
 
@@ -1533,7 +1667,7 @@
 
 
         </div>
-        
+      
         <script type="text/javascript">
             $(document).ready(function SearchText() {
                 //alert("in autocomplete function");
@@ -1544,6 +1678,7 @@
                 // Place here the first init of the autocomplete
                 InitAutoCompl();
             });        
+           
 
             function InitializeRequest(sender, args) {
             }
@@ -1631,6 +1766,7 @@
              }
 
         </script>
+         
     </form>
 </body>
 </html>
