@@ -2894,6 +2894,14 @@
 
             });
         }
+        function closeViewPlan() {
+            $('#divViewPlan').fadeOut('slow', function () {
+            });
+        }
+        function viewPlan() {
+            $('#divViewPlan').fadeIn('slow', function () {
+            });
+        }
         function CloseViewLP() {
             $('#divViewLesson').fadeOut('slow', function () {
             });
@@ -2924,6 +2932,8 @@
                      async: false,
                      success: function (data) {
                          $('#stViewLP').attr('src', data.d);
+                         $('#divViewPlan').fadeOut('slow', function () {
+                         });
                      },
                      error: function (request, status, error) {
                          alert("Error");
@@ -2933,6 +2943,41 @@
 
         }
 
+        function ViewSupportStrategy() {
+            var isiPad = navigator.userAgent.match(/iPad/i);
+            if (isiPad != null) {
+                document.getElementById('divViewLesson').style.top = '5%';
+                document.getElementById('divViewLesson').style.marginLeft = '-210px';
+                document.getElementById('divViewLesson2').style.overflowX = 'hidden';
+                document.getElementById('divViewLesson2').style.overflowY = 'scroll';
+            }
+            else {
+                document.getElementById('divViewLesson').style.top = '7%';
+                document.getElementById('divViewLesson').style.marginLeft = '-277px';
+                document.getElementById('divViewLesson2').style.overflowY = 'hidden';
+            }
+            $('#divViewLesson').fadeIn('slow', function () {
+                var SessHdr = document.getElementById('hdnSessionHdr').value;
+                $.ajax(
+                 {
+                     type: "POST",
+                     url: "Datasheet.aspx/ViewSupportStrategyData",
+                     data: "{'Id':'" + SessHdr + "'}",
+                     contentType: "application/json; charset=utf-8",
+                     dataType: "json",
+                     async: false,
+                     success: function (data) {
+                         $('#stViewLP').attr('src', data.d);
+                         $('#divViewPlan').fadeOut('slow', function () {
+                         });
+                     },
+                     error: function (request, status, error) {
+                         alert("Error");
+                     }
+                 });
+            });
+
+        }
 
         function fillMatchtosapmpleval() {
             var grid = document.getElementById('<%=grdDataSht.ClientID%>');
@@ -3271,7 +3316,7 @@
 
 
                                     <tr>
-                                        <td class="st" style="background-color: #03507d; color: white;">Lesson Prep :</td>
+                                        <td class="st" style="background-color: #03507d; color: white;">Prep :</td>
                                         <td>
                                             <asp:Label ID="lblLessonPrep" runat="server" Text="-"></asp:Label>
                                         </td>
@@ -3415,7 +3460,7 @@
                                             <input id="viewDocbtn" type="button" class="NFButtonWithNoImage" onclick="viewDoc(); scrollToTop();" value="View Attachments" style="float: right;" />
                                         </td>
                                         <td style="width: 10%">
-                                            <input id="btnViewLP" type="button" class="NFButtonWithNoImage" onclick="ViewLp(); scrollToTop();" value="View Lesson Plan" style="float: right;" />
+                                            <input id="btnViewPlan" type="button" class="NFButtonWithNoImage" onclick="ViewLp(); scrollToTop();" value="View Lesson Plan" style="float: right;" />
                                         </td>
                                     </tr>
 
@@ -4483,6 +4528,18 @@
                     </table>
                 </div>
             </div>
+            <div id="divViewPlan" class="web_dialog" style="top: 7%; left:50%; z-index: 10000; width: 350px; min-height:75px;">
+            <a id="A2" onclick="closeViewPlan();" href="#" style="margin-top: -13px; margin-right: -14px; float: right">
+                    <img src="../Administration/images/clb.PNG" style="float: right; margin-right: 0px; margin-top: 0px; z-index: 300" width="18" height="18" alt="" />
+            </a>
+                <td>
+                                            <input id="BtnViewSupStgy" type="button" class="NFButtonWithNoImage" onclick="ViewSupportStrategy(); scrollToTop();" value="Support Strategy" style="width: 134px; margin-top:25px; margin-left:29px; margin-right: 10px;" />
+                                        </td>
+                                        <td style="width: 10%">
+                                            <input id="BtnViewLP" type="button" class="NFButtonWithNoImage" onclick="ViewLp(); scrollToTop();" value="Lesson Plan" style="margin-top:25px;margin-left:10px;width: 134px;margin-right: 25px;"/>
+                                        </td>
+            </div>
+
             <div id="divDoc" class="web_dialog" style="top: 7%; z-index: 10000">
 
 
