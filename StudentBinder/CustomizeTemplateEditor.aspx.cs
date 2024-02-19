@@ -828,6 +828,11 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         {
                             RadioButtonListSets.Items[0].Selected = true;
                         }
+                        if (RadioButtonListSets.SelectedValue.ToString()=="")
+                        {
+                            RadioButtonListSets.Items[0].Selected = true;
+                            loadStepOverrid(Convert.ToInt32(RadioButtonListSets.SelectedValue.ToString()));
+                        }
                     }
                     // Approval Popup Issue New Lesson Creation [18 - jun -2020] - Dev 1 -- End
                     RadioButtonListSets_tt.DataSource = ds;
@@ -848,6 +853,12 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         }
                         else
                             RadioButtonListSets.Items[0].Selected = true;
+
+                        if (RadioButtonListSets.SelectedValue.ToString() == "")
+                        {
+                            RadioButtonListSets.Items[0].Selected = true;
+                            loadStepOverrid(Convert.ToInt32(RadioButtonListSets.SelectedValue.ToString()));
+                        }
                     }
                     // Approval Popup Issue New Lesson Creation [18 - jun -2020] - Dev 1 -- End
                     rptr_ListSets.DataSource = ds;
@@ -1114,6 +1125,11 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                 }
                                 else
 								    RadioButtonListSteps.Items[0].Selected = true;
+
+                            if (RadioButtonListSteps.SelectedValue.ToString()=="")
+                            {
+                                RadioButtonListSteps.Items[0].Selected = true;
+                            }
                             // Approval Popup Issue New Lesson Creation [18 - jun -2020] - Dev 1  r
                         }
                         else
