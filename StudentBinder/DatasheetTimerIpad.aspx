@@ -661,6 +661,20 @@
                 //timer
                 $('#testtimer' + id).show();
                 $('#testtimer2' + id).hide();
+                var splitHrElems = parseInt(document.getElementById('testtimer2' + id).getElementsByTagName('input')[0].value);
+                var splitMinElems = parseInt(document.getElementById('testtimer2' + id).getElementsByTagName('input')[1].value);
+                var splitSecElems = parseInt(document.getElementById('testtimer2' + id).getElementsByTagName('input')[2].value);
+                $('#hdnTimerEdited').val('True');
+                var setTime = "";
+                setTime += (splitHrElems > 0) ? splitHrElems : "0";
+                setTime += ":" + ((splitMinElems > 0) ? splitMinElems : "0");
+                setTime += ":" + ((splitSecElems > 0) ? splitSecElems : "0");
+                document.getElementById('testtimer' + id).getElementsByTagName('input')[0].value = setTime;
+				var setSec = 0;
+                setSec += ((splitHrElems > 0) ? splitHrElems : 0) * 60 * 60;
+                setSec += ((splitMinElems > 0) ? splitMinElems : 0) * 60;
+                setSec += ((splitSecElems > 0) ? splitSecElems : 0);
+                $('#testtimer' + id).parents('.tabContent').find('.stpSeconds').text(setSec);
             }
         }
         function editTOE(elem) {
