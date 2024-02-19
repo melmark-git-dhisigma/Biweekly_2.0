@@ -256,7 +256,7 @@
                         <td style="padding: 0" runat="server" id="tdMsg"></td>
                     </tr>
                 </table>
-
+                <br />
                 <table width="95%" cellspacing="0" cellpadding="0" border="1">
                     <tr>
                         <td class="title" runat="server" id="tdLesson" colspan="2">Title</td>
@@ -339,18 +339,18 @@
                     </tr>--%>
                 </table>
 
-                <br />
+                <%--<br />--%>
 
 
-                <table width="95%" cellspacing="0" cellpadding="0" border="1">
+                <%--<table width="95%" cellspacing="0" cellpadding="0" border="1">
                     <tr>
                         <td colspan="2" runat="server" id="tdBaseLine"><strong>POST CHECK PROCEDURE:</strong></td>
                         <%--</br>
                         <span runat="server" id="tdBaseLine"></span>
                         </br>
                         <span runat="server" id="tdGenProcedure"></span>--%>
-                    </tr>
-                </table>
+                    <%--</tr>
+                </table>--%>
 
             </div>
         </div>
