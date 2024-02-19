@@ -57,45 +57,47 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
         RV_Behavior.AsyncRendering = false;
         RV_Behavior.SizeToReportContent = true;
         RV_Behavior.ZoomMode = ZoomMode.PageWidth;
-
-        sess = (clsSession)Session["UserSession"];
-        if (sess == null)
+        try
         {
-            Response.Redirect("Error.aspx?Error=Your session has expired. Please log-in again");
-        }
-        else
-        {
-            bool flag = clsGeneral.PageIdentification(sess.perPage);
-            if (flag == false)
-            {
-                Response.Redirect("Error.aspx?Error=You are not authorized to access this Page.Contact Program Administrator");
-            }
-        }
-        if (!IsPostBack)
-        {
-            FILLBEHAVIOR();
             sess = (clsSession)Session["UserSession"];
-            ObjTempSess = (ClsTemplateSession)Session["BiweeklySession"];
-            ClassDatatable objClassData = new ClassDatatable();
-            hfPopUpValue.Value = "false";
-            if (Request.QueryString["studid"] != null)
+            if (sess == null)
             {
-                int pageid = Convert.ToInt32(Request.QueryString["pageid"].ToString());
-                int studid = Convert.ToInt32(Request.QueryString["studid"].ToString());
-                sess.StudentId = studid;
-                ObjTempSess.LessonPlanId = pageid;
-                chkbxevents.Checked = true;
-                chkbxIOA.Checked = true;
-                chkmedication.Checked = false;
-                //chkrate.Checked = true;
-                chkrate.Checked = false;
-                chkreptrend.Checked = true;
-                txtEdate.Text = DateTime.Now.Date.AddDays(1).ToString("MM/dd/yyyy").Replace("-", "/");
-                txtSdate.Text = DateTime.Now.Date.AddDays(-91).ToString("MM/dd/yyyy").Replace("-", "/");
-                //rbtnClassType.SelectedValue = objClassData.GetClassType(sess.Classid);
-                RV_Behavior.Visible = false;
-                ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "loadWait();", true);
-                if (pageid == 0)
+                Response.Redirect("Error.aspx?Error=Your session has expired. Please log-in again");
+            }
+            else
+            {
+                bool flag = clsGeneral.PageIdentification(sess.perPage);
+                if (flag == false)
+                {
+                    Response.Redirect("Error.aspx?Error=You are not authorized to access this Page.Contact Program Administrator");
+                }
+            }
+            if (!IsPostBack)
+            {
+                FILLBEHAVIOR();
+                sess = (clsSession)Session["UserSession"];
+                ObjTempSess = (ClsTemplateSession)Session["BiweeklySession"];
+                ClassDatatable objClassData = new ClassDatatable();
+                hfPopUpValue.Value = "false";
+                if (Request.QueryString["studid"] != null)
+                {
+                    int pageid = Convert.ToInt32(Request.QueryString["pageid"].ToString());
+                    int studid = Convert.ToInt32(Request.QueryString["studid"].ToString());
+                    sess.StudentId = studid;
+                    ObjTempSess.LessonPlanId = pageid;
+                    chkbxevents.Checked = true;
+                    chkbxIOA.Checked = true;
+                    chkmedication.Checked = false;
+                    //chkrate.Checked = true;
+                    chkrate.Checked = false;
+                    chkreptrend.Checked = true;
+                    //txtEdate.Text = DateTime.Now.Date.AddDays(1).ToString("MM/dd/yyyy").Replace("-", "/");
+                    txtEdate.Text = DateTime.Now.Date.ToString("MM/dd/yyyy").Replace("-", "/");
+                    txtSdate.Text = DateTime.Now.Date.AddDays(-91).ToString("MM/dd/yyyy").Replace("-", "/");
+                    //rbtnClassType.SelectedValue = objClassData.GetClassType(sess.Classid);
+                    RV_Behavior.Visible = false;
+                    ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "loadWait();", true);
+                    if (pageid == 0)
                     {
                         chkbxevents.Checked = true;
                         chkbxIOA.Checked = true;
@@ -120,10 +122,17 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
                         //GenerateBehaviourReport();
                         LessonDiv.Visible = true;
                     }
-                //LoadGraph();
+                    //LoadGraph();
+                }
             }
+            ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "disp();", true);
         }
-        ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "disp();", true);
+        catch (Exception Ex)
+        {
+            ClsErrorLog clError = new ClsErrorLog();
+            clError.WriteToLog(Ex.ToString());
+            throw Ex;
+        }
     }
 
     [Serializable]
@@ -1391,11 +1400,14 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
     protected void btnPrevious_Click(object sender, EventArgs e)
     {
         int id = ddlLessonplan.SelectedIndex;
-        if (id > 0)
+        if (id >= 0)
         {
-            ddlLessonplan.SelectedIndex = id - 1;
+            if (id > 0)
+            {
+                ddlLessonplan.SelectedIndex = id - 1;
+            }
             string LessonId = ddlLessonplan.SelectedValue.ToString();
- if (highcheck.Checked == true)
+            if (highcheck.Checked == true)
             {
                 fillGraphhighchart(LessonId);
             }
@@ -1411,20 +1423,23 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
     {
         int id = ddlLessonplan.SelectedIndex;
         int count = ddlLessonplan.Items.Count - 1;
-        if (id < count)
+        if (id <= count)
         {
-            ddlLessonplan.SelectedIndex = id + 1;
+            if (id < count)
+            {
+                ddlLessonplan.SelectedIndex = id + 1;
+            }
             string LessonId = ddlLessonplan.SelectedValue.ToString();
             if (highcheck.Checked == false)
-        {
-string script = "closePopup();";
+            {
+            string script = "closePopup();";
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "hidepop", script, true);
             fillGraph(LessonId);
-        }
-else{
+            }
+            else{
 
-fillGraphhighchart(LessonId);
-    }
+        fillGraphhighchart(LessonId);
+            }
         }
     }
     protected void ddlLessonplan_SelectedIndexChanged(object sender, EventArgs e)
