@@ -701,7 +701,7 @@ year
                     myDiv.style.width = '931.84809449pt';
                     myDiv.style.height = '434.678740152pt';
                 } else {
-                        myDiv.style.width = '1000pt';
+                        myDiv.style.width = '931.84809449pt';
                         myDiv.style.height = '434.678740152pt';
                 }
                 var inputsDate = "<%=sdate%>";

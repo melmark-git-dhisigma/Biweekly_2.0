@@ -941,6 +941,28 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
                         }
 
                     }
+					if (HttpContext.Current.Request.UserAgent.ToLower().Contains("ipad"))
+                    {
+                        reptype = true;
+                        if (rbtnIncidentalRegular.SelectedValue == "Regular")
+                        {
+                        }
+                        else
+                        {
+                            inctype = true;
+                        }
+                    }
+                    else
+                    {
+                        reptype = false;
+                        if (rbtnIncidentalRegular.SelectedValue == "Regular")
+                        {
+                        }
+                        else
+                        {
+                            inctype = true;
+                        }
+                    }
                     lbgraph.Visible = false;
                     cont.Visible = true;
                     sname.Visible = true;
