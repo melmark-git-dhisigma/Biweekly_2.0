@@ -115,6 +115,70 @@
                 obj.value = '';
             }
         }
+        function countCharacters() {
+            var textBox = document.getElementById('<%= txteventname.ClientID %>');
+            var charCountSpan = document.getElementById('charCount');
+            var remainingCount = 50 - textBox.value.length;
+
+            charCountSpan.innerText = remainingCount >= 0 ? remainingCount : 0;
+
+            if (remainingCount < 0) {
+                textBox.value = textBox.value.substring(0, 50);
+                charCountSpan.innerText = '0  characters remaining';
+            } else {
+                charCountSpan.innerText = remainingCount + '  characters remaining';
+            }
+        }
+        function showCharCount() {
+            var textBox = document.getElementById('<%= txteventname.ClientID %>');
+            var charCountSpan = document.getElementById('charCount');
+
+            if (textBox.value.length > 0) {
+                charCountSpan.style.display = 'inline'; 
+                charCountSpan.style.color = 'gray';
+                charCountSpan.style.fontSize = '10px'; 
+            } else {
+                charCountSpan.style.display = 'none'; 
+            }
+
+            countCharacters(); 
+        }
+        function countCharacters2() {
+            var textBox = document.getElementById('<%= txtComment.ClientID %>');
+     var charCountSpan = document.getElementById('charCount2');
+     var remainingCount = 50 - textBox.value.length;
+
+     charCountSpan.innerText = remainingCount >= 0 ? remainingCount : 0;
+
+     if (remainingCount < 0) {
+         textBox.value = textBox.value.substring(0, 50);
+         charCountSpan.innerText = ' 0  characters remaining';
+     } else {
+         charCountSpan.innerText = remainingCount + '  characters remaining';
+     }
+ }
+ function showCharCount2() {
+     var textBox = document.getElementById('<%= txtComment.ClientID %>');
+     var charCountSpan = document.getElementById('charCount2');
+
+     if (textBox.value.length > 0) {
+         charCountSpan.style.display = 'inline';
+         charCountSpan.style.color = 'gray';
+         charCountSpan.style.fontSize = '10px';
+     } else {
+         charCountSpan.style.display = 'none';
+     }
+     countCharacters2();
+        }
+        function hideCharCount() {
+            var charCountSpan = document.getElementById('charCount');
+            charCountSpan.style.display = 'none';
+        }
+        function hideCharCount2() {
+            var charCountSpan = document.getElementById('charCount2');
+            charCountSpan.style.display = 'none'; 
+        }
+        
     </script>
 
     <style type="text/css">
@@ -249,8 +313,10 @@
                                                     <span style="color: red">*</span>
                                                 </td>
                                                 <td>
-                                                    <asp:TextBox ID="txteventname" runat="server" CssClass="textClass"
+                                                    <asp:TextBox ID="txteventname" runat="server" CssClass="textClass" oninput="showCharCount()"  onkeyup="countCharacters()" onfocus="showCharCount()" onblur="hideCharCount()"  MaxLength="50"
                                                         Width="275px" ></asp:TextBox>
+                                                    <br />
+                                                             <span id="charCount"></span>    
                                                 </td>
                                             </tr>
 
@@ -271,7 +337,9 @@
                                                     <%--<span style="color: red">*</span>--%>
                                                 </td>
                                                 <td>
-                                                    <asp:TextBox ID="txtComment" runat="server" Width="350"></asp:TextBox>
+                                                    <asp:TextBox ID="txtComment" runat="server" Width="350" oninput="showCharCount2()" onkeyup="countCharacters2()" onfocus="showCharCount2()" onblur="hideCharCount2()"  MaxLength="50"></asp:TextBox>
+                                                    <br />
+                                                    <span id="charCount2"></span>
                                                 </td>
                                             </tr>
                                         </table>
