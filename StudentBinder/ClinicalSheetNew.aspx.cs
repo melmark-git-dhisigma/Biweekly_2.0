@@ -732,7 +732,7 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
             btnSave.Text = "Save";
             btnExport.Visible = false;
             btnGenDelete.Visible = false;
-            Datacarryover();
+            Datacarryover(endDate);
         }
         else
         {
@@ -996,7 +996,7 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
         gVRecChange.DataBind();
 
     }
-    public void Datacarryover()
+    public void Datacarryover(string endDate)
     {       
         if (btnSave.Text == "Save")
         {
@@ -1008,7 +1008,7 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
             string strcarry;
             string follow;
 
-            strcarry = "select top 1 ClinicalCvId from StdtClinicalCoverSheet where  SchoolId=" + sess.SchoolId + " and StudentId=" + sess.StudentId + " order by ClinicalCvId desc";
+            strcarry = "select top 1 ClinicalCvId from StdtClinicalCoverSheet where  SchoolId=" + sess.SchoolId + " and StudentId=" + sess.StudentId + " AND EndDate < '" + endDate + "' order by EndDate desc";
             cvrId = Convert.ToInt32(objData.FetchValue(strcarry));
             if (cvrId != 0)
             {
