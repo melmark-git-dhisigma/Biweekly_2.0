@@ -1,6 +1,6 @@
 ﻿function StopWatch(element, measurementId, c_studentId) {
     var _this = this;
-    this.Element = $('<div class="tapCount" style="height:40px;width:125px;"><input type="text" onKeyPress="return isNumber(event);" value="0:0:0" class="Time-Box"/><input type="button" id="btnStartStopTimer" value="Start" class="btrn start-stop" /><div class="retId" style="display:none;"></div><span style="display:none;" class="measurementId">' + measurementId + '</span><span class="stpSeconds" style="display:none;">0</span><span style="display:none;" class="c_studentId">' + c_studentId + '</span></div>');
+    this.Element = $('<div class="tapCount" style="height:40px;width:125px;"><input type="text" onKeyPress="return isNumber(event);" value="0:0:0" readonly="readonly" class="Time-Box"/><input type="button" id="btnStartStopTimer" value="Start" class="btrn start-stop" /><div class="retId" style="display:none;"></div><span style="display:none;" class="measurementId">' + measurementId + '</span><span class="stpSeconds" style="display:none;">0</span><span style="display:none;" class="c_studentId">' + c_studentId + '</span></div>');
     $(element).append(this.Element);
     this.Time = new Date(0);
     var FuncID;
@@ -11,11 +11,25 @@
 
 
     }
-    function start() {
-        $(_this.Element).find('.start-stop').val('Stop')
+    function start(idval) {
+        $(_this.Element).find('.start-stop').val('Stop');
+        var time = document.getElementById('testtimer' + idval).getElementsByTagName('input')[0].value;
+        var totalSec = 0;
+        var totalTime = time.split(':');
+        var splitHrElems = parseInt(totalTime[0]);
+        var splitMinElems = parseInt(totalTime[1]);
+        var splitSecElems = parseInt(totalTime[2]);
+        totalSec += (splitHrElems > 0) ? (splitHrElems * 60 * 60) : 0;
+        totalSec += (splitMinElems > 0) ? (splitMinElems * 60) : 0;
+        totalSec += (splitSecElems > 0) ? splitSecElems : 0;
+
+        _this.Time.setTime(0);
+        _this.Time.setSeconds(totalSec);
+
         FuncID = window.setInterval(function () {
             _this.Time.setSeconds(_this.Time.getSeconds() + 1);
             refreshDisplay();
+            $('.swt').hide();
         }, 1000);
 
         // saveStartTime(_this.Element);
@@ -30,6 +44,7 @@
        //alert($(_this.Element).html());
        
         refreshDisplay();
+        $('.swt').show();
     }
     function refreshDisplay() {
         var timeString = _this.Time.getUTCHours() + ":" + _this.Time.getUTCMinutes() + ":" + _this.Time.getUTCSeconds();
@@ -42,7 +57,8 @@
     }
     this.Element.find('.start-stop').click(function () {
         if ($(this).val() == 'Start') {
-            start();
+            var idval = $(this).parent().parent().attr('id').replace('testtimer', '');
+            start(idval);
         }
         else {
             stop();
