@@ -778,7 +778,7 @@ public partial class StudentBinder_SupportStrategyAttributes : System.Web.UI.Pag
                 //tdMistrialResponse.InnerHtml = "<b>Mistrial Response:</b>" + Dt.Rows[0]["Mistrial"].ToString();
                 tdNCorrect.InnerHtml = "<b>Correct Response:</b>" + Dt.Rows[0]["StudCorrRespDef"].ToString() + "</br><b>Incorrect Response:</b>" + Dt.Rows[0]["StudIncorrRespDef"].ToString();
                 //tdNICorrect.InnerHtml = "<b>Incorrect Response:</b>" + Dt.Rows[0]["StudIncorrRespDef"].ToString();
-                tdBaseLine.InnerHtml = "<b>POST CHECK PROCEDURE:</b></br>" + Dt.Rows[0]["Baseline"].ToString()+"</br>"+Dt.Rows[0]["GeneralProcedure"].ToString();
+                //tdBaseLine.InnerHtml = "<b>POST CHECK PROCEDURE:</b></br>" + Dt.Rows[0]["Baseline"].ToString()+"</br>"+Dt.Rows[0]["GeneralProcedure"].ToString();
                 //tdGenProcedure.InnerHtml = Dt.Rows[0]["GeneralProcedure"].ToString();
                 tdObjective.InnerHtml = "<b>OBJECTIVE:</b>" + " " + Dt.Rows[0]["Objective"].ToString();
                 q1.InnerHtml = Dt.Rows[0]["TeacherPrepare"].ToString();
