@@ -10510,6 +10510,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             BtnSaveMeasure.Visible = false;
             if (Hdfsavemeasure.Value != "")
             {
+                viewClearData();
                 viewMeasures();
             }
             else
@@ -10608,7 +10609,80 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         txtFrequency.ReadOnly = true;
         chkFrequencyIIG.Enabled = false;
     }
-
+    protected void viewClearData()
+    {
+        txtColumnName.Text = "";
+        rdbplusMinus.SelectedValue = "+";
+        txtplusCorrectResponse.Text = "";
+        txtPlusIncorrectResp.Text = "";
+        chkplusAccuracy.Checked = false;
+        chkplusAccuracyIIG.Checked = false;
+        chkPlusPromptPercIIG.Checked = false;
+        chkplusindependentIIG.Checked = false;
+        chkplusindependentForAllIIG.Checked = false;
+        chkpluslearnedStepIIG.Checked = false;
+        chkCurrentStepIIG.Checked = false;
+        chkplustotalcorrectIIG.Checked = false;
+        chkplustotalIncorrectIIG.Checked = false;
+        chkPrompPercAccuracyIIG.Checked = false;
+        chkPromptPercPromptIIG.Checked = false;
+        chkPercIndependentIIG.Checked = false;
+        chkPercIndependentForAllIIG.Checked = false;
+        chkPromptAccLearnedStepIIG.Checked = false;
+        chkPromptAccExcluseCrntStepIIG.Checked = false;
+        chkTxtNaIIG.Checked = false;
+        chkTextCustomizeIIG.Checked = false;
+        chkDurAverageIIG.Checked = false;
+        chkDurTotalDurIIG.Checked = false;
+        chkFrequencyIIG.Checked = false;
+        txtplusAccuracy.Text = "";
+        txtplustotalcorrect.Text = "";
+        txtPlustotalIncorrect.Text = "";
+        chkPlusPromptPerc.Checked = false;
+        txtPlusPromptPerc.Text = "";
+        chkplusindependent.Checked = false;
+        txtplusIndependent.Text = "";
+        chkplusindependentForAll.Checked = false;
+        txtplusIndependentForAll.Text = "";
+        chkplustotalcorrect.Checked = false;
+        chkplustotalIncorrect.Checked = false;
+        chkpluslearnedStep.Checked = false;
+        txtpluslearnedStep.Text = "";
+        chkCurrentStep.Checked = false;
+        txtExCurrentStep.Text = "";
+        chkCurrentPrompt.Checked = false;
+        txtpromptSelectPrompt.Text = "";
+        txtPromptIncrctResp.Text = "";
+        chkPrompPercAccuracy.Checked = false;
+        txtPromptAccuracy.Text = "";
+        chkPromptPercPrompt.Checked = false;
+        txtPromptpecPrompt.Text = "";
+        chkPercIndependent.Checked = false;
+        txtPromptIndependent.Text = "";
+        chkPercIndependentForAll.Checked = false;
+        txtPromptIndependentForAll.Text = "";
+        chkPromptAccLearnedStep.Checked = false;
+        txtPromptAccLearnedStep.Text = "";
+        chkPromptAccExcluseCrntStep.Checked = false;
+        txtPromptAccExcluseCrntStep.Text = "";
+        chkTxtNa.Checked = false;
+        txtTxtNA.Text = "";
+        chkTextCustomize.Checked = false;
+        txtTxtCustomize.Text = "";
+        txtCalcuType.Text = "";
+        txtTextCrctResponse.Text = "";
+        txtTextInCrctResp.Text = "";
+        txtDurCorrectResponse.Text = "";
+        txtDurIncrctResp.Text = "";
+        chkDurAverage.Checked = false;
+        txtDurAverage.Text = "";
+        chkDurTotalDur.Checked = false;
+        txtDurTotalDuration.Text = "";
+        txtFreqCorrectResponse.Text = "";
+        txtfreqIncrctResp.Text = "";
+        chkFrequency.Checked = false;
+        txtFrequency.Text = "";
+    }
     protected void EditMeasureData(int columnId)
     {
         objData = new clsData();
