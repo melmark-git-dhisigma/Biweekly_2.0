@@ -3260,13 +3260,16 @@ public partial class Home : System.Web.UI.Page
         objData = new clsData();
         if (txtSnameDsch.Text.Trim() == "Choose Discharged Client")
         {
-            studentDetail = "SELECT distinct ST.StudentPersonalId AS Id, ST.FirstName+' ' +ST.LastName AS Name FROM StudentPersonal ST  join StdtClass stcl on ST.StudentPersonalId=stcl.StdtId where stcl.ClassId=(select ClassId from Class where ClassCd='dsch')";
+            studentDetail = "SELECT Distinct StudentPersonalId AS Id, FirstName+' ' +LastName AS Name FROM StudentPersonal WHERE StudentType='client' and clientid>0 and StudentPersonalId not in" +
+                             "(SELECT Distinct ST.StudentPersonalId FROM StudentPersonal ST join Placement PLC on PLC.StudentPersonalId=ST.StudentPersonalId WHERE (PLC.EndDate is null or PLC.EndDate>=cast (GETDATE() as DATE)) and PLC.Status=1 )";
         }
         else
         {
-            studentDetail = "SELECT Id, Name FROM (SELECT distinct STP.StudentPersonalId AS Id, STP.FirstName+' ' +STP.LastName AS Name FROM StudentPersonal STP  join StdtClass stcl on STP.StudentPersonalId=stcl.StdtId where stcl.ClassId=(select ClassId from Class where ClassCd='dsch') AND (STP.FirstName='" + clsGeneral.convertQuotes(txtSnameDsch.Text.Trim()) + "' " +
-                            "OR STP.LastName='" + clsGeneral.convertQuotes(txtSnameDsch.Text.Trim()) + "' OR STP.FirstName+STP.LastName='" + clsGeneral.convertQuotes(txtSnameDsch.Text.Trim()) + "' OR STP.LastName+STP.FirstName='" + clsGeneral.convertQuotes(txtSnameDsch.Text.Trim()) + "' " +
-                            "OR STP.LastName LIKE '%" + clsGeneral.convertQuotes(txtSnameDsch.Text.Trim()) + "%' OR STP.FirstName LIKE '%" + clsGeneral.convertQuotes(txtSnameDsch.Text.Trim()) + "%')) AS STDTCLASS";
+            studentDetail = "SELECT Id, Name FROM (SELECT distinct StudentPersonalId AS Id, FirstName+' ' +LastName AS Name FROM StudentPersonal WHERE StudentType='client' and clientid>0 and StudentPersonalId not in" +
+                             "(SELECT Distinct ST.StudentPersonalId FROM StudentPersonal ST join Placement PLC on PLC.StudentPersonalId=ST.StudentPersonalId WHERE (PLC.EndDate is null or PLC.EndDate>=cast (GETDATE() as DATE)) and PLC.Status=1 )"+
+                            "AND (FirstName='" + clsGeneral.convertQuotes(txtSnameDsch.Text.Trim()) + "' " +
+                            "OR LastName='" + clsGeneral.convertQuotes(txtSnameDsch.Text.Trim()) + "' OR FirstName+LastName='" + clsGeneral.convertQuotes(txtSnameDsch.Text.Trim()) + "' OR LastName+FirstName='" + clsGeneral.convertQuotes(txtSnameDsch.Text.Trim()) + "' " +
+                            "OR LastName LIKE '%" + clsGeneral.convertQuotes(txtSnameDsch.Text.Trim()) + "%' OR FirstName LIKE '%" + clsGeneral.convertQuotes(txtSnameDsch.Text.Trim()) + "%')) AS STDTCLASS";
         }
         DataTable dt = objData.ReturnDataTable(studentDetail, false);
         if (dt == null) return;

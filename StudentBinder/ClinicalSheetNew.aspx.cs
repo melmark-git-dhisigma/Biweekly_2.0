@@ -777,7 +777,7 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
                     //string setloctnlstA = objData.FetchValue(setloctnlst).ToString();
 
                     System.Data.DataColumn newProgram = new System.Data.DataColumn("Program", typeof(System.String));
-                    newProgram.DefaultValue = getHdrPrograms(Flcvid); //setpgmlstA.ToString();
+                    newProgram.DefaultValue = getHdrPrograms(Flcvid,0); //setpgmlstA.ToString();
                     DtStdetailGrid.Columns.Add(newProgram);
 
                     System.Data.DataColumn newLocation = new System.Data.DataColumn("Location", typeof(System.String));
@@ -1485,15 +1485,43 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
             iepDate = objVal.ToString();
         }
 
-        //string Program = Convert.ToString(objData.FetchValue("SELECT Department FROM Placement WHERE StudentPersonalId=" + sess.StudentId + " AND Location=" + sess.Classid + ""));
-
-        string getLoctn = objData.FetchValue("SELECT STUFF(( SELECT ','+CAST(Location AS VARCHAR(500)) FROM Placement WHERE StudentPersonalId = " + sess.StudentId + " AND EndDate IS NULL AND Status > 0 FOR XML PATH('')), 1, 1, '')").ToString();
+        //For discharged student 
+        string disstud = "SELECT Distinct StudentPersonalId AS Id, FirstName+' ' +LastName AS Name FROM StudentPersonal WHERE StudentType='client' and clientid>0 and StudentPersonalId not in" +
+                             "(SELECT Distinct ST.StudentPersonalId FROM StudentPersonal ST join Placement PLC on PLC.StudentPersonalId=ST.StudentPersonalId WHERE (PLC.EndDate is null or PLC.EndDate>=cast (GETDATE() as DATE)) and PLC.Status=1 )";
+         System.Data.DataTable disdt = objData.ReturnDataTable(disstud, false);
+        String studStatus = "";
+        DataRow[] foundRows = disdt.Select("Id = '" + sess.StudentId + "'");
+        if (foundRows.Length > 0)
+        {
+            studStatus = "DISCHARGED";
+        }
+        else
+        {
+            studStatus = "ACTIVE";
+        }
+        string getLoctn = "";
         string getPgm = "";
+        if (studStatus == "DISCHARGED")
+        {
+
+            getLoctn = objData.FetchValue("SELECT STUFF(( SELECT ','+CAST(PrevClassId AS VARCHAR(500)) FROM Placement WHERE StudentPersonalId = " + sess.StudentId + " AND Location=(select ClassId  from Class where ClassCd='DSCH') AND Status > 0 FOR XML PATH('')), 1, 1, '')").ToString();
+            
+          if (getLoctn != "") 
+                {
+                    getPgm = objData.FetchValue("SELECT (SELECT STUFF(( SELECT ','+CAST(Department AS VARCHAR(500)) FROM Placement WHERE StudentPersonalId = " + sess.StudentId + "  AND PrevClassId IN(" + getLoctn + ") AND EndDate < CONVERT(date, GETDATE()) AND STATUS > 0 FOR XML PATH('')), 1, 1, ''))").ToString();
+                }
+        }
+            
+        
+        else
+        {
+            //string Program = Convert.ToString(objData.FetchValue("SELECT Department FROM Placement WHERE StudentPersonalId=" + sess.StudentId + " AND Location=" + sess.Classid + ""));
+            getLoctn = objData.FetchValue("SELECT STUFF(( SELECT ','+CAST(Location AS VARCHAR(500)) FROM Placement WHERE StudentPersonalId = " + sess.StudentId + " AND (EndDate IS NULL OR EndDate >= CONVERT(date, GETDATE())) AND Status > 0 FOR XML PATH('')), 1, 1, '')").ToString();
         if (getLoctn != "")
         {
-            getPgm = objData.FetchValue("SELECT (SELECT STUFF(( SELECT ','+CAST(Department AS VARCHAR(500)) FROM Placement WHERE StudentPersonalId = " + sess.StudentId + "  AND Location IN(" + getLoctn + ") AND EndDate IS NULL AND STATUS > 0 FOR XML PATH('')), 1, 1, ''))").ToString();
+                getPgm = objData.FetchValue("SELECT (SELECT STUFF(( SELECT ','+CAST(Department AS VARCHAR(500)) FROM Placement WHERE StudentPersonalId = " + sess.StudentId + "  AND Location IN(" + getLoctn + ") AND (EndDate IS NULL OR EndDate >= CONVERT(date, GETDATE())) AND STATUS > 0 FOR XML PATH('')), 1, 1, ''))").ToString();
         }
-
+        }
         //else
         //{
         //    querry = "Select CONVERT(varchar,[EffStartDate],101)+'-'+CONVERT(varchar,[EffEndDate],101) As IEPDATE FROM StdtIEP WHERE StudentId = " + sess.StudentId + " and StatusId = " + iepApproval;
@@ -1981,7 +2009,7 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
             if (Dt != null)
             {
                 System.Data.DataColumn newProgram = new System.Data.DataColumn("Program", typeof(System.String));
-                newProgram.DefaultValue = getHdrPrograms(int.Parse(hdFldCvid.Value));
+                newProgram.DefaultValue = getHdrPrograms(int.Parse(hdFldCvid.Value),1);
                 Dt.Columns.Add(newProgram);
 
                 System.Data.DataColumn newLocation = new System.Data.DataColumn("Location", typeof(System.String));
@@ -3535,48 +3563,200 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
             endDate = asmdate.Split('-')[1];
         }
 
-        string getLocations = objData.FetchValue("SELECT STUFF(( SELECT ','+CAST(Location AS VARCHAR(500)) FROM Placement WHERE StudentPersonalId = " + sess.StudentId + " AND EndDate IS NULL AND Status > 0 FOR XML PATH('')), 1, 1, '')").ToString();
-
-        if (getLocations != "")
+        string getLocations = "";
+        string disstud = "SELECT Distinct StudentPersonalId AS Id, FirstName+' ' +LastName AS Name FROM StudentPersonal WHERE StudentType='client' and clientid>0 and StudentPersonalId not in" +
+                             "(SELECT Distinct ST.StudentPersonalId FROM StudentPersonal ST join Placement PLC on PLC.StudentPersonalId=ST.StudentPersonalId WHERE (PLC.EndDate is null or PLC.EndDate>=cast (GETDATE() as DATE)) and PLC.Status=1 )";
+        System.Data.DataTable disdt = objData.ReturnDataTable(disstud, false);
+        String studStatus = "";
+        DataRow[] foundRows = disdt.Select("Id = '" + sess.StudentId + "'");
+        if (foundRows.Length > 0)
         {
+            studStatus = "DISCHARGED";
+        }
+        else
+        {
+            studStatus = "ACTIVE";
+        }
+        if (studStatus == "DISCHARGED")
+        {
+
+            getLocations = objData.FetchValue("SELECT STUFF(( SELECT ','+CAST(PrevClassId AS VARCHAR(500)) FROM Placement WHERE StudentPersonalId = " + sess.StudentId + " AND Location=(select ClassId  from Class where ClassCd='DSCH') AND Status > 0 FOR XML PATH('')), 1, 1, '')").ToString();
+        }
+        else
+        {
+            getLocations = objData.FetchValue("SELECT STUFF(( SELECT ','+CAST(Location AS VARCHAR(500)) FROM Placement WHERE StudentPersonalId = " + sess.StudentId + " AND (EndDate IS NULL OR EndDate >= CONVERT(date, GETDATE())) AND Status > 0 FOR XML PATH('')), 1, 1, '')").ToString();
+        }
+
+        
             string query = "";
-            if (sess.SchoolId == 1)
+           if (sess.SchoolId == 1)
             {
-                query = "select Student.StudentPersonalId as StdtId," +
-                        "Student.StudentFname+' '+Student.StudentLname as StdName," +
-                        "(SELECT ClassName FROM Class WHERE ClassId = " + clsid + ") Location_old," +
-                        "(SELECT (SELECT STUFF(( SELECT ','+ClassName FROM Class WHERE ClassId IN (" + getLocations + ") FOR XML PATH('')), 1, 1, ''))) as Location," +
-                        "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPSDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = Student.StudentPersonalId AND ClinicalBehIEPSDate IS NOT NULL order by EndDate desc) AS IepStDate," +
-                        "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPEDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = Student.StudentPersonalId AND ClinicalBehIEPEDate IS NOT NULL order by EndDate desc) AS IepEnDate," +
-                        "(SELECT TOP 1 Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = Student.StudentPersonalId AND Location = " + clsid + " AND EndDate IS NULL AND STATUS > 0)) Program_old," +
-                        "(SELECT (SELECT STUFF(( SELECT ','+Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = Student.StudentPersonalId AND Location IN(" + getLocations + ") AND EndDate IS NULL AND STATUS > 0) FOR XML PATH('')), 1, 1, ''))) AS Program," +
-                        "(Select TOP 1 CONVERT(varchar,[EffStartDate],101)+'-'+CONVERT(varchar,[EffEndDate],101) As IEPDATE FROM StdtIEP WHERE StudentId = Student.StudentPersonalId and StatusId IN (" +
-                        "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'In Progress')," +
-                        "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Approved')," +
-                        "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Pending Approval')) ORDER BY StdtIEPId DESC) AS IepYear," +
-                        "(SELECT convert(varchar,AsmntYearStartDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdstdate," +
-                        "(SELECT convert(varchar,AsmntYearEndDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdendate " +
-                        "from Student " +
-                        "where Student.StudentId = " + stdid + " and Student.SchoolId = " + schlid + "";
+                if (getLocations != "")
+                {
+                    if (studStatus == "DISCHARGED")
+                    {
+                        query = "select StudentPersonal.StudentPersonalId as StdtId," +
+                                                        "StudentPersonal.FirstName+' '+StudentPersonal.LastName as StdName," +
+                                                        "(SELECT ClassName FROM Class WHERE ClassId = " + clsid + ") Location_old," +
+                                                        "(SELECT (SELECT STUFF(( SELECT ','+ClassName FROM Class WHERE ClassId IN (" + getLocations + ") FOR XML PATH('')), 1, 1, ''))) as Location," +
+                                                        "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPSDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPSDate IS NOT NULL order by EndDate desc) AS IepStDate," +
+                                                        "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPEDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPEDate IS NOT NULL order by EndDate desc) AS IepEnDate," +
+                                                        "(SELECT TOP 1 Replace(LookupName, '&', '&') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND Location = " + clsid + " AND  EndDate<cast (GETDATE() as DATE) AND STATUS > 0)) Program_old," +
+                                                        "(SELECT (SELECT STUFF(( SELECT ','+Replace(LookupName, '&', '&') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND PrevClassId IN(" + getLocations + ") AND  EndDate<cast (GETDATE() as DATE) AND STATUS > 0) FOR XML PATH('')), 1, 1, ''))) AS Program," +
+                                                        "(Select TOP 1 CONVERT(varchar,[EffStartDate],101)+'-'+CONVERT(varchar,[EffEndDate],101) As IEPDATE FROM StdtIEP WHERE StudentId = StudentPersonal.StudentPersonalId and StatusId IN (" +
+                                                        "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'In Progress')," +
+                                                        "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Approved')," +
+                                                        "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Pending Approval')) ORDER BY StdtIEPId DESC) AS IepYear," +
+                                                        "(SELECT convert(varchar,AsmntYearStartDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdstdate," +
+                                                        "(SELECT convert(varchar,AsmntYearEndDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdendate " +
+                                                        "from StudentPersonal " +
+                                                        "where StudentPersonal.StudentPersonalId = " + stdid + " and StudentPersonal.SchoolId = " + schlid + "";
+                    }
+                    else
+                    {
+                        query = "select StudentPersonal.StudentPersonalId as StdtId," +
+                                "StudentPersonal.FirstName+' '+StudentPersonal.LastName as StdName," +
+                                "(SELECT ClassName FROM Class WHERE ClassId = " + clsid + ") Location_old," +
+                                "(SELECT (SELECT STUFF(( SELECT ','+ClassName FROM Class WHERE ClassId IN (" + getLocations + ") FOR XML PATH('')), 1, 1, ''))) as Location," +
+                                "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPSDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPSDate IS NOT NULL order by EndDate desc) AS IepStDate," +
+                                "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPEDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPEDate IS NOT NULL order by EndDate desc) AS IepEnDate," +
+                                "(SELECT TOP 1 Replace(LookupName, '&', '&') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND Location = " + clsid + " AND (EndDate IS NULL OR EndDate>=cast (GETDATE() as DATE)) AND STATUS > 0)) Program_old," +
+                                "(SELECT (SELECT STUFF(( SELECT ','+Replace(LookupName, '&', '&') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND Location IN(" + getLocations + ") AND (EndDate IS NULL OR EndDate>=cast (GETDATE() as DATE)) AND STATUS > 0) FOR XML PATH('')), 1, 1, ''))) AS Program," +
+                                "(Select TOP 1 CONVERT(varchar,[EffStartDate],101)+'-'+CONVERT(varchar,[EffEndDate],101) As IEPDATE FROM StdtIEP WHERE StudentId = StudentPersonal.StudentPersonalId and StatusId IN (" +
+                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'In Progress')," +
+                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Approved')," +
+                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Pending Approval')) ORDER BY StdtIEPId DESC) AS IepYear," +
+                                "(SELECT convert(varchar,AsmntYearStartDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdstdate," +
+                                "(SELECT convert(varchar,AsmntYearEndDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdendate " +
+                                "from StudentPersonal " +
+                                "where StudentPersonal.StudentPersonalId = " + stdid + " and StudentPersonal.SchoolId = " + schlid + "";
+                    }
+                }
+                else {
+                    if (studStatus == "DISCHARGED")
+                    {
+                        query = "select StudentPersonal.StudentPersonalId as StdtId," +
+                               "StudentPersonal.FirstName+' '+StudentPersonal.LastName as StdName," +
+                               "(SELECT ClassName FROM Class WHERE ClassId = " + clsid + ") Location_old," +
+                               " 'No location available' as Location," +
+                               "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPSDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPSDate IS NOT NULL order by EndDate desc) AS IepStDate," +
+                               "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPEDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPEDate IS NOT NULL order by EndDate desc) AS IepEnDate," +
+                               "(SELECT TOP 1 Replace(LookupName, '&', '&') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND Location = " + clsid + " AND  EndDate<cast (GETDATE() as DATE) AND STATUS > 0)) Program_old," +
+                               "'No program available' AS Program," +
+                               "(Select TOP 1 CONVERT(varchar,[EffStartDate],101)+'-'+CONVERT(varchar,[EffEndDate],101) As IEPDATE FROM StdtIEP WHERE StudentId = StudentPersonal.StudentPersonalId and StatusId IN (" +
+                               "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'In Progress')," +
+                               "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Approved')," +
+                               "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Pending Approval')) ORDER BY StdtIEPId DESC) AS IepYear," +
+                               "(SELECT convert(varchar,AsmntYearStartDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdstdate," +
+                               "(SELECT convert(varchar,AsmntYearEndDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdendate " +
+                               "from StudentPersonal " +
+                               "where StudentPersonal.StudentPersonalId = " + stdid + " and StudentPersonal.SchoolId = " + schlid + "";
+                    }
+                    else
+                    {
+                        query = "select StudentPersonal.StudentPersonalId as StdtId," +
+                               "StudentPersonal.FirstName+' '+StudentPersonal.LastName as StdName," +
+                               "(SELECT ClassName FROM Class WHERE ClassId = " + clsid + ") Location_old," +
+                               " 'No location available' as Location," +
+                               "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPSDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPSDate IS NOT NULL order by EndDate desc) AS IepStDate," +
+                               "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPEDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPEDate IS NOT NULL order by EndDate desc) AS IepEnDate," +
+                               "(SELECT TOP 1 Replace(LookupName, '&', '&') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND Location = " + clsid + " AND (EndDate IS NULL OR EndDate>=cast (GETDATE() as DATE)) AND STATUS > 0)) Program_old," +
+                               "'No program available' AS Program," +
+                               "(Select TOP 1 CONVERT(varchar,[EffStartDate],101)+'-'+CONVERT(varchar,[EffEndDate],101) As IEPDATE FROM StdtIEP WHERE StudentId = StudentPersonal.StudentPersonalId and StatusId IN (" +
+                               "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'In Progress')," +
+                               "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Approved')," +
+                               "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Pending Approval')) ORDER BY StdtIEPId DESC) AS IepYear," +
+                               "(SELECT convert(varchar,AsmntYearStartDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdstdate," +
+                               "(SELECT convert(varchar,AsmntYearEndDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdendate " +
+                               "from StudentPersonal " +
+                               "where StudentPersonal.StudentPersonalId = " + stdid + " and StudentPersonal.SchoolId = " + schlid + "";
+                    }
+
+                }
             }
             else
             {
-                query = "select Student.StudentPersonalId as StdtId," +
-                        "Student.StudentFname+' '+Student.StudentLname as StdName," +
-                        "(SELECT ClassName FROM Class WHERE ClassId = " + clsid + ") Location_old," +
-                        "(SELECT (SELECT STUFF(( SELECT ','+ClassName FROM Class WHERE ClassId IN (" + getLocations + ") FOR XML PATH('')), 1, 1, ''))) as Location," +
-                        "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPSDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = Student.StudentPersonalId AND ClinicalBehIEPSDate IS NOT NULL order by EndDate desc) AS IepStDate," +
-                        "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPEDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = Student.StudentPersonalId AND ClinicalBehIEPEDate IS NOT NULL order by EndDate desc) AS IepEnDate," +
-                        "(SELECT TOP 1 Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = Student.StudentPersonalId AND Location = " + clsid + " AND EndDate IS NULL AND STATUS > 0)) Program_old," +
-                        "(SELECT (SELECT STUFF(( SELECT ','+Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = Student.StudentPersonalId AND Location IN(" + getLocations + ") AND EndDate IS NULL AND STATUS > 0) FOR XML PATH('')), 1, 1, ''))) AS Program," +
-                        "(Select TOP 1 CONVERT(varchar,[EffStartDate],101)+'-'+CONVERT(varchar,[EffEndDate],101) As IEPDATE FROM StdtIEP WHERE StudentId = Student.StudentPersonalId and StatusId IN (" +
-                        "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'In Progress')," +
-                        "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Approved')," +
-                        "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Pending Approval')) ORDER BY StdtIEPId DESC) AS IepYear," +
-                        "(SELECT convert(varchar,AsmntYearStartDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdstdate," +
-                        "(SELECT convert(varchar,AsmntYearEndDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdendate " +
-                        "from Student " +
-                        "where Student.StudentId = " + stdid + " and Student.SchoolId = " + schlid + "";
+                if (getLocations != "")
+                {
+                    if (studStatus == "DISCHARGED")
+                    {
+                        query = "select StudentPersonal.StudentPersonalId as StdtId," +
+                                "StudentPersonal.FirstName+' '+StudentPersonal.LastName as StdName," +
+                                "(SELECT ClassName FROM Class WHERE ClassId = " + clsid + ") Location_old," +
+                                "(SELECT (SELECT STUFF(( SELECT ','+ClassName FROM Class WHERE ClassId IN (" + getLocations + ") FOR XML PATH('')), 1, 1, ''))) as Location," +
+                                "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPSDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPSDate IS NOT NULL order by EndDate desc) AS IepStDate," +
+                                "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPEDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPEDate IS NOT NULL order by EndDate desc) AS IepEnDate," +
+                                "(SELECT TOP 1 Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND Location = " + clsid + " AND  EndDate<cast (GETDATE() as DATE) AND STATUS > 0)) Program_old," +
+                                "(SELECT (SELECT STUFF(( SELECT ','+Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND PrevClassId IN(" + getLocations + ") AND EndDate<cast (GETDATE() as DATE) AND STATUS > 0) FOR XML PATH('')), 1, 1, ''))) AS Program," +
+                                "(Select TOP 1 CONVERT(varchar,[EffStartDate],101)+'-'+CONVERT(varchar,[EffEndDate],101) As IEPDATE FROM StdtIEP WHERE StudentId = StudentPersonal.StudentPersonalId and StatusId IN (" +
+                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'In Progress')," +
+                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Approved')," +
+                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Pending Approval')) ORDER BY StdtIEPId DESC) AS IepYear," +
+                                "(SELECT convert(varchar,AsmntYearStartDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdstdate," +
+                                "(SELECT convert(varchar,AsmntYearEndDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdendate " +
+                                "from StudentPersonal " +
+                                "where StudentPersonal.StudentPersonalId = " + stdid + " and StudentPersonal.SchoolId = " + schlid + "";
+                    }
+                    else
+                    {
+                        query = "select StudentPersonal.StudentPersonalId as StdtId," +
+                                "StudentPersonal.FirstName+' '+StudentPersonal.LastName as StdName," +
+                                "(SELECT ClassName FROM Class WHERE ClassId = " + clsid + ") Location_old," +
+                                "(SELECT (SELECT STUFF(( SELECT ','+ClassName FROM Class WHERE ClassId IN (" + getLocations + ") FOR XML PATH('')), 1, 1, ''))) as Location," +
+                                "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPSDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPSDate IS NOT NULL order by EndDate desc) AS IepStDate," +
+                                "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPEDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPEDate IS NOT NULL order by EndDate desc) AS IepEnDate," +
+                                "(SELECT TOP 1 Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND Location = " + clsid + " AND (EndDate IS NULL OR EndDate>=cast (GETDATE() as DATE)) AND STATUS > 0)) Program_old," +
+                                "(SELECT (SELECT STUFF(( SELECT ','+Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND Location IN(" + getLocations + ") AND (EndDate IS NULL OR EndDate>=cast (GETDATE() as DATE)) AND STATUS > 0) FOR XML PATH('')), 1, 1, ''))) AS Program," +
+                                "(Select TOP 1 CONVERT(varchar,[EffStartDate],101)+'-'+CONVERT(varchar,[EffEndDate],101) As IEPDATE FROM StdtIEP WHERE StudentId = StudentPersonal.StudentPersonalId and StatusId IN (" +
+                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'In Progress')," +
+                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Approved')," +
+                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Pending Approval')) ORDER BY StdtIEPId DESC) AS IepYear," +
+                                "(SELECT convert(varchar,AsmntYearStartDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdstdate," +
+                                "(SELECT convert(varchar,AsmntYearEndDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdendate " +
+                                "from StudentPersonal " +
+                                "where StudentPersonal.StudentPersonalId = " + stdid + " and StudentPersonal.SchoolId = " + schlid + "";
+                    }
+                }
+                else{
+                    if (studStatus == "DISCHARGED")
+                    {
+                        query = "select StudentPersonal.StudentPersonalId as StdtId," +
+                                "StudentPersonal.FirstName+' '+StudentPersonal.LastName as StdName," +
+                                "(SELECT ClassName FROM Class WHERE ClassId = " + clsid + ") Location_old," +
+                                "'No location available' as Location," +
+                                "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPSDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPSDate IS NOT NULL order by EndDate desc) AS IepStDate," +
+                                "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPEDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPEDate IS NOT NULL order by EndDate desc) AS IepEnDate," +
+                                "(SELECT TOP 1 Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND Location = " + clsid + " AND  EndDate<cast (GETDATE() as DATE) AND STATUS > 0)) Program_old," +
+                                "'No program available' AS Program," +
+                                "(Select TOP 1 CONVERT(varchar,[EffStartDate],101)+'-'+CONVERT(varchar,[EffEndDate],101) As IEPDATE FROM StdtIEP WHERE StudentId = StudentPersonal.StudentPersonalId and StatusId IN (" +
+                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'In Progress')," +
+                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Approved')," +
+                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Pending Approval')) ORDER BY StdtIEPId DESC) AS IepYear," +
+                                "(SELECT convert(varchar,AsmntYearStartDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdstdate," +
+                                "(SELECT convert(varchar,AsmntYearEndDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdendate " +
+                                "from StudentPersonal " +
+                                "where StudentPersonal.StudentPersonalId = " + stdid + " and StudentPersonal.SchoolId = " + schlid + "";
+                    }
+                    else
+                    {
+                        query = "select StudentPersonal.StudentPersonalId as StdtId," +
+                                "StudentPersonal.FirstName+' '+StudentPersonal.LastName as StdName," +
+                                "(SELECT ClassName FROM Class WHERE ClassId = " + clsid + ") Location_old," +
+                                "'No location available' as Location," +
+                                "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPSDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPSDate IS NOT NULL order by EndDate desc) AS IepStDate," +
+                                "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPEDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPEDate IS NOT NULL order by EndDate desc) AS IepEnDate," +
+                                "(SELECT TOP 1 Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND Location = " + clsid + " AND (EndDate IS NULL OR EndDate>=cast (GETDATE() as DATE)) AND STATUS > 0)) Program_old," +
+                                "'No program available' AS Program," +
+                                "(Select TOP 1 CONVERT(varchar,[EffStartDate],101)+'-'+CONVERT(varchar,[EffEndDate],101) As IEPDATE FROM StdtIEP WHERE StudentId = StudentPersonal.StudentPersonalId and StatusId IN (" +
+                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'In Progress')," +
+                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Approved')," +
+                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Pending Approval')) ORDER BY StdtIEPId DESC) AS IepYear," +
+                                "(SELECT convert(varchar,AsmntYearStartDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdstdate," +
+                                "(SELECT convert(varchar,AsmntYearEndDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdendate " +
+                                "from StudentPersonal " +
+                                "where StudentPersonal.StudentPersonalId = " + stdid + " and StudentPersonal.SchoolId = " + schlid + "";
+                    }
+                }
             }
 
             dtHdr = objData.ReturnDataTable(query, false);
@@ -3594,8 +3774,8 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
                 GridView2.DataSource = dtHdr;
                 GridView2.DataBind();
             }
-        }
-    }
+     }
+    
 
     public string getHdrLocations(int Clcvid1)
     {
@@ -3605,15 +3785,22 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
         {
             string getloctnlst = "select Location from StdtClinicalCoverSheet where ClinicalCvId =" + Clid;
             string getloctnlstA = objData.FetchValue(getloctnlst).ToString();
-            string setloctnlst = "SELECT (SELECT STUFF(( SELECT ', '+ClassName FROM Class WHERE ClassId IN  (" + getloctnlstA + ") FOR XML PATH('')), 1, 1, ''))from StdtClinicalCoverSheet where ClinicalCvId =" + Clid;            
+            if (getloctnlstA != "")
+            {
+                string setloctnlst = "SELECT (SELECT STUFF(( SELECT ', '+ClassName FROM Class WHERE ClassId IN  (" + getloctnlstA + ") FOR XML PATH('')), 1, 1, ''))from StdtClinicalCoverSheet where ClinicalCvId =" + Clid;
             string setloctnlstA = objData.FetchValue(setloctnlst).ToString();
             setLoctn = setloctnlstA;
+        }
+            else
+            {
+                setLoctn = "No location available";
+            }
         }
 
         return setLoctn;
     }
 
-    public string getHdrPrograms(int Clcvid2)
+    public string getHdrPrograms(int Clcvid2,int expval)
     {
         int Clid = Clcvid2;
         string setPgm = "";
@@ -3621,9 +3808,22 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
         {
             string getpgmlst = "select Program from StdtClinicalCoverSheet where ClinicalCvId =" + Clid;
             string getpgmlstA = objData.FetchValue(getpgmlst).ToString();
-            string setpgmlst = "SELECT (SELECT STUFF(( SELECT ', '+Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (" + getpgmlstA + ") FOR XML PATH('')), 1, 1, '')) from StdtClinicalCoverSheet where ClinicalCvId =" + Clid;
+            if (getpgmlstA != "")
+            {
+                string setpgmlst = "SELECT (SELECT STUFF(( SELECT ', '+Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (" + getpgmlstA + ") FOR XML PATH('')), 1, 1, '')) from StdtClinicalCoverSheet where ClinicalCvId =" + Clid;
             string setpgmlstA = objData.FetchValue(setpgmlst).ToString();
             setPgm = setpgmlstA;
+        }
+            else
+            {
+                if (expval == 1)
+                {
+                    //tdMsg.InnerHtml = clsGeneral.warningMsg("Location and Program not available");
+                    string script = "<script>alert('Location or Program is missing!');</script>";
+                    ClientScript.RegisterStartupScript(this.GetType(), "ServerAlert", script);
+                }
+                setPgm = "No program available ";
+            }
         }
         return setPgm;
     }
