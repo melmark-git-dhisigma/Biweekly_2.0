@@ -1785,8 +1785,11 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 }
             } 
 
-            selQuerry = "SELECT  DSTempParentStepId,SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames FROM DSTempParentStep"
-                        + " WHERE DSTempHdrId = " + headerId + " And ActiveInd = 'A' ORDER BY SortOrder";
+            //selQuerry = "SELECT  DSTempParentStepId,SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames FROM DSTempParentStep"
+            //            + " WHERE DSTempHdrId = " + headerId + " And ActiveInd = 'A' ORDER BY SortOrder";
+            selQuerry = "SELECT  DSTempParentStepId,SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames FROM DSTempParentStep " +
+                        " WHERE DSTempHdrId = " + headerId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + headerId + " AND ActiveInd = 'A') " +
+                        " AND ActiveInd = 'A' ORDER BY SortOrder";
             DataTable dtList = objData.ReturnDataTable(selQuerry, false);
             DataTable dtUpdated = new DataTable();
             dtUpdated = dtList.Clone();
