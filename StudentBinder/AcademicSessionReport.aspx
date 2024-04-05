@@ -1976,8 +1976,8 @@ year
 
                         }
                         else {
-                            meddiv.style.width = '900pt';
-                            meddiv.style.height = '200pt';
+                            meddiv.style.width = '935.43307pt';
+                            meddiv.style.height = '164.05358746pt';
 
                         }
                     }
@@ -1989,8 +1989,8 @@ year
                     myDiv.style.width = '671.976pt';
                     myDiv.style.height = '510.2364pt';
                 } else {
-                    myDiv.style.width = '900pt';
-                    myDiv.style.height = '400pt';
+                    myDiv.style.width = '935.43307pt';
+                    myDiv.style.height = '688.901215752pt';
                 }
                     // set cont size End
                 var lplan = lessid;

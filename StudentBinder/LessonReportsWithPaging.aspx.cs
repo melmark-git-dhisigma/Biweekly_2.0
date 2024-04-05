@@ -118,7 +118,7 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
                         GenerateLessonPlanReport();
                         LessonDiv.Visible = true;
                     }
-                    // GenerateReport();
+                    // generateHighchartReport();
                     loadLessonPlan();
                     //}
                     //else
@@ -1551,6 +1551,28 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
                 }
             }
             if (highcheck.Checked == true) {
+				if (HttpContext.Current.Request.UserAgent.ToLower().Contains("ipad"))
+                {
+                    reptype = true;
+                    if (rbtnIncidentalRegularall.SelectedValue == "Regular")
+                    {
+                    }
+                    else
+                    {
+                        inctype = true;
+                    }
+                }
+                else
+                {
+                    reptype = false;
+                    if (rbtnIncidentalRegularall.SelectedValue == "Regular")
+                    {
+                    }
+                    else
+                    {
+                        inctype = true;
+                    }
+                }
                 Session["StudName"] = sess.StudentName;
                 sDate = StartDate.ToString();
                 eDate = enddate.ToString();

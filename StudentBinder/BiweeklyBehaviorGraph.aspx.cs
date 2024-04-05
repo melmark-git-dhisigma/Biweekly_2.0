@@ -1082,6 +1082,28 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
                 {
                     rategraph.Visible = true;
                 }
+                if (HttpContext.Current.Request.UserAgent.ToLower().Contains("ipad"))
+                {
+                    reptype = true;
+                    if (rbtnIncidentalRegular.SelectedValue == "Regular")
+                    {
+                    }
+                    else
+                    {
+                        inctype = true;
+                    }
+                }
+                else
+                {
+                    reptype = false;
+                    if (rbtnIncidentalRegular.SelectedValue == "Regular")
+                    {
+                    }
+                    else
+                    {
+                        inctype = true;
+                    }
+                }
                 Session["StudName"] = sess.StudentName;
                 ClientScript.RegisterStartupScript(GetType(), "", "exportChart();", true);
                 tdMsgExport.InnerHtml = clsGeneral.sucessMsg("Export Successfully Created...");
