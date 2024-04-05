@@ -18819,7 +18819,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 else
                 {
                     strQuery = "Insert into MailedLP (DstempHdrId,SchoolId,LessonId,LessonName,MailStatus,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn) " +
-                                "Values(" + headerid + "," + sess.SchoolId + "," + LessonPlanId + ",'" + LessonPlanName + "','1'," + sess.LoginId + ",getdate()," + sess.LoginId + ",getdate()) ";
+                                "Values(" + headerid + "," + sess.SchoolId + "," + LessonPlanId + ",'" + clsGeneral.convertQuotes(LessonPlanName) + "','1'," + sess.LoginId + ",getdate()," + sess.LoginId + ",getdate()) ";
                     int promptId = objData.Execute(strQuery);
                 }
                 emailFullReset(sender, e);
