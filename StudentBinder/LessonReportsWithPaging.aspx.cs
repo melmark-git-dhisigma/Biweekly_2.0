@@ -137,6 +137,8 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
+            ClsErrorLog clError = new ClsErrorLog();
+            clError.WriteToLog(Ex.ToString());
             throw Ex;
         }
     }
@@ -1880,9 +1882,12 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
     protected void btnPrevious_Click(object sender, EventArgs e)
     {
         int id = ddlLessonplan.SelectedIndex;   
-        if (id > 0)
+        if (id >= 0)
         {
-            ddlLessonplan.SelectedIndex = id - 1;
+            if (id > 0)
+            {
+                ddlLessonplan.SelectedIndex = id - 1;
+            }
             string LessonId = ddlLessonplan.SelectedValue.ToString();
 
             if (highcheck.Checked == true)
@@ -1901,9 +1906,12 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
     {
         int id = ddlLessonplan.SelectedIndex;
         int count = ddlLessonplan.Items.Count-1;
-        if (id < count)
+        if (id <= count)
         {
-            ddlLessonplan.SelectedIndex = id + 1;
+            if (id < count)
+            {
+                ddlLessonplan.SelectedIndex = id + 1;
+            }
             string LessonId = ddlLessonplan.SelectedValue.ToString();
             if (highcheck.Checked == true)
             {

@@ -110,6 +110,8 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
+            ClsErrorLog clError = new ClsErrorLog();
+            clError.WriteToLog(Ex.ToString());
             throw Ex;
         }
     }
@@ -1255,9 +1257,12 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
     {
 
         int id = ddlLessonplan1.SelectedIndex;
-        if (id > 0)
+        if (id >= 0)
         {
-            ddlLessonplan1.SelectedIndex = id - 1;
+            if (id > 0)
+            {
+                ddlLessonplan1.SelectedIndex = id - 1;
+            }
             string LessonId = ddlLessonplan1.SelectedValue.ToString();
             string LessonName = ddlLessonplan1.SelectedItem.Text.ToString();
             if (highcheck.Checked == true)
@@ -1294,9 +1299,12 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
     {
         int id = ddlLessonplan1.SelectedIndex;
         int count = ddlLessonplan1.Items.Count - 1;
-        if (id < count)
+        if (id <= count)
         {
-            ddlLessonplan1.SelectedIndex = id + 1;
+            if (id < count)
+            {
+                ddlLessonplan1.SelectedIndex = id + 1;
+            }
             string LessonId = ddlLessonplan1.SelectedValue.ToString();
             string LessonName = ddlLessonplan1.SelectedItem.Text.ToString();
             if (highcheck.Checked == true)
@@ -1308,9 +1316,9 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
             {
                 string script = "closePopup();";
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "hidepop", script, true);
-            fillGraph(LessonId, LessonName);
+                fillGraph(LessonId, LessonName);
+            }
         }
-    }
     }
 
     private void fillGraphhighchart(string AllLesson, string LessonName)
