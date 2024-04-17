@@ -550,27 +550,21 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     DataTable dtstps = oDS.dtSteps.Clone();
                     if (SkillType != "Discrete" || oDS.TeachProc == "Match-to-Sample")
                     {
-                        if (dtstepIDs.Rows.Count != 0)
+                        foreach (DataRow dr in oDS.dtSteps.Rows)
                         {
-                            for (int i = 0; i < dtstepIDs.Rows.Count; i++)
+                            string sortOrderQry = "SELECT SortOrder FROM DSTempStep WHERE DSTempStepId = " + dr[0].ToString();
+                            string sortOrderResult = Convert.ToString(oData.FetchValue(sortOrderQry));
+                            if (sortOrderResult != null && sortOrderResult != "")
                             {
-                                for (int j = 0; j < oDS.dtSteps.Rows.Count; j++)
-                                {
-                                    //int dtstepID = Convert.ToInt32(dtstepIDs.Rows[i]["DSTempStepId"]);
-                                    //int oDsStepId = Convert.ToInt32(oDS.dtSteps.Rows[j]["DSTempStepId"]);
-                                    if (Convert.ToInt32(dtstepIDs.Rows[i]["DSTempStepId"]) == Convert.ToInt32(oDS.dtSteps.Rows[j]["DSTempStepId"]))
-                                    {
-                                        DataRow dr = dtstps.NewRow();
-                                        dr.ItemArray = oDS.dtSteps.Rows[j].ItemArray;
-                                        dtstps.Rows.Add(dr);
-                                    }
-                                }
+                                DataRow dr1 = dtstps.NewRow();
+                                dr1.ItemArray = dr.ItemArray;
+                                dtstps.Rows.Add(dr1);
                             }
-                            oDS.dtSteps = dtstps;
                         }
+
+                        oDS.dtSteps = dtstps;
                     }
-                    else
-                        dtstps = oDS.dtSteps;
+                    dtstps = oDS.dtSteps;
                     if (dtstps.Rows.Count == 0)
                     {
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('This set does not have any steps attached, please modify the lesson to assign steps...');", true);
@@ -1521,9 +1515,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         sorttable.Merge(sortedTable);
     }
     
-    private string getTeachingMethod(string TeachingProc)
+    private string getTeachingMethod(string templateId)
     {
-        string sqlStr = "SELECT LookupDesc FROM LookUp WHERE LookupName = '" + TeachingProc + "'";
+        //string sqlStr = "SELECT LookupDesc FROM LookUp WHERE LookupName = '" + TeachingProc + "'";
+        string sqlStr = "SELECT LookupDesc FROM LookUp WHERE LookupType = 'Datasheet-Teaching Procedures' AND LookupId = (SELECT TeachingProcId from DSTempHdr where DSTempHdrId =  '" + templateId + "')";
         DataTable dt = oData.ReturnDataTable(sqlStr, false);
 
         return dt.Rows[0]["LookupDesc"].ToString();
@@ -2158,7 +2153,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             ///
                             //oDS.TeachProc = dtTmpHdrDtls.Rows[0]["TeachingProc"].ToString();
                             string TeachingProc = dtTmpHdrDtls.Rows[0]["TeachingProc"].ToString();
-                            oDS.TeachProc = getTeachingMethod(TeachingProc);
+                            oDS.TeachProc = getTeachingMethod(oTemp.TemplateId.ToString());
                             lblTypOfIns.Text = TeachingProc;
                             ///end
                             ///
