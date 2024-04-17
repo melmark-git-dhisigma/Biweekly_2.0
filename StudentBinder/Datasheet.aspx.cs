@@ -1341,7 +1341,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 {
                     DataTable dtHdrs = new DataTable();
                     DataTable dtHdrsIOA = new DataTable();
-                    int[] orderarray={};
+                    int[] orderarray = {};
                     string ordervalue = "";
                     //string sqlStr = "SELECT [DSTempStepId],[StepCd]+' - '+[StepName] as StepCd,[StepName],SortOrder as StepId  FROM [dbo].[DSTempStep] " +
                     //" WHERE DSTempHdrId=" + oTemp.TemplateId + " AND  DsTempSetId=" + SetId + " AND ActiveInd='A' AND IsDynamic=0 ORDER BY [SortOrder]";
@@ -1355,8 +1355,8 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             Session["totalRandom"] = "Randomized";
                             if (ViewState["StdtSessHdr"] != null)
                             {
-                            if (Convert.ToBoolean(ViewState["IsHistory"]) != true)
-                            {
+								if (Convert.ToBoolean(ViewState["IsHistory"]) != true)
+                                {
                                     string currstatus = "select * from StdtSessionHdr where StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
                                     DataTable dtcstatus = new DataTable();
                                     dtcstatus = oData.ReturnDataTable(currstatus, false);
@@ -1401,12 +1401,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         else
                                         {
-                                sqlStr = "SELECT [DSTempStepId],[StepCd]+' - '+[StepName] as StepCd,[StepName],SortOrder as StepId  FROM [dbo].[DSTempStep] " +
-                            " WHERE DSTempHdrId=" + oTemp.TemplateId + " AND DsTempSetId=" + SetId + " AND ActiveInd='A'  AND IsDynamic=0 ORDER BY NEWID()";
-                            }
+                                    sqlStr = "SELECT [DSTempStepId],[StepCd]+' - '+[StepName] as StepCd,[StepName],SortOrder as StepId  FROM [dbo].[DSTempStep] " +
+                                            " WHERE DSTempHdrId=" + oTemp.TemplateId + " AND DsTempSetId=" + SetId + " AND ActiveInd='A'  AND IsDynamic=0 ORDER BY NEWID()";
+                                        }
                                     }
                                 }
-                            else
+                                else
                                 {
                                     string prior = "SELECT  StepOrder FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
                                     DataTable priortable = oData.ReturnDataTable(prior, false);
@@ -1415,15 +1415,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     {
                                         orderarray = ordervalue.Split(',').Select(int.Parse).ToArray();
                                     }
-                                    else
-                                    {
-                                sqlStr = "SELECT [DSTempStepId],[StepCd]+' - '+[StepName] as StepCd,[StepName],SortOrder as StepId  FROM [dbo].[DSTempStep] " +
-                                " WHERE DSTempHdrId=" + oTemp.TemplateId + " AND  DsTempSetId=" + SetId + "  AND ActiveInd='A'  AND IsDynamic=0 ORDER BY SortOrder";
-                        }
-                    }
-
+                                    sqlStr = "SELECT [DSTempStepId],[StepCd]+' - '+[StepName] as StepCd,[StepName],SortOrder as StepId  FROM [dbo].[DSTempStep] " +
+                                	" WHERE DSTempHdrId=" + oTemp.TemplateId + " AND  DsTempSetId=" + SetId + "  AND ActiveInd='A'  AND IsDynamic=0 ORDER BY SortOrder";
+                                }
                             }
-                            else {
+                            else
+                            {
 
                                 sqlStr = "SELECT [DSTempStepId],[StepCd]+' - '+[StepName] as StepCd,[StepName],SortOrder as StepId  FROM [dbo].[DSTempStep] " +
                                             " WHERE DSTempHdrId=" + oTemp.TemplateId + " AND DsTempSetId=" + SetId + " AND ActiveInd='A'  AND IsDynamic=0 ORDER BY NEWID()";
@@ -1441,8 +1438,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     if (ordervalue != "")
                     {
                         SortstepTable(dt, orderarray);
-                        
-                }
+                    }
                     else
                     {
                         string steporder = "";
