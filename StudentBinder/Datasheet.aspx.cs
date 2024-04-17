@@ -29994,69 +29994,87 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         
 
         oData = new clsData();
-        int queryStat = 0;
-        string strqry = "select StdtSessionStepId stepId from StdtSessionStep WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
-        DataSet ds = oData.ReturnDataSet(strqry, false);
-        if (ds != null)
+        SqlConnection con = null;
+        SqlTransaction trans = null;
+        try
         {
-            int n = ds.Tables[0].Rows.Count;
-            for (int i = 0; i < n; i++)
+            int queryStat = 0;
+            string strqry = "select StdtSessionStepId stepId from StdtSessionStep WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+            DataSet ds = oData.ReturnDataSet(strqry, false);
+            con = oData.Open();
+            trans = con.BeginTransaction();
+            if (ds != null)
             {
-                string sessdel = "select * from StdtSessionDtl where StdtSessionStepId=" + Convert.ToInt32(ds.Tables[0].Rows[i]["stepId"]);
-                DataTable ses = new DataTable();
-                ses = oData.ReturnDataTable(sessdel, false);
-                if (ses != null)
+                int n = ds.Tables[0].Rows.Count;
+                for (int i = 0; i < n; i++)
                 {
-                    if (ses.Rows.Count > 0)
+                    string sessdel = "select * from StdtSessionDtl where StdtSessionStepId=" + Convert.ToInt32(ds.Tables[0].Rows[i]["stepId"]);
+                    DataTable ses = new DataTable();
+                    ses = oData.ReturnDataTable(sessdel, false);
+                    if (ses != null)
                     {
-                        foreach (DataRow dr in ses.Rows)
+                        if (ses.Rows.Count > 0)
                         {
-                            oData.Execute("Update StdtSessionDtl set StdtSessionStepId=" + (Convert.ToInt32(dr["StdtSessionStepId"]) * (-1)) + ",DSTempSetColId=" + (Convert.ToInt32(dr["DSTempSetColId"]) * (-1)) + "WHERE StdtSessionStepId=" + Convert.ToInt32(ds.Tables[0].Rows[i]["stepId"]));
+                            foreach (DataRow dr in ses.Rows)
+                            {
+                                oData.ExecuteWithTrans("Update StdtSessionDtl set StdtSessionStepId=" + (Convert.ToInt32(dr["StdtSessionStepId"]) * (-1)) + ",DSTempSetColId=" + (Convert.ToInt32(dr["DSTempSetColId"]) * (-1)) + "WHERE StdtSessionStepId=" + Convert.ToInt32(ds.Tables[0].Rows[i]["stepId"]), con, trans);
+                            }
                         }
                     }
                 }
             }
-        }
 
 
-        string sq = "select * from StdtSessColScore where StdtSessionHdrId=" + ViewState["StdtSessHdr"];
-        DataTable sco = new DataTable();
-        sco = oData.ReturnDataTable(sq, false);
-        if (sco != null)
-        {
-            if (sco.Rows.Count > 0)
+            string sq = "select * from StdtSessColScore where StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+            DataTable sco = new DataTable();
+            sco = oData.ReturnDataTable(sq, false);
+            if (sco != null)
             {
-                foreach (DataRow dr in sco.Rows)
+                if (sco.Rows.Count > 0)
                 {
-                    
-                    oData.Execute("Update   StdtSessColScore set StudentId=" + (Convert.ToInt32(dr["StudentId"]) * (-1)) + ",DSTempSetColId=" + (Convert.ToInt32(dr["DSTempSetColId"]) * (-1)) + ", DSTempSetColCalcId=" + (Convert.ToInt32(dr["DSTempSetColCalcId"]) * (-1)) + ",StdtSessionHdrId=" + (Convert.ToInt32(dr["StdtSessionHdrId"]) * (-1)) + " WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"]);              
+                    foreach (DataRow dr in sco.Rows)
+                    {
+
+                        oData.ExecuteWithTrans("Update   StdtSessColScore set StudentId=" + (Convert.ToInt32(dr["StudentId"]) * (-1)) + ",DSTempSetColId=" + (Convert.ToInt32(dr["DSTempSetColId"]) * (-1)) + ", DSTempSetColCalcId=" + (Convert.ToInt32(dr["DSTempSetColCalcId"]) * (-1)) + ",StdtSessionHdrId=" + (Convert.ToInt32(dr["StdtSessionHdrId"]) * (-1)) + " WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"], con, trans);
+                    }
                 }
             }
-        }
 
-        string disupdate = "select DSTempHdrId,LessonPlanId,StudentId from StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
-        DataTable dis = new DataTable();
-        dis = oData.ReturnDataTable(disupdate, false);
-        if (dis != null)
-        {
-            if (dis.Rows.Count > 0)
+            string disupdate = "select DSTempHdrId,LessonPlanId,StudentId from StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+            DataTable dis = new DataTable();
+            dis = oData.ReturnDataTable(disupdate, false);
+            if (dis != null)
             {
-                foreach (DataRow dr in dis.Rows)
+                if (dis.Rows.Count > 0)
                 {
+                    foreach (DataRow dr in dis.Rows)
+                    {
 
-                    queryStat= oData.Execute("Update   StdtSessionHdr set DSTempHdrId=" + (Convert.ToInt32(dr["DSTempHdrId"]) * (-1)) + ",LessonPlanId=" + (Convert.ToInt32(dr["LessonPlanId"]) * (-1)) + ",StudentId="+(Convert.ToInt32(dr["StudentId"]) * (-1)) +"WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"]);
+                        queryStat = oData.ExecuteWithTrans("Update   StdtSessionHdr set DSTempHdrId=" + (Convert.ToInt32(dr["DSTempHdrId"]) * (-1)) + ",LessonPlanId=" + (Convert.ToInt32(dr["LessonPlanId"]) * (-1)) + ",StudentId=" + (Convert.ToInt32(dr["StudentId"]) * (-1)) + "WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"], con, trans);
+                    }
                 }
             }
+            SaveBeforePrint.Visible = false;
+            dashMain.Visible = false;
+            printComplete.Visible = false;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "triggerDiscardClick('" + queryStat + "');", true);
+            oData.CommitTransation(trans, con);
+
         }
-        SaveBeforePrint.Visible = false;
-        dashMain.Visible = false;
-        printComplete.Visible = false;
-        ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "triggerDiscardClick('"+queryStat+"');", true);
-        
+        catch (Exception ex)
+        {
+            if (trans != null && trans.Connection.State == ConnectionState.Open)
+            {
+                oData.RollBackTransation(trans, con);
 
-        
+            }
+            if (con != null)
+                con.Close();
 
-      
+            ClsErrorLog clError = new ClsErrorLog();
+            clError.WriteToLog(ex.ToString());
+            throw ex;
+        }
     }
 
     protected void btn_new_continue_Click(object sender, EventArgs e)
