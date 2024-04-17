@@ -203,7 +203,7 @@ public partial class StudentBinder_ProgressReport : System.Web.UI.Page
 
                                     ProgressReport += "<tr><td>Progress Report Date:&nbsp;&nbsp;<input type='text' class='datepicker' id='date_" + Cnt + "_" + row["GoalLPRelId"] + "' value='" + rpt["Report_Date"] + "'  onkeydown='allowBackSpace(event,this)' onpaste='return false' onkeypress='return false' /></td><td></td><td>Progress Report # " + Cnt + " of  4</td></tr>" +
                                     "<tr><td colspan='3'>Progress Reports are required to be sent to parents at least as often as parents are informed of their non-disabled children’s progress. Each progress report must describe the student’s progress toward meeting each annual goal.</td></tr>" +
-                                    "<tr><td colspan='3'><input id='info_" + Cnt + "_" + row["GoalLPRelId"] + "' type='text' style='width: 90%; height: 60px; border: 1px solid #ccc' value='" + rpt["Report_Info"] + "' /></td></tr>" +
+                                    "<tr><td colspan='3'><input id='info_" + Cnt + "_" + row["GoalLPRelId"] + "' type='text' style='width: 90%; height: 60px; border: 1px solid #ccc' value='" + (rpt["Report_Info"]).ToString().Replace("'", "&#39;") + "' /></td></tr>" +
                                     "<tr><td colspan='3'><hr  style='width:100%' border:'solid' /></td></tr>";
                                     Cnt++;
                                 }
@@ -297,7 +297,7 @@ public partial class StudentBinder_ProgressReport : System.Web.UI.Page
                 if (goal_date_info[1] != "") goal_date_info[1] = ReturnDate(goal_date_info[1]);
                 if (goal_date_info[1] != "" || goal_date_info[2] != "")
                 {
-                    int InsertPropData = objData.Execute("INSERT INTO Progress_Report(Report_Date,Report_Info,GoalId,CreatedBy,CreatedOn,StdtIEPId,ModifiedBy,ModifiedOn) VALUES ('" + goal_date_info[1] + "','" + goal_date_info[2] + "','" + goal_date_info[0] + "','" + sess.LoginId + "',GETDATE(),'" + IepId + "','" + sess.LoginId + "',GETDATE())");
+                    int InsertPropData = objData.Execute("INSERT INTO Progress_Report(Report_Date,Report_Info,GoalId,CreatedBy,CreatedOn,StdtIEPId,ModifiedBy,ModifiedOn) VALUES ('" + goal_date_info[1] + "','" + clsGeneral.convertQuotes(goal_date_info[2]) + "','" + goal_date_info[0] + "','" + sess.LoginId + "',GETDATE(),'" + IepId + "','" + sess.LoginId + "',GETDATE())");
                     Result = "Saved Successfully...";
                 }
             }

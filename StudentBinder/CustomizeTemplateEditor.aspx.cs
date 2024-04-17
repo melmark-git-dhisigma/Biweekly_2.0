@@ -20236,7 +20236,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
                 DataTable newTable = new DataTable();
 
-                dv.RowFilter = "UserName Like '%" + SrchCondtn + "%'";
+                dv.RowFilter = "UserName Like '%" + SrchCondtn.Replace("'", "''") + "%'";
                 newTable = dv.ToTable();                
 
                 dlEmailforSorting_Copy.DataSource = newTable;
