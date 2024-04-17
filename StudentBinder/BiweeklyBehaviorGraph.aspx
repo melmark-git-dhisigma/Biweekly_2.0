@@ -1032,6 +1032,7 @@
                                     leftmax = lmax;
                                 }
                             }
+							var subtt =  res[0].Stratgy;
                             //left y axis name and max end
                             //right y axis name and max value
                             var durstat = res[0].DuratnStat;
@@ -1363,10 +1364,15 @@
                         text: ''
                     },
                     subtitle: {
-                        text: 'nothing',
+                        useHTML: true,
+                        align: 'left',
+                        text: subtt,
                         align: 'left',
                         style: {
-                            color: 'transparent'
+                            fontWeight: 'bold',
+                            color: 'black',
+                            fontSize: 12,
+                            fontFamily: 'Arial'
                         }
                     },
                     credits: {
@@ -2124,6 +2130,7 @@
                                     leftmax = lmax;
                                 }
                             }
+							var subtt = res[0].Stratgy;
                             //left y axis name and max end
                             //right y axis name and max value
                             var durstat = res[0].DuratnStat;
@@ -2449,10 +2456,15 @@
                         text: ''
                     },
                     subtitle: {
-                        text: 'nothing',
+                        useHTML: true,
+                        align: 'left',
+                        text: subtt,
                         align: 'left',
                         style: {
-                            color: 'transparent'
+                            fontWeight: 'bold',
+                            color: 'black',
+                            fontSize: 12,
+                            fontFamily: 'Arial'
                         }
                     },
                     credits: {
