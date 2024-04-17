@@ -18798,7 +18798,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
                 objData.ExecuteWithTrans("UPDATE DSTempStep SET ActiveInd = 'D' WHERE IsDynamic = 0 AND DSTempHdrId = " + TemplateId,con,Transs);
 
-                //objData.ExecuteWithTrans("UPDATE DSTempParentStep SET ActiveInd = 'D'  WHERE DSTempHdrId = " + TemplateId, con, Transs);
+                objData.ExecuteWithTrans("UPDATE DSTempParentStep SET ActiveInd = 'D'  WHERE DSTempHdrId = " + TemplateId, con, Transs);
                 objData.CommitTransation(Transs, con);
             }
 		hideAllOptions();
