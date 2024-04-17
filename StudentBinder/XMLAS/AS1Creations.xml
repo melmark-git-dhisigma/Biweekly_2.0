@@ -19,6 +19,14 @@
       <Mapping Column="Period5" PlaceHolder="PlcPeriod5"/>
       <Mapping Column="Period6" PlaceHolder="PlcPeriod6"/>
       <Mapping Column="Period7" PlaceHolder="PlcPeriod7"/>
+		
+      <Mapping Column="Progressing1" PlaceHolder="PlcPrgres1"/>
+      <Mapping Column="Progressing2" PlaceHolder="PlcPrgres2"/>
+      <Mapping Column="Progressing3" PlaceHolder="PlcPrgres3"/>
+      <Mapping Column="Progressing4" PlaceHolder="PlcPrgres4"/>
+      <Mapping Column="Progressing5" PlaceHolder="PlcPrgres5"/>
+      <Mapping Column="Progressing6" PlaceHolder="PlcPrgres6"/>
+      <Mapping Column="Progressing7" PlaceHolder="PlcPrgres7"/>
 
 
       <Mapping Column="TypeOfInstruction" PlaceHolder="PlcTypeOfIns1"/>

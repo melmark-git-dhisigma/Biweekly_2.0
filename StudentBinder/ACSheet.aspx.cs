@@ -24,6 +24,12 @@ using System.Globalization;
 using System.Data.SqlClient;
 using OpenXmlPowerTools;
 using Xceed.Words.NET;
+using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.Math;
+using Xceed.Document.NET;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using System.Runtime.InteropServices.ComTypes;
 public partial class StudentBinder_ACSheet : System.Web.UI.Page
 {
     static string[] columns;
@@ -36,6 +42,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
     clsData objData = null;
     clsSession sess = null;
 
+    System.Data.DataTable dtAgendaItem = new System.Data.DataTable();
     System.Data.DataTable dtPMeeting = new System.Data.DataTable();
     System.Data.DataTable dtCMeeting = new System.Data.DataTable();
 
@@ -74,6 +81,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 tdMsg1.Visible = false;
                 tdMsg2.Visible = false;
                 tdreview2.Visible = false;
+                gvAgendaItem.Visible = false;
                 //btnBack.Visible = false;
                 //    btnLoadData.Visible = false;
             }
@@ -97,6 +105,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 tdMsg1.Visible = false;
                 tdMsg2.Visible = false;
                 tdreview2.Visible = false;
+                gvAgendaItem.Visible = false;
                 btnSaveNew.Visible = false;
                 btnUpdateNew.Visible = false;
                 //btnBack.Visible = true;
@@ -440,6 +449,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 tdMsg1.Visible = true;
                 tdMsg2.Visible = true;
                 tdreview2.Visible = true;
+                gvAgendaItem.Visible = true;
                 btnUpdate.Visible = false;
                 btnUpdateNew.Visible = false;
                 btnImport.Visible = false;
@@ -456,6 +466,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 tdMsg1.Visible = false;
                 tdMsg2.Visible = false;
                 tdreview2.Visible = false;
+                gvAgendaItem.Visible = false;
                 btnUpdate.Visible = false;
                 btnUpdateNew.Visible = false;
                 btnImport.Visible = false;
@@ -473,6 +484,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             tdMsg1.Visible = false;
             tdMsg2.Visible = false;
             tdreview2.Visible = false;
+            gvAgendaItem.Visible = false;
             btnUpdate.Visible = false;
             btnUpdateNew.Visible = false;
             btnImport.Visible = false;
@@ -491,6 +503,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
         tdMsg1.Visible = true;
         tdMsg2.Visible = true;
         tdreview2.Visible = true;
+        gvAgendaItem.Visible = true;
         rbtnLsnClassTypeAc.SelectedValue = "Day,Residence";
         ///LinkButton lnkDate = (LinkButton)sender;
         try
@@ -499,6 +512,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             ViewState["CurrentDate"] = dateVal;
             LoadPMeetingGV();
             LoadCMeetingGV();
+            loadAgendaItemGV();
             loadDataList(dateVal);
             LoadMeetings(dateVal);
             MultiView1.ActiveViewIndex = 1;             ///Set multiview 1 view(update button for already saved academic sheets) --jis
@@ -537,12 +551,12 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
         {
             qry = "SELECT * FROM (select StdtAcdSheet.AccSheetId,StdtAcdSheet.StudentId,StdtAcdSheet.DateOfMeeting,StdtAcdSheet.EndDate,StdtAcdSheet.GoalArea," +
                   "StdtAcdSheet.Goal,StdtAcdSheet.Benchmarks,StdtAcdSheet.FeedBack,StdtAcdSheet.PreposalDiss, StdtAcdSheet.PersonResNdDeadline," +
-                  "StdtAcdSheet.TypeOfInstruction,StdtAcdSheet.Period1,StdtAcdSheet.Set1,StdtAcdSheet.Prompt1,StdtAcdSheet.IOA1,StdtAcdSheet.NoOfTimes1,StdtAcdSheet.Mistrial1,StdtAcdSheet.Step1 AS stepId1,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step1) step1," +
-                  "StdtAcdSheet.Period2,StdtAcdSheet.Set2,StdtAcdSheet.Prompt2,StdtAcdSheet.IOA2,StdtAcdSheet.NoOfTimes2,StdtAcdSheet.Mistrial2,StdtAcdSheet.Step2 AS stepId2,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step2) step2,StdtAcdSheet.Period3,StdtAcdSheet.Set3," +
-                  "StdtAcdSheet.Prompt3,StdtAcdSheet.IOA3,StdtAcdSheet.NoOfTimes3,StdtAcdSheet.Mistrial3,StdtAcdSheet.Step3 AS stepId3,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step3) step3,StdtAcdSheet.Period4,StdtAcdSheet.Set4,StdtAcdSheet.Prompt4,StdtAcdSheet.IOA4," +
-                  "StdtAcdSheet.NoOfTimes4,StdtAcdSheet.Mistrial4,StdtAcdSheet.Step4 AS stepId4,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step4) step4,StdtAcdSheet.Period5,StdtAcdSheet.Set5,StdtAcdSheet.Prompt5,StdtAcdSheet.IOA5,StdtAcdSheet.NoOfTimes5,StdtAcdSheet.Mistrial5,StdtAcdSheet.Step5 AS stepId5," +
-                  "(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step5) step5,StdtAcdSheet.Period6,StdtAcdSheet.Set6,StdtAcdSheet.Prompt6,StdtAcdSheet.IOA6,StdtAcdSheet.NoOfTimes6,StdtAcdSheet.Mistrial6,StdtAcdSheet.Step6 AS stepId6,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step6) step6,StdtAcdSheet.Period7,StdtAcdSheet.Set7" +
-                  ",StdtAcdSheet.Prompt7,StdtAcdSheet.IOA7,StdtAcdSheet.NoOfTimes7,StdtAcdSheet.Mistrial7,StdtAcdSheet.Step7 AS stepId7,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step7) step7,StdtAcdSheet.LessonPlanId,(SELECT TOP 1 LessonOrder FROM DSTempHdr WHERE DSTempHdr.LessonPlanId" +
+                  "StdtAcdSheet.TypeOfInstruction,StdtAcdSheet.Period1,StdtAcdSheet.Set1,StdtAcdSheet.Prompt1,StdtAcdSheet.IOA1,StdtAcdSheet.NoOfTimes1,StdtAcdSheet.Progressing1,StdtAcdSheet.Mistrial1,StdtAcdSheet.Step1 AS stepId1,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step1) step1," +
+                  "StdtAcdSheet.Period2,StdtAcdSheet.Set2,StdtAcdSheet.Prompt2,StdtAcdSheet.IOA2,StdtAcdSheet.NoOfTimes2,StdtAcdSheet.Progressing2,StdtAcdSheet.Mistrial2,StdtAcdSheet.Step2 AS stepId2,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step2) step2,StdtAcdSheet.Period3,StdtAcdSheet.Set3," +
+                  "StdtAcdSheet.Prompt3,StdtAcdSheet.IOA3,StdtAcdSheet.NoOfTimes3,StdtAcdSheet.Progressing3,StdtAcdSheet.Mistrial3,StdtAcdSheet.Step3 AS stepId3,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step3) step3,StdtAcdSheet.Period4,StdtAcdSheet.Set4,StdtAcdSheet.Prompt4,StdtAcdSheet.IOA4," +
+                  "StdtAcdSheet.NoOfTimes4,StdtAcdSheet.Progressing4,StdtAcdSheet.Mistrial4,StdtAcdSheet.Step4 AS stepId4,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step4) step4,StdtAcdSheet.Period5,StdtAcdSheet.Set5,StdtAcdSheet.Prompt5,StdtAcdSheet.IOA5,StdtAcdSheet.NoOfTimes5,StdtAcdSheet.Progressing5,StdtAcdSheet.Mistrial5,StdtAcdSheet.Step5 AS stepId5," +
+                  "(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step5) step5,StdtAcdSheet.Period6,StdtAcdSheet.Set6,StdtAcdSheet.Prompt6,StdtAcdSheet.IOA6,StdtAcdSheet.NoOfTimes6,StdtAcdSheet.Progressing6,StdtAcdSheet.Mistrial6,StdtAcdSheet.Step6 AS stepId6,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step6) step6,StdtAcdSheet.Period7,StdtAcdSheet.Set7" +
+                  ",StdtAcdSheet.Prompt7,StdtAcdSheet.IOA7,StdtAcdSheet.NoOfTimes7,StdtAcdSheet.Progressing7,StdtAcdSheet.Mistrial7,StdtAcdSheet.Step7 AS stepId7,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step7) step7,StdtAcdSheet.LessonPlanId,(SELECT TOP 1 LessonOrder FROM DSTempHdr WHERE DSTempHdr.LessonPlanId" +
                   "=StdtAcdSheet.LessonPlanId AND DSTempHdr.StudentId=" + sess.StudentId + ") LessonOrder,StdtAcdSheet.MetObjective,StdtAcdSheet.MetGoal,StdtAcdSheet.NotMaintaining  from StdtAcdSheet " +
                   "WHERE StdtAcdSheet.StudentId=" + sess.StudentId + " and StdtAcdSheet.LessonPlanId in (select s.LessonPlanId from StdtSessionHdr s join Class c on c.ClassId=s.StdtClassId where c.ResidenceInd=0) and CONVERT(char(10),DateOfMeeting,101)='" + stDate + "' AND CONVERT(char(10),EndDate,101)" +
                   "='" + endDate + "') STDTACSHT ORDER BY LessonOrder";
@@ -551,12 +565,12 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
         {
             qry = "SELECT * FROM (select StdtAcdSheet.AccSheetId,StdtAcdSheet.StudentId,StdtAcdSheet.DateOfMeeting,StdtAcdSheet.EndDate,StdtAcdSheet.GoalArea," +
                   "StdtAcdSheet.Goal,StdtAcdSheet.Benchmarks,StdtAcdSheet.FeedBack,StdtAcdSheet.PreposalDiss, StdtAcdSheet.PersonResNdDeadline," +
-                  "StdtAcdSheet.TypeOfInstruction,StdtAcdSheet.Period1,StdtAcdSheet.Set1,StdtAcdSheet.Prompt1,StdtAcdSheet.IOA1,StdtAcdSheet.NoOfTimes1,StdtAcdSheet.Mistrial1,StdtAcdSheet.Step1 AS stepId1,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step1) step1," +
-                  "StdtAcdSheet.Period2,StdtAcdSheet.Set2,StdtAcdSheet.Prompt2,StdtAcdSheet.IOA2,StdtAcdSheet.NoOfTimes2,StdtAcdSheet.Mistrial2,StdtAcdSheet.Step2 AS stepId2,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step2) step2,StdtAcdSheet.Period3,StdtAcdSheet.Set3," +
-                  "StdtAcdSheet.Prompt3,StdtAcdSheet.IOA3,StdtAcdSheet.NoOfTimes3,StdtAcdSheet.Mistrial3,StdtAcdSheet.Step3 AS stepId3,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step3) step3,StdtAcdSheet.Period4,StdtAcdSheet.Set4,StdtAcdSheet.Prompt4,StdtAcdSheet.IOA4," +
-                  "StdtAcdSheet.NoOfTimes4,StdtAcdSheet.Mistrial4,StdtAcdSheet.Step4 AS stepId4,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step4) step4,StdtAcdSheet.Period5,StdtAcdSheet.Set5,StdtAcdSheet.Prompt5,StdtAcdSheet.IOA5,StdtAcdSheet.NoOfTimes5,StdtAcdSheet.Mistrial5,StdtAcdSheet.Step5 AS stepId5," +
-                  "(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step5) step5,StdtAcdSheet.Period6,StdtAcdSheet.Set6,StdtAcdSheet.Prompt6,StdtAcdSheet.IOA6,StdtAcdSheet.NoOfTimes6,StdtAcdSheet.Mistrial6,StdtAcdSheet.Step6 AS stepId6,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step6) step6,StdtAcdSheet.Period7,StdtAcdSheet.Set7" +
-                  ",StdtAcdSheet.Prompt7,StdtAcdSheet.IOA7,StdtAcdSheet.NoOfTimes7,StdtAcdSheet.Mistrial7,StdtAcdSheet.Step7 AS stepId7,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step7) step7,StdtAcdSheet.LessonPlanId,(SELECT TOP 1 LessonOrder FROM DSTempHdr WHERE DSTempHdr.LessonPlanId" +
+                  "StdtAcdSheet.TypeOfInstruction,StdtAcdSheet.Period1,StdtAcdSheet.Set1,StdtAcdSheet.Prompt1,StdtAcdSheet.IOA1,StdtAcdSheet.NoOfTimes1,StdtAcdSheet.Progressing1,StdtAcdSheet.Mistrial1,StdtAcdSheet.Step1 AS stepId1,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step1) step1," +
+                  "StdtAcdSheet.Period2,StdtAcdSheet.Set2,StdtAcdSheet.Prompt2,StdtAcdSheet.IOA2,StdtAcdSheet.NoOfTimes2,StdtAcdSheet.Progressing2,StdtAcdSheet.Mistrial2,StdtAcdSheet.Step2 AS stepId2,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step2) step2,StdtAcdSheet.Period3,StdtAcdSheet.Set3," +
+                  "StdtAcdSheet.Prompt3,StdtAcdSheet.IOA3,StdtAcdSheet.NoOfTimes3,StdtAcdSheet.Progressing3,StdtAcdSheet.Mistrial3,StdtAcdSheet.Step3 AS stepId3,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step3) step3,StdtAcdSheet.Period4,StdtAcdSheet.Set4,StdtAcdSheet.Prompt4,StdtAcdSheet.IOA4," +
+                  "StdtAcdSheet.NoOfTimes4,StdtAcdSheet.Progressing4,StdtAcdSheet.Mistrial4,StdtAcdSheet.Step4 AS stepId4,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step4) step4,StdtAcdSheet.Period5,StdtAcdSheet.Set5,StdtAcdSheet.Prompt5,StdtAcdSheet.IOA5,StdtAcdSheet.NoOfTimes5,StdtAcdSheet.Progressing5,StdtAcdSheet.Mistrial5,StdtAcdSheet.Step5 AS stepId5," +
+                  "(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step5) step5,StdtAcdSheet.Period6,StdtAcdSheet.Set6,StdtAcdSheet.Prompt6,StdtAcdSheet.IOA6,StdtAcdSheet.NoOfTimes6,StdtAcdSheet.Progressing6,StdtAcdSheet.Mistrial6,StdtAcdSheet.Step6 AS stepId6,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step6) step6,StdtAcdSheet.Period7,StdtAcdSheet.Set7" +
+                  ",StdtAcdSheet.Prompt7,StdtAcdSheet.IOA7,StdtAcdSheet.NoOfTimes7,StdtAcdSheet.Progressing7,StdtAcdSheet.Mistrial7,StdtAcdSheet.Step7 AS stepId7,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step7) step7,StdtAcdSheet.LessonPlanId,(SELECT TOP 1 LessonOrder FROM DSTempHdr WHERE DSTempHdr.LessonPlanId" +
                   "=StdtAcdSheet.LessonPlanId AND DSTempHdr.StudentId=" + sess.StudentId + ") LessonOrder,StdtAcdSheet.MetObjective,StdtAcdSheet.MetGoal,StdtAcdSheet.NotMaintaining  from StdtAcdSheet " +
                   "WHERE StdtAcdSheet.StudentId=" + sess.StudentId + " and StdtAcdSheet.LessonPlanId in (select s.LessonPlanId from StdtSessionHdr s join Class c on c.ClassId=s.StdtClassId where c.ResidenceInd=1) and CONVERT(char(10),DateOfMeeting,101)='" + stDate + "' AND CONVERT(char(10),EndDate,101)" +
                   "='" + endDate + "') STDTACSHT ORDER BY LessonOrder";
@@ -565,12 +579,12 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
         {
             qry = "SELECT * FROM (select StdtAcdSheet.AccSheetId,StdtAcdSheet.StudentId,StdtAcdSheet.DateOfMeeting,StdtAcdSheet.EndDate,StdtAcdSheet.GoalArea," +
                   "StdtAcdSheet.Goal,StdtAcdSheet.Benchmarks,StdtAcdSheet.FeedBack,StdtAcdSheet.PreposalDiss, StdtAcdSheet.PersonResNdDeadline," +
-                  "StdtAcdSheet.TypeOfInstruction,StdtAcdSheet.Period1,StdtAcdSheet.Set1,StdtAcdSheet.Prompt1,StdtAcdSheet.IOA1,StdtAcdSheet.NoOfTimes1,StdtAcdSheet.Mistrial1,StdtAcdSheet.Step1 AS stepId1,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step1) step1," +
-                  "StdtAcdSheet.Period2,StdtAcdSheet.Set2,StdtAcdSheet.Prompt2,StdtAcdSheet.IOA2,StdtAcdSheet.NoOfTimes2,StdtAcdSheet.Mistrial2,StdtAcdSheet.Step2 AS stepId2,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step2) step2,StdtAcdSheet.Period3,StdtAcdSheet.Set3," +
-                  "StdtAcdSheet.Prompt3,StdtAcdSheet.IOA3,StdtAcdSheet.NoOfTimes3,StdtAcdSheet.Mistrial3,StdtAcdSheet.Step3 AS stepId3,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step3) step3,StdtAcdSheet.Period4,StdtAcdSheet.Set4,StdtAcdSheet.Prompt4,StdtAcdSheet.IOA4," +
-                  "StdtAcdSheet.NoOfTimes4,StdtAcdSheet.Mistrial4,StdtAcdSheet.Step4 AS stepId4,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step4) step4,StdtAcdSheet.Period5,StdtAcdSheet.Set5,StdtAcdSheet.Prompt5,StdtAcdSheet.IOA5,StdtAcdSheet.NoOfTimes5,StdtAcdSheet.Mistrial5,StdtAcdSheet.Step5 AS stepId5," +
-                  "(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step5) step5,StdtAcdSheet.Period6,StdtAcdSheet.Set6,StdtAcdSheet.Prompt6,StdtAcdSheet.IOA6,StdtAcdSheet.NoOfTimes6,StdtAcdSheet.Mistrial6,StdtAcdSheet.Step6 AS stepId6,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step6) step6,StdtAcdSheet.Period7,StdtAcdSheet.Set7" +
-                  ",StdtAcdSheet.Prompt7,StdtAcdSheet.IOA7,StdtAcdSheet.NoOfTimes7,StdtAcdSheet.Mistrial7,StdtAcdSheet.Step7 AS stepId7,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step7) step7,StdtAcdSheet.LessonPlanId,(SELECT TOP 1 LessonOrder FROM DSTempHdr WHERE DSTempHdr.LessonPlanId" +
+                  "StdtAcdSheet.TypeOfInstruction,StdtAcdSheet.Period1,StdtAcdSheet.Set1,StdtAcdSheet.Prompt1,StdtAcdSheet.IOA1,StdtAcdSheet.NoOfTimes1,StdtAcdSheet.Progressing1,StdtAcdSheet.Mistrial1,StdtAcdSheet.Step1 AS stepId1,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step1) step1," +
+                  "StdtAcdSheet.Period2,StdtAcdSheet.Set2,StdtAcdSheet.Prompt2,StdtAcdSheet.IOA2,StdtAcdSheet.NoOfTimes2,StdtAcdSheet.Progressing2,StdtAcdSheet.Mistrial2,StdtAcdSheet.Step2 AS stepId2,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step2) step2,StdtAcdSheet.Period3,StdtAcdSheet.Set3," +
+                  "StdtAcdSheet.Prompt3,StdtAcdSheet.IOA3,StdtAcdSheet.NoOfTimes3,StdtAcdSheet.Progressing3,StdtAcdSheet.Mistrial3,StdtAcdSheet.Step3 AS stepId3,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step3) step3,StdtAcdSheet.Period4,StdtAcdSheet.Set4,StdtAcdSheet.Prompt4,StdtAcdSheet.IOA4," +
+                  "StdtAcdSheet.NoOfTimes4,StdtAcdSheet.Progressing4,StdtAcdSheet.Mistrial4,StdtAcdSheet.Step4 AS stepId4,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step4) step4,StdtAcdSheet.Period5,StdtAcdSheet.Set5,StdtAcdSheet.Prompt5,StdtAcdSheet.IOA5,StdtAcdSheet.NoOfTimes5,StdtAcdSheet.Progressing5,StdtAcdSheet.Mistrial5,StdtAcdSheet.Step5 AS stepId5," +
+                  "(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step5) step5,StdtAcdSheet.Period6,StdtAcdSheet.Set6,StdtAcdSheet.Prompt6,StdtAcdSheet.IOA6,StdtAcdSheet.NoOfTimes6,StdtAcdSheet.Progressing6,StdtAcdSheet.Mistrial6,StdtAcdSheet.Step6 AS stepId6,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step6) step6,StdtAcdSheet.Period7,StdtAcdSheet.Set7" +
+                  ",StdtAcdSheet.Prompt7,StdtAcdSheet.IOA7,StdtAcdSheet.NoOfTimes7,StdtAcdSheet.Progressing7,StdtAcdSheet.Mistrial7,StdtAcdSheet.Step7 AS stepId7,(SELECT CASE WHEN StepCd IS NULL THEN StepName ELSE StepCd END FROM DSTempStep WHERE DSTempStepId=StdtAcdSheet.Step7) step7,StdtAcdSheet.LessonPlanId,(SELECT TOP 1 LessonOrder FROM DSTempHdr WHERE DSTempHdr.LessonPlanId" +
                   "=StdtAcdSheet.LessonPlanId AND DSTempHdr.StudentId=" + sess.StudentId + ") LessonOrder,StdtAcdSheet.MetObjective,StdtAcdSheet.MetGoal,StdtAcdSheet.NotMaintaining  from StdtAcdSheet " +
                   "WHERE StdtAcdSheet.StudentId=" + sess.StudentId + " and CONVERT(char(10),DateOfMeeting,101)='" + stDate + "' AND CONVERT(char(10),EndDate,101)" +
                   "='" + endDate + "') STDTACSHT ORDER BY LessonOrder";
@@ -623,12 +637,77 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 tdMsg1.Visible = true;
                 tdMsg2.Visible = true;
                 tdreview2.Visible = true;
+                gvAgendaItem.Visible = true;
                 btnSave.Visible = false;
                 btnSaveNew.Visible = false;
                 int i = 0;
                         foreach (GridViewRow row in GridViewAccSheetedit.Rows)
                         {
-                            if (Dt.Rows[i]["MetObjective"] != null && Dt.Rows[i]["MetGoal"] != null && Dt.Rows[i]["NotMaintaining"] != null&& i<Dt.Rows.Count)
+                    RadioButtonList radBtnLst1 = row.FindControl("RadioButtonList8") as RadioButtonList;
+                    RadioButtonList radBtnLst2 = row.FindControl("RadioButtonList9") as RadioButtonList;
+                    RadioButtonList radBtnLst3 = row.FindControl("RadioButtonList10") as RadioButtonList;
+                    RadioButtonList radBtnLst4 = row.FindControl("RadioButtonList11") as RadioButtonList;
+                    RadioButtonList radBtnLst5 = row.FindControl("RadioButtonList12") as RadioButtonList;
+                    RadioButtonList radBtnLst6 = row.FindControl("RadioButtonList13") as RadioButtonList;
+                    RadioButtonList radBtnLst7 = row.FindControl("RadioButtonList14") as RadioButtonList;
+                    
+                    radBtnLst1.SelectedValue = Dt.Rows[i]["Progressing1"].ToString();
+                    if (radBtnLst1.SelectedValue == "Yes")
+                        radBtnLst1.Items[0].Attributes["Style"] = "color:lightgreen;";
+                    else if(radBtnLst1.SelectedValue == "No")
+                        radBtnLst1.Items[1].Attributes["Style"] = "color:red;";
+                    else if(radBtnLst1.SelectedValue == "No Change")
+                        radBtnLst1.Items[2].Attributes["Style"] = "color:yellow;";
+
+                    radBtnLst2.SelectedValue = Dt.Rows[i]["Progressing2"].ToString();
+                    if (radBtnLst2.SelectedValue == "Yes")
+                        radBtnLst2.Items[0].Attributes["Style"] = "color:lightgreen;";
+                    else if (radBtnLst2.SelectedValue == "No")
+                        radBtnLst2.Items[1].Attributes["Style"] = "color:red;";
+                    else if (radBtnLst2.SelectedValue == "No Change")
+                        radBtnLst2.Items[2].Attributes["Style"] = "color:yellow;";
+
+                    radBtnLst3.SelectedValue = Dt.Rows[i]["Progressing3"].ToString();
+                    if (radBtnLst3.SelectedValue == "Yes")
+                        radBtnLst3.Items[0].Attributes["Style"] = "color:lightgreen;";
+                    else if (radBtnLst3.SelectedValue == "No")
+                        radBtnLst3.Items[1].Attributes["Style"] = "color:red;";
+                    else if (radBtnLst3.SelectedValue == "No Change")
+                        radBtnLst3.Items[2].Attributes["Style"] = "color:yellow;";
+
+                    radBtnLst4.SelectedValue = Dt.Rows[i]["Progressing4"].ToString();
+                    if (radBtnLst4.SelectedValue == "Yes")
+                        radBtnLst4.Items[0].Attributes["Style"] = "color:lightgreen;";
+                    else if (radBtnLst4.SelectedValue == "No")
+                        radBtnLst4.Items[1].Attributes["Style"] = "color:red;";
+                    else if (radBtnLst4.SelectedValue == "No Change")
+                        radBtnLst4.Items[2].Attributes["Style"] = "color:yellow;";
+
+                    radBtnLst5.SelectedValue = Dt.Rows[i]["Progressing5"].ToString();
+                    if (radBtnLst5.SelectedValue == "Yes")
+                        radBtnLst5.Items[0].Attributes["Style"] = "color:lightgreen;";
+                    else if (radBtnLst5.SelectedValue == "No")
+                        radBtnLst5.Items[1].Attributes["Style"] = "color:red;";
+                    else if (radBtnLst5.SelectedValue == "No Change")
+                        radBtnLst5.Items[2].Attributes["Style"] = "color:yellow;";
+
+                    radBtnLst6.SelectedValue = Dt.Rows[i]["Progressing6"].ToString();
+                    if (radBtnLst6.SelectedValue == "Yes")
+                        radBtnLst6.Items[0].Attributes["Style"] = "color:lightgreen;";
+                    else if (radBtnLst6.SelectedValue == "No")
+                        radBtnLst6.Items[1].Attributes["Style"] = "color:red;";
+                    else if (radBtnLst6.SelectedValue == "No Change")
+                        radBtnLst6.Items[2].Attributes["Style"] = "color:yellow;";
+
+                    radBtnLst7.SelectedValue = Dt.Rows[i]["Progressing7"].ToString();
+                    if (radBtnLst7.SelectedValue == "Yes")
+                        radBtnLst7.Items[0].Attributes["Style"] = "color:lightgreen;";
+                    else if (radBtnLst7.SelectedValue == "No")
+                        radBtnLst7.Items[1].Attributes["Style"] = "color:red;";
+                    else if (radBtnLst7.SelectedValue == "No Change")
+                        radBtnLst7.Items[2].Attributes["Style"] = "color:yellow;";
+
+                    if (Dt.Rows[i]["MetObjective"] != null && Dt.Rows[i]["MetGoal"] != null && Dt.Rows[i]["NotMaintaining"] != null&& i<Dt.Rows.Count)
                             {
 
                                 HtmlInputCheckBox checkbox1 = row.FindControl("Checkbox1") as HtmlInputCheckBox;
@@ -685,6 +764,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 tdMsg1.Visible = false;
                 tdMsg2.Visible = false;
                 tdreview2.Visible = false;
+                gvAgendaItem.Visible = false;
                 btnUpdate.Visible = false;
                 btnUpdateNew.Visible = false;
                 btnSave.Visible = false;
@@ -974,7 +1054,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 string EndPath = Server.MapPath("~\\StudentBinder\\ASTemplates\\ASTemplateEnd.docx");
               
                 // Replace placeholders with data
-                bool dse = findStartandEnd(StartPath, EndPath, columns[0], columns[1], columns[2]);
+                bool dse = findStartandEnd(StartPath, EndPath, columns[0], columns[1], columns[2], dateVal);
 
                 bool iepDoneFlg = MergeFiles();
 
@@ -1003,7 +1083,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
     }
    
 
-    private bool findStartandEnd(string StartPath, string EndPath, string sname,string iepdate,string dateofmeet)
+    private bool findStartandEnd(string StartPath, string EndPath, string sname,string iepdate,string dateofmeet, string dateVal)
     {
         bool retVal = false;
         
@@ -1013,6 +1093,19 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             string Acid = ViewState["CurrentAccId"].ToString();
             string strQueryfind = "select Attendees,IEPYear,IEPSigDate,Reviewed  from StdtAcdSheet WHERE AccSheetId=" + Acid;
             DataTable ac = objData.ReturnDataTable(strQueryfind, false);
+
+            string strtDate = "";
+            string endDate = "";
+            if (dateVal != null && dateVal != "")
+            {
+                strtDate = dateVal.Split('-')[0];
+                endDate = dateVal.Split('-')[1];
+            }
+            string strAgendaItemqry = "select AgendaItem, StaffInitials, AgendaAddedDate, DoneCarryOver from AcdSheetMtng where followstatus = 'A' and AccSheetId in " +
+                                      " (select StdtAcdSheet.Accsheetid from StdtAcdSheet inner join Student on StdtAcdSheet.StudentId=Student.StudentId where StdtAcdSheet.StudentId = " + sess.StudentId + "" +
+                                      " and CONVERT(datetime,DateOfMeeting)=CONVERT(datetime,'" + strtDate + "') and CONVERT(datetime,EndDate)=CONVERT(datetime,'" + endDate + "'))";
+            DataTable dtAgItm = objData.ReturnDataTable(strAgendaItemqry, false);
+
             ViewState["dtable"] = ac;
             string Temp = Server.MapPath("~\\StudentBinder") + "\\ACStartTemp";
 
@@ -1042,7 +1135,6 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
 
             string fileName2 = string.Format(output2, DateTime.Now);
             File.Copy(EndPath, fileName2);
-
             using (WordprocessingDocument theDoc = WordprocessingDocument.Open(fileName, true))   
             {
                 replaceWithTextsSingle(theDoc.MainDocumentPart, "PlcStudentName", sname);
@@ -1059,6 +1151,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             if (ac.Rows[0]["IEPYear"] != "")
             {
                 replaceWithTextsSingle(theDoc.MainDocumentPart, "PlcIEPYear", ac.Rows[0]["IEPYear"].ToString());
+                    
             }
             else
             {
@@ -1072,6 +1165,70 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             {
                 replaceWithTextsSingle(theDoc.MainDocumentPart, "PlcIEPSignatureandDate", "");
             }
+
+                MainDocumentPart mainPart = theDoc.MainDocumentPart;
+                Body bod = mainPart.Document.Body;
+                int tablecounter = 0;
+                foreach (DocumentFormat.OpenXml.Wordprocessing.Table t in bod.Descendants<DocumentFormat.OpenXml.Wordprocessing.Table>())
+                {
+                    if (tablecounter == 4)
+                    {
+                        foreach (DataRow dr in dtAgItm.Rows)
+                        {
+                            DocumentFormat.OpenXml.Wordprocessing.TableRow trXml = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
+                            string val1 = dr[0].ToString();
+                            DocumentFormat.OpenXml.Wordprocessing.Run run1 = new DocumentFormat.OpenXml.Wordprocessing.Run();
+                            if (val1 != "")
+                                run1.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(val1));
+                            else
+                                run1.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(""));
+
+                            string val2 = dr[1].ToString();
+                            DocumentFormat.OpenXml.Wordprocessing.Run run2 = new DocumentFormat.OpenXml.Wordprocessing.Run();
+                            if (val2 != "")
+                                run2.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(val2));
+                            else
+                                run2.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(""));
+
+                            string val3 = dr[2].ToString();
+                            DocumentFormat.OpenXml.Wordprocessing.Run run3 = new DocumentFormat.OpenXml.Wordprocessing.Run();
+                            if (val3 != "")
+                                run3.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(val3));
+                            else
+                                run3.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(""));
+
+                            string val4 = dr[3].ToString();
+                            DocumentFormat.OpenXml.Wordprocessing.Run run4 = new DocumentFormat.OpenXml.Wordprocessing.Run();
+                            if (val4 != "")
+                                run4.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(val4));
+                            else
+                                run4.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(""));
+
+                            DocumentFormat.OpenXml.Wordprocessing.TableCell tblCell1
+                                    = new DocumentFormat.OpenXml.Wordprocessing.TableCell(new DocumentFormat.OpenXml.Wordprocessing.Paragraph(new DocumentFormat.OpenXml.Wordprocessing.Run(new DocumentFormat.OpenXml.Wordprocessing.Text(""))));
+                            tblCell1.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Paragraph(run1));
+                            DocumentFormat.OpenXml.Wordprocessing.TableCell tblCell2
+                                    = new DocumentFormat.OpenXml.Wordprocessing.TableCell(new DocumentFormat.OpenXml.Wordprocessing.Paragraph(new DocumentFormat.OpenXml.Wordprocessing.Run(new DocumentFormat.OpenXml.Wordprocessing.Text(""))));
+                            tblCell2.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Paragraph(run2));
+                            DocumentFormat.OpenXml.Wordprocessing.TableCell tblCell3
+                                    = new DocumentFormat.OpenXml.Wordprocessing.TableCell(new DocumentFormat.OpenXml.Wordprocessing.Paragraph(new DocumentFormat.OpenXml.Wordprocessing.Run(new DocumentFormat.OpenXml.Wordprocessing.Text(""))));
+                            tblCell3.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Paragraph(run3));
+                            DocumentFormat.OpenXml.Wordprocessing.TableCell tblCell4
+                                    = new DocumentFormat.OpenXml.Wordprocessing.TableCell(new DocumentFormat.OpenXml.Wordprocessing.Paragraph(new DocumentFormat.OpenXml.Wordprocessing.Run(new DocumentFormat.OpenXml.Wordprocessing.Text(""))));
+                            tblCell4.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Paragraph(run4));
+
+
+                            trXml.Append(tblCell1);
+                            trXml.Append(tblCell2);
+                            trXml.Append(tblCell3);
+                            trXml.Append(tblCell4);
+
+                            t.Append(trXml);
+                        }
+                    }
+                    tablecounter++;
+                }
+                mainPart.Document.Save();
             }
             //Replace end - start
             using (WordprocessingDocument theDoc = WordprocessingDocument.Open(fileName2, true))
@@ -1315,6 +1472,14 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 TextBox txtNoOfPos6 = row.Controls[0].FindControl("txtNoOfPos6") as TextBox;
                 TextBox txtNoOfPos7 = row.Controls[0].FindControl("txtNoOfPos7") as TextBox;
 
+                RadioButtonList radioButtonList1 = row.Controls[0].FindControl("radioButtonList1") as RadioButtonList;
+                RadioButtonList radioButtonList2 = row.Controls[0].FindControl("radioButtonList2") as RadioButtonList;
+                RadioButtonList radioButtonList3 = row.Controls[0].FindControl("radioButtonList3") as RadioButtonList;
+                RadioButtonList radioButtonList4 = row.Controls[0].FindControl("radioButtonList4") as RadioButtonList;
+                RadioButtonList radioButtonList5 = row.Controls[0].FindControl("radioButtonList5") as RadioButtonList;
+                RadioButtonList radioButtonList6 = row.Controls[0].FindControl("radioButtonList6") as RadioButtonList;
+                RadioButtonList radioButtonList7 = row.Controls[0].FindControl("radioButtonList7") as RadioButtonList;
+
                 //result = true;
                 //result = ValidateDenominator(txtNoOfPos1);
                 //if (result == false) break;
@@ -1356,6 +1521,15 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 string NumPos6 = lblNoOfPos6.Text + "/" + txtNoOfPos6.Text;
                 string NumPos7 = lblNoOfPos7.Text + "/" + txtNoOfPos7.Text;
 
+                string radBtnList1 = radioButtonList1.SelectedValue.ToString();
+                string radBtnList2 = radioButtonList2.SelectedValue.ToString();
+                string radBtnList3 = radioButtonList3.SelectedValue.ToString();
+                string radBtnList4 = radioButtonList4.SelectedValue.ToString();
+                string radBtnList5 = radioButtonList5.SelectedValue.ToString();
+                string radBtnList6 = radioButtonList6.SelectedValue.ToString();
+                string radBtnList7 = radioButtonList7.SelectedValue.ToString();
+
+
                 TextBox txtFreeText = row.Controls[0].FindControl("txtFreetxt") as TextBox;
                 TextBox txtPersDissc = row.Controls[0].FindControl("txtPersDissc") as TextBox;
                 TextBox txtResAndDeadline = row.Controls[0].FindControl("txtResAndDeadline") as TextBox;
@@ -1381,9 +1555,11 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 else { c3 = 0; }
                 
                 string sqlQry = "INSERT INTO [dbo].[StdtAcdSheet] ([StudentId],[DateOfMeeting],[EndDate],[GoalArea],[Goal],[Benchmarks]" +
-                    ",[TypeOfInstruction],[Period1],[Set1],[Prompt1],[IOA1],[NoOfTimes1],[Period2],[Set2],[Prompt2],[IOA2]," +
-                    "[NoOfTimes2],[Period3],[Set3],[Prompt3],[IOA3],[NoOfTimes3],[Period4],[Set4],[Prompt4],[IOA4],[NoOfTimes4],[Period5],[Set5]," +
-                "[Prompt5],[IOA5],[NoOfTimes5],[Period6],[Set6],[Prompt6],[IOA6],[NoOfTimes6],[Period7],[Set7],[Prompt7],[IOA7],[NoOfTimes7],[LessonPlanId],[Mistrial1],[Mistrial2],[Mistrial3],[Mistrial4],[Mistrial5],[Mistrial6],[Mistrial7],[Step1],[Step2],[Step3],[Step4],[Step5],[Step6],[Step7],[Attendees],[IEPYear],[IEPSigDate],[Reviewed],[MetObjective],[MetGoal],[NotMaintaining]) " +
+                    ",[TypeOfInstruction],[Period1],[Set1],[Prompt1],[IOA1],[NoOfTimes1],[Progressing1],[Period2],[Set2],[Prompt2],[IOA2]," +
+                    "[NoOfTimes2],[Progressing2],[Period3],[Set3],[Prompt3],[IOA3],[NoOfTimes3],[Progressing3],[Period4],[Set4],[Prompt4],[IOA4],[NoOfTimes4],[Progressing4],[Period5],[Set5]," +
+                "[Prompt5],[IOA5],[NoOfTimes5],[Progressing5],[Period6],[Set6],[Prompt6],[IOA6],[NoOfTimes6],[Progressing6],[Period7],[Set7],[Prompt7],[IOA7],[NoOfTimes7],[Progressing7],[LessonPlanId]," + 
+                "[Mistrial1],[Mistrial2],[Mistrial3],[Mistrial4],[Mistrial5],[Mistrial6],[Mistrial7],[Step1],[Step2],[Step3],[Step4],[Step5],[Step6],[Step7]," + 
+                "[Attendees],[IEPYear],[IEPSigDate],[Reviewed],[MetObjective],[MetGoal],[NotMaintaining]) " +
                 "VALUES(" + sess.StudentId + ",'" + dtst.ToString("MM/dd/yyyy") + "','" + dted.ToString("MM/dd/yyyy") + "'," +
                 "'" + lblGoalArea.Text + "'," +
                 "'" + lblGoal.Text + "'," +
@@ -1400,42 +1576,55 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 "'" + lblprmtLvl1.Text + "'," +
                 "'" + lblIOA1.Text + "'," +
                 "'" + NumPos1 + "'," +
+                "'" + radBtnList1 + "'," +
 
                 "'" + lblPeriod2.Text + "'," +
                 "'" + clsGeneral.convertQuotes(lblStmlsSet2.Text) + "'," +
                 "'" + lblprmtLvl2.Text + "'," +
                 "'" + lblIOA2.Text + "'," +
                 "'" + NumPos2 + "'," +
+                "'" + radBtnList2 + "'," +
 
                 "'" + lblPeriod3.Text + "'," +
                 "'" + clsGeneral.convertQuotes(lblStmlsSet3.Text) + "'," +
                 "'" + lblprmtLvl3.Text + "'," +
                 "'" + lblIOA3.Text + "'," +
                 "'" + NumPos3 + "'," +
+                "'" + radBtnList3 + "'," +
+
 
                 "'" + lblPeriod4.Text + "'," +
                 "'" + clsGeneral.convertQuotes(lblStmlsSet4.Text) + "'," +
                 "'" + lblprmtLvl4.Text + "'," +
                 "'" + lblIOA4.Text + "'," +
                 "'" + NumPos4 + "'," +
+                "'" + radBtnList4 + "'," +
+
 
                 "'" + lblPeriod5.Text + "'," +
                 "'" + clsGeneral.convertQuotes(lblStmlsSet5.Text) + "'," +
                 "'" + lblprmtLvl5.Text + "'," +
                 "'" + lblIOA5.Text + "'," +
                 "'" + NumPos5 + "'," +
+                "'" + radBtnList5 + "'," +
+
 
                 "'" + lblPeriod6.Text + "'," +
                 "'" + clsGeneral.convertQuotes(lblStmlsSet6.Text) + "'," +
                 "'" + lblprmtLvl6.Text + "'," +
                 "'" + lblIOA6.Text + "'," +
                 "'" + NumPos6 + "'," +
+                "'" + radBtnList6 + "'," +
+
 
                 "'" + lblPeriod7.Text + "'," +
                 "'" + clsGeneral.convertQuotes(lblStmlsSet7.Text) + "'," +
                 "'" + lblprmtLvl7.Text + "'," +
                 "'" + lblIOA7.Text + "'," +
                 "'" + NumPos7 + "'," +
+                "'" + radBtnList7 + "'," +
+
+
                 hfLPId.Value + "," +
                 "'" + lblMis1.Text + "'," +
                 "'" + lblMis2.Text + "'," +
@@ -1452,10 +1641,10 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 "'" + hdnstep5.Value + "'," +
                 "'" + hdnstep6.Value + "'," +
                 "'" + hdnstep7.Value + "'," +
-                "'" + AttendeesText.Text + "'," +
-                "'" + Iepyeartxt.Text + "'," +
-                "'" + Ieptxt.Text + "'," +
-                "'" + ReviewbydateSave.Text + "'," +
+                "'" + clsGeneral.convertQuotes(AttendeesText.Text )+ "'," +
+                "'" + clsGeneral.convertQuotes(Iepyeartxt.Text) + "'," +
+                "'" + clsGeneral.convertQuotes(Ieptxt.Text) + "'," +
+                "'" + clsGeneral.convertQuotes(ReviewbydateSave.Text) + "'," +
                 "'" + c1 + "'," +
                 "'" + c2 + "'," +
                 "'" + c3 + "'" +
@@ -1464,7 +1653,61 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
 
                 //int insetChk = objData.Execute(sqlQry);
                 int insetChk = objData.ExecuteWithScope(sqlQry);
+                int testSave = 0;
+                int accSheetId = insetChk;
+                DataTable dtAccSheetId = new DataTable();
+                DataColumn dc = new DataColumn("AccSheetId", typeof(Int32));
+                dtAccSheetId.Columns.Add(dc);
+                DataRow dr = dtAccSheetId.NewRow();
+                if (accSheetId != 0)
+                {
+                        foreach (GridViewRow row2 in gvAgendaItem.Rows)
+                        {
+                            Label lblAgendaItemId = (Label)row2.FindControl("LblAgendaItemId");
+                            TextBox txtAgendaItem = (TextBox)row2.FindControl("txtAgendaItem");
+                            TextBox txtStaffInitials = (TextBox)row2.FindControl("txtStaffInitials");
+                            TextBox txtDateAdded = (TextBox)row2.FindControl("txtDateAdded");
+                            RadioButtonList RadBtnListDoneCarryOver = (RadioButtonList)row2.FindControl("RBLDoneCarry");
+                            DataTable dtAccSheetId2 = new DataTable();
+                            dtAccSheetId2 = null;
+                            if (lblAgendaItemId.Text != "")
+                            {
+                                string accSheetIdQry = "select AccSheetId from AcdSheetMtng where MtngId = " + lblAgendaItemId.Text;
+                                dtAccSheetId2 = objData.ReturnDataTable(accSheetIdQry, false);
+                            }
 
+                            if (txtAgendaItem.Text != "")
+                            {
+
+                                if (lblAgendaItemId.Text != "")
+                                {
+                                    //update
+                                    string strqury = "update AcdSheetMtng set AgendaItem='" + clsGeneral.convertQuotes(txtAgendaItem.Text.Trim()) + "',StaffInitials='" + clsGeneral.convertQuotes(txtStaffInitials.Text.Trim()) +
+                                        "',AgendaAddedDate='" + clsGeneral.convertQuotes(txtDateAdded.Text) + "',DoneCarryOver='" + RadBtnListDoneCarryOver.SelectedValue.ToString() + "', ModifiedBy=" + sess.LoginId + ",ModifiedOn=GETDATE() where MtngId=" + lblAgendaItemId.Text + "";
+                                    testSave += Convert.ToInt32(objData.Execute(strqury));
+                                }
+                                else
+                                {
+                                    //save
+                                    string strqury = "insert into AcdSheetMtng (AccSheetId,LessonPlanId,AgendaItem,StaffInitials,AgendaAddedDate,DoneCarryOver,ActiveInd,CreatedBy,CreatedOn,followstatus) " +
+                                        "values (" + accSheetId + ",(select LessonPlanId from StdtAcdSheet where AccSheetId=" + accSheetId + "),'" + clsGeneral.convertQuotes(txtAgendaItem.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtStaffInitials.Text.Trim()) +
+                                        "','" + clsGeneral.convertQuotes(txtDateAdded.Text) + "','" + RadBtnListDoneCarryOver.SelectedValue.ToString() + "', 'A'," + sess.LoginId + ",GETDATE(),'A')";
+                                    testSave += Convert.ToInt32(objData.Execute(strqury));
+                                    DataTable dt = new DataTable();
+                                    dt = objData.ReturnDataTable("select top 1 MtngId from AcdSheetMtng order by 1 desc", false);
+                                    lblAgendaItemId.Text = dt.Rows[0]["MtngId"].ToString();
+                                }
+                            }
+                            else
+                            {
+                                //PersonRespCheck = 0;
+                                //testupdate = 0;
+                                //break;
+                            }
+
+
+                        }
+                    }
 
                 int personResp = 0;
             string textVal = "";
@@ -1560,6 +1803,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                     tdMsg1.Visible = true;
                     tdMsg2.Visible = true;
                     tdreview2.Visible = true;
+                    gvAgendaItem.Visible = true;
                     rbtnLsnClassTypeAc.SelectedValue = "Day,Residence";
                     btnSave.Visible = false;
                     btnSaveNew.Visible = false;
@@ -1675,11 +1919,13 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             tdMsg1.Visible = false;
             tdMsg2.Visible = false;
             tdreview2.Visible = false;
+            gvAgendaItem.Visible = false;
             //btnBack.Text = "Cancel";
 
             string testIfPresent = "select AccSheetId from StdtAcdSheet where StudentId=" + sess.StudentId + " AND CONVERT(datetime,DateOfMeeting)=CONVERT(datetime,'" + dtst.ToString("MM/dd/yyyy") + "') AND CONVERT(datetime,EndDate)=CONVERT(datetime,'" + dted.ToString("MM/dd/yyyy") + "')";
             if (objData.IFExists(testIfPresent) == false)
             {
+                loadAgendaItemGV();
                 LoadPMeetingGVNew();
                 LoadCMeetingGVNew();
                 loadDataList();
@@ -1691,6 +1937,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 tdMsg1.Visible = true;
                 tdMsg2.Visible = true;
                 tdreview2.Visible = true;
+                gvAgendaItem.Visible = true;
                 rbtnLsnClassTypeAc.SelectedValue = "Day,Residence";
             }
             else
@@ -1864,6 +2111,75 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
         //        + clsGeneral.convertQuotes(txtResAndDeadline.Text.Trim()) + "' WHERE AccSheetId=" + hdFldAcdId.Value + "";
         //    testupdate += objData.Execute(strqury);
         //}
+            DataTable dtAccSheetId = new DataTable();
+            DataColumn dc = new DataColumn("AccSheetId", typeof(Int32));
+            dtAccSheetId.Columns.Add(dc);
+            DataRow dr = dtAccSheetId.NewRow();
+            foreach(GridViewRow row3 in GridViewAccSheetedit.Rows)
+            {
+                dr = dtAccSheetId.NewRow();
+                HiddenField hdFldAcdId = row3.Controls[0].FindControl("hdFldAcdId") as HiddenField;
+                AccShtId = Convert.ToInt32(hdFldAcdId.Value);
+                dr["AccSheetId"] = AccShtId;
+                dtAccSheetId.Rows.Add(dr);
+            }
+            if (dtAccSheetId != null)
+            {
+                foreach (DataRow row4 in dtAccSheetId.Rows)
+                {
+                    foreach (GridViewRow row2 in gvAgendaItem.Rows)
+                    {
+                    Label lblAgendaItemId = (Label)row2.FindControl("LblAgendaItemId");
+                    TextBox txtAgendaItem = (TextBox)row2.FindControl("txtAgendaItem");
+                    TextBox txtStaffInitials = (TextBox)row2.FindControl("txtStaffInitials");
+                    TextBox txtDateAdded = (TextBox)row2.FindControl("txtDateAdded");
+                    RadioButtonList RadBtnListDoneCarryOver = (RadioButtonList)row2.FindControl("RBLDoneCarry");
+                    DataTable dtAccSheetId2 = new DataTable();
+                    dtAccSheetId2 = null;
+                    if (lblAgendaItemId.Text != "")
+                    {
+                        string accSheetIdQry = "select AccSheetId from AcdSheetMtng where MtngId = " + lblAgendaItemId.Text;
+                        dtAccSheetId2 = objData.ReturnDataTable(accSheetIdQry, false);
+                    }
+                    
+                    if (txtAgendaItem.Text != "")
+                    {
+                        if(dtAccSheetId2 != null)
+                        {
+                            if (row4["AccSheetId"].ToString() != dtAccSheetId2.Rows[0]["AccSheetId"].ToString())
+                                continue;
+                        }
+                        
+                        if (lblAgendaItemId.Text != "")
+                        {
+                            //update
+                            string strqury = "update AcdSheetMtng set AgendaItem='" + clsGeneral.convertQuotes(txtAgendaItem.Text.Trim()) + "',StaffInitials='" + clsGeneral.convertQuotes(txtStaffInitials.Text.Trim()) +
+                                "',AgendaAddedDate='" + clsGeneral.convertQuotes(txtDateAdded.Text) + "',DoneCarryOver='" + RadBtnListDoneCarryOver.SelectedValue.ToString() + "', ModifiedBy=" + sess.LoginId + ",ModifiedOn=GETDATE() where MtngId=" + lblAgendaItemId.Text + "";
+                            testupdate += Convert.ToInt32(objData.Execute(strqury));
+                        }
+                        else
+                        {
+                            //save
+                            string strqury = "insert into AcdSheetMtng (AccSheetId,LessonPlanId,AgendaItem,StaffInitials,AgendaAddedDate,DoneCarryOver,ActiveInd,CreatedBy,CreatedOn,followstatus) " +
+                                "values (" + AccShtId + ",(select LessonPlanId from StdtAcdSheet where AccSheetId=" + AccShtId + "),'" + clsGeneral.convertQuotes(txtAgendaItem.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtStaffInitials.Text.Trim()) +
+                                "','" + clsGeneral.convertQuotes(txtDateAdded.Text) + "','" + RadBtnListDoneCarryOver.SelectedValue.ToString() + "', 'A'," + sess.LoginId + ",GETDATE(),'A')";
+                            testupdate += Convert.ToInt32(objData.Execute(strqury));
+                            DataTable dt = new DataTable();
+                            dt = objData.ReturnDataTable("select top 1 MtngId from AcdSheetMtng order by 1 desc",false);
+                            lblAgendaItemId.Text = dt.Rows[0]["MtngId"].ToString();
+                        }
+                    }
+                    else
+                    {
+                        //PersonRespCheck = 0;
+                        //testupdate = 0;
+                        //break;
+                    }
+
+
+                }
+            }
+            }
 
         foreach (GridViewRow row in GridViewAccSheetedit.Rows)
         {
@@ -1886,6 +2202,16 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             TextBox txtNoOfPos5 = row.Controls[0].FindControl("txtNoOfPos12") as TextBox;
             TextBox txtNoOfPos6 = row.Controls[0].FindControl("txtNoOfPos13") as TextBox;
             TextBox txtNoOfPos7 = row.Controls[0].FindControl("txtNoOfPos14") as TextBox;
+
+            RadioButtonList radioButtonList1 = row.Controls[0].FindControl("radioButtonList8") as RadioButtonList;
+            RadioButtonList radioButtonList2 = row.Controls[0].FindControl("radioButtonList9") as RadioButtonList;
+            RadioButtonList radioButtonList3 = row.Controls[0].FindControl("radioButtonList10") as RadioButtonList;
+            RadioButtonList radioButtonList4 = row.Controls[0].FindControl("radioButtonList11") as RadioButtonList;
+            RadioButtonList radioButtonList5 = row.Controls[0].FindControl("radioButtonList12") as RadioButtonList;
+            RadioButtonList radioButtonList6 = row.Controls[0].FindControl("radioButtonList13") as RadioButtonList;
+            RadioButtonList radioButtonList7 = row.Controls[0].FindControl("radioButtonList14") as RadioButtonList;
+
+
 
             //bool result=true;
             //result= ValidateDenominator(txtNoOfPos1);
@@ -1910,6 +2236,15 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             string NumPos5 = lblNoOfPos5.Text + "/" + txtNoOfPos5.Text;
             string NumPos6 = lblNoOfPos6.Text + "/" + txtNoOfPos6.Text;
             string NumPos7 = lblNoOfPos7.Text + "/" + txtNoOfPos7.Text;
+
+            string radBtnList1 = radioButtonList1.SelectedValue.ToString();
+            string radBtnList2 = radioButtonList2.SelectedValue.ToString();
+            string radBtnList3 = radioButtonList3.SelectedValue.ToString();
+            string radBtnList4 = radioButtonList4.SelectedValue.ToString();
+            string radBtnList5 = radioButtonList5.SelectedValue.ToString();
+            string radBtnList6 = radioButtonList6.SelectedValue.ToString();
+            string radBtnList7 = radioButtonList7.SelectedValue.ToString();
+
             string attendees = AttendeesText.Text;
             string IEPyear = Iepyeartxt.Text;
             string IEPDate = Ieptxt.Text;
@@ -1934,7 +2269,10 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             }
             else { c3 = 0; }
 
-            string UpdateAcdsht = "UPDATE StdtAcdSheet SET NoOfTimes1='" + NumPos1 + "',NoOfTimes2='" + NumPos2 + "',NoOfTimes3='" + NumPos3 + "',NoOfTimes4='" + NumPos4 + "',NoOfTimes5='" + NumPos5 + "',NoOfTimes6='" + NumPos6 + "',NoOfTimes7='" + NumPos7 + "',Attendees='" + attendees + "',IEPYear='" + IEPyear + "',IEPSigDate='" + IEPDate + "',Reviewed='" + review + "',MetObjective='" + c1 + "',MetGoal='" + c2 + "',NotMaintaining='"+c3+"' WHERE AccSheetId=" + AccShtId + "";
+            string UpdateAcdsht = "UPDATE StdtAcdSheet SET NoOfTimes1='" + NumPos1 + "',NoOfTimes2='" + NumPos2 + "',NoOfTimes3='" + NumPos3 + "',NoOfTimes4='" + NumPos4 + "',NoOfTimes5='" + NumPos5 + "',NoOfTimes6='" + NumPos6 + "',NoOfTimes7='" + NumPos7 +
+                                  "',Attendees='" + clsGeneral.convertQuotes(attendees) + "',IEPYear='" + clsGeneral.convertQuotes(IEPyear) + "',IEPSigDate='" + clsGeneral.convertQuotes(IEPDate) + "',Reviewed='" +clsGeneral.convertQuotes( review) + "',MetObjective='" + c1 + "',MetGoal='" + c2 + "',NotMaintaining='" + c3 +
+                                  "',Progressing1='"+radBtnList1+"',Progressing2='"+radBtnList2+"',Progressing3='"+radBtnList3+"',Progressing4='"+radBtnList4+"',Progressing5='"+radBtnList5+"',Progressing6='"+radBtnList6+"',Progressing7='"+radBtnList7+"' " +
+                                  "WHERE AccSheetId=" + AccShtId + "";
             objData.Execute(UpdateAcdsht);
 
             int personResp = 0;
@@ -2195,7 +2533,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                         isBullet = true;
                     if (isBullet)
                     {
-                        ParagraphProperties paraProp = new ParagraphProperties();
+                        DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties paraProp = new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties();
                         ParagraphStyleId paraStyleid = new ParagraphStyleId() { Val = "BulletPara" };
                         NumberingProperties numProp = new NumberingProperties();
                         NumberingLevelReference numLvlRef = new NumberingLevelReference() { Val = 0 };
@@ -2219,7 +2557,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
         paras = mainPart.Document.Descendants<DocumentFormat.OpenXml.Wordprocessing.Paragraph>().Where(element => element.InnerText == plcT);
         foreach (DocumentFormat.OpenXml.Wordprocessing.Paragraph para in paras)
         {
-            para.RemoveAllChildren<Run>();
+            para.RemoveAllChildren<DocumentFormat.OpenXml.Wordprocessing.Run>();
         }
     }
     //protected void txtSdate_TextChanged(object sender, EventArgs e)
@@ -2233,6 +2571,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
     //        txtEdate.Text = Edate.Date.ToString("MM'/'dd'/'yyyy");
     //    }
     //}
+    
     protected void GridViewAccSheet_SelectedIndexChanged(object sender, EventArgs e)
     {
 
@@ -2350,7 +2689,181 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
         dr["CDeadlines"] = "";
         dtCMeeting.Rows.Add(dr);
     }
+    protected void gvAgendaItem_RowCommand(object sender, GridViewCommandEventArgs e)
+    {
+        if (e.CommandName == "AddRow")
+        {
+            GridView gvC = (GridView)sender;
+            addRowAgendaEdit(gvC);
+        }
+        if (e.CommandName == "deleteRow")
+        {
+            GridViewRow gvr = (GridViewRow)((ImageButton)e.CommandSource).NamingContainer;
 
+            int RowIndex = gvr.RowIndex;
+            int AgItmId = 0;
+            GridView gvC = (GridView)sender;
+            string cArg = e.CommandArgument.ToString();
+            if (cArg != "")
+            {
+                AgItmId = int.Parse(e.CommandArgument.ToString());
+                objData = new clsData();
+                string sQuery = "delete from AcdSheetMtng where MtngId=" + AgItmId;
+                objData.Execute(sQuery);
+                delRowAgendaItem(RowIndex);
+                //gvAgendaItem.DeleteRow(RowIndex);
+            }
+            else
+            {
+                delRowAgendaItem(RowIndex);
+            }
+        }
+    }
+    //protected void gvAgendaItem_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    //{
+    //    GridView gvC = (GridView)sender;
+    //    int rowIndex = e.RowIndex;
+    //    ArrangeGVAgendaItem(gvC, rowIndex);
+    //}
+    protected void delRowAgendaItem(int id)
+    {
+        DataTable dt = new DataTable();
+        dt.Columns.Add("AgendaItemId", typeof(string));
+        dt.Columns.Add("AgendaItem", typeof(string));
+        dt.Columns.Add("StaffInitials", typeof(string));
+        dt.Columns.Add("DateAdded", typeof(string));
+        dt.Columns.Add("DoneCarryOver", typeof(string));
+
+        foreach (GridViewRow row2 in gvAgendaItem.Rows)
+        {
+            Label lblAgendaItemId = (Label)row2.FindControl("LblAgendaItemId");
+            TextBox txtAgendaItem = (TextBox)row2.FindControl("txtAgendaItem");
+            TextBox txtStaffInitials = (TextBox)row2.FindControl("txtStaffInitials");
+            TextBox txtDateAdded = (TextBox)row2.FindControl("txtDateAdded");
+            RadioButtonList RadBtnListDoneCarryOver = (RadioButtonList)row2.FindControl("RBLDoneCarry");
+
+            dt.Rows.Add(lblAgendaItemId.Text.ToString(), txtAgendaItem.Text.ToString(), txtStaffInitials.Text.ToString(), txtDateAdded.Text.ToString(), RadBtnListDoneCarryOver.SelectedValue.ToString());
+        }
+
+        if(id<dt.Rows.Count)
+        dt.Rows[id].Delete();
+
+        gvAgendaItem.DataSource = dt;
+        gvAgendaItem.DataBind();
+        int i = 0;
+        foreach (GridViewRow row3 in gvAgendaItem.Rows)
+        {
+            RadioButtonList radBtnLst1 = row3.FindControl("RBLDoneCarry") as RadioButtonList;
+            if (dt.Rows[i]["DoneCarryOver"].ToString() != "" && i < dt.Rows.Count)
+            {
+                radBtnLst1.SelectedValue = dt.Rows[i++]["DoneCarryOver"].ToString();
+            }
+        }
+
+    }
+    protected void ArrangeGVAgendaItem(GridView gvC, int rowIndex)
+    {
+        dtAgendaItem.Columns.Add("AgendaItemId", typeof(string));
+        dtAgendaItem.Columns.Add("AgendaItem", typeof(string));
+        dtAgendaItem.Columns.Add("StaffInitials", typeof(string));
+        dtAgendaItem.Columns.Add("DateAdded", typeof(string));
+        dtAgendaItem.Columns.Add("DoneCarryOver", typeof(string));
+
+
+        foreach (GridViewRow gvr in gvC.Rows)
+        {
+            DataRow drTemp = dtAgendaItem.NewRow();
+            drTemp["AgendaItemId"] = ((Label)gvr.FindControl("LblAgendaItemId")).Text;
+            drTemp["AgendaItem"] = ((TextBox)gvr.FindControl("txtAgendaItem")).Text;
+            drTemp["StaffInitials"] = ((TextBox)gvr.FindControl("txtStaffInitials")).Text;
+            drTemp["DateAdded"] = ((TextBox)gvr.FindControl("txtDateAdded")).Text;
+            drTemp["DoneCarryOver"] = ((RadioButtonList)gvr.FindControl("RBLDoneCarry")).SelectedValue;
+            dtAgendaItem.Rows.Add(drTemp);
+        }
+        if (dtAgendaItem.Rows.Count > 0)
+        {
+            dtAgendaItem.Rows.RemoveAt(rowIndex);
+        }
+        if (dtAgendaItem.Rows.Count == 0)
+        {
+            DataRow dr = dtAgendaItem.NewRow();
+            dr["AgendaItemId"] = "";
+            dr["AgendaItem"] = "";
+            dr["StaffInitials"] = "";
+            dr["DateAdded"] = "";
+            dr["DoneCarryOver"] = "";
+            dtAgendaItem.Rows.Add(dr);
+        }
+        gvC.DataSource = dtAgendaItem;
+        gvC.DataBind();
+    }
+    public void addRowAgendaEdit(GridView gvC)
+    {
+
+        dtAgendaItem.Columns.Add("AgendaItemId", typeof(string));
+        dtAgendaItem.Columns.Add("AgendaItem", typeof(string));
+        dtAgendaItem.Columns.Add("StaffInitials", typeof(string));
+        dtAgendaItem.Columns.Add("DateAdded", typeof(string));
+        dtAgendaItem.Columns.Add("DoneCarryOver", typeof(string));
+
+        foreach (GridViewRow gvr in gvC.Rows)
+        {
+            DataRow drTemp = dtAgendaItem.NewRow();
+            drTemp["AgendaItemId"] = ((Label)gvr.FindControl("LblAgendaItemId")).Text;
+            drTemp["AgendaItem"] = ((TextBox)gvr.FindControl("txtAgendaItem")).Text;
+            drTemp["StaffInitials"] = ((TextBox)gvr.FindControl("txtStaffInitials")).Text;
+            drTemp["DateAdded"] = ((TextBox)gvr.FindControl("txtDateAdded")).Text;
+            drTemp["DoneCarryOver"] = ((RadioButtonList)gvr.FindControl("RBLDoneCarry")).SelectedValue;
+            dtAgendaItem.Rows.Add(drTemp);
+        }
+        DataRow dr = dtAgendaItem.NewRow();
+        dr["AgendaItemId"] = "";
+        dr["AgendaItem"] = "";
+        dr["StaffInitials"] = "";
+        dr["DateAdded"] = "";
+        dr["DoneCarryOver"] = "";
+        dtAgendaItem.Rows.Add(dr);
+        gvC.DataSource = dtAgendaItem;
+        gvC.DataBind();
+        int i = 0;
+        foreach (GridViewRow row3 in gvAgendaItem.Rows)
+        {
+            RadioButtonList radBtnLst1 = row3.FindControl("RBLDoneCarry") as RadioButtonList;
+            if (dtAgendaItem.Rows[i]["DoneCarryOver"].ToString() != "" && i < dtAgendaItem.Rows.Count)
+            {
+                radBtnLst1.SelectedValue = dtAgendaItem.Rows[i++]["DoneCarryOver"].ToString();
+            }
+        }
+        ScriptManager.RegisterStartupScript(Page, this.GetType(), "somekey", "destroy();", true);
+    }
+    protected void loadAgendaItemGV()
+    {
+        dtAgendaItem.Columns.Add("AgendaItemId");
+        dtAgendaItem.Columns.Add("AgendaItem");
+        dtAgendaItem.Columns.Add("StaffInitials");
+        dtAgendaItem.Columns.Add("DateAdded");
+        dtAgendaItem.Columns.Add("DoneCarryOver");
+
+
+        DataRow dr = dtAgendaItem.NewRow();
+        dr["AgendaItemId"] = "";
+        dr["AgendaItem"] = "";
+        dr["StaffInitials"] = "";
+        dr["DateAdded"] = "";
+        dr["DoneCarryOver"] = "";
+        dtAgendaItem.Rows.Add(dr);
+        DataTable dt = new DataTable();
+        dt.Columns.Add("AgendaItemId", typeof(int));
+        dt.Columns.Add("AgendaItem", typeof(string));
+        dt.Columns.Add("StaffInitials", typeof(string));
+        dt.Columns.Add("DateAdded", typeof(string));
+        dt.Columns.Add("DoneCarryOver", typeof(string));
+
+
+        gvAgendaItem.DataSource = dtAgendaItem;
+        gvAgendaItem.DataBind();
+        gvAgendaItem.Visible = true;
+    }
     public void LoadMeetings(string date)
     {
         objData = new clsData();
@@ -2376,6 +2889,58 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
         dtCMtng.Columns.Add(new DataColumn("PersonResponsibleEdit", typeof(string)));
         dtCMtng.Columns.Add(new DataColumn("CPersonResponsibleEdit", typeof(Int32)));
         dtCMtng.Columns.Add(new DataColumn("CDeadlinesEdit", typeof(string)));
+        
+        DataTable dtAgItm = new DataTable();
+        dtAgItm.Columns.Add(new DataColumn("AgendaItemId", typeof(Int32)));
+        dtAgItm.Columns.Add(new DataColumn("AgendaItem", typeof(string)));
+        dtAgItm.Columns.Add(new DataColumn("StaffInitials", typeof(string)));
+        dtAgItm.Columns.Add(new DataColumn("DateAdded", typeof(string)));
+        dtAgItm.Columns.Add(new DataColumn("DoneCarryOver", typeof(string)));
+        DataTable Dt3 = new DataTable();
+
+
+        string agItmQry = "select MtngId from AcdSheetMtng where followstatus = 'A' and ActiveInd='A' and AccSheetId in " +
+                          "(select AccSheetId from StdtAcdSheet where studentid=" + sess.StudentId + " and EndDate = '" + endDate + "')";
+        DataTable dtAgendaId = objData.ReturnDataTable(agItmQry, false);
+        int agendaId = 0;
+        if(dtAgendaId != null )
+        {
+            foreach (DataRow row1 in dtAgendaId.Rows)
+            {
+                agendaId = Convert.ToInt32(row1["MtngId"]);
+                string Aquery = "select MtngId as AgendaItemId, AgendaItem, StaffInitials, AgendaAddedDate as DateAdded, DoneCarryOver from AcdSheetMtng where MtngId =" + agendaId;
+                Dt3 = objData.ReturnDataTable(Aquery, false);
+                foreach (DataRow row2 in Dt3.Rows)
+                    if (row2["AgendaItem"].ToString() != "" || row2["StaffInitials"].ToString() != "")
+                    {
+                        if (row2["DateAdded"].ToString() != "")
+                        {
+                            string dateAdded = row2["DateAdded"].ToString().Replace("-", "/");
+                            dtAgItm.Rows.Add(Convert.ToInt32(row2["AgendaItemId"]), row2["AgendaItem"].ToString(), row2["StaffInitials"].ToString(), dateAdded, row2["DoneCarryOver"].ToString());
+                        }
+                        else
+                            dtAgItm.Rows.Add(Convert.ToInt32(row2["AgendaItemId"]), row2["AgendaItem"].ToString(), row2["StaffInitials"].ToString(), row2["DoneCarryOver"].ToString());
+                    }
+            }
+            if (dtAgItm != null)
+            {
+                if (dtAgItm.Rows.Count > 0)
+                {
+                    gvAgendaItem.DataSource = dtAgItm;
+                    gvAgendaItem.DataBind();
+                    int i = 0;
+                    foreach(GridViewRow row3 in gvAgendaItem.Rows)
+                    {
+                        RadioButtonList radBtnLst1 = row3.FindControl("RBLDoneCarry") as RadioButtonList;
+                        if (dtAgItm.Rows[i]["DoneCarryOver"].ToString() != "" && i < dtAgItm.Rows.Count)
+                        {
+                            radBtnLst1.SelectedValue = dtAgItm.Rows[i++]["DoneCarryOver"].ToString();
+                        }
+                    }
+                }
+            }
+        }
+
         foreach (GridViewRow row in GridViewAccSheetedit.Rows)
         {
             HiddenField hdFldAcdId = (HiddenField)row.FindControl("hdFldAcdId");
@@ -2523,7 +3088,57 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             startDate = date.Split('-')[0];
             endDate = date.Split('-')[1];
         }
+        DataTable dtAgItm = new DataTable();
+        dtAgItm.Columns.Add(new DataColumn("AgendaItemId", typeof(Int32)));
+        dtAgItm.Columns.Add(new DataColumn("AgendaItem", typeof(string)));
+        dtAgItm.Columns.Add(new DataColumn("StaffInitials", typeof(string)));
+        dtAgItm.Columns.Add(new DataColumn("DateAdded", typeof(string)));
+        dtAgItm.Columns.Add(new DataColumn("DoneCarryOver", typeof(string)));
+        DataTable dtMtngId = new DataTable();
+        DataTable Dt3 = new DataTable();
 
+
+        string agItmQry = "select MtngId from AcdSheetMtng where followstatus = 'A' and ActiveInd='A' and AccSheetId in " +
+                          "(select AccSheetId from StdtAcdSheet where studentid=" + sess.StudentId + " and EndDate = '" + endDate + "')";
+        DataTable dtAgendaId = objData.ReturnDataTable(agItmQry, false);
+        int agendaId = 0;
+        if (dtAgendaId != null)
+        {
+            foreach (DataRow row1 in dtAgendaId.Rows)
+            {
+                agendaId = Convert.ToInt32(row1["MtngId"]);
+                string Aquery = "select MtngId as AgendaItemId, AgendaItem, StaffInitials, AgendaAddedDate as DateAdded, DoneCarryOver from AcdSheetMtng where MtngId =" + agendaId;
+                Dt3 = objData.ReturnDataTable(Aquery, false);
+                foreach (DataRow row2 in Dt3.Rows)
+                    if (row2["AgendaItem"].ToString() != "" || row2["StaffInitials"].ToString() != "")
+                    {
+                        if (row2["DateAdded"].ToString() != "")
+                        {
+                            string dateAdded = row2["DateAdded"].ToString().Replace("-", "/");
+                            dtAgItm.Rows.Add(Convert.ToInt32(row2["AgendaItemId"]), row2["AgendaItem"].ToString(), row2["StaffInitials"].ToString(), dateAdded, row2["DoneCarryOver"].ToString());
+                        }
+                        else
+                            dtAgItm.Rows.Add(Convert.ToInt32(row2["AgendaItemId"]), row2["AgendaItem"].ToString(), row2["StaffInitials"].ToString(), row2["DoneCarryOver"].ToString());
+                    }
+            }
+            if (dtAgItm != null)
+            {
+                if (dtAgItm.Rows.Count > 0)
+                {
+                    gvAgendaItem.DataSource = dtAgItm;
+                    gvAgendaItem.DataBind();
+                    int i = 0;
+                    foreach (GridViewRow row3 in gvAgendaItem.Rows)
+                    {
+                        RadioButtonList radBtnLst1 = row3.FindControl("RBLDoneCarry") as RadioButtonList;
+                        if (dtAgItm.Rows[i]["DoneCarryOver"].ToString() != "" && i < dtAgItm.Rows.Count)
+                        {
+                            radBtnLst1.SelectedValue = dtAgItm.Rows[i++]["DoneCarryOver"].ToString();
+                        }
+                    }
+                }
+            }
+        }
         foreach (GridViewRow row in GridViewAccSheet.Rows)
         {
             HiddenField hdFldAcdId = (HiddenField)row.FindControl("hdFldAcdId");
@@ -2916,6 +3531,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 tdMsg1.Visible = false;
                 tdMsg2.Visible = false;
                 tdreview2.Visible = false;
+                gvAgendaItem.Visible = false;
                 btnUpdate.Visible = false;
                 btnUpdateNew.Visible = false;
                 FillData(); 
@@ -2943,6 +3559,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
         tdMsg1.Visible = true;
         tdMsg2.Visible = true;
         tdreview2.Visible = true;
+        gvAgendaItem.Visible = true;
     }
     protected void Loadlesson()
     {
@@ -3095,7 +3712,8 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 tdMsg1.Visible = true;
                 tdMsg2.Visible = true;
                 tdreview2.Visible = true;
-                
+                gvAgendaItem.Visible = true;
+
             }
             else
             {
@@ -3109,9 +3727,10 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 btnSave.Visible = true;
                 btnSaveNew.Visible = true;
                 rbtnLsnClassTypeAc.Visible = true;
-                tdMsg1.Visible = true;
-                tdMsg2.Visible = true;
-                tdreview2.Visible = true;
+                tdMsg1.Visible = false;
+                tdMsg2.Visible = false;
+                tdreview2.Visible = false;
+                gvAgendaItem.Visible = false;
             }
         }
         else
@@ -3126,9 +3745,10 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             btnSave.Visible = true;
             btnSaveNew.Visible = true;
             rbtnLsnClassTypeAc.Visible = true;
-            tdMsg1.Visible = true;
-            tdMsg2.Visible = true;
-            tdreview2.Visible = true;
+            tdMsg1.Visible = false;
+            tdMsg2.Visible = false;
+            tdreview2.Visible = false;
+            gvAgendaItem.Visible = false;
         }
     }
     protected void TextBox1_TextChanged(object sender, EventArgs e)
