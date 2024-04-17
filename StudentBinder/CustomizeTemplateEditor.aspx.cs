@@ -4547,7 +4547,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             headerId = Convert.ToInt32(ViewState["HeaderId"]);
         }
         try
-        {           
+        {
+			GetStepData(headerId);
             string txtCommentTypeofInstrP = txtCommentTypeofInstr.Text.Trim().Replace("'", "''");
             string UpdateAppr = "UPDATE DSTempHdr SET ApprNoteTypeInstruction='" + txtCommentTypeofInstrP + "' WHERE DSTempHdrId='" + headerId + "'";
             objData.Execute(UpdateAppr);
@@ -4555,11 +4556,19 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             if (chkDiscrete.Checked == true)
             {
                 skilltype = "Discrete";
+				dlStepDetails.Visible = false;
+                stepPanel.Style.Add("display", "None");
+                lblStepStart.Visible = false;
+                btnAddStepCriteria.Visible = false;
             }
             else
             {
                 skilltype = "Chained";
                 txtNoofTrail.Text = "";
+				dlStepDetails.Visible = true;
+                stepPanel.Style.Add("display", "Block");
+                lblStepStart.Visible = true;
+                btnAddStepCriteria.Visible = true;
             }
             try
             {
@@ -6586,7 +6595,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         List<String> CountryName_list = new List<string>();
         try
         {
-            string selQuerry = "SELECT DSTempSetId,StepCd,StepName,SetIds,SortOrder FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempParentStepId = " + stepId;
+            string selQuerry = "SELECT DSTempSetId,StepCd,StepName,SetIds,RANK() OVER(ORDER BY SortOrder) as SortOrder FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempParentStepId = " + stepId;
             DataTable dtList = objData.ReturnDataTable(selQuerry, false);
             if (dtList != null)
             {
@@ -18772,13 +18781,35 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
     }
     protected void drp_teachingFormat_SelectedIndexChanged(object sender, EventArgs e)
     {
+		SqlTransaction Transs = null;
+        SqlConnection con = objData.Open();
+        try
+        {
         int TemplateId = Convert.ToInt32(ViewState["HeaderId"]);
 		int parentLookupId = Convert.ToInt16(drp_teachingFormat.SelectedValue);
 		drpTeachingProc.Items.Clear();
 		objData = new clsData();
 		objData.ReturnDropDown("Select LookupId as Id , LookupName as Name from dbo.LookUp where ParentLookupId=" + parentLookupId, drpTeachingProc);
-        objData.Execute("UPDATE DSTempStep SET ActiveInd = 'D' WHERE IsDynamic = 0 AND DSTempHdrId = " + TemplateId);
+			string selitem = drp_teachingFormat.SelectedItem.ToString();
+            if (selitem != "Task Analysis" && selitem != "Other")
+            {
+                clsData.blnTrans = true;
+                Transs = con.BeginTransaction();
+
+                objData.ExecuteWithTrans("UPDATE DSTempStep SET ActiveInd = 'D' WHERE IsDynamic = 0 AND DSTempHdrId = " + TemplateId,con,Transs);
+
+                //objData.ExecuteWithTrans("UPDATE DSTempParentStep SET ActiveInd = 'D'  WHERE DSTempHdrId = " + TemplateId, con, Transs);
+                objData.CommitTransation(Transs, con);
+            }
 		hideAllOptions();
+    }
+	catch (Exception Ex)
+        {
+            objData.RollBackTransation(Transs, con);
+            con.Close();
+            throw Ex;
+        }
+        
     }
     protected void LoadEmailforSorting()
     {
