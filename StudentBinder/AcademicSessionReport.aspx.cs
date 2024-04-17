@@ -80,7 +80,8 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
                         //ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "$('.loading').fadeIn('fast');", true);
                         //chkbxevents.Checked = true;
                         //chkbxIOA.Checked = true;
-                        txtEdate.Text = DateTime.Now.Date.AddDays(1).ToString("MM/dd/yyyy").Replace("-", "/");
+                        //txtEdate.Text = DateTime.Now.Date.AddDays(1).ToString("MM/dd/yyyy").Replace("-", "/");
+                        txtEdate.Text = DateTime.Now.Date.ToString("MM/dd/yyyy").Replace("-", "/");
                         txtSdate.Text = DateTime.Now.Date.AddDays(-30).ToString("MM/dd/yyyy").Replace("-", "/");
                         //rbtnClassType.SelectedValue = objClassData.GetClassType(sess.Classid);
                         hdnallLesson.Value = "AllLessons";
@@ -186,6 +187,18 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
                 }
 
             }
+            if (txtEdate.Text != "")
+            {
+                DateTime dtst = new DateTime();
+                dtst = DateTime.ParseExact(txtEdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                if (dtst > DateTime.Now)
+                {
+                    result = false;
+                    tdMsg.InnerHtml = clsGeneral.warningMsg("Invalid End date");
+                    return result;
+                }
+
+            }
             if (txtSdate.Text != "" && txtEdate.Text != "")
             {
                 DateTime dtst = new DateTime();
@@ -195,7 +208,7 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
                 if (dtst > dted)
                 {
                     result = false;
-                    tdMsg.InnerHtml = clsGeneral.warningMsg("Start date is must before the End date");
+                    tdMsg.InnerHtml = clsGeneral.warningMsg("Start Date must be before the End Date");
                     return result;
                 }
 
@@ -228,6 +241,18 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
                 }
 
             }
+            if (txtEndDate.Text != "")
+            {
+                DateTime dtst = new DateTime();
+                dtst = DateTime.ParseExact(txtEndDate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                if (dtst > DateTime.Now)
+                {
+                    result = false;
+                    tdMsg1.InnerHtml = clsGeneral.warningMsg("Invalid End date");
+                    return result;
+                }
+
+            }
             if (txtStartDate.Text != "" && txtEndDate.Text != "")
             {
                 DateTime dtst = new DateTime();
@@ -237,7 +262,7 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
                 if (dtst > dted)
                 {
                     result = false;
-                    tdMsg1.InnerHtml = clsGeneral.warningMsg("Start date is must before the End date");
+                    tdMsg1.InnerHtml = clsGeneral.warningMsg("Start Date must be before the End Date");
                     return result;
                 }
 
@@ -269,17 +294,31 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
                 {
                     if (highcheck.Checked == false)
                     {
-                    RV_LPReport.Visible = false;
+                        RV_LPReport.Visible = false;
                     }
+                    else
+                    {
+                        string script = "warningmsgpop();";
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), "hidepops", script, true);
+                    }
+                    hfPopUpValue.Value = "false";
                     btnPrevious1.Visible = false;
                     ddlLessonplan1.Visible = false;
                     btnNext1.Visible = false;
+                    
                 }
                
             }
             else
             {
+                hfPopUpValue.Value = "false";
                 tdMsg.InnerHtml = clsGeneral.warningMsg("Please Select LessonPlan");
+                if (highcheck.Checked == true)
+                {
+                    string script = "warningmsgpop();";
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "hidepopss", script, true);
+                }
+
             }
         }
         catch (Exception Ex)
@@ -298,6 +337,10 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
             if (highcheck.Checked == false)
             {
             RV_LPReport.Visible = true;
+            }
+            else
+            {
+                RV_LPReport.Visible = false;
             }
             sess = (clsSession)Session["UserSession"];
             ObjTempSess = (ClsTemplateSession)Session["BiweeklySession"];
@@ -762,360 +805,364 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
     {
         try
         {
-            if (highcheck.Checked == true) {
-                string scripts = "showPopup();";
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "Showpop", scripts, true);
-                graphPopup.Visible = false;
-            }
-
-            ObjData = new clsData();
-            //string ReportXML = "SELECT [Name],CAST(CAST([Content] AS VARBINARY(MAX)) AS XML) AS reportXML FROM [Catalog] WHERE type = 2";
-            //DataTable dt = ObjData.ReturnDataTable(ReportXML, false);
-            sess = (clsSession)Session["UserSession"];
-            int studid = Convert.ToInt32(Request.QueryString["studid"].ToString());
-            int templateId = Convert.ToInt32(Request.QueryString["pageid"].ToString());
-            string StudName = "";
-            string strQuery = "SELECT StudentLname+','+StudentFname AS StudentName FROM Student WHERE StudentId=" + studid;
-            DataTable dt = ObjData.ReturnDataTable(strQuery, false);
-            if (dt != null)
+            if (Validate() == true)
             {
-                if (dt.Rows.Count > 0)
-                {
-                    StudName = dt.Rows[0]["StudentName"].ToString();
-                }
-            }
-            string[] StudentName = StudName.Split(',');
-            ObjTempSess = (ClsTemplateSession)Session["BiweeklySession"];
-            ReportViewer AcademicReport = new ReportViewer();
-            string AllLesson = "";
-            if (hdnType.Value != "MaintenanceGraph")
-            {
-                string result = "";
-
-                string StrQuery = "";
-                for (int i = 0; i < ListBox2.Items.Count; i++)
-                {
-                    StrQuery += ListBox2.Items[i].Value + ",";
-                }
-                StrQuery = StrQuery.Substring(0, (StrQuery.Length - 1));
-                AllLesson = Convert.ToString(StrQuery);
-            }
-            else
-            {
-                AllLesson = "";
-                string SetId = drpSetname.SelectedValue;
-
-                AllLesson = Convert.ToString(ObjData.FetchValue("SELECT LessonPlanId FROM DSTempHdr WHERE DSTempHdrId=" + templateId));
-                Session["AcademicLessons"] = AllLesson;
-                if (AllLesson == "")
-                {
-                    RV_LPReport.Visible = false;
-                    ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "alert('No Data Available For Graph Plotting');", true);
-                    return;
-                }
-            }
-            DateTime dtst = new DateTime();
-            DateTime dted = new DateTime();
-            if (hdnType.Value == "SessionGraph")
-            {
-                dtst = DateTime.ParseExact(txtSdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
-                dted = DateTime.ParseExact(txtEdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
-                string StartDate = dtst.ToString("yyyy-MM-dd");
-                string enddate = dted.ToString("yyyy-MM-dd");
-
-                string TrendType = "NotNeed";
-                if (Convert.ToBoolean(chkreptrend.Checked))
-                {
-                    TrendType = "Quarter";
-                }
-
-                string Events = "None,";
-                if (chkrepmajor.Checked == true)
-                {
-                    Events += "Major,";
-                }
-                if (chkrepminor.Checked == true)
-                {
-                    Events += "Minor,";
-                }
-                if (chkreparrow.Checked == true)
-                {
-                    Events += "Arrow";
-                }
-
-                string LPStatus = "";
-                foreach (ListItem item in chkStatus.Items)
-                {
-                    if (item.Selected == true)
-                    {
-                        if (item.Text == "Active")
-                        {
-                            LPStatus += "'Approved'";
-                        }
-                        else if (item.Text == "Maintenance")
-                        {
-                            if (LPStatus != "")
-                            {
-                                LPStatus += ",";
-                            }
-                            LPStatus += "'Maintenance'";
-                        }
-                        else if (item.Text == "Inactive")
-                        {
-                            if (LPStatus != "")
-                            {
-                                LPStatus += ",";
-                            }
-                            LPStatus += "'Inactive'";
-                        }
-                    }
-                }
-                //foreach (ListItem item in chkStatus.Items)
-                //{
-                //    if (item.Selected == true)
-                //    {
-                //        if (item.Text == "Active")
-                //        {
-                //            LPStatus += "Approved,";
-                //        }
-                //        else if (item.Text == "Maintenance")
-                //        {
-                //            LPStatus += "Maintenance,";
-                //        }
-                //        else if (item.Text == "Inactive")
-                //        {
-                //            LPStatus += "Inactive,";
-                //        }
-                //    }
-                //}
-                string StrStat = "SELECT LookupId FROM Lookup WHERE LookupType='TemplateStatus' AND LookupName IN(" + LPStatus + ")";
-                DataTable LPStat = ObjData.ReturnDataTable(StrStat, false);
-                string StatusId = "";
-                for (int i = 0; i < LPStat.Rows.Count; i++)
-                {
-                    StatusId += LPStat.Rows[i]["LookupId"].ToString() + ",";
-                }
-                //string[] StudentName = sess.StudentName.Split(',');
                 if (highcheck.Checked == true)
                 {
-                    sDate = StartDate.ToString();
-                    eDate = enddate.ToString();
-                    sid = studid;
-                    lid = AllLesson;
-                    scid = sess.SchoolId;
-                    cls = rbtnClassType.SelectedValue;
-                    evnt = Events;
-                    ioa = Convert.ToBoolean(chkrepioa.Checked).ToString();
-                    trend = TrendType;
-                    med = Convert.ToBoolean(chkrepmedi.Checked);
-                    string lessname = "";
-                    foreach (ListItem item in ddlLessonplan1.Items)
-                    {
+                    string scripts = "showPopup();";
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "Showpop", scripts, true);
+                    graphPopup.Visible = false;
+                }
 
-                        lessname += item.Text + ",";
-                        
+                ObjData = new clsData();
+                //string ReportXML = "SELECT [Name],CAST(CAST([Content] AS VARBINARY(MAX)) AS XML) AS reportXML FROM [Catalog] WHERE type = 2";
+                //DataTable dt = ObjData.ReturnDataTable(ReportXML, false);
+                sess = (clsSession)Session["UserSession"];
+                int studid = Convert.ToInt32(Request.QueryString["studid"].ToString());
+                int templateId = Convert.ToInt32(Request.QueryString["pageid"].ToString());
+                string StudName = "";
+                string strQuery = "SELECT StudentLname+','+StudentFname AS StudentName FROM Student WHERE StudentId=" + studid;
+                DataTable dt = ObjData.ReturnDataTable(strQuery, false);
+                if (dt != null)
+                {
+                    if (dt.Rows.Count > 0)
+                    {
+                        StudName = dt.Rows[0]["StudentName"].ToString();
                     }
+                }
+                string[] StudentName = StudName.Split(',');
+                ObjTempSess = (ClsTemplateSession)Session["BiweeklySession"];
+                ReportViewer AcademicReport = new ReportViewer();
+                string AllLesson = "";
+                if (hdnType.Value != "MaintenanceGraph")
+                {
+                    string result = "";
 
-                    if (lessname.EndsWith(","))
+                    string StrQuery = "";
+                    for (int i = 0; i < ListBox2.Items.Count; i++)
                     {
-                        lessname = lessname.Substring(0, lessname.Length - 1);
+                        StrQuery += ListBox2.Items[i].Value + ",";
                     }
-                    lname = lessname;
-                    lpstatus = LPStatus;
-
-                    if (med)
-                    {
-                        ObjData = new clsData();
-                        string squery = "SELECT * FROM (SELECT        SchoolId, StudentId, EventName, StdtSessEventType, Comment, EvntTs,CASE WHEN ( CASE WHEN EndTime='1900-01-01 00:00:00.000'  THEN NULL ELSE EndTime END) IS NULL THEN DATEADD(DAY,1, '" + eDate + "') ELSE EndTime END AS EndTime, EventType FROM            StdtSessEvent WHERE        (StdtSessEventType = 'Medication') AND  SchoolId = " + scid + "   AND StudentId =" + sid + ") MEDICATION WHERE EvntTs BETWEEN  '" + sDate + "'  AND '" + eDate + "' OR EndTime BETWEEN '" + sDate + "' AND  '" + eDate + "' OR (EvntTs <= '" + sDate + "' AND EndTime >= '" + eDate + "')";
-                        DataTable medtab = ObjData.ReturnDataTable(squery, false);
-                        int i = medtab.Rows.Count;
-                        if (i < 1)
-                        {
-                            medno = true;
-                            mednodata.Text = "No Data Available";
-                            mednodata.Visible = true;
-                            medcont.Visible = false;
-                        }
-                        else
-                        {
-                            mednodata.Visible = false;
-                            medcont.Visible = true;
-                        }
-
-                    }
-					if (HttpContext.Current.Request.UserAgent.ToLower().Contains("ipad"))
-                    {
-                        reptype = true;
-                        if (rbtnIncidentalRegular.SelectedValue == "Regular")
-                        {
-                        }
-                        else
-                        {
-                            inctype = true;
-                        }
-                    }
-                    else
-                    {
-                        reptype = false;
-                        if (rbtnIncidentalRegular.SelectedValue == "Regular")
-                        {
-                        }
-                        else
-                        {
-                            inctype = true;
-                        }
-                    }
-                    lbgraph.Visible = false;
-                    cont.Visible = true;
-                    sname.Visible = true;
-                    lnam.Visible = true;
-                    daterang.Visible = true;
-                    mel.Visible = true;
-                    deftxt.Visible = true;
-                    Session["StudName"] = StudName;
-                    ClientScript.RegisterStartupScript(GetType(), "", "exportChart();", true);
-                    tdMsgExport.InnerHtml = clsGeneral.sucessMsg("Export Successfully Created...");
-                    hdnExport.Value = "true";
+                    StrQuery = StrQuery.Substring(0, (StrQuery.Length - 1));
+                    AllLesson = Convert.ToString(StrQuery);
                 }
                 else
                 {
-                AcademicReport.ProcessingMode = ProcessingMode.Remote;
-                AcademicReport.ServerReport.ReportServerCredentials = new CustomReportCredentials(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"], ConfigurationManager.AppSettings["Domain"]);
-                if (rbtnIncidentalRegular.SelectedValue == "Regular")
-                {
-                    AcademicReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["ExportSessionBased"];
-                }
-                else
-                {
-                    AcademicReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["IncidentalExportSessionBased"];
-                }
-                AcademicReport.ServerReport.ReportServerUrl = new Uri(ConfigurationManager.AppSettings["ReportUrl"]);
-                AcademicReport.ServerReport.Refresh();
+                    AllLesson = "";
+                    string SetId = drpSetname.SelectedValue;
 
-                ReportParameter[] parm = new ReportParameter[12];
-                parm[0] = new ReportParameter("StartDate", StartDate.ToString());
-                parm[1] = new ReportParameter("EndDate", enddate.ToString());
-                parm[2] = new ReportParameter("StudentId", studid.ToString());
-                parm[3] = new ReportParameter("LessonPlan", AllLesson.ToString());
-                parm[4] = new ReportParameter("SchoolId", sess.SchoolId.ToString());
-                parm[5] = new ReportParameter("ClsType", rbtnClassType.SelectedValue);//Parameter Value
-                parm[6] = new ReportParameter("Events", Events);
-                parm[7] = new ReportParameter("IncludeIOA", Convert.ToBoolean(chkrepioa.Checked).ToString());
-                parm[8] = new ReportParameter("Trendtype", TrendType);
-                parm[9] = new ReportParameter("IncludeMedication", Convert.ToBoolean(chkrepmedi.Checked).ToString());
-                parm[10] = new ReportParameter("StudentName", StudentName[0] + ", " + StudentName[1]);
-                parm[11] = new ReportParameter("LPStatus", StatusId);
-                AcademicReport.ServerReport.SetParameters(parm);
-            }
-            }
-            else if (hdnType.Value == "MaintenanceGraph")
-            {
-                dtst = DateTime.ParseExact(txtStartDate.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
-                dted = DateTime.ParseExact(txtEndDate.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
-                string StartDate = dtst.ToString("yyyy-MM-dd");
-                string enddate = dted.ToString("yyyy-MM-dd");
-                string SetId = drpSetname.SelectedValue;
-
-                AllLesson = Convert.ToString(ObjData.FetchValue("SELECT LessonPlanId FROM DSTempHdr WHERE DSTempHdrId=" + templateId));
-                Session["AcademicLessons"] = AllLesson;
-                if (AllLesson == "")
-                {
-                    RV_LPReport.Visible = false;
-                    ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "alert('No Data Available For Graph Plotting');", true);
-                    return;
+                    AllLesson = Convert.ToString(ObjData.FetchValue("SELECT LessonPlanId FROM DSTempHdr WHERE DSTempHdrId=" + templateId));
+                    Session["AcademicLessons"] = AllLesson;
+                    if (AllLesson == "")
+                    {
+                        RV_LPReport.Visible = false;
+                        ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "alert('No Data Available For Graph Plotting');", true);
+                        return;
+                    }
                 }
-                string TrendType = "NotNeed";
-                if (Convert.ToBoolean(chktrend.Checked))
+                DateTime dtst = new DateTime();
+                DateTime dted = new DateTime();
+                if (hdnType.Value == "SessionGraph")
                 {
-                    TrendType = "Quarter";
-                }
+                    dtst = DateTime.ParseExact(txtSdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                    dted = DateTime.ParseExact(txtEdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                    string StartDate = dtst.ToString("yyyy-MM-dd");
+                    string enddate = dted.ToString("yyyy-MM-dd");
 
-                string Events = "NotNeed,";
-                if (Convert.ToInt32(SetId) == -1)
-                {
-                    if (chkmajor.Checked == true)
+                    string TrendType = "NotNeed";
+                    if (Convert.ToBoolean(chkreptrend.Checked))
+                    {
+                        TrendType = "Quarter";
+                    }
+
+                    string Events = "None,";
+                    if (chkrepmajor.Checked == true)
                     {
                         Events += "Major,";
                     }
-                    if (chkminor.Checked == true)
+                    if (chkrepminor.Checked == true)
                     {
                         Events += "Minor,";
                     }
+                    if (chkreparrow.Checked == true)
+                    {
+                        Events += "Arrow";
+                    }
+
+                    string LPStatus = "";
+                    foreach (ListItem item in chkStatus.Items)
+                    {
+                        if (item.Selected == true)
+                        {
+                            if (item.Text == "Active")
+                            {
+                                LPStatus += "'Approved'";
+                            }
+                            else if (item.Text == "Maintenance")
+                            {
+                                if (LPStatus != "")
+                                {
+                                    LPStatus += ",";
+                                }
+                                LPStatus += "'Maintenance'";
+                            }
+                            else if (item.Text == "Inactive")
+                            {
+                                if (LPStatus != "")
+                                {
+                                    LPStatus += ",";
+                                }
+                                LPStatus += "'Inactive'";
+                            }
+                        }
+                    }
+                    //foreach (ListItem item in chkStatus.Items)
+                    //{
+                    //    if (item.Selected == true)
+                    //    {
+                    //        if (item.Text == "Active")
+                    //        {
+                    //            LPStatus += "Approved,";
+                    //        }
+                    //        else if (item.Text == "Maintenance")
+                    //        {
+                    //            LPStatus += "Maintenance,";
+                    //        }
+                    //        else if (item.Text == "Inactive")
+                    //        {
+                    //            LPStatus += "Inactive,";
+                    //        }
+                    //    }
+                    //}
+                    string StrStat = "SELECT LookupId FROM Lookup WHERE LookupType='TemplateStatus' AND LookupName IN(" + LPStatus + ")";
+                    DataTable LPStat = ObjData.ReturnDataTable(StrStat, false);
+                    string StatusId = "";
+                    for (int i = 0; i < LPStat.Rows.Count; i++)
+                    {
+                        StatusId += LPStat.Rows[i]["LookupId"].ToString() + ",";
+                    }
+                    //string[] StudentName = sess.StudentName.Split(',');
+                    if (highcheck.Checked == true)
+                    {
+                        sDate = StartDate.ToString();
+                        eDate = enddate.ToString();
+                        sid = studid;
+                        lid = AllLesson;
+                        scid = sess.SchoolId;
+                        cls = rbtnClassType.SelectedValue;
+                        evnt = Events;
+                        ioa = Convert.ToBoolean(chkrepioa.Checked).ToString();
+                        trend = TrendType;
+                        med = Convert.ToBoolean(chkrepmedi.Checked);
+                        string lessname = "";
+                        foreach (ListItem item in ddlLessonplan1.Items)
+                        {
+
+                            lessname += item.Text + ",";
+
+                        }
+
+                        if (lessname.EndsWith(","))
+                        {
+                            lessname = lessname.Substring(0, lessname.Length - 1);
+                        }
+                        lname = lessname;
+                        lpstatus = LPStatus;
+
+                        if (med)
+                        {
+                            ObjData = new clsData();
+                            string squery = "SELECT * FROM (SELECT        SchoolId, StudentId, EventName, StdtSessEventType, Comment, EvntTs,CASE WHEN ( CASE WHEN EndTime='1900-01-01 00:00:00.000'  THEN NULL ELSE EndTime END) IS NULL THEN DATEADD(DAY,1, '" + eDate + "') ELSE EndTime END AS EndTime, EventType FROM            StdtSessEvent WHERE        (StdtSessEventType = 'Medication') AND  SchoolId = " + scid + "   AND StudentId =" + sid + ") MEDICATION WHERE EvntTs BETWEEN  '" + sDate + "'  AND '" + eDate + "' OR EndTime BETWEEN '" + sDate + "' AND  '" + eDate + "' OR (EvntTs <= '" + sDate + "' AND EndTime >= '" + eDate + "')";
+                            DataTable medtab = ObjData.ReturnDataTable(squery, false);
+                            int i = medtab.Rows.Count;
+                            if (i < 1)
+                            {
+                                medno = true;
+                                mednodata.Text = "No Data Available";
+                                mednodata.Visible = true;
+                                medcont.Visible = false;
+                            }
+                            else
+                            {
+                                mednodata.Visible = false;
+                                medcont.Visible = true;
+                            }
+
+                        }
+                        if (HttpContext.Current.Request.UserAgent.ToLower().Contains("ipad"))
+                        {
+                            reptype = true;
+                            if (rbtnIncidentalRegular.SelectedValue == "Regular")
+                            {
+                            }
+                            else
+                            {
+                                inctype = true;
+                            }
+                        }
+                        else
+                        {
+                            reptype = false;
+                            if (rbtnIncidentalRegular.SelectedValue == "Regular")
+                            {
+                            }
+                            else
+                            {
+                                inctype = true;
+                            }
+                        }
+                        lbgraph.Visible = false;
+                        cont.Visible = true;
+                        sname.Visible = true;
+                        lnam.Visible = true;
+                        daterang.Visible = true;
+                        mel.Visible = true;
+                        deftxt.Visible = true;
+                        Session["StudName"] = StudName;
+                        ClientScript.RegisterStartupScript(GetType(), "", "exportChart();", true);
+                        tdMsgExport.InnerHtml = clsGeneral.sucessMsg("Export Successfully Created...");
+                        hdnExport.Value = "true";
+                    }
+                    else
+                    {
+                        AcademicReport.ProcessingMode = ProcessingMode.Remote;
+                        AcademicReport.ServerReport.ReportServerCredentials = new CustomReportCredentials(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"], ConfigurationManager.AppSettings["Domain"]);
+                        if (rbtnIncidentalRegular.SelectedValue == "Regular")
+                        {
+                            AcademicReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["ExportSessionBased"];
+                        }
+                        else
+                        {
+                            AcademicReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["IncidentalExportSessionBased"];
+                        }
+                        AcademicReport.ServerReport.ReportServerUrl = new Uri(ConfigurationManager.AppSettings["ReportUrl"]);
+                        AcademicReport.ServerReport.Refresh();
+
+                        ReportParameter[] parm = new ReportParameter[12];
+                        parm[0] = new ReportParameter("StartDate", StartDate.ToString());
+                        parm[1] = new ReportParameter("EndDate", enddate.ToString());
+                        parm[2] = new ReportParameter("StudentId", studid.ToString());
+                        parm[3] = new ReportParameter("LessonPlan", AllLesson.ToString());
+                        parm[4] = new ReportParameter("SchoolId", sess.SchoolId.ToString());
+                        parm[5] = new ReportParameter("ClsType", rbtnClassType.SelectedValue);//Parameter Value
+                        parm[6] = new ReportParameter("Events", Events);
+                        parm[7] = new ReportParameter("IncludeIOA", Convert.ToBoolean(chkrepioa.Checked).ToString());
+                        parm[8] = new ReportParameter("Trendtype", TrendType);
+                        parm[9] = new ReportParameter("IncludeMedication", Convert.ToBoolean(chkrepmedi.Checked).ToString());
+                        parm[10] = new ReportParameter("StudentName", StudentName[0] + ", " + StudentName[1]);
+                        parm[11] = new ReportParameter("LPStatus", StatusId);
+                        AcademicReport.ServerReport.SetParameters(parm);
+                    }
                 }
-                if (chkarrow.Checked == true)
+                else if (hdnType.Value == "MaintenanceGraph")
                 {
-                    Events += "Arrow";
+                    dtst = DateTime.ParseExact(txtStartDate.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                    dted = DateTime.ParseExact(txtEndDate.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                    string StartDate = dtst.ToString("yyyy-MM-dd");
+                    string enddate = dted.ToString("yyyy-MM-dd");
+                    string SetId = drpSetname.SelectedValue;
+
+                    AllLesson = Convert.ToString(ObjData.FetchValue("SELECT LessonPlanId FROM DSTempHdr WHERE DSTempHdrId=" + templateId));
+                    Session["AcademicLessons"] = AllLesson;
+                    if (AllLesson == "")
+                    {
+                        RV_LPReport.Visible = false;
+                        ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "alert('No Data Available For Graph Plotting');", true);
+                        return;
+                    }
+                    string TrendType = "NotNeed";
+                    if (Convert.ToBoolean(chktrend.Checked))
+                    {
+                        TrendType = "Quarter";
+                    }
+
+                    string Events = "NotNeed,";
+                    if (Convert.ToInt32(SetId) == -1)
+                    {
+                        if (chkmajor.Checked == true)
+                        {
+                            Events += "Major,";
+                        }
+                        if (chkminor.Checked == true)
+                        {
+                            Events += "Minor,";
+                        }
+                    }
+                    if (chkarrow.Checked == true)
+                    {
+                        Events += "Arrow";
+                    }
+
+                    AcademicReport.ProcessingMode = ProcessingMode.Remote;
+                    AcademicReport.ServerReport.ReportServerCredentials = new CustomReportCredentials(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"], ConfigurationManager.AppSettings["Domain"]);
+
+                    if (rbtnLsnIncidentalRegular.SelectedValue == "Regular")
+                    {
+                        AcademicReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["ExportMaintenance"];
+                    }
+                    else
+                    {
+                        AcademicReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["IncidentalExportMaintenance"];
+                    }
+                    AcademicReport.ServerReport.ReportServerUrl = new Uri(ConfigurationManager.AppSettings["ReportUrl"]);
+                    AcademicReport.ShowParameterPrompts = false;
+
+                    ReportParameter[] parm = new ReportParameter[10];
+                    parm[0] = new ReportParameter("StartDate", StartDate.ToString());
+                    parm[1] = new ReportParameter("EndDate", enddate.ToString());
+                    parm[2] = new ReportParameter("StudentId", studid.ToString());
+                    parm[3] = new ReportParameter("LessonHdrId", templateId.ToString());
+                    parm[4] = new ReportParameter("SchoolId", sess.SchoolId.ToString());
+                    parm[5] = new ReportParameter("TrendType", TrendType);
+                    parm[6] = new ReportParameter("ClsType", rbtnLsnClassType.SelectedValue);
+                    parm[7] = new ReportParameter("SetId", SetId);
+                    parm[8] = new ReportParameter("IncludeIOA", Convert.ToBoolean(chkioa.Checked).ToString());
+                    parm[9] = new ReportParameter("Events", Events);
+                    AcademicReport.ServerReport.SetParameters(parm);
                 }
 
-                AcademicReport.ProcessingMode = ProcessingMode.Remote;
-                AcademicReport.ServerReport.ReportServerCredentials = new CustomReportCredentials(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"], ConfigurationManager.AppSettings["Domain"]);
-
-                if (rbtnLsnIncidentalRegular.SelectedValue == "Regular")
+                Warning[] warnings;
+                string[] streamids;
+                string mimeType, encoding, extension, deviceInfo;
+                if (highcheck.Checked == false)
                 {
-                    AcademicReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["ExportMaintenance"];
+                    deviceInfo = "<DeviceInfo><PageHeight>8.5in</PageHeight><PageWidth>11in</PageWidth><MarginTop>.5cm</MarginTop></DeviceInfo>";
+
+                    //deviceInfo = "<DeviceInfo><PageHeight>8.5in</PageHeight><PageWidth>11in</PageWidth></DeviceInfo>";
+
+                    byte[] bytes = AcademicReport.ServerReport.Render("PDF", deviceInfo, out mimeType, out encoding, out extension, out streamids, out warnings);
+
+                    string outputPath = "";
+                    if (hdnType.Value == "SessionGraph")
+                    {
+                        outputPath = Server.MapPath("~\\StudentBinder\\Reports\\" + StudName + "_Session-BasedReport.pdf");
+                    }
+                    else
+                    {
+                        string LessonName = Convert.ToString(ObjData.FetchValue("SELECT DSTemplateName FROM DSTempHdr WHERE DSTempHdrId='" + templateId + "'"));
+                        string LPName = StudName.Replace(' ', '_') + "_" + LessonName.Replace(' ', '_');
+                        LPName = LPName.Replace('-', '_').Replace(',', '_').Replace(':', '_').Replace('.', '_').Replace('"', '_').Replace(';', '_');
+                        outputPath = Server.MapPath("~\\StudentBinder\\Reports\\" + LPName + ".pdf");
+                    }
+                    using (FileStream fs = new FileStream(outputPath, FileMode.Create))
+                    {
+                        fs.Write(bytes, 0, bytes.Length);
+                        fs.Close();
+                    }
+
+
+                    Session["PdfPath"] = outputPath;
+                    tdMsgExport.InnerHtml = clsGeneral.sucessMsg("Export Successfully Created...");
+                    hdnExport.Value = "true";
+                    ClientScript.RegisterStartupScript(GetType(), "", "DownloadPopup();", true);
+                    //Response.Buffer = true;
+                    //Response.Clear();
+                    //Response.ContentType = mimeType;
+                    //Response.AddHeader("content-disposition", "attachment; filename=" + sess.StudentName + "_Session-BasedReport.pdf");
+
+                    //Response.BinaryWrite(bytes); // create the file
+                    //Response.Flush(); // send it to the client to download
                 }
-                else
-                {
-                    AcademicReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["IncidentalExportMaintenance"];
-                }
-                AcademicReport.ServerReport.ReportServerUrl = new Uri(ConfigurationManager.AppSettings["ReportUrl"]);
-                AcademicReport.ShowParameterPrompts = false;
-
-                ReportParameter[] parm = new ReportParameter[10];
-                parm[0] = new ReportParameter("StartDate", StartDate.ToString());
-                parm[1] = new ReportParameter("EndDate", enddate.ToString());
-                parm[2] = new ReportParameter("StudentId", studid.ToString());
-                parm[3] = new ReportParameter("LessonHdrId", templateId.ToString());
-                parm[4] = new ReportParameter("SchoolId", sess.SchoolId.ToString());
-                parm[5] = new ReportParameter("TrendType", TrendType);
-                parm[6] = new ReportParameter("ClsType", rbtnLsnClassType.SelectedValue);
-                parm[7] = new ReportParameter("SetId", SetId);
-                parm[8] = new ReportParameter("IncludeIOA", Convert.ToBoolean(chkioa.Checked).ToString());
-                parm[9] = new ReportParameter("Events", Events);
-                AcademicReport.ServerReport.SetParameters(parm);                
-            }
-
-            Warning[] warnings;
-            string[] streamids;
-            string mimeType, encoding, extension, deviceInfo;
-            if (highcheck.Checked == false)
-            {
-            deviceInfo = "<DeviceInfo><PageHeight>8.5in</PageHeight><PageWidth>11in</PageWidth><MarginTop>.5cm</MarginTop></DeviceInfo>";
-
-            //deviceInfo = "<DeviceInfo><PageHeight>8.5in</PageHeight><PageWidth>11in</PageWidth></DeviceInfo>";
-
-            byte[] bytes = AcademicReport.ServerReport.Render("PDF", deviceInfo, out mimeType, out encoding, out extension, out streamids, out warnings);
-
-            string outputPath = "";
-            if (hdnType.Value == "SessionGraph")
-            {
-                outputPath = Server.MapPath("~\\StudentBinder\\Reports\\" + StudName + "_Session-BasedReport.pdf");
-            }
-            else
-            {
-                string LessonName = Convert.ToString(ObjData.FetchValue("SELECT DSTemplateName FROM DSTempHdr WHERE DSTempHdrId='" + templateId + "'"));
-                string LPName = StudName.Replace(' ', '_') + "_" + LessonName.Replace(' ', '_');
-                LPName = LPName.Replace('-', '_').Replace(',', '_').Replace(':', '_').Replace('.', '_').Replace('"', '_').Replace(';', '_');
-                outputPath = Server.MapPath("~\\StudentBinder\\Reports\\" + LPName + ".pdf");
-            }
-            using (FileStream fs = new FileStream(outputPath, FileMode.Create))
-            {
-                fs.Write(bytes, 0, bytes.Length);
-                fs.Close();
-            }
-
-
-            Session["PdfPath"] = outputPath;
-            tdMsgExport.InnerHtml = clsGeneral.sucessMsg("Export Successfully Created...");
-            hdnExport.Value = "true";
-            ClientScript.RegisterStartupScript(GetType(), "", "DownloadPopup();", true);
-            //Response.Buffer = true;
-            //Response.Clear();
-            //Response.ContentType = mimeType;
-            //Response.AddHeader("content-disposition", "attachment; filename=" + sess.StudentName + "_Session-BasedReport.pdf");
-
-            //Response.BinaryWrite(bytes); // create the file
-            //Response.Flush(); // send it to the client to download
             }
 
         }
@@ -1123,6 +1170,7 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
         {
             throw Ex;
         }
+    
     }
     protected void btnPrint_Click(object sender, EventArgs e)
     {
@@ -1444,6 +1492,7 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
             daterang.Visible = true;
             mel.Visible = true;
             deftxt.Visible = true;
+            HighchartGraph.Visible = true;
             string script = "loadchart('" + sDate + "', '" + eDate + "','" + sid + "','" + lid + "','" + scid + "','" + evnt + "','" + trend + "','" + ioa + "','" + cls + "','" + med + "','" + lpstatus + "','" + medno + "','" + reptype + "','" + inctype + "','"+lname+"');";
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ShowMessageWithParamsScript", script, true);
         
@@ -1747,7 +1796,16 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
         }
         else
         {
-            RV_LPReport.Visible = false;
+            if (highcheck.Checked == false)
+            {
+                RV_LPReport.Visible = false;
+            }
+            else
+            {
+
+                string script = "warningmsgpop();";
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "hidepops2", script, true);
+            }
             btnPrevious1.Visible = false;
             ddlLessonplan1.Visible = false;
             btnNext1.Visible = false;
@@ -1781,7 +1839,7 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
     {
         ObjTempSess = (ClsTemplateSession)Session["BiweeklySession"];
         RV_LPReport.Visible = false;
-        txtEndDate.Text = DateTime.Now.Date.AddDays(1).ToString("MM/dd/yyyy").Replace("-", "/");
+        txtEndDate.Text = DateTime.Now.Date.ToString("MM/dd/yyyy").Replace("-", "/");
         txtStartDate.Text = DateTime.Now.Date.AddDays(-10).ToString("MM/dd/yyyy").Replace("-", "/");        
         chkmajor.Checked = true;
         chkminor.Checked = true;

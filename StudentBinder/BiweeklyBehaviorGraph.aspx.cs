@@ -102,7 +102,7 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
                         chkbxevents.Checked = true;
                         chkbxIOA.Checked = true;
                         chkmedication.Checked = false;
-                        txtEdate.Text = DateTime.Now.Date.AddDays(1).ToString("MM/dd/yyyy").Replace("-", "/");
+                        txtEdate.Text = DateTime.Now.Date.ToString("MM/dd/yyyy").Replace("-", "/");
                         txtSdate.Text = DateTime.Now.Date.AddDays(-91).ToString("MM/dd/yyyy").Replace("-", "/");
                         //rbtnClassTypeall.SelectedValue = objdatacls.GetClassType(sess.Classid);
                         hdnallLesson.Value = "AllLessons";
@@ -189,7 +189,31 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
             tdMsg.InnerHtml = clsGeneral.warningMsg("Please Enter End Date");
             return result;
         }
-        else if (txtSdate.Text != "" && txtEdate.Text != "")
+        if (txtSdate.Text != "")
+        {
+            DateTime dtst = new DateTime();
+            dtst = DateTime.ParseExact(txtSdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+            if (dtst > DateTime.Now)
+            {
+                result = false;
+                tdMsg.InnerHtml = clsGeneral.warningMsg("Invalid Start date");
+                return result;
+            }
+
+        }
+        if (txtEdate.Text != "")
+        {
+            DateTime dtst = new DateTime();
+            dtst = DateTime.ParseExact(txtEdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+            if (dtst > DateTime.Now)
+            {
+                result = false;
+                tdMsg.InnerHtml = clsGeneral.warningMsg("Invalid End date");
+                return result;
+            }
+
+        }
+         if (txtSdate.Text != "" && txtEdate.Text != "")
         {
             DateTime dtst = new DateTime();
             DateTime dted = new DateTime();
@@ -198,7 +222,7 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
             if (dtst > dted)
             {
                 result = false;
-                tdMsg.InnerHtml = clsGeneral.warningMsg("Start date is must before the End date");
+                tdMsg.InnerHtml = clsGeneral.warningMsg("Start Date must be before the End Date.");
                 return result;
             }
 
@@ -315,6 +339,10 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
         {
         RV_Behavior.Visible = true;
         }
+        else
+        {
+            RV_Behavior.Visible = false;
+        }
         sess = (clsSession)Session["UserSession"];
         ObjTempSess = (ClsTemplateSession)Session["BiweeklySession"];
         hdnType.Value = "MultipleLessonPlan";
@@ -389,6 +417,12 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
             if (highcheck.Checked == false)
             {
             RV_Behavior.Visible = false;
+            }
+            else
+            {
+                string script = "warningmsgpop();";
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "hidepops", script, true);
+
             }
             ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "alert('No Data Available For Graph Plotting');", true);
             return;
@@ -559,6 +593,8 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
                 {
                     rategraph.Visible = true;
                 }
+                stname = stname.Replace("'", "**");
+
                 string script = "loadchart('" + sdate + "', '" + edate + "','" + sid + "','" + behid + "','" + scid + "','" + events + "','" + trend + "','" + ioa + "','" + clstype + "','" + med + "','" + gategraph + "','" + medno + "','" + reptype + "','" + inctype + "','" + stname + "');";
             ScriptManager.RegisterStartupScript(this, this.GetType(), "showgraph", script, true);
             }
@@ -566,7 +602,9 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
         
         else
         {
-            RV_Behavior.Visible = false;
+            hfPopUpValue.Value = "false";
+            string script = "warningmsgpop();";
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "hidepop01", script, true);
             btnPrevious.Visible = false;
             ddlLessonplan.Visible = false;
             btnNext.Visible = false;
@@ -769,6 +807,7 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
         }
         else
         {
+            hfPopUpValue.Value = "false";
             RV_Behavior.Visible = false;
             btnPrevious.Visible = false;
             ddlLessonplan.Visible = false;
@@ -1476,13 +1515,12 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
             string script = "closePopup();";
             ScriptManager.RegisterStartupScript(this, this.GetType(), "hidepop3", script, true);
         fillGraph(LessonId);
-        }
+    }
     }
     protected void EvntCheckBox_CheckedChanged(object sender, EventArgs e)
     {
         ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "showEvents();", true); 
     }
-
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public static string getClinicalcReport(string StartDate, string enddate, int studid, string Behav, int SchoolId, string Events, string Trendtype, string Clstype)
@@ -1532,6 +1570,7 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
         }
         JavaScriptSerializer json = new JavaScriptSerializer();
         return json.Serialize(rows);
+
     }
     [WebMethod]
     public static string[] getgraphs(string base64, string chartId)

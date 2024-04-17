@@ -298,6 +298,14 @@
             }
 
         }
+        function warningmsgpop() {
+            $('#graphPopup').show();
+            $('#overlay').show();
+            var hchart = document.getElementById('<%= HighchartGraph.ClientID %>');
+            hchart.style.display = 'none';
+            var popup = document.getElementById('popup');
+            popup.style.display = 'none';
+        }
          function showPopup() {
              $('#graphPopup').hide();
              $('#overlay').hide();
@@ -391,7 +399,7 @@
 
 
         function HideAndDisplay() {
-
+            btnsubmitVisibility();
             var val = document.getElementById("hfPopUpValue").value;
             var valLesson = document.getElementById("hdnallLesson").value;
             if (valLesson == "AllLessons") {
@@ -720,7 +728,7 @@
 
                                     <%--<asp:Button ID="Button1" runat="server" Text="Execute" OnClick="Button1_Click" CssClass="NFButton" />--%>
                                     <asp:Button ID="btnsubmit" runat="server" Text="" CssClass="showgraph" ToolTip="Show Graph" OnClick="btnsubmit_Click" Style="float: right;" OnClientClick="javascript:loadWait();" />
-                                     <asp:Button ID="btnsubmith" runat="server" Text="" CssClass="showgraph" ToolTip="Show Graph" OnClick="btnsubmit_Clickhigh" Style="float: right; display: none;" OnClientClick="javascript:showPopup();" />
+                                     <asp:Button ID="btnsubmith" runat="server" Text="" CssClass="showgraph" ToolTip="Show Graph" OnClick="btnsubmit_Click" Style="float: right; display: none;" OnClientClick="javascript:showPopup();" />
                                     <asp:CheckBox id="highcheck" runat="server" Text="" onchange="btnsubmitVisibility();"></asp:CheckBox>
                                 </td>  
                                
@@ -837,7 +845,9 @@
                     </tr>
                 </table>
             </div>
-            <div style="text-align: center; width: 100%;">                
+             <asp:UpdatePanel ID="reportpanel" runat="server">
+                                    <ContentTemplate>
+            <div style="text-align: center; width: 100%;"   runat="server">                
                 <table style="width: 100%">
 
                     <tr>
@@ -856,6 +866,8 @@
                 </table>               
             </div>
         </div>
+                                        </ContentTemplate>
+                                </asp:UpdatePanel> 
       <asp:UpdatePanel ID="highchartupdate" runat="server">
                                     <ContentTemplate>
          <div id="HighchartGraph" runat="server" style="background-color: white;">

@@ -65,7 +65,7 @@ public partial class StudentBinder_ChainedBarGraphReport : System.Web.UI.Page
 
                     //ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "loadWait();", true);
                     ObjTempSess.TemplateId = pageid;
-                    txtEdate.Text = DateTime.Now.Date.AddDays(1).ToString("MM/dd/yyyy").Replace("-", "/");
+                    txtEdate.Text = DateTime.Now.Date.ToString("MM/dd/yyyy").Replace("-", "/");
                     txtSdate.Text = DateTime.Now.Date.AddDays(-10).ToString("MM/dd/yyyy").Replace("-", "/");
                     //rbtnClassType.SelectedValue = objClassData.GetClassType(sess.Classid);
                     
@@ -150,7 +150,31 @@ public partial class StudentBinder_ChainedBarGraphReport : System.Web.UI.Page
             tdMsg.InnerHtml = clsGeneral.warningMsg("Please Enter End Date");
             return result;
         }
-        else if (txtSdate.Text != "" && txtEdate.Text != "")
+        if (txtSdate.Text != "")
+        {
+            DateTime dtst = new DateTime();
+            dtst = DateTime.ParseExact(txtSdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+            if (dtst > DateTime.Now)
+            {
+                result = false;
+                tdMsg.InnerHtml = clsGeneral.warningMsg("Invalid Start date");
+                return result;
+            }
+
+        }
+        if (txtEdate.Text != "")
+        {
+            DateTime dtst = new DateTime();
+            dtst = DateTime.ParseExact(txtEdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+            if (dtst > DateTime.Now)
+            {
+                result = false;
+                tdMsg.InnerHtml = clsGeneral.warningMsg("Invalid End date");
+                return result;
+            }
+
+        }
+         if (txtSdate.Text != "" && txtEdate.Text != "")
         {
             DateTime dtst = new DateTime();
             DateTime dted = new DateTime();
@@ -159,10 +183,11 @@ public partial class StudentBinder_ChainedBarGraphReport : System.Web.UI.Page
             if (dtst > dted)
             {
                 result = false;
-                tdMsg.InnerHtml = clsGeneral.warningMsg("Start date is must before the End date");
+                tdMsg.InnerHtml = clsGeneral.warningMsg("Start Date must be before the End Date.");
+                return result;
             }
-            return result;
-        }
+               
+         }
         return result;
 
     }
@@ -250,93 +275,94 @@ public partial class StudentBinder_ChainedBarGraphReport : System.Web.UI.Page
     {
         try
         {
-
-            ObjData = new clsData();
-            int studid = Convert.ToInt32(Request.QueryString["studid"].ToString());
-            int templateId = Convert.ToInt32(Request.QueryString["pageid"].ToString());
-            string StudName = "";
-            string strQuery = "SELECT StudentLname+','+StudentFname AS StudentName FROM Student WHERE StudentId=" + studid;
-            StudName = Convert.ToString(ObjData.FetchValue(strQuery));
-
-            //string ReportXML = "SELECT [Name],CAST(CAST([Content] AS VARBINARY(MAX)) AS XML) AS reportXML FROM [Catalog] WHERE type = 2";
-            //DataTable dt = ObjData.ReturnDataTable(ReportXML, false);
-            sess = (clsSession)Session["UserSession"];
-            ObjTempSess = (ClsTemplateSession)Session["BiweeklySession"];
-            ReportViewer ChainedBarReport = new ReportViewer();
-            string AllLesson = "";
-            AllLesson = Convert.ToString(ObjData.FetchValue("SELECT LessonPlanId FROM DSTempHdr WHERE DSTempHdrId=" + templateId));
-            DateTime dtst = new DateTime();
-            DateTime dted = new DateTime();
-            dtst = DateTime.ParseExact(txtSdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
-            dted = DateTime.ParseExact(txtEdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
-            string StartDate = dtst.ToString("yyyy-MM-dd");
-            string enddate = dted.ToString("yyyy-MM-dd");
-            ChainedBarReport.ProcessingMode = ProcessingMode.Remote;
-            ChainedBarReport.ServerReport.ReportServerCredentials = new CustomReportCredentials(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"], ConfigurationManager.AppSettings["Domain"]);
-            ChainedBarReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["ChainedExportBar"];
-            ChainedBarReport.ServerReport.ReportServerUrl = new Uri(ConfigurationManager.AppSettings["ReportUrl"]);
-            ChainedBarReport.ServerReport.Refresh();
-            string LPStatus = ObjData.FetchValue("SELECT LookupName FROM LOOKUP LU INNER JOIN DSTempHdr HD ON LU.LookupId=HD.StatusId WHERE LookupType='TemplateStatus' AND DSTempHdrId=" + templateId).ToString();
-            if (highcheck.Checked == true)
+            if (Validate() == true)
             {
-                ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "loadWait();", true);
-                lid = Convert.ToInt32(AllLesson);
-                prompttype = RbtnPloatType.SelectedValue;
-                sid = studid;
-                scid = sess.SchoolId;
-                sdate = StartDate.ToString();
-                edate = enddate.ToString();
-                tempid = templateId;
-                classtype = rbtnClassType.SelectedValue;
-                Session["StudName"]=StudName;
-                ClientScript.RegisterStartupScript(GetType(), "", "exportChart();", true);
-                tdMsgExport.InnerHtml = clsGeneral.sucessMsg("Export Successfully Created...");
-                ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "HideWait();", true);
-                hdnExport.Value = "true";
-              //  ClientScript.RegisterStartupScript(GetType(), "", "DownloadPopup();", true);
+                ObjData = new clsData();
+                int studid = Convert.ToInt32(Request.QueryString["studid"].ToString());
+                int templateId = Convert.ToInt32(Request.QueryString["pageid"].ToString());
+                string StudName = "";
+                string strQuery = "SELECT StudentLname+','+StudentFname AS StudentName FROM Student WHERE StudentId=" + studid;
+                StudName = Convert.ToString(ObjData.FetchValue(strQuery));
+
+                //string ReportXML = "SELECT [Name],CAST(CAST([Content] AS VARBINARY(MAX)) AS XML) AS reportXML FROM [Catalog] WHERE type = 2";
+                //DataTable dt = ObjData.ReturnDataTable(ReportXML, false);
+                sess = (clsSession)Session["UserSession"];
+                ObjTempSess = (ClsTemplateSession)Session["BiweeklySession"];
+                ReportViewer ChainedBarReport = new ReportViewer();
+                string AllLesson = "";
+                AllLesson = Convert.ToString(ObjData.FetchValue("SELECT LessonPlanId FROM DSTempHdr WHERE DSTempHdrId=" + templateId));
+                DateTime dtst = new DateTime();
+                DateTime dted = new DateTime();
+                dtst = DateTime.ParseExact(txtSdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                dted = DateTime.ParseExact(txtEdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                string StartDate = dtst.ToString("yyyy-MM-dd");
+                string enddate = dted.ToString("yyyy-MM-dd");
+                ChainedBarReport.ProcessingMode = ProcessingMode.Remote;
+                ChainedBarReport.ServerReport.ReportServerCredentials = new CustomReportCredentials(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"], ConfigurationManager.AppSettings["Domain"]);
+                ChainedBarReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["ChainedExportBar"];
+                ChainedBarReport.ServerReport.ReportServerUrl = new Uri(ConfigurationManager.AppSettings["ReportUrl"]);
+                ChainedBarReport.ServerReport.Refresh();
+                string LPStatus = ObjData.FetchValue("SELECT LookupName FROM LOOKUP LU INNER JOIN DSTempHdr HD ON LU.LookupId=HD.StatusId WHERE LookupType='TemplateStatus' AND DSTempHdrId=" + templateId).ToString();
+                if (highcheck.Checked == true)
+                {
+                    ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "loadWait();", true);
+                    lid = Convert.ToInt32(AllLesson);
+                    prompttype = RbtnPloatType.SelectedValue;
+                    sid = studid;
+                    scid = sess.SchoolId;
+                    sdate = StartDate.ToString();
+                    edate = enddate.ToString();
+                    tempid = templateId;
+                    classtype = rbtnClassType.SelectedValue;
+                    Session["StudName"] = StudName;
+                    ClientScript.RegisterStartupScript(GetType(), "", "exportChart();", true);
+                    tdMsgExport.InnerHtml = clsGeneral.sucessMsg("Export Successfully Created...");
+                    ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "HideWait();", true);
+                    hdnExport.Value = "true";
+                    //  ClientScript.RegisterStartupScript(GetType(), "", "DownloadPopup();", true);
+                }
+                else
+                {
+                    ReportParameter[] parm = new ReportParameter[8];
+                    parm[0] = new ReportParameter("LessonPlanId", AllLesson);
+                    parm[1] = new ReportParameter("StudentId", studid.ToString());
+                    parm[2] = new ReportParameter("SDate", StartDate.ToString());
+                    parm[3] = new ReportParameter("EDate", enddate.ToString());
+                    parm[4] = new ReportParameter("ClassType", rbtnClassType.SelectedValue);
+                    parm[5] = new ReportParameter("SchoolId", sess.SchoolId.ToString());
+                    parm[6] = new ReportParameter("PromptType", RbtnPloatType.SelectedValue);
+                    //parm[7] = new ReportParameter("LPStatus", LPStatus);
+                    parm[7] = new ReportParameter("DSTempHdrId", templateId.ToString());
+                    ChainedBarReport.ServerReport.SetParameters(parm);
+
+                    Warning[] warnings;
+                    string[] streamids;
+                    string mimeType, encoding, extension, deviceInfo;
+
+                    deviceInfo = "<DeviceInfo><PageHeight>8.5in</PageHeight><PageWidth>11in</PageWidth><MarginTop>1in</MarginTop></DeviceInfo>";
+
+                    //deviceInfo = "<DeviceInfo><PageHeight>8.5in</PageHeight><PageWidth>11in</PageWidth></DeviceInfo>";
+
+                    byte[] bytes = ChainedBarReport.ServerReport.Render("PDF", deviceInfo, out mimeType, out encoding, out extension, out streamids, out warnings);
+                    string outputPath = Server.MapPath("~\\StudentBinder\\Reports\\" + StudName + "_Chained-Bar-Graph-Report.pdf");
+                    using (FileStream fs = new FileStream(outputPath, FileMode.Create))
+                    {
+                        fs.Write(bytes, 0, bytes.Length);
+                        fs.Close();
+                    }
+                    Session["PdfPath"] = outputPath;
+                    tdMsgExport.InnerHtml = clsGeneral.sucessMsg("Export Successfully Created...");
+                    hdnExport.Value = "true";
+                    ClientScript.RegisterStartupScript(GetType(), "", "DownloadPopup();", true);
+                    //Response.Buffer = true;
+                    //Response.Clear();
+                    //Response.ContentType = mimeType;
+                    //Response.AddHeader("content-disposition", "attachment; filename=" + sess.StudentName + "_Chained-Bar-Graph-Report.pdf");
+
+                    //Response.BinaryWrite(bytes); // create the file
+                    //Response.Flush(); // send it to the client to download
+                }
             }
-            else
-            {
-            ReportParameter[] parm = new ReportParameter[8];
-            parm[0] = new ReportParameter("LessonPlanId", AllLesson);
-            parm[1] = new ReportParameter("StudentId", studid.ToString());
-            parm[2] = new ReportParameter("SDate", StartDate.ToString());
-            parm[3] = new ReportParameter("EDate", enddate.ToString());
-            parm[4] = new ReportParameter("ClassType", rbtnClassType.SelectedValue);
-            parm[5] = new ReportParameter("SchoolId", sess.SchoolId.ToString());
-            parm[6] = new ReportParameter("PromptType", RbtnPloatType.SelectedValue);
-            //parm[7] = new ReportParameter("LPStatus", LPStatus);
-            parm[7] = new ReportParameter("DSTempHdrId", templateId.ToString());
-            ChainedBarReport.ServerReport.SetParameters(parm);
-
-            Warning[] warnings;
-            string[] streamids;
-            string mimeType, encoding, extension, deviceInfo;
-
-            deviceInfo = "<DeviceInfo><PageHeight>8.5in</PageHeight><PageWidth>11in</PageWidth><MarginTop>1in</MarginTop></DeviceInfo>";
-
-            //deviceInfo = "<DeviceInfo><PageHeight>8.5in</PageHeight><PageWidth>11in</PageWidth></DeviceInfo>";
-
-            byte[] bytes = ChainedBarReport.ServerReport.Render("PDF", deviceInfo, out mimeType, out encoding, out extension, out streamids, out warnings);
-            string outputPath = Server.MapPath("~\\StudentBinder\\Reports\\" + StudName + "_Chained-Bar-Graph-Report.pdf");
-            using (FileStream fs = new FileStream(outputPath, FileMode.Create))
-            {
-                fs.Write(bytes, 0, bytes.Length);
-                fs.Close();
-            }
-            Session["PdfPath"] = outputPath;
-            tdMsgExport.InnerHtml = clsGeneral.sucessMsg("Export Successfully Created...");
-            hdnExport.Value = "true";
-            ClientScript.RegisterStartupScript(GetType(), "", "DownloadPopup();", true);
-            //Response.Buffer = true;
-            //Response.Clear();
-            //Response.ContentType = mimeType;
-            //Response.AddHeader("content-disposition", "attachment; filename=" + sess.StudentName + "_Chained-Bar-Graph-Report.pdf");
-
-            //Response.BinaryWrite(bytes); // create the file
-            //Response.Flush(); // send it to the client to download
-            }
-
         }
         catch (Exception Ex)
         {
