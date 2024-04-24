@@ -552,7 +552,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     {
                         foreach (DataRow dr in oDS.dtSteps.Rows)
                         {
-                            string sortOrderQry = "SELECT SortOrder FROM DSTempStep WHERE DSTempStepId = " + dr[0].ToString();
+                            string sortOrderQry = "SELECT SortOrder FROM DSTempStep WHERE DSTempStepId = " + dr["DSTempStepId"].ToString();
                             string sortOrderResult = Convert.ToString(oData.FetchValue(sortOrderQry));
                             if (sortOrderResult != null && sortOrderResult != "")
                             {
