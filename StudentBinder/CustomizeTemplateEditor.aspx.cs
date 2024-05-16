@@ -18891,7 +18891,40 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
     }
     protected void drp_teachingFormat_SelectedIndexChanged(object sender, EventArgs e)
     {
-		SqlTransaction Transs = null;
+        try
+        {
+        int TemplateId = Convert.ToInt32(ViewState["HeaderId"]);
+		int parentLookupId = Convert.ToInt16(drp_teachingFormat.SelectedValue);
+		objData = new clsData();
+		objData.ReturnDropDown("Select LookupId as Id , LookupName as Name from dbo.LookUp where ParentLookupId=" + parentLookupId, drpTeachingProc);
+            string selitem = drp_teachingFormat.SelectedItem.ToString();
+            if (selitem != "Task Analysis" && selitem != "Other")
+            {
+                string selectQuerry = "SELECT COUNT(*)  FROM DSTempStep WHERE ActiveInd = 'A' AND DSTempHdrId = " + TemplateId;
+                int stepcount =Convert.ToInt32( objData.FetchValue(selectQuerry));
+                if (stepcount > 0)
+                {
+                string scripts = "showPopup();";
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "Showpop", scripts, true);
+            }
+        }
+        }
+        catch (Exception Ex)
+        {
+           ClsErrorLog clError = new ClsErrorLog();
+            clError.WriteToLog(Ex.ToString());
+            throw Ex;
+        }
+        
+    }
+    protected void cancelbtn_Click(object sender, EventArgs e)
+    {
+        FillTypeOfInstruction(Convert.ToInt32(ViewState["HeaderId"]));
+        ScriptManager.RegisterStartupScript(this, this.GetType(), "save", "autosave()", true);
+
+    }
+    protected void btnContinue_Click(object sender, EventArgs e)
+    {
         SqlConnection con = objData.Open();
         try
         {
@@ -18917,6 +18950,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         {
             objData.RollBackTransation(Transs, con);
             con.Close();
+            ClsErrorLog clError = new ClsErrorLog();
+            clError.WriteToLog(Ex.ToString());
             throw Ex;
         }
         

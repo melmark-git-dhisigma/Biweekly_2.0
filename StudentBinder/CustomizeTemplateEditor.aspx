@@ -14,6 +14,23 @@
     <%--<script src="../Administration/JS/jquery-1.8.0.js"></script>   --%>
     <%--  <script src="jsScripts/jQuery.js" type="text/javascript"></script>--%>
     <style type="text/css">
+
+
+    .frmtchngpopup-content {
+        display:none;
+    background-color: white;
+    width: 400px;
+    height: 120px;
+    padding: 20px;
+    border-color:#03507D;
+    border-width: 3px;
+    border-style: solid;
+    border-radius: 5px;
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    }
         .warning_box {
             width: 20%;
             clear: both;
@@ -1232,6 +1249,17 @@
             float: left;
             margin: 0 0 3px 0;
         }
+        .loading2 {
+            display: none;
+            position: absolute;
+            width: 100%;
+            height: 900px;
+            top: 0px;
+            left: 0px;
+            z-index: 1000;
+            background-image: url("images/overlay.png");
+            /*background: repeat-x scroll center top transparent;*/
+        }
 
         .loading {
             display: none;
@@ -1861,6 +1889,15 @@
                 obj.value = '';
             }
         }
+
+        function showPopup() {
+            document.getElementById('formatchngloader').style.display='block';
+            var popup = document.getElementById('frmtchngpopup');
+            popup.style.display = 'block';
+              
+            
+        }
+        
     </script>
 
 </head>
@@ -2699,6 +2736,19 @@
                                                 </table>
                                             </div>
 
+                                             <div class="loading2" id="formatchngloader" runat="server">
+                                              <div class="innerLoading">
+                                                    <img src="../Administration/images/load.gif" alt="loading" />
+                                                    Please Wait...
+                                                </div>
+                                                    <div class="frmtchngpopup-content" id="frmtchngpopup">
+        <p style="font-size: 15px; text-align:center; color:black">Changing method to discrete trial will delete any steps previously entered.</p>
+    <br />
+       <asp:Button ID="btnContinue" runat="server" Text="Continue" OnClick="btnContinue_Click" OnClientClick="showload();" CssClass="NFButton" style="margin-left:50px;"/>
+       <asp:Button ID="cancelbtn" runat="server" Text="Cancel" OnClick="cancelbtn_Click" OnClientClick="showload();"  CssClass="NFButton" style="margin-left:100px;"/>
+    </div>
+                                                </div>
+                                            </div>
 
 
                                         </ContentTemplate>
@@ -6558,6 +6608,16 @@
             document.getElementById("<%=txtBoxAddSet.ClientID%>").focus();
         }
 
+    }
+    function showload() {
+        document.getElementById('formatchngloader').style.display = 'block';
+        var popup = document.getElementById('frmtchngpopup');
+        popup.style.display = 'none';
+    }
+    function Hideload() {
+        document.getElementById('formatchngloader').style.display = 'none';
+        var popup = document.getElementById('frmtchngpopup');
+        popup.style.display = 'none';
     }
 
 
