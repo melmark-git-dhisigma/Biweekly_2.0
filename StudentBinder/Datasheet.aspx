@@ -379,7 +379,7 @@
             parent.$('.fillLessons2').hide();
 
             parent.resetOverrideSessionfn(sheetId);
-
+			closeIframe1(frameId);
             parent.listLessonPlan();
             HideHdrDiv();
             //parent.$('#divContentPages').find('#divTF' + frameId).remove();
