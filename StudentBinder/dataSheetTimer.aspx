@@ -748,6 +748,25 @@
                                         $('#div' + behaveid + '_' + timeList[j]).parent().find('.current,.past').css('border-color', 'black');
 
                                         $('#div' + behaveid + '_' + timeList[j]).trigger('click');
+										
+										if (timeList[j].length == 4) {
+                                            var time = timeList[j];
+                                            var hr = parseInt(time.substring(0, 2));
+                                            var min = time.substring(2);
+                                            var amOrPM = 0;
+                                            if (hr > 12) {
+                                                hr = hr - 12;
+                                                amOrPM = 1;
+                                            }
+                                            var hr1 = hr.toString();
+                                            if (hr < 10)
+                                                hr1 = "0" + hr1;
+                                            $('#txtTimeHr' + behaveId).val(hr1);
+                                            $('#txtTimeMin' + behaveId).val(min);
+                                            $('#txtTimeSec' + behaveId).val("00");
+                                            $('#drpTimeAmPm' + behaveId).val(amOrPM.toString());
+
+                                        }
 
                                         var scrTop = $('#dvTimeId_' + behaveid).scrollTop() + $('#div' + behaveid + '_' + timeList[j]).position().top;
 
@@ -1127,7 +1146,8 @@
             
             $('#hdnchecktabchange').val('True');
             if (!$(elm).hasClass('future')) {
-                resetOther(elm);
+                resetTimeIntervals(behaveId, elm)
+                //resetOther(elm);
                 $(elm).parent().parent().parent().find('#butSavReset').find('.btns').val('Save');
                 var time = $(elm).text();
                 //var f=$('.current').text();
@@ -1790,7 +1810,7 @@
                             + '<div class="tabContent4" style="top:400px; border: 0px;">'
                             //start
                           + '<div id="butSavReset" style="margin-top:25px"><input type="button" id="btnSaveOther,' + ulId[BehavCount] + '" class="btns save" value="Save" onclick="saveFreqYesOrNo(' + ulId[BehavCount] + ',this)"/>'
-                           + '<input type="button" class="btnr reset" value="Reset" onclick="resetOther(this)"/>'
+                           + '<input type="button" class="btnr reset" value="Reset" onclick="resetTimeIntervals(' + ulId[BehavCount] + ', this)"/>'
                            + '</div>'
                            //end
                            + '</div>'
@@ -1853,7 +1873,7 @@
                             + '<div class="tabContent4" style="top:230px; border: 0px;">'
                             //
                           + '<div id="butSavReset" style="margin-top:25px"><input type="button" id="btnSaveOther,' + ulId[BehavCount] + '" class="btns save" value="Save" onclick="saveYesOrNo(' + ulId[BehavCount] + ',this)"/>'
-                           + '<input type="button" class="btnr reset" value="Reset" onclick="resetOther(this)"/>'
+                           + '<input type="button" class="btnr reset" value="Reset" onclick="resetTimeIntervals(' + ulId[BehavCount] + ', this)"/>'
                            + '</div>'
                            //
                            + '</div>'
@@ -1935,7 +1955,7 @@
                             + '<div class="tabContent4" style="top:325px; border: 0px;">'
                             //
                           + '<div id="butSavReset" style="margin-top:25px"><input type="button" id="btnSaveOther,' + ulId[BehavCount] + '" class="btns save" value="Save" onclick="saveOtherFreq(' + ulId[BehavCount] + ',this)"/>'
-                           + '<input type="button" class="btnr reset" value="Reset" onclick="resetOther(this)"/>'
+                           + '<input type="button" class="btnr reset" value="Reset" onclick="resetTimeIntervals(' + ulId[BehavCount] + ', this)"/>'
                            + '</div>'
                            //
                            + '</div>'
@@ -2401,7 +2421,7 @@
                             + '<div class="tabContent4" style="top:460px; border: 0px;">'
                             //start
                           + '<div id="butSavReset" style="margin-top:25px"><input type="button" id="btnSaveOther,' + ulId[BehavCount] + '" class="btns save" value="Save" onclick="saveFreqYesOrNo(' + ulId[BehavCount] + ',this)"/>'
-                           + '<input type="button" class="btnr reset" value="Reset" onclick="resetOther(this)"/>'
+                           + '<input type="button" class="btnr reset" value="Reset" onclick="resetTimeIntervals(' + ulId[BehavCount] + ', this)"/>'
                            + '</div>'
                            //end
                            + '</div>'
@@ -2531,7 +2551,7 @@
                              + '<div class="tabContent4" style="top:375px; border: 0px;">'
                              //start
                           + '<div id="butSavReset" style="margin-top:25px"><input type="button" id="btnSaveOther,' + ulId[BehavCount] + '" class="btns save" value="Save" onclick="saveOtherFreq(' + ulId[BehavCount] + ',this)"/>'
-                           + '<input type="button" class="btnr reset" value="Reset" onclick="resetOther(this)"/>'
+                           + '<input type="button" class="btnr reset" value="Reset" onclick="resetTimeIntervals(' + ulId[BehavCount] + ', this)"/>'
                            + '</div>'
                            //end
                            + '</div>'
@@ -3147,7 +3167,17 @@
             }
             $('#hdnchecktabchange').val('True');
         }
-
+		function resetTimeIntervals(behaveId, thisElem) {
+            var h = document.getElementById('txtTimeHr' + behaveId).value;
+            var m = document.getElementById('txtTimeMin' + behaveId).value;
+            var s = document.getElementById('txtTimeSec' + behaveId).value;
+            var amOrPM = document.getElementById('drpTimeAmPm' + behaveId).value;
+            resetOther(thisElem);   
+            $('#txtTimeHr' + behaveId).val(h);
+            $('#txtTimeMin' + behaveId).val(m);
+            $('#txtTimeSec' + behaveId).val(s);
+            $('#drpTimeAmPm' + behaveId).val(amOrPM);
+        }
         function resetOther(thisElem) {
             //var text=$(thisElem).parent().find('.txtFreq').val('');
             //var drp = $(thisElem).parent().parent().find('.drpcls');
