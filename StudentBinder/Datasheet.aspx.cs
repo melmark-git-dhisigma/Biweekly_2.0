@@ -14,8 +14,6 @@ using System.Text.RegularExpressions;
 using System.Web.Services;
 using System.Net;
 
-
-
 public partial class StudentBinder_Datasheet : System.Web.UI.Page
 {
     public static clsData objData = null;
@@ -38,13 +36,19 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
     List<String> GroupName = new List<String>();
     int freqDurMUPcount = 0;
     int freqDurMDWNcount = 0;
+    clsGeneral clsGeneralSchk = new clsGeneral();
 	int preid =0;
     string preuser = "";
     int SessStudentid = 0;
+    int PreClassid = 0;
     string Sessstname = "";
     string Pagepath = "";
     string curesesid = "";
     string ip = "";
+    string HostName = "";
+    string userAgent = "";
+    DateTime now = DateTime.Now;
+    DateTime today = DateTime.Today;
 
 
     protected void Page_Load(object sender, EventArgs e)
@@ -53,7 +57,14 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         Response.ExpiresAbsolute = DateTime.Now.AddDays(-1d);
         Response.Cache.SetCacheability(HttpCacheability.NoCache);
         Session["promptid"] = 0;
+
         Prevsess = (clsSession)Session["PreSession"];
+        preid = Convert.ToInt16(Session["Spreid"]);
+        preuser = Session["Spreuser"].ToString();
+        SessStudentid = Convert.ToInt16(Session["Sprestid"]);
+        PreClassid = Convert.ToInt16(Session["SpreClsid"]);
+        Sessstname = Session["Sprestname"].ToString();
+
         int printid = Convert.ToInt32(Request.QueryString["printid"]);
         if (printid == 1)
         {
@@ -361,25 +372,21 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
        ScriptManager.RegisterStartupScript(this, this.GetType(), "CallFunction", script, true);
             
         curesesid = this.Session.SessionID.ToString();
-        preid = Convert.ToInt16(Session["Spreid"]);
-        preuser = Session["Spreuser"].ToString();
-        SessStudentid = Convert.ToInt16(Session["Sprestid"]);
-        Sessstname = Session["Sprestname"].ToString();
-        string HostName = Dns.GetHostName();
-        string userAgent = HttpContext.Current.Request.UserAgent.ToString();
+        HostName = Dns.GetHostName();
+        userAgent = HttpContext.Current.Request.UserAgent.ToString();
         ip = clsGeneral.GetIPAddress();
         ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
         Pagepath = "Datasheet:Page_Load";
         if (Prevsess != null)
         {
-            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + Prevsess.Classid + ',' + oSession.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+            sesserrlog.WriteToLog(today.ToString("yyyy-MM-dd") + ',' + now.ToString("HH:mm:ss") + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + Prevsess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + Prevsess.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + Prevsess.Classid + ',' + PreClassid + ',' + oSession.StudentId + ',' + Prevsess.StudentId + ',' + SessStudentid + ',' + HostName + ',' + userAgent);
         }
         else
         {
-            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + "PrevSession Null" + ',' + oSession.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+            sesserrlog.WriteToLog(today.ToString("yyyy-MM-dd") + ',' + now.ToString("HH:mm:ss") + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + "PrevSession Null" + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + "PrevSession Null" + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + "PrevSession Null" + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + "PrevSession Null" + ',' + PreClassid + ',' + oSession.StudentId + ',' + "PrevSession Null" + ',' + SessStudentid + ',' + HostName + ',' + userAgent);
         }
-        
-        oSession = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, Sessstname,Pagepath);
+        oSession = clsGeneralSchk.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, PreClassid, Sessstname, Pagepath);
+                
     }
 
     public string getFormulae(string calId)
@@ -565,7 +572,6 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 dtstps.Rows.Add(dr1);
                             }
                         }
-
                         oDS.dtSteps = dtstps;
                     }
                     dtstps = oDS.dtSteps;
@@ -1539,14 +1545,14 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         Pagepath = "Datasheet:checkStat";
         if (Prevsess != null)
         {
-            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + Prevsess.Classid + ',' + oSession.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+            sesserrlog.WriteToLog(today.ToString("yyyy-MM-dd") + ',' + now.ToString("HH:mm:ss") + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + Prevsess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + Prevsess.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + Prevsess.Classid + ',' + PreClassid + ',' + oSession.StudentId + ',' + Prevsess.StudentId + ',' + SessStudentid + ',' + HostName + ',' + userAgent);
         }
         else
         {
-            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + "PrevSession Null" + ',' + oSession.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+            sesserrlog.WriteToLog(today.ToString("yyyy-MM-dd") + ',' + now.ToString("HH:mm:ss") + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + "PrevSession Null" + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + "PrevSession Null" + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + "PrevSession Null" + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + "PrevSession Null" + ',' + PreClassid + ',' + oSession.StudentId + ',' + "PrevSession Null" + ',' + SessStudentid + ',' + HostName + ',' + userAgent);
         }
-        
-        oSession = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, Sessstname, Pagepath);
+        oSession = clsGeneralSchk.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, PreClassid, Sessstname, Pagepath);
+
         oDS = new clsDataSheet();
         int hasPrevSet = fillTempOverride(oTemp.TemplateId);
 		
@@ -2967,23 +2973,21 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         if (oTemp != null)
         {
             oSession = (clsSession)Session["UserSession"];
-            oSession = (clsSession)Session["UserSession"];
             curesesid = this.Session.SessionID.ToString();
-            string HostName = Dns.GetHostName();
-            string userAgent = HttpContext.Current.Request.UserAgent.ToString();
+            HostName = Dns.GetHostName();
+            userAgent = HttpContext.Current.Request.UserAgent.ToString();
             ip = clsGeneral.GetIPAddress();
             ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
             Pagepath = "Datasheet:SaveDraft";
             if (Prevsess != null)
             {
-                sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + Prevsess.Classid + ',' + oSession.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+                sesserrlog.WriteToLog(today.ToString("yyyy-MM-dd") + ',' + now.ToString("HH:mm:ss") + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + Prevsess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + Prevsess.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + Prevsess.Classid + ',' + PreClassid + ',' + oSession.StudentId + ',' + Prevsess.StudentId + ',' + SessStudentid + ',' + HostName + ',' + userAgent);
             }
             else
             {
-                sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + "PrevSession Null" + ',' + oSession.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+                sesserrlog.WriteToLog(today.ToString("yyyy-MM-dd") + ',' + now.ToString("HH:mm:ss") + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + "PrevSession Null" + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + "PrevSession Null" + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + "PrevSession Null" + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + "PrevSession Null" + ',' + PreClassid + ',' + oSession.StudentId + ',' + "PrevSession Null" + ',' + SessStudentid + ',' + HostName + ',' + userAgent);
             }
-            
-            oSession = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, Sessstname, Pagepath);
+            oSession = clsGeneralSchk.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, PreClassid, Sessstname, Pagepath);
 
             if (ddlIOAUsers.SelectedValue != oSession.LoginId.ToString())
             {
@@ -3426,20 +3430,19 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
         curesesid = this.Session.SessionID.ToString();
         string HostName = Dns.GetHostName();
-        string userAgent = HttpContext.Current.Request.UserAgent.ToString();
+        userAgent = HttpContext.Current.Request.UserAgent.ToString();
         ip = clsGeneral.GetIPAddress();
         ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
         Pagepath = "Datasheet : updateDraft";
         if (Prevsess != null)
         {
-            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + Prevsess.Classid + ',' + oSession.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+            sesserrlog.WriteToLog(today.ToString("yyyy-MM-dd") + ',' + now.ToString("HH:mm:ss") + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + Prevsess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + Prevsess.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + Prevsess.Classid + ',' + PreClassid + ',' + oSession.StudentId + ',' + Prevsess.StudentId + ',' + SessStudentid + ',' + HostName + ',' + userAgent);
         }
         else
         {
-            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + "PrevSession Null" + ',' + oSession.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+            sesserrlog.WriteToLog(today.ToString("yyyy-MM-dd") + ',' + now.ToString("HH:mm:ss") + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + "PrevSession Null" + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + "PrevSession Null" + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + "PrevSession Null" + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + "PrevSession Null" + ',' + PreClassid + ',' + oSession.StudentId + ',' + "PrevSession Null" + ',' + SessStudentid + ',' + HostName + ',' + userAgent);
         }
-        
-        oSession = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, Sessstname, Pagepath);
+        oSession = clsGeneralSchk.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, PreClassid, Sessstname, Pagepath);
 
         string updQry = "";
         bool Ismaint = Convert.ToBoolean(hdn_isMaintainance.Value);
@@ -4665,21 +4668,19 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                 string curesesid = this.Session.SessionID.ToString();
                 string HostName = Dns.GetHostName();
-                string userAgent = HttpContext.Current.Request.UserAgent.ToString();
+                userAgent = HttpContext.Current.Request.UserAgent.ToString();
                 ip = clsGeneral.GetIPAddress();
                 ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
                 Pagepath = "Datasheet : btnSubmit_Click";
                 if (Prevsess != null)
                 {
-                    sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + Prevsess.Classid + ',' + oSession.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+                    sesserrlog.WriteToLog(today.ToString("yyyy-MM-dd") + ',' + now.ToString("HH:mm:ss") + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + Prevsess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + Prevsess.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + Prevsess.Classid + ',' + PreClassid + ',' + oSession.StudentId + ',' + Prevsess.StudentId + ',' + SessStudentid + ',' + HostName + ',' + userAgent);
                 }
                 else
                 {
-                    sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + "PrevSession Null" + ',' + oSession.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+                    sesserrlog.WriteToLog(today.ToString("yyyy-MM-dd") + ',' + now.ToString("HH:mm:ss") + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + "PrevSession Null" + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + "PrevSession Null" + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + "PrevSession Null" + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + "PrevSession Null" + ',' + PreClassid + ',' + oSession.StudentId + ',' + "PrevSession Null" + ',' + SessStudentid + ',' + HostName + ',' + userAgent);
                 }
-                
-                oSession = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, Sessstname, Pagepath);
-
+                oSession = clsGeneralSchk.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, PreClassid, Sessstname, Pagepath);
 
                 if (reslt2)
                 {
@@ -29717,25 +29718,20 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             oTemp = (ClsTemplateSession)Session["BiweeklySession"];
 
             curesesid = this.Session.SessionID.ToString();
-            preid = Convert.ToInt16(Session["Spreid"]);
-            preuser = Session["Spreuser"].ToString();
-            SessStudentid = Convert.ToInt16(Session["Sprestid"]);
-            Sessstname = Session["Sprestname"].ToString();
             string HostName = Dns.GetHostName();
-            string userAgent = HttpContext.Current.Request.UserAgent.ToString();
+            string userAgent = Request.UserAgent.ToString();
             ip = clsGeneral.GetIPAddress();
             ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
             Pagepath = "Datasheet : rptr_tempOverride_ItemDataBound";
             if (Prevsess != null)
             {
-                sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + Prevsess.Classid + ',' + oSession.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+                sesserrlog.WriteToLog(today.ToString("yyyy-MM-dd") + ',' + now.ToString("HH:mm:ss") + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + Prevsess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + Prevsess.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + Prevsess.Classid + ',' + PreClassid + ',' + oSession.StudentId + ',' + Prevsess.StudentId + ',' + SessStudentid + ',' + HostName + ',' + userAgent);
             }
             else
             {
-                sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + "PrevSession Null" + ',' + oSession.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+                sesserrlog.WriteToLog(today.ToString("yyyy-MM-dd") + ',' + now.ToString("HH:mm:ss") + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + "PrevSession Null" + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + "PrevSession Null" + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + "PrevSession Null" + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + "PrevSession Null" + ',' + PreClassid + ',' + oSession.StudentId + ',' + "PrevSession Null" + ',' + SessStudentid + ',' + HostName + ',' + userAgent);
             }
-            
-            oSession = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, Sessstname, Pagepath);
+            oSession = clsGeneralSchk.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, PreClassid, Sessstname, Pagepath);
 
             string query = "select * from StdtSessionHdr where StudentId=" + oSession.StudentId + " AND DSTempHdrId=" + oTemp.TemplateId + " AND SessionStatusCd = 'D' and CurrentSetId='" + hdn_tempSetId.Value + "'";
             DataTable dt = oData.ReturnDataTable(query, false);
@@ -31065,21 +31061,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 }
             }
         }
-        string HostName = Dns.GetHostName();
-        string userAgent = HttpContext.Current.Request.UserAgent.ToString();
-        ip = clsGeneral.GetIPAddress();
-        ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
-        Pagepath = "Datasheet:ConfirmSubmission";
-        if (Prevsess != null)
-        {
-            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + Prevsess.Classid + ',' + oSession.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
-        }
-        else
-        {
-            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + "PrevSession Null" + ',' + oSession.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
-        }
         
-        oSession = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, Sessstname, Pagepath);
     }
     protected bool checkIfScoreIsNA(bool IsInfluencedBy, int ColId)
     {
@@ -31818,21 +31800,21 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
     {
         oSession = (clsSession)Session["UserSession"];
         curesesid = this.Session.SessionID.ToString();
-        string HostName = Dns.GetHostName();
-        string userAgent = HttpContext.Current.Request.UserAgent.ToString();
+        HostName = Dns.GetHostName();
+        userAgent = HttpContext.Current.Request.UserAgent.ToString();
         ip = clsGeneral.GetIPAddress();
         ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
         Pagepath = "Datasheet:LoadDropdown";
         if (Prevsess != null)
         {
-            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ":" + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + Prevsess.Classid + ',' + oSession.StudentId + ',' + Prevsess.StudentId + ',' + HostName + ',' + userAgent);
+            sesserrlog.WriteToLog(today.ToString("yyyy-MM-dd") + ',' + now.ToString("HH:mm:ss") + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + Prevsess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + Prevsess.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + Prevsess.Classid + ',' + PreClassid + ',' + oSession.StudentId + ',' + Prevsess.StudentId + ',' + SessStudentid + ',' + HostName + ',' + userAgent);
         }
         else
         {
-            sesserrlog.WriteToLog(DateTime.Now.ToString() + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + "PrevSession Null" + ',' + oSession.StudentId + ',' + "PrevSession Null" + ',' + HostName + ',' + userAgent);
+            sesserrlog.WriteToLog(today.ToString("yyyy-MM-dd") + ',' + now.ToString("HH:mm:ss") + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + "PrevSession Null" + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + "PrevSession Null" + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + "PrevSession Null" + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + "PrevSession Null" + ',' + PreClassid + ',' + oSession.StudentId + ',' + "PrevSession Null" + ',' + SessStudentid + ',' + HostName + ',' + userAgent);
         }
-        
-        oSession = clsGeneral.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, Sessstname, Pagepath);
+        oSession = clsGeneralSchk.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, PreClassid, Sessstname, Pagepath);
+
         if (ddlIOAUsers.SelectedValue != oSession.LoginId.ToString())
         {
         string strQuery = "SELECT UserId as Id,UserLName+' '+UserFName AS Name FROM [dbo].[User] WHERE ActiveInd='A' AND UserId=" + oSession.LoginId;

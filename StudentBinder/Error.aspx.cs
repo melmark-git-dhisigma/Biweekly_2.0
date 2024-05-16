@@ -7,13 +7,13 @@ using System.Web.UI.WebControls;
 
 public partial class Admin_Error : System.Web.UI.Page
 {
-    private static clsSession sess = null;
+    private clsSession sess = null;
     protected void Page_Load(object sender, EventArgs e)
     {
         sess = (clsSession)Session["UserSession"];
         if (sess == null)
         {
-            Response.Redirect("../Administration/Login.aspx");
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "navToLogin();", true);
         }
         if (Request.QueryString["Error"] != null)
         {

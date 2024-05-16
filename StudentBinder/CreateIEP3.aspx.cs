@@ -12,7 +12,7 @@ public partial class StudentBinder_CreateIEP3 : System.Web.UI.Page
 {
 
     public static clsData objData = null;
-    public static clsSession sess = null;
+    public clsSession sess = null;
     string strQuery = "";
     static int IEPId = 0;
     int retVal = 0;

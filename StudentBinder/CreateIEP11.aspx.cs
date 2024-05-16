@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 public partial class StudentBinder_CreateIEP11 : System.Web.UI.Page
 {
     public static clsData objData = null;
-    public static clsSession sess = null;
+    public clsSession sess = null;
     static int IEPId = 0;
     string strQuery = "";
     int retVal = 0;

@@ -11,14 +11,14 @@ using System.Globalization;
 
 public partial class Admin_AddStudent : System.Web.UI.Page
 {
-    private static int intAddressId = 0;
-    public static int intStudentId = 0;
-    public static int intclassid = 0;
+    private  int intAddressId = 0;
+    public  int intStudentId = 0;
+    public  int intclassid = 0;
     static Boolean Result;
     // private static string strNumber = "";
 
 
-    public static clsSession sess = null;
+    public clsSession sess = null;
     clsData objData = null;
     DataClass objdataClass = null;
     public static int temp;

@@ -10,7 +10,7 @@ using System.Web.Services;
 public partial class StudentBinder_CreateIEP10 : System.Web.UI.Page
 {
     public static clsData objData = null;
-    public static clsSession sess = null;
+    public clsSession sess = null;
     string strQuery = "";
     string strQuery1 = "";
     string strQuery2 = "";
