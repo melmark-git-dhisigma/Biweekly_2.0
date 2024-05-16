@@ -154,6 +154,8 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
         chkInactive.Checked = false;
         lblCalc.Visible = false;
         rdoSumTotal.Visible = false;
+        lblCalcOpp.Visible = false;
+        chkOpportunities.Visible = false;
 
 
         if (Disable == true)
@@ -204,7 +206,7 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
     //        }
     //    }
     //    if (flg == 1)
-    //    {
+    //    
     //        return i;
     //    }
     //    else
@@ -220,6 +222,8 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
     protected void chkDuration_CheckedChanged(object sender, EventArgs e)
     {
         chkFrequency.Checked = false;
+        lblCalcOpp.Visible = false;
+        chkOpportunities.Visible = false;
         if (chkDuration.Checked)
         {
             // chkhr.Enabled = true;
@@ -228,6 +232,11 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
         }
         else
         {
+            if (chkYesOrNo.Checked == true && chkFrequency.Checked == false)
+            {
+                lblCalcOpp.Visible = true;
+                chkOpportunities.Visible = true;
+            }
             // chkhr.Checked = false;
             // chkmin.Checked = false;
             // chksec.Checked = false;
@@ -265,6 +274,8 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
         chkYesOrNo.Checked = false;
         lblCalc.Visible = false;
         rdoSumTotal.Visible = false;
+        lblCalcOpp.Visible = false;
+        chkOpportunities.Visible = false;
         chkPartial.Checked = false;
         CheckBoxLessonPlan.Checked = false;
         CheckBoxCostLessPlan.Checked = false;
@@ -518,6 +529,7 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
 
                                             Boolean frq = false;
                                             Boolean due = false;
+                                            Boolean opp = false;
                                             Boolean format = false;
                                             Boolean yesOrNo = false;                                            
                                             Boolean perInterval=false;
@@ -530,6 +542,10 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
                                             if (chkDuration.Checked == true)
                                             {
                                                 due = true;
+                                            }
+                                            if(chkOpportunities.Checked == true)
+                                            {
+                                                opp = true;
                                             }
                                             if (chk24Hr.Checked == true)
                                             {
@@ -640,7 +656,7 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
 
 
                                                     //result = " Insert into BehaviourDetails(StudentId,SchoolId,ClassId,Behaviour,Frequency,Duration,PartialInterval,Hr24,YesOrNo,IfPerInterval,StartTime,EndTime,NumOfTimes,Period,Interval,IsAcceleration,ActiveInd,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,StartDate,EndDate,Condition,BehavDefinition,BehavStrategy,GoalDesc) Values('" + sess.StudentId + "'," + sess.SchoolId + "," + sess.Classid + ",'" + clsGeneral.convertQuotes(txtBehaviour.Text.Trim()) + "','" + frq + "','" + due + "','True','" + format + "','" + yesOrNo + "','" + perInterval + "','" + StartTime.TimeOfDay + "','" + EndTime.TimeOfDay + "','" + int.Parse(txtNoOfTimes.Text) + "','" + int.Parse(txtPeriod.Text) + "','" + int.Parse(txtInterval.Text) + "','" + acceleration + "','A','" + sess.LoginId + "' ,(SELECT Convert(Varchar,getdate(),100)),'" + sess.LoginId + "' ,(SELECT Convert(Varchar,getdate(),100)),'" + txtStartDate.Text + "','" + txtEndsOn.Text + "','" + DropDownValuetoTable + "','" + clsGeneral.convertQuotes(txtBehavDefinition.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtBehavStrategy.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtGoalDesc.Text.Trim()) + "')";
-                                                    result = " Insert into BehaviourDetails(StudentId,SchoolId,ClassId,Behaviour,Frequency,Duration,PartialInterval,Hr24,YesOrNo,IfPerInterval,StartTime,EndTime,NumOfTimes,Period,Interval,IsAcceleration,ActiveInd,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,StartDate,EndDate,Condition,BehavDefinition,BehavStrategy,GoalDesc,BehaviorIEPObjctve,BehaviorBasPerfLvl) Values('" + sess.StudentId + "'," + sess.SchoolId + "," + sess.Classid + ",'" + clsGeneral.convertQuotes(txtBehaviour.Text.Trim()) + "','" + frq + "','" + due + "','True','" + format + "','" + yesOrNo + "','" + perInterval + "','" + StartTime.TimeOfDay + "','" + EndTime.TimeOfDay + "','" + int.Parse(txtNoOfTimes.Text) + "','" + int.Parse(txtPeriod.Text) + "','" + int.Parse(txtInterval.Text) + "','" + acceleration + "','A','" + sess.LoginId + "' ,(SELECT Convert(Varchar,getdate(),100)),'" + sess.LoginId + "' ,(SELECT Convert(Varchar,getdate(),100)),'" + txtStartDate.Text + "','" + txtEndsOn.Text + "','" + DropDownValuetoTable + "','" + clsGeneral.convertQuotes(txtBehavDefinition.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtBehavStrategy.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtGoalDesc.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtbehIEPobjtve.Text) + "','" + clsGeneral.convertQuotes(txtbehBasperlvl.Text) + "')";
+                                                    result = " Insert into BehaviourDetails(StudentId,SchoolId,ClassId,Behaviour,Frequency,Duration,Opportunities,PartialInterval,Hr24,YesOrNo,IfPerInterval,StartTime,EndTime,NumOfTimes,Period,Interval,IsAcceleration,ActiveInd,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,StartDate,EndDate,Condition,BehavDefinition,BehavStrategy,GoalDesc,BehaviorIEPObjctve,BehaviorBasPerfLvl) Values('" + sess.StudentId + "'," + sess.SchoolId + "," + sess.Classid + ",'" + clsGeneral.convertQuotes(txtBehaviour.Text.Trim()) + "','" + frq + "','" + due + "','" + opp + "','True','" + format + "','" + yesOrNo + "','" + perInterval + "','" + StartTime.TimeOfDay + "','" + EndTime.TimeOfDay + "','" + int.Parse(txtNoOfTimes.Text) + "','" + int.Parse(txtPeriod.Text) + "','" + int.Parse(txtInterval.Text) + "','" + acceleration + "','A','" + sess.LoginId + "' ,(SELECT Convert(Varchar,getdate(),100)),'" + sess.LoginId + "' ,(SELECT Convert(Varchar,getdate(),100)),'" + txtStartDate.Text + "','" + txtEndsOn.Text + "','" + DropDownValuetoTable + "','" + clsGeneral.convertQuotes(txtBehavDefinition.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtBehavStrategy.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtGoalDesc.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtbehIEPobjtve.Text) + "','" + clsGeneral.convertQuotes(txtbehBasperlvl.Text) + "')";
                                                     Final = objData.ExecuteWithScope(result);
 
 
@@ -828,7 +844,7 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
                                             {
 
                                                 //result = " Insert into BehaviourDetails(StudentId,SchoolId,ClassId,Behaviour,Frequency,Duration,PartialInterval,IsAcceleration,ActiveInd,BehavDefinition,BehavStrategy,GoalDesc,YesOrNo,IfPerInterval,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn) Values('" + sess.StudentId + "'," + sess.SchoolId + "," + sess.Classid + ",'" + clsGeneral.convertQuotes(txtBehaviour.Text.Trim()) + "','" + frq + "','" + due + "','False','" + acceleration + "','A','" + clsGeneral.convertQuotes(txtBehavDefinition.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtBehavStrategy.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtGoalDesc.Text.Trim()) + "','" + yesOrNo + "','" + perInterval + "','" + sess.LoginId + "' ,(SELECT Convert(Varchar,getdate(),100)),'" + sess.LoginId + "' ,(SELECT Convert(Varchar,getdate(),100)))";
-                                                result = " Insert into BehaviourDetails(StudentId,SchoolId,ClassId,Behaviour,Frequency,Duration,PartialInterval,IsAcceleration,ActiveInd,BehavDefinition,BehavStrategy,GoalDesc,YesOrNo,IfPerInterval,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,BehaviorIEPObjctve,BehaviorBasPerfLvl) Values('" + sess.StudentId + "'," + sess.SchoolId + "," + sess.Classid + ",'" + clsGeneral.convertQuotes(txtBehaviour.Text.Trim()) + "','" + frq + "','" + due + "','False','" + acceleration + "','A','" + clsGeneral.convertQuotes(txtBehavDefinition.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtBehavStrategy.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtGoalDesc.Text.Trim()) + "','" + yesOrNo + "','" + perInterval + "','" + sess.LoginId + "' ,(SELECT Convert(Varchar,getdate(),100)),'" + sess.LoginId + "' ,(SELECT Convert(Varchar,getdate(),100)),'" + clsGeneral.convertQuotes(txtbehIEPobjtve.Text) + "','" + clsGeneral.convertQuotes(txtbehBasperlvl.Text) + "')";
+                                                result = " Insert into BehaviourDetails(StudentId,SchoolId,ClassId,Behaviour,Frequency,Duration,Opportunities,PartialInterval,IsAcceleration,ActiveInd,BehavDefinition,BehavStrategy,GoalDesc,YesOrNo,IfPerInterval,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,BehaviorIEPObjctve,BehaviorBasPerfLvl) Values('" + sess.StudentId + "'," + sess.SchoolId + "," + sess.Classid + ",'" + clsGeneral.convertQuotes(txtBehaviour.Text.Trim()) + "','" + frq + "','" + due + "','" + opp + "','False','" + acceleration + "','A','" + clsGeneral.convertQuotes(txtBehavDefinition.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtBehavStrategy.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtGoalDesc.Text.Trim()) + "','" + yesOrNo + "','" + perInterval + "','" + sess.LoginId + "' ,(SELECT Convert(Varchar,getdate(),100)),'" + sess.LoginId + "' ,(SELECT Convert(Varchar,getdate(),100)),'" + clsGeneral.convertQuotes(txtbehIEPobjtve.Text) + "','" + clsGeneral.convertQuotes(txtbehBasperlvl.Text) + "')";
                                                 Final = objData.ExecuteWithScope(result);
                                             }
 
@@ -902,6 +918,7 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
 
                                         Boolean frq = false;
                                         Boolean due = false;
+                                        Boolean opp = false;
                                         Boolean format = false;
                                         Boolean yesOrNo = false;
                                         Boolean perInterval = false;
@@ -950,7 +967,10 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
                                         {
                                             due = true;
                                         }
-
+                                        if(chkOpportunities.Checked == true)
+                                            {
+                                                opp = true;
+                                            }
                                         if (chkInactive.Checked == true)
                                         {
                                             stat = "N";
@@ -1028,7 +1048,7 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
 
                                             //result = " Insert into BehaviourDetails(StudentId,Behaviour,Frequency,Duration,PartialInterval,StartTime,NumOfTimes,Period,Interval,ActiveInd,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,StartDate,EndDate,Condition) Values('" + Convert.ToInt32(ddlStudent.SelectedItem.Value) + "','" + txtBehaviour.Text + "','" + frq + "','" + due + "','True','" + StartTime.TimeOfDay + "','" + int.Parse(txtNoOfTimes.Text) + "','" + int.Parse(txtPeriod.Text) + "','" + int.Parse(txtInterval.Text) + "','A','" + sess.LoginId + "' ,(SELECT Convert(Varchar,getdate(),100)),'" + sess.LoginId + "' ,(SELECT Convert(Varchar,getdate(),100)),'" + StartTempDate.ToShortDateString() + "','" + EndTempDate.ToShortDateString() + "','" + DropDownValuetoTable + "')";
                                             //result = "Update BehaviourDetails set StudentId='" + sess.StudentId + "',SchoolId=" + sess.SchoolId + ",ClassId=" + sess.Classid + ",IsAcceleration='" + acceleration + "',Behaviour='" + clsGeneral.convertQuotes(txtBehaviour.Text.Trim()) + "',Frequency='" + frq + "',Duration='" + due + "',PartialInterval='True',Hr24='" + format + "',YesOrNo='" + yesOrNo + "',IfPerInterval='"+perInterval+"',StartTime='" + StartTime.TimeOfDay + "',EndTime='" + EndTime.TimeOfDay + "',NumOfTimes='" + int.Parse(txtNoOfTimes.Text) + "',Period='" + int.Parse(txtPeriod.Text) + "',Interval='" + int.Parse(txtInterval.Text) + "',ActiveInd='" + stat + "',BehavDefinition='" + clsGeneral.convertQuotes(txtBehavDefinition.Text.Trim()) + "',BehavStrategy='" + clsGeneral.convertQuotes(txtBehavStrategy.Text.Trim()) + "',GoalDesc='" + clsGeneral.convertQuotes(txtGoalDesc.Text.Trim()) + "',ModifiedBy='" + sess.LoginId + "',ModifiedOn=(SELECT Convert(Varchar,getdate(),100)),StartDate='" + txtStartDate.Text + "',EndDate='" + txtEndsOn.Text + "',Condition='" + DropDownValuetoTable + "' where MeasurementId='" + Convert.ToInt32(hdnid.Value) + "'";
-                                            result = "Update BehaviourDetails set StudentId='" + sess.StudentId + "',SchoolId=" + sess.SchoolId + ",ClassId=" + sess.Classid + ",IsAcceleration='" + acceleration + "',Behaviour='" + clsGeneral.convertQuotes(txtBehaviour.Text.Trim()) + "',Frequency='" + frq + "',Duration='" + due + "',PartialInterval='True',Hr24='" + format + "',YesOrNo='" + yesOrNo + "',IfPerInterval='" + perInterval + "',StartTime='" + StartTime.TimeOfDay + "',EndTime='" + EndTime.TimeOfDay + "',NumOfTimes='" + int.Parse(txtNoOfTimes.Text) + "',Period='" + int.Parse(txtPeriod.Text) + "',Interval='" + int.Parse(txtInterval.Text) + "',ActiveInd='" + stat + "',BehavDefinition='" + clsGeneral.convertQuotes(txtBehavDefinition.Text.Trim()) + "',BehavStrategy='" + clsGeneral.convertQuotes(txtBehavStrategy.Text.Trim()) + "',GoalDesc='" + clsGeneral.convertQuotes(txtGoalDesc.Text.Trim()) + "',ModifiedBy='" + sess.LoginId + "',ModifiedOn=(SELECT Convert(Varchar,getdate(),100)),StartDate='" + txtStartDate.Text + "',EndDate='" + txtEndsOn.Text + "',Condition='" + DropDownValuetoTable + "',BehaviorIEPObjctve='" + clsGeneral.convertQuotes(txtbehIEPobjtve.Text) + "',BehaviorBasPerfLvl='" + clsGeneral.convertQuotes(txtbehBasperlvl.Text) + "' where MeasurementId='" + Convert.ToInt32(hdnid.Value) + "'";
+                                            result = "Update BehaviourDetails set StudentId='" + sess.StudentId + "',SchoolId=" + sess.SchoolId + ",ClassId=" + sess.Classid + ",IsAcceleration='" + acceleration + "',Behaviour='" + clsGeneral.convertQuotes(txtBehaviour.Text.Trim()) + "',Frequency='" + frq + "',Duration='" + due + "',Opportunities='" + opp + "',PartialInterval='True',Hr24='" + format + "',YesOrNo='" + yesOrNo + "',IfPerInterval='" + perInterval + "',StartTime='" + StartTime.TimeOfDay + "',EndTime='" + EndTime.TimeOfDay + "',NumOfTimes='" + int.Parse(txtNoOfTimes.Text) + "',Period='" + int.Parse(txtPeriod.Text) + "',Interval='" + int.Parse(txtInterval.Text) + "',ActiveInd='" + stat + "',BehavDefinition='" + clsGeneral.convertQuotes(txtBehavDefinition.Text.Trim()) + "',BehavStrategy='" + clsGeneral.convertQuotes(txtBehavStrategy.Text.Trim()) + "',GoalDesc='" + clsGeneral.convertQuotes(txtGoalDesc.Text.Trim()) + "',ModifiedBy='" + sess.LoginId + "',ModifiedOn=(SELECT Convert(Varchar,getdate(),100)),StartDate='" + txtStartDate.Text + "',EndDate='" + txtEndsOn.Text + "',Condition='" + DropDownValuetoTable + "',BehaviorIEPObjctve='" + clsGeneral.convertQuotes(txtbehIEPobjtve.Text) + "',BehaviorBasPerfLvl='" + clsGeneral.convertQuotes(txtbehBasperlvl.Text) + "' where MeasurementId='" + Convert.ToInt32(hdnid.Value) + "'";
                                             string WhereConditionWeekly = "";
                                             if (ddlRepeat.SelectedIndex == 0)
                                             {
@@ -1217,12 +1237,12 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
 
                                             if (chkPartial.Checked == false)
                                             {
-                                                result = "Update BehaviourDetails set StudentId='" + sess.StudentId + "',SchoolId=" + sess.SchoolId + ",ClassId=" + sess.Classid + ",IsAcceleration='" + acceleration + "',Behaviour='" + clsGeneral.convertQuotes(txtBehaviour.Text.Trim()) + "',BehavDefinition='" + clsGeneral.convertQuotes(txtBehavDefinition.Text.Trim()) + "',BehavStrategy='" + clsGeneral.convertQuotes(txtBehavStrategy.Text.Trim()) + "',GoalDesc='" + clsGeneral.convertQuotes(txtGoalDesc.Text.Trim()) + "',Frequency='" + frq + "',YesOrNo='" + yesOrNo + "',IfPerInterval='" + perInterval + "',Duration='" + due + "',PartialInterval='False',ActiveInd='" + stat + "',ModifiedBy='" + sess.LoginId + "',BehaviorIEPObjctve='" + clsGeneral.convertQuotes(txtbehIEPobjtve.Text) + "',BehaviorBasPerfLvl='" + clsGeneral.convertQuotes(txtbehBasperlvl.Text) + "',StartTime=null,EndTime=null,NumOfTimes=null,Period=null,Interval=null,StartDate=null,EndDate=null,Condition=null,Hr24=0,ModifiedOn=(SELECT Convert(Varchar,getdate(),100)) where MeasurementId='" + Convert.ToInt32(hdnid.Value) + "'";
+                                                result = "Update BehaviourDetails set StudentId='" + sess.StudentId + "',SchoolId=" + sess.SchoolId + ",ClassId=" + sess.Classid + ",IsAcceleration='" + acceleration + "',Behaviour='" + clsGeneral.convertQuotes(txtBehaviour.Text.Trim()) + "',BehavDefinition='" + clsGeneral.convertQuotes(txtBehavDefinition.Text.Trim()) + "',BehavStrategy='" + clsGeneral.convertQuotes(txtBehavStrategy.Text.Trim()) + "',GoalDesc='" + clsGeneral.convertQuotes(txtGoalDesc.Text.Trim()) + "',Frequency='" + frq + "',YesOrNo='" + yesOrNo + "',IfPerInterval='" + perInterval + "',Duration='" + due + "',Opportunities='" + opp + "',PartialInterval='False',ActiveInd='" + stat + "',ModifiedBy='" + sess.LoginId + "',BehaviorIEPObjctve='" + clsGeneral.convertQuotes(txtbehIEPobjtve.Text) + "',BehaviorBasPerfLvl='" + clsGeneral.convertQuotes(txtbehBasperlvl.Text) + "',StartTime=null,EndTime=null,NumOfTimes=null,Period=null,Interval=null,StartDate=null,EndDate=null,Condition=null,Hr24=0,ModifiedOn=(SELECT Convert(Varchar,getdate(),100)) where MeasurementId='" + Convert.ToInt32(hdnid.Value) + "'";
                                             }                                                                                           
                                             else
                                             {
                                             //result = "Update BehaviourDetails set StudentId='" + sess.StudentId + "',SchoolId=" + sess.SchoolId + ",ClassId=" + sess.Classid + ",IsAcceleration='" + acceleration + "',Behaviour='" + clsGeneral.convertQuotes(txtBehaviour.Text.Trim()) + "',BehavDefinition='" + clsGeneral.convertQuotes(txtBehavDefinition.Text.Trim()) + "',BehavStrategy='" + clsGeneral.convertQuotes(txtBehavStrategy.Text.Trim()) + "',GoalDesc='" + clsGeneral.convertQuotes(txtGoalDesc.Text.Trim()) + "',Frequency='" + frq + "',YesOrNo='" + yesOrNo + "',IfPerInterval='"+perInterval+"',Duration='" + due + "',PartialInterval='False',ActiveInd='" + stat + "',ModifiedBy='" + sess.LoginId + "',ModifiedOn=(SELECT Convert(Varchar,getdate(),100)) where MeasurementId='" + Convert.ToInt32(hdnid.Value) + "'";
-                                            result = "Update BehaviourDetails set StudentId='" + sess.StudentId + "',SchoolId=" + sess.SchoolId + ",ClassId=" + sess.Classid + ",IsAcceleration='" + acceleration + "',Behaviour='" + clsGeneral.convertQuotes(txtBehaviour.Text.Trim()) + "',BehavDefinition='" + clsGeneral.convertQuotes(txtBehavDefinition.Text.Trim()) + "',BehavStrategy='" + clsGeneral.convertQuotes(txtBehavStrategy.Text.Trim()) + "',GoalDesc='" + clsGeneral.convertQuotes(txtGoalDesc.Text.Trim()) + "',Frequency='" + frq + "',YesOrNo='" + yesOrNo + "',IfPerInterval='" + perInterval + "',Duration='" + due + "',PartialInterval='False',ActiveInd='" + stat + "',ModifiedBy='" + sess.LoginId + "',BehaviorIEPObjctve='" + clsGeneral.convertQuotes(txtbehIEPobjtve.Text) + "',BehaviorBasPerfLvl='" + clsGeneral.convertQuotes(txtbehBasperlvl.Text) + "',ModifiedOn=(SELECT Convert(Varchar,getdate(),100)) where MeasurementId='" + Convert.ToInt32(hdnid.Value) + "'";
+                                            result = "Update BehaviourDetails set StudentId='" + sess.StudentId + "',SchoolId=" + sess.SchoolId + ",ClassId=" + sess.Classid + ",IsAcceleration='" + acceleration + "',Behaviour='" + clsGeneral.convertQuotes(txtBehaviour.Text.Trim()) + "',BehavDefinition='" + clsGeneral.convertQuotes(txtBehavDefinition.Text.Trim()) + "',BehavStrategy='" + clsGeneral.convertQuotes(txtBehavStrategy.Text.Trim()) + "',GoalDesc='" + clsGeneral.convertQuotes(txtGoalDesc.Text.Trim()) + "',Frequency='" + frq + "',YesOrNo='" + yesOrNo + "',IfPerInterval='" + perInterval + "',Duration='" + due + "',Opportunities='" + opp + "',PartialInterval='False',ActiveInd='" + stat + "',ModifiedBy='" + sess.LoginId + "',BehaviorIEPObjctve='" + clsGeneral.convertQuotes(txtbehIEPobjtve.Text) + "',BehaviorBasPerfLvl='" + clsGeneral.convertQuotes(txtbehBasperlvl.Text) + "',ModifiedOn=(SELECT Convert(Varchar,getdate(),100)) where MeasurementId='" + Convert.ToInt32(hdnid.Value) + "'";
                                             }
 
 
@@ -1834,6 +1854,8 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
 
         lblCalc.Visible = false;
         rdoSumTotal.Visible = false;
+        lblCalcOpp.Visible = false;
+        chkOpportunities.Visible = false;
 
         // chkhr.Checked = false;
         // chkmin.Checked = false;
@@ -1860,6 +1882,8 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
         chkYesOrNo.Checked = false;
         lblCalc.Visible = false;
         rdoSumTotal.Visible = false;
+        lblCalcOpp.Visible = false;
+        chkOpportunities.Visible = false;
 
         // chkhr.Checked = false;
         // chkmin.Checked = false;
@@ -1988,6 +2012,8 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
                     ///
                     if (chkPartial.Checked == true)
                     {
+                        lblCalcOpp.Visible = false;
+                        chkOpportunities.Visible = false;
                         if (chkFrequency.Checked == true)
                         {
                             chkYesOrNo.Checked = false;                          
@@ -2014,7 +2040,12 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
                         //}
                     }
                     else
-                    {                       
+                    {
+                        if (chkYesOrNo.Checked == true && chkDuration.Checked == false && chkFrequency.Checked == false)
+                        {
+                            lblCalcOpp.Visible = true;
+                            chkOpportunities.Visible = true;                            
+                        }
                         lblCalc.Visible = false;
                         rdoSumTotal.Visible = false;
                     }                   
@@ -2344,6 +2375,8 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
     protected void chkFrequency_CheckedChanged(object sender, EventArgs e)
     {
         chkDuration.Checked = false;
+        lblCalcOpp.Visible = false;
+        chkOpportunities.Visible = false;
         // chkhr.Checked = false;
         //  chkmin.Checked = false;
         //  chksec.Checked = false;
@@ -2455,7 +2488,8 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
         //tdMsg.InnerHtml = "";
         if (chkPartial.Checked == true)
         {
-            
+            lblCalcOpp.Visible = false;
+            chkOpportunities.Visible = false;
             if (chkFrequency.Checked == true)
             {
                 chkYesOrNo.Checked = false;
@@ -2481,6 +2515,11 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
             }
             if (chkYesOrNo.Checked == true)
             {
+                if (chkFrequency.Checked != true && chkDuration.Checked != true)
+                {
+                    lblCalcOpp.Visible = true;
+                    chkOpportunities.Visible = true;
+                }
                 chkYesOrNo.Checked = true;
             }
             lblCalc.Visible = false;
@@ -2534,6 +2573,8 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
     }
     protected void chkYesOrNo_CheckedChanged(object sender, EventArgs e)
     {
+        lblCalcOpp.Visible = false;
+        chkOpportunities.Visible = false;
         if (chkPartial.Checked == true)
         {
             if (chkYesOrNo.Checked == true)
@@ -2550,15 +2591,20 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
         }
         else
         {
-           
+            if (chkYesOrNo.Checked == true && chkDuration.Checked == false && chkFrequency.Checked == false)
+            {
+                lblCalcOpp.Visible = true;
+                chkOpportunities.Visible = true;
+            }
             lblCalc.Visible = false;
             rdoSumTotal.Visible = false;
-
         }
     }
 
     protected void chkFrequency_CheckedChanged1(object sender, EventArgs e)
     {
+        lblCalcOpp.Visible = false;
+        chkOpportunities.Visible = false;
         if (chkPartial.Checked == true)
         {
             if (chkFrequency.Checked == true)
@@ -2569,7 +2615,12 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
             } 
         }
         else
-        {          
+        {
+            if (chkYesOrNo.Checked == true && chkDuration.Checked == false && chkFrequency.Checked == false)
+            {
+                lblCalcOpp.Visible = true;
+                chkOpportunities.Visible = true;    
+            }
             lblCalc.Visible = false;
             rdoSumTotal.Visible = false;
         }

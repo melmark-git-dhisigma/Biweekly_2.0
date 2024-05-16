@@ -488,7 +488,7 @@
                                         <tr>
                                             <td>Measurement&nbsp; </td>
                                             <td class="auto-style6">
-                                                <asp:CheckBox ID="chkDuration" runat="server" Text=" Duration" />
+                                                <asp:CheckBox ID="chkDuration" runat="server" Text=" Duration" AutoPostBack="true" OnCheckedChanged="chkDuration_CheckedChanged" />
                                                 <asp:CheckBox ID="chkFrequency" runat="server" Text=" Frequency" Style="margin-left: 10px" AutoPostBack="true" OnCheckedChanged="chkFrequency_CheckedChanged1" />
                                                 <asp:CheckBox ID="chkYesOrNo" runat="server" Text="Yes/No"  AutoPostBack="true" OnCheckedChanged="chkYesOrNo_CheckedChanged"/>
                                                 <%--<asp:CheckBox ID="chkPartial" runat="server" AutoPostBack="true" OnCheckedChanged="chkPartial_CheckedChanged" Text=" Interval" Style="margin-left: 10px" />--%>
@@ -509,17 +509,17 @@
                                             <td class="auto-style6"></td>
                                         </tr>
                                         <tr>
-                                            <td><asp:Label ID="lblCalc" runat="server" Text="Calculation"></asp:Label></td>
+                                            <td><asp:Label ID="lblCalc" runat="server" Text="Calculation"></asp:Label>
+                                                <asp:Label ID="lblCalcOpp" runat="server" Text="Calculation"></asp:Label>
+                                            </td>
                                             <td class="auto-style6">
                                                 <asp:RadioButtonList ID="rdoSumTotal" runat="server" RepeatDirection="Horizontal" Visible="false" >
                                                     <asp:ListItem Selected="True" Value="0">Total</asp:ListItem>
                                                     <asp:ListItem Value="1">%Interval</asp:ListItem>
                                                 </asp:RadioButtonList>
+                                                <asp:CheckBox ID="chkOpportunities" runat="server" Text=" % Opportunities" />
                                             </td>
                                         </tr>
-                                       
-
-
                                         <tr>
                                             <td>&nbsp;</td>
                                             <td class="auto-style6">
