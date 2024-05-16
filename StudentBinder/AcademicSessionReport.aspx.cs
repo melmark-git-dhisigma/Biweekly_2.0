@@ -1020,7 +1020,7 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
                         mel.Visible = true;
                         deftxt.Visible = true;
                         Session["StudName"] = StudName;
-                        ClientScript.RegisterStartupScript(GetType(), "", "exportChart();", true);
+                        ClientScript.RegisterStartupScript(GetType(), "", @"setTimeout(function() {exportChart();}, 500);", true);
                         tdMsgExport.InnerHtml = clsGeneral.sucessMsg("Export Successfully Created...");
                         hdnExport.Value = "true";
                     }
@@ -1497,7 +1497,7 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
             mel.Visible = true;
             deftxt.Visible = true;
             HighchartGraph.Visible = true;
-            string script = "loadchart('" + sDate + "', '" + eDate + "','" + sid + "','" + lid + "','" + scid + "','" + evnt + "','" + trend + "','" + ioa + "','" + cls + "','" + med + "','" + lpstatus + "','" + medno + "','" + reptype + "','" + inctype + "','"+lname+"');";
+            string script = @"setTimeout(function() {loadchart('" + sDate + "', '" + eDate + "','" + sid + "','" + lid + "','" + scid + "','" + evnt + "','" + trend + "','" + ioa + "','" + cls + "','" + med + "','" + lpstatus + "','" + medno + "','" + reptype + "','" + inctype + "','" + lname + "');}, 500);";
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ShowMessageWithParamsScript", script, true);
         
 
@@ -1992,6 +1992,11 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
     }
     protected void btnDone_Click(object sender, EventArgs e)
     {
+        if (highcheck.Checked == true)
+        {
+            string script = "showPopup();";
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "show", script, true);
+        }
         string sourcePdfPath = HttpContext.Current.Server.MapPath("~/StudentBinder/Exported/TempSession/");
         if (Directory.Exists(sourcePdfPath))
         {

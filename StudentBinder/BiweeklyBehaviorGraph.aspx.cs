@@ -595,7 +595,7 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
                 }
                 stname = stname.Replace("'", "**");
 
-                string script = "loadchart('" + sdate + "', '" + edate + "','" + sid + "','" + behid + "','" + scid + "','" + events + "','" + trend + "','" + ioa + "','" + clstype + "','" + med + "','" + gategraph + "','" + medno + "','" + reptype + "','" + inctype + "','" + stname + "');";
+                string script = @"setTimeout(function() {loadchart('" + sdate + "', '" + edate + "','" + sid + "','" + behid + "','" + scid + "','" + events + "','" + trend + "','" + ioa + "','" + clstype + "','" + med + "','" + gategraph + "','" + medno + "','" + reptype + "','" + inctype + "','" + stname + "');}, 500);";
             ScriptManager.RegisterStartupScript(this, this.GetType(), "showgraph", script, true);
             }
 
@@ -1152,7 +1152,7 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
                     }
                 }
                 Session["StudName"] = sess.StudentName;
-                ClientScript.RegisterStartupScript(GetType(), "", "exportChart();", true);
+                ClientScript.RegisterStartupScript(GetType(), "", @"setTimeout(function() {exportChart();}, 500);", true);
                 tdMsgExport.InnerHtml = clsGeneral.sucessMsg("Export Successfully Created...");
                 hdnExport.Value = "true";
                 ClientScript.RegisterStartupScript(GetType(), "", "HideWait();", true);
@@ -1626,6 +1626,11 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
     }
     protected void btnDone_Click(object sender, EventArgs e)
     {
+        if (highcheck.Checked == true)
+        {
+            string script = "showPopup();";
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "show", script, true);
+        }
         string sourcePdfPath = HttpContext.Current.Server.MapPath("~/StudentBinder/Exported/TempClinical/");
         if (Directory.Exists(sourcePdfPath))
         {

@@ -1986,7 +1986,6 @@
                  var lessnum = less.length;
                  var i = 0;
                  function exportChart() {
-                     alert("Please Wait..it takes a few Seconds ");
                      sizeOffont = '14px';
                          processNextChart();
              }

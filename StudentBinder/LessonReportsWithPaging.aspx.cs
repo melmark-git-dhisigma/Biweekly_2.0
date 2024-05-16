@@ -865,7 +865,8 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
     mel.Visible = true;
     deftxt.Visible = true;
                 Session["lid"] = lid;
-                string script = "loadchart('" + sDate + "', '" + eDate + "','" + sid + "','" + lid + "','" + scid + "','" + evnt + "','" + trend + "','" + ioa + "','" + cls + "','" + med + "','" + lpstatus + "','" + medno + "','" + reptype + "','" + inctype + "');";
+              //  string script = "loadchart('" + sDate + "', '" + eDate + "','" + sid + "','" + lid + "','" + scid + "','" + evnt + "','" + trend + "','" + ioa + "','" + cls + "','" + med + "','" + lpstatus + "','" + medno + "','" + reptype + "','" + inctype + "');";
+                string script = @"setTimeout(function() {loadchart('" + sDate + "', '" + eDate + "','" + sid + "','" + lid + "','" + scid + "','" + evnt + "','" + trend + "','" + ioa + "','" + cls + "','" + med + "','" + lpstatus + "','" + medno + "','" + reptype + "','" + inctype + "');}, 500);";
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ShowMessageWithParamsScript", script, true);
         }
     }
@@ -987,7 +988,8 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
                 mel.Visible = true;
                 deftxt.Visible = true;
                 Session["lid"] = lid;
-                string script = "loadchart('" + sDate + "', '" + eDate + "','"+sid+"','"+lid+"','"+scid+"','"+evnt+"','"+trend+"','"+ioa+"','"+cls+"','"+med+"','"+lpstatus+"','"+medno+"','"+reptype+"','"+inctype+"');";
+                //string script = "loadchart('" + sDate + "', '" + eDate + "','"+sid+"','"+lid+"','"+scid+"','"+evnt+"','"+trend+"','"+ioa+"','"+cls+"','"+med+"','"+lpstatus+"','"+medno+"','"+reptype+"','"+inctype+"');";
+                string script = @"setTimeout(function() {loadchart('" + sDate + "', '" + eDate + "','" + sid + "','" + lid + "','" + scid + "','" + evnt + "','" + trend + "','" + ioa + "','" + cls + "','" + med + "','" + lpstatus + "','" + medno + "','" + reptype + "','" + inctype + "');}, 500);";
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ShowMessageWithParamsScript", script, true);
     }
   
@@ -1608,7 +1610,8 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
                     mel.Visible = true;
                     deftxt.Visible = true;
                     //ClientScript.RegisterStartupScript(GetType(), "", "exportChart();", true);
-                    string script = "exportChart();";
+                   // string script = "exportChart();";
+                    string script = @"setTimeout(function() {exportChart();}, 500);";
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "newone", script, true);
                     tdMsgExport.InnerHtml = clsGeneral.sucessMsg("Export Successfully Created...");
                     hdnExport.Value = "true";
