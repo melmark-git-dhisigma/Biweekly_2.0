@@ -1351,7 +1351,8 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
                 response.AddHeader("Content-Disposition", "attachment;filename=\"" + outputPath + "\"");
                 byte[] data = req.DownloadData(outputPath);
                 response.BinaryWrite(data);
-                response.End();
+               // response.End();
+                HttpContext.Current.ApplicationInstance.CompleteRequest();
             }
         else{
             string FileName = Session["PdfPath"].ToString();
@@ -1365,7 +1366,8 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
             byte[] data = req.DownloadData(FileName);
             response.BinaryWrite(data);
             ClientScript.RegisterStartupScript(GetType(), "", "HideWait();", true);
-            response.End();
+           // response.End();
+            HttpContext.Current.ApplicationInstance.CompleteRequest();
         }
         }
         catch (Exception ex)
@@ -1382,9 +1384,8 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
             {
                 if (highcheck.Checked == true)
                 {
-                    string scripts = "showPopup();";
+                    string scripts = "showPopups();";
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "Showpop", scripts, true);
-                    graphPopup.Visible = false;
                 }
                 hdnType.Value = Session["hdnType"].ToString();
                 string LPStatus = "";
@@ -2088,6 +2089,35 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
             }
         }
        
+    }
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public static string getAcademicReportNext(string lplan, int studid)
+    {
+        objData = new clsData();
+        string str = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
+        SqlConnection cn = new SqlConnection(str);
+        cn.Open();
+
+        List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+        Dictionary<string, object> row;
+        String proc = "[dbo].[SessionGraphReport]";
+
+        DataTable dt = objData.ReturnSessTableNext(proc, lplan, studid);
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            row = new Dictionary<string, object>();
+            foreach (DataColumn dc in dt.Columns)
+            {
+                row.Add(dc.ColumnName, dr[dc]);
+            }
+            rows.Add(row);
+
+        }
+
+        JavaScriptSerializer json = new JavaScriptSerializer();
+        return json.Serialize(rows);
     }
    
 }

@@ -979,9 +979,8 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
         try
         {
             if (highcheck.Checked == true) {
-                string scripts = "showPopup();";
+                string scripts = "showPopups();";
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "Showpop", scripts, true);
-                graphPopup.Visible = false;
             }
             if (Convert.ToString(Session["ClinicalReport"]) != "")
             {
@@ -1291,7 +1290,8 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
                 byte[] data = req.DownloadData(outputPath);
                 response.BinaryWrite(data);
                 btnsubmit_Click(sender, e);
-                response.End();
+               // response.End();
+                HttpContext.Current.ApplicationInstance.CompleteRequest();
 
             }
             else
@@ -1307,7 +1307,8 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
             byte[] data = req.DownloadData(FileName);
             response.BinaryWrite(data);
             ClientScript.RegisterStartupScript(GetType(), "", "HideWait();", true);
-            response.End();
+           // response.End();
+            HttpContext.Current.ApplicationInstance.CompleteRequest();
         }
         }
         catch (Exception ex)
@@ -1643,5 +1644,25 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
             }
         }
 
+    }
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public static string Getbehaviourname(int bid)
+    {
+        ObjData = new clsData();
+        List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+        Dictionary<string, object> row;
+        DataTable dt = ObjData.ReturnDataTable("select Behaviour,BehavDefinition,BehavStrategy from BehaviourDetails where MeasurementId=" + bid, false);
+        foreach (DataRow dr in dt.Rows)
+        {
+            row = new Dictionary<string, object>();
+            foreach (DataColumn dc in dt.Columns)
+            {
+                row.Add(dc.ColumnName, dr[dc]);
+            }
+            rows.Add(row);
+        }
+        JavaScriptSerializer json = new JavaScriptSerializer();
+        return json.Serialize(rows);
     }
 }

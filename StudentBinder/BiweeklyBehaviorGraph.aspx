@@ -264,6 +264,15 @@
            var popup = document.getElementById('popup');
            popup.style.display = 'none';
        }
+        function showPopups() {
+            document.getElementById("hfPopUpValue").value = true;
+            $('#graphPopup').hide();
+            $('#overlay').hide();
+            var hchart = document.getElementById('<%= HighchartGraph.ClientID %>');
+            hchart.style.display = 'none';
+            var popup = document.getElementById('popup');
+            popup.style.display = 'block';
+        }
         function showPopup() {
             $('#graphPopup').hide();
             $('#overlay').hide();
@@ -789,6 +798,8 @@
                 <br />
            <div id = "medcont" runat="server"  style = "width: 935.43pt; margin: 0 auto"></div>
                  <br />
+                <asp:Label ID="stgy" runat="server" Text="" Font-Bold="true" visibility="false" style="font-family: Arial; font-size: 12px; color: #000000;"></asp:Label>
+                <br />
                 <asp:Label ID="lbgraph" runat="server" Text="" Font-Bold="true" font-size="18px"></asp:Label>
                 <span id="lbgraphSpan"></span>
             <div id = "cont" runat="server"  style = "width: 935.43pt; height:574.08pt; margin: 0 auto"></div>
@@ -797,9 +808,10 @@
 <%--                 <asp:label runat="server" text="" id="Label2"  Font-Bold="true" font-size="15px"></asp:label>--%>
                 <br />
         </center>
-            <asp:label id="deftxt" runat="server" text="" style ="font-family: Arial; font-size: 12px;color:black;margin-left:150px;"  Font-Bold="true"></asp:label>
+            <div style = "margin-left:275px;width: 1280px;"><asp:label id="deftxt" runat="server" text="" style ="font-family: Arial; font-size: 12px;color:black;margin-left:150px;"  Font-Bold="true"></asp:label></div>
+                
                 <br />
-       <asp:label id="mel" runat="server" text="" style ="font-family: Arial; font-size: 12px;color:black;margin-left:1200px;" Font-Bold="true"></asp:label>
+       <asp:label id="mel" runat="server" text="" style ="font-family: Arial; font-size: 12px;color:black;margin-left:1300px;" Font-Bold="true"></asp:label>
                 </div>
         
         </div>
@@ -919,14 +931,78 @@
                                 }
                             var span = document.getElementById('lbgraphSpan');
                             span.innerHTML = "No Data Available";
-                            $('#sname').css("display", "none");
+                                span.style.fontSize = '14px';
+                                $('#sname').css("display", "block");
+                                $('#stgy').css("display", "block");
                             $('#cont').css("display", "none");
-                            $('#behnam').css("display", "none");
-                            $('#daterang').css("display", "none");
-                            $('#mel').css("display", "none");
-                            $('#deftxt').css("display", "none");
+                                $('#behnam').css("display", "block");
+                                $('#daterang').css("display", "block");
+                                $('#mel').css("display", "block");
+                                $('#deftxt').css("display", "block");
+
+                                var inputsDates =sdate;
+                            inputsDates = inputsDates.replace(/-/g, '/');
+                            var inputeDates = edate;
+                            inputeDates = inputeDates.replace(/-/g, '/');
+
+
+                            $.ajax({
+                                type: "POST",
+                                url: "BiweeklyBehaviorGraph.aspx/Getbehaviourname",
+                                data: JSON.stringify({ bid: bid }),
+                                contentType: "application/json; charset=utf-8",
+                                async: false,
+                                dataType: "json",
+                                success: function (resp) {
+                                    var resu = JSON.parse(resp.d);
+                                    $.map(resu, function (items, index) {
+                                        var stgy = document.getElementById('stgy');
+                                        stgy.style.fontSize = '12px';
+                                        if (items['BehavDefinition'] != null) {
+                                            document.getElementById('stgy').innerHTML = 'Stgy: ' + items['BehavStrategy'];
+                                        } else {
+                                            document.getElementById('stgy').innerHTML = 'Stgy: ';
+                        }
+
+                                        document.getElementById('behnam').innerHTML = items['Behaviour'];
+                                        var bname = document.getElementById('behnam');
+                                        bname.style.fontSize = '12px';
+
+                                        var deftxt = document.getElementById('deftxt');
+                                        deftxt.style.fontSize = '12px';
+                                        if (items['BehavDefinition'] != null) {
+                                            document.getElementById('deftxt').innerHTML = 'Definition:    ' + items['BehavDefinition'];
+
+                                        }
+                        else {
+                                            document.getElementById('deftxt').innerHTML = 'Definition:    ';
+                                        }
+                                        
+                                        if (scid == 1) {
+                                            document.getElementById('mel').innerHTML = 'Melmark New England';
+                                            document.getElementById('mel').style.fontSize = '12px';
+                                        }
+                                        else {
+                                            document.getElementById('mel').innerHTML = 'Melmark Pennsylvania';
+                                            document.getElementById('mel').style.fontSize = '12px';
+                                        }
+                                    });
+
+                                },
+                                error: function (xhr, status, error) {
+
+                                    console.error("AJAX request failed:", error);
+                                }
+                            });
+                            document.getElementById('sname').innerHTML = stname;
+                            var studname = document.getElementById('sname');
+                            studname.style.fontSize = '12px';
+                            document.getElementById('daterang').innerHTML = convertDateFormat(inputsDates) + "-" + convertDateFormat(inputeDates);
+                            var drange = document.getElementById('daterang');
+                            drange.style.fontSize = '12px';
                         }
                         else {
+                            $('#stgy').css("display", "none");
                                 var hchart = document.getElementById('<%= cont.ClientID %>');
                                 if(hchart){
                                     hchart.style.display = 'block';
@@ -961,7 +1037,12 @@
                                 document.getElementById('sname').innerHTML = stname;
                                 document.getElementById('behnam').innerHTML = item['behaviour'];
                                 document.getElementById('daterang').innerHTML = convertDateFormat(inputsDate) + "-" + convertDateFormat(inputeDate);
+                                if (scid == 1) {
                                 document.getElementById('mel').innerHTML = 'Melmark New England';
+                                }
+                                else {
+                                    document.getElementById('mel').innerHTML = 'Melmark Pennsylvania';
+                                }
                                 if (item['Deftn'] != null) {
                                     document.getElementById('deftxt').innerHTML = 'Definition:    ' + item['Deftn'];
                                 }
@@ -1378,6 +1459,7 @@
                     },
                     subtitle: {
                         useHTML: true,
+                        x:50,
                         align: 'left',
                         text: subtt,
                         align: 'left',
@@ -1581,7 +1663,8 @@
                             text: ''
                         },
                         subtitle:{
-                            text:' ',
+                            text: ' ',
+                            x: 50,
                             align: 'left',
                             useHTML: true,
                             style: {
@@ -1710,7 +1793,8 @@
                                  text: ''
                              },
                              subtitle:{
-                                 text:' Medication Details',
+                                 text: ' Medication Details',
+                                 x: 50,
                                  align:'left',
                                  useHTML: true,
                                  style: {
@@ -2014,14 +2098,78 @@
                                 }
                             var span = document.getElementById('lbgraphSpan');
                             span.innerHTML = "No Data Available";
-                            $('#sname').css("display", "none");
+                            span.style.fontSize = '18px';
+                            $('#sname').css("display", "block");
+                            $('#stgy').css("display", "block");
                             $('#cont').css("display", "none");
-                            $('#behnam').css("display", "none");
-                            $('#daterang').css("display", "none");
-                            $('#mel').css("display", "none");
-                            $('#deftxt').css("display", "none");
+                            $('#behnam').css("display", "block");
+                            $('#daterang').css("display", "block");
+                            $('#mel').css("display", "block");
+                            $('#deftxt').css("display", "block");
+
+                            var inputsDates = "<%=sdate%>";
+                            inputsDates = inputsDates.replace(/-/g, '/');
+                            var inputeDates = "<%=edate%>";
+                            inputeDates = inputeDates.replace(/-/g, '/');
+
+
+                            $.ajax({
+                                type: "POST",
+                                url: "BiweeklyBehaviorGraph.aspx/Getbehaviourname",
+                                data: JSON.stringify({bid: bid}),
+                                contentType: "application/json; charset=utf-8",
+                                async: false,
+                                dataType: "json",
+                                success: function (resp) {
+                                    var resu = JSON.parse(resp.d);
+                                    $.map(resu, function (items, index) {
+                                        var stgy = document.getElementById('stgy');
+                                        stgy.style.fontSize = '16px';
+                                        if (items['BehavDefinition'] != null) {
+                                            document.getElementById('stgy').innerHTML ='Stgy: '+ items['BehavStrategy'];
+                                        } else {
+                                            document.getElementById('stgy').innerHTML = 'Stgy: ';
+                        }
+
+                                        document.getElementById('behnam').innerHTML = items['Behaviour'];
+                                        var bname = document.getElementById('behnam');
+                                        bname.style.fontSize = '16px';
+
+                                        var deftxt = document.getElementById('deftxt');
+                                        deftxt.style.fontSize = '16px';
+                                        if (items['BehavDefinition'] != null) {
+                                            document.getElementById('deftxt').innerHTML = 'Definition:    ' + items['BehavDefinition'];
+
+                                        }
+                        else {
+                                            document.getElementById('deftxt').innerHTML = 'Definition:    ';
+                                        }
+                                       
+                                        if (scid == 1) {
+                                            document.getElementById('mel').innerHTML = 'Melmark New England';
+                                        }
+                                        else {
+                                            document.getElementById('mel').innerHTML = 'Melmark Pennsylvania';
+                                        }
+                                    });
+                           
+                                },
+                                error: function (xhr, status, error) {
+                                   
+                                    console.error("AJAX request failed:", error);
+                                }
+                            });
+
+                            document.getElementById('sname').innerHTML = "<%=stname%>";
+                            var studname = document.getElementById('sname');
+                            studname.style.fontSize = '16px';
+                            document.getElementById('daterang').innerHTML = convertDateFormat(inputsDates) + "-" + convertDateFormat(inputeDates);
+                            var drange = document.getElementById('daterang');
+                            drange.style.fontSize = '16px';
                         }
                         else {
+                            $('#stgy').css("display", "none");
+                           
                                 var hchart = document.getElementById('<%= cont.ClientID %>');
                             if (hchart) {
                                 hchart.style.display = 'block';
@@ -2059,7 +2207,14 @@
                                 var bname = document.getElementById('behnam');
                                 bname.style.fontSize = '16px';
                                 document.getElementById('daterang').innerHTML = convertDateFormat(inputsDate) + "-" + convertDateFormat(inputeDate);
-                                document.getElementById('mel').innerHTML = 'Melmark New England';
+                                if (scid == 1) {
+                                    document.getElementById('mel').innerHTML = 'Melmark New England';
+                                    document.getElementById('mel').style.fontSize = '12px';
+                                }
+                                else {
+                                    document.getElementById('mel').innerHTML = 'Melmark Pennsylvania';
+                                    document.getElementById('mel').style.fontSize = '12px';
+                                }
                                 var drange = document.getElementById('daterang');
                                 drange.style.fontSize = '16px';
                                 if (item['Deftn'] != null) {
@@ -2470,6 +2625,7 @@
                     },
                     subtitle: {
                         useHTML: true,
+                        x: 50,
                         align: 'left',
                         text: subtt,
                         align: 'left',
@@ -2671,6 +2827,7 @@
                         },
                         subtitle: {
                             text: ' ',
+                            x: 50,
                             align: 'left',
                             useHTML: true,
                             style: {
@@ -2799,6 +2956,7 @@
                                 },
                                 subtitle: {
                                     text: ' Medication Details',
+                                    x: 50,
                                     align: 'left',
                                     useHTML: true,
                                     style: {

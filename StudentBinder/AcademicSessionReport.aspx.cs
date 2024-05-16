@@ -809,9 +809,10 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
             {
                 if (highcheck.Checked == true)
                 {
-                    string scripts = "showPopup();";
+                    
+                    string scripts = "showPopups();";
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "Showpop", scripts, true);
-                    graphPopup.Visible = false;
+                   
                 }
 
                 ObjData = new clsData();
@@ -1273,7 +1274,9 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
                 byte[] data = req.DownloadData(outputPath);
                 response.BinaryWrite(data);
                 btnsubmit_Click(sender, e);
-                response.End();
+                //response.End();
+                HttpContext.Current.ApplicationInstance.CompleteRequest();
+                
 
             }
             else{
@@ -1288,7 +1291,8 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
             byte[] data = req.DownloadData(FileName);
             response.BinaryWrite(data);
             ClientScript.RegisterStartupScript(GetType(), "", "HideWait();", true);
-            response.End();
+           // response.End();
+            HttpContext.Current.ApplicationInstance.CompleteRequest();
         }
         }
         catch (Exception ex)

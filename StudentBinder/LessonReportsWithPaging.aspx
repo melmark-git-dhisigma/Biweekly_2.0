@@ -306,6 +306,15 @@
             var popup = document.getElementById('popup');
             popup.style.display = 'none';
         }
+        function showPopups() {
+            document.getElementById("hfPopUpValue").value = true;
+            $('#graphPopup').hide();
+            $('#overlay').hide();
+            var hchart = document.getElementById('<%= HighchartGraph.ClientID %>');
+             hchart.style.display = 'none';
+             var popup = document.getElementById('popup');
+             popup.style.display = 'block';
+         }
          function showPopup() {
              $('#graphPopup').hide();
              $('#overlay').hide();
@@ -871,22 +880,31 @@
       <asp:UpdatePanel ID="highchartupdate" runat="server">
                                     <ContentTemplate>
          <div id="HighchartGraph" runat="server" style="background-color: white;">
-              <br /> <br />
+               <center>
+                <br />
+            <asp:label id="sname" runat="server" text="" Font-Bold="true" style="font-family: Arial; font-size: 12px; color: #000000;" visibility="false"></asp:label>
+                <br />
+            <asp:label id="lnam" runat="server" text="" Font-Bold="true" style="font-family: Arial; font-size: 12px; color: #000000;" visibility="false" ></asp:label>
+                <br />
+            <asp:label id="daterang" runat="server" text="" Font-Bold="true" style="font-family: Arial; font-size: 12px; color: #000000;" visibility="false"></asp:label>
+                </center>
          <%-- <asp:label id="treat" runat="server" text=""></asp:label>--%>
             <center>
            <asp:label runat="server" text="" id="mednodata"  Font-Bold="true" font-size="15px"></asp:label>
                 <br />
            <div id = "medcont" runat="server"  style = "width: 935.43307pt; margin: 0 auto"></div>
                 <br />
+                <asp:Label ID="trtmnt" runat="server" Text="" Font-Bold="true" visibility="false" style="font-family: Arial; font-size: 12px; color: #000000;"></asp:Label>                <br />
                 <asp:Label ID="lbgraph" runat="server" Text="" Font-Bold="true" font-size="18px"></asp:Label>
                 <span id="lbgraphSpan"></span>
                 <br />
             <div id = "cont" runat="server"  style = "width: 935.43pt; height:688.901215752pt; margin: 0 auto;background-color: white;"></div>
                 <br /><br /><br />
         </center>
-            <asp:label id="deftxt" runat="server" text="" Font-Bold="true" style ="font-family: Arial; font-size: 12px;color:black;margin-left:150px;" ></asp:label>
+             <div style = "margin-left:275px;width: 1280px;"><asp:label id="deftxt" runat="server" text="" style ="font-family: Arial; font-size: 12px;color:black;margin-left:150px;"  Font-Bold="true"></asp:label></div>
+                
                 <br />
-       <asp:label id="mel" runat="server" text="" Font-Bold="true" style ="font-family: Arial; font-size: 12px;color:black;margin-left:1200px;"></asp:label>
+       <asp:label id="mel" runat="server" text="" Font-Bold="true" style ="font-family: Arial; font-size: 12px;color:black;margin-left:1300px;"></asp:label>
                 </div>
         </div>
                                          </ContentTemplate>
@@ -976,11 +994,18 @@
                                      rangedate = convertDateFormat(inputsDate) + "-" + convertDateFormat(inputeDate)
                                      if ((medno == "false" || medno == "False")&&(med == "True" || med == "true")) {
                                          medtitle = titlename + '<br>' + titlelesson + '<br>' + titledate;
+                                         maintitle = '';
                                      }
                                      else {
                                          maintitle = titlename + '<br>' + titlelesson + '<br>' + titledate;
+                                         medtitle = '';
                                      }
+                                     if (scid == 1) {
                              document.getElementById('mel').innerHTML = 'Melmark New England';
+                                     }
+                                     else {
+                                         document.getElementById('mel').innerHTML = 'Melmark Pennsylvania';
+                                     }
                                      if (item['Deftn'] != null) {
                                          document.getElementById('deftxt').innerHTML = ' Definition:    ' + item['Deftn'];
                              }
@@ -1043,11 +1068,81 @@
                              }
                              var span = document.getElementById('lbgraphSpan');
                              span.innerHTML = "No Data Available";
-                             $('#mel').css("display", "none");
-                             $('#deftxt').css("display", "none");
+                             span.style.fontSize = '14px';
+                             $('#sname').css("display", "block");
+                             $('#trtmnt').css("display", "block");
+                             $('#cont').css("display", "none");
+                             $('#lnam').css("display", "block");
+                             $('#daterang').css("display", "block");
+                             $('#mel').css("display", "block");
+                             $('#deftxt').css("display", "block");
+
+                             var inputsDates = sdate;
+                             inputsDates = inputsDates.replace(/-/g, '/');
+                             var inputeDates = edate;
+                             inputeDates = inputeDates.replace(/-/g, '/');
+
+
+                             $.ajax({
+                                 type: "POST",
+                                 url: "LessonReportsWithPaging.aspx/getAcademicReportNext",
+                                 data: JSON.stringify({ lplan: lid, studid: sid }),
+                                 contentType: "application/json; charset=utf-8",
+                                 async: false,
+                                 dataType: "json",
+                                 success: function (resp) {
+                                     var resu = JSON.parse(resp.d);
+                                     $.map(resu, function (items, index) {
+                                         var trtmnt = document.getElementById('trtmnt');
+                                         trtmnt.style.fontSize = '12px';
+                                         if (items['Treatment'] != null) {
+                                             document.getElementById('trtmnt').innerHTML = items['Treatment'];
+                                         } else {
+                                             document.getElementById('trtmnt').innerHTML = 'Tx: ';
+                         }
+
+                                         document.getElementById('lnam').innerHTML = items['LessonPlanName'];
+                                         var bname = document.getElementById('lnam');
+                                         bname.style.fontSize = '12px';
+
+                                         var deftxt = document.getElementById('deftxt');
+                                         deftxt.style.fontSize = '12px';
+                                         if (items['Deftn'] != null) {
+                                             document.getElementById('deftxt').innerHTML = 'Definition:    ' + items['Deftn'];
+
+                                         }
+                                 else {
+                                             document.getElementById('deftxt').innerHTML = 'Definition:    ';
+                                         }
+                                         document.getElementById('sname').innerHTML = items['StudentName'];
+                                         var studname = document.getElementById('sname');
+                                         studname.style.fontSize = '12px';
+                                     });
+
+                                 },
+                                 error: function (xhr, status, error) {
+
+                                     console.error("AJAX request failed:", error);
+                                 }
+                             });
+                             document.getElementById('daterang').innerHTML = convertDateFormat(inputsDates) + "-" + convertDateFormat(inputeDates);
+                             if (scid == 1) {
+                                 document.getElementById('mel').innerHTML = 'Melmark New England';
+                                 document.getElementById('mel').style.fontSize = '12px';
+                             }
+                             else {
+                                 document.getElementById('mel').innerHTML = 'Melmark Pennsylvania';
+                                 document.getElementById('mel').style.fontSize = '12px';
+                             }
+                             var drange = document.getElementById('daterang');
+                             drange.style.fontSize = '12px';
 
                          }
-                                 else {
+                         else {
+                             $('#sname').css("display", "none");
+                             $('#trtmnt').css("display", "none");
+                             $('#lnam').css("display", "none");
+                             $('#daterang').css("display", "none");
                              var hchart = document.getElementById('<%= cont.ClientID %>');
                              if (hchart) {
                                  hchart.style.display = 'block';
@@ -1507,6 +1602,7 @@
                                          },
                                          subtitle: {
                          text: treatment,
+                                             x: 50,
                          useHTML: true,
                          style: {
                              fontWeight: 'bold',
@@ -1723,6 +1819,7 @@
                                                  },
                                                  subtitle: {
                                                      text: ' Medication Details',
+                                                     x: 50,
                                                      align: 'left',
                                   fontSize: '55px',
                                   style: {
@@ -1970,11 +2067,18 @@
                              rangedate = convertDateFormat(inputsDate) + "-" + convertDateFormat(inputeDate);
                              if (("<%=medno%>" == "false" || "<%=medno%>" == "False") && ("<%=med%>" == "true" || "<%=med%>" == "True")) {
                                  medtitle = titlename + '<br>' + titlelesson + '<br>' + titledate;
+                                 maintitle = '';
                              }
                              else {
+                                 medtitle = '';
                                  maintitle = titlename + '<br>' + titlelesson + '<br>' + titledate;
                              }
+                             if (item['SchoolId'] == 1) {
                              document.getElementById('mel').innerHTML = 'Melmark New England';
+                             }
+                             else {
+                                 document.getElementById('mel').innerHTML = 'Melmark Pennsylvania';
+                             }
                              if (item['Deftn'] != null) {
                                  document.getElementById('deftxt').innerHTML = ' Definition:    ' + item['Deftn'];
                              }
@@ -2037,11 +2141,81 @@
                              }
                              var span = document.getElementById('lbgraphSpan');
                              span.innerHTML = "No Data Available";
-                             $('#mel').css("display", "none");
-                             $('#deftxt').css("display", "none");
+                             span.style.fontSize = '18px';
+                             $('#sname').css("display", "block");
+                             $('#trtmnt').css("display", "block");
+                             $('#cont').css("display", "none");
+                             $('#lnam').css("display", "block");
+                             $('#daterang').css("display", "block");
+                             $('#mel').css("display", "block");
+                             $('#deftxt').css("display", "block");
+
+                             var inputsDates = sdate;
+                             inputsDates = inputsDates.replace(/-/g, '/');
+                             var inputeDates = edate;
+                             inputeDates = inputeDates.replace(/-/g, '/');
+
+
+                             $.ajax({
+                                 type: "POST",
+                                 url: "LessonReportsWithPaging.aspx/getAcademicReportNext",
+                                 data: JSON.stringify({ lplan: lid, studid: sid }),
+                                 contentType: "application/json; charset=utf-8",
+                                 async: false,
+                                 dataType: "json",
+                                 success: function (resp) {
+                                     var resu = JSON.parse(resp.d);
+                                     $.map(resu, function (items, index) {
+                                         var trtmnt = document.getElementById('trtmnt');
+                                         trtmnt.style.fontSize = '16px';
+                                         if (items['Treatment'] != null) {
+                                             document.getElementById('trtmnt').innerHTML = items['Treatment'];
+                                         } else {
+                                             document.getElementById('trtmnt').innerHTML = 'Tx: ';
+                         }
+
+                                         document.getElementById('lnam').innerHTML = items['LessonPlanName'];
+                                         var bname = document.getElementById('lnam');
+                                         bname.style.fontSize = '16px';
+
+                                         var deftxt = document.getElementById('deftxt');
+                                         deftxt.style.fontSize = '16px';
+                                         if (items['Deftn'] != null) {
+                                             document.getElementById('deftxt').innerHTML = 'Definition:    ' + items['Deftn'];
+
+                                         }
+                         else {
+                                             document.getElementById('deftxt').innerHTML = 'Definition:    ';
+                                         }
+                                         document.getElementById('sname').innerHTML = items['StudentName'];
+                                         var studname = document.getElementById('sname');
+                                         studname.style.fontSize = '16px';
+                                     });
+
+                                 },
+                                 error: function (xhr, status, error) {
+
+                                     console.error("AJAX request failed:", error);
+                                 }
+                             });
+                             document.getElementById('daterang').innerHTML = convertDateFormat(inputsDates) + "-" + convertDateFormat(inputeDates);
+                             if (scid == 1) {
+                                 document.getElementById('mel').innerHTML = 'Melmark New England';
+                                 document.getElementById('mel').style.fontSize = '16px';
+                             }
+                             else {
+                                 document.getElementById('mel').innerHTML = 'Melmark Pennsylvania';
+                                 document.getElementById('mel').style.fontSize = '16px';
+                             }
+                             var drange = document.getElementById('daterang');
+                             drange.style.fontSize = '16px';
 
                          }
                          else {
+                             $('#sname').css("display", "none");
+                             $('#trtmnt').css("display", "none");
+                             $('#lnam').css("display", "none");
+                             $('#daterang').css("display", "none");
                              var hchart = document.getElementById('<%= cont.ClientID %>');
                              if (hchart) {
                                  hchart.style.display = 'block';
@@ -2502,6 +2676,7 @@
                              },
                              subtitle: {
                                  text: treatment,
+                                 x: 50,
                                  useHTML: true,
                                  style: {
                                      fontWeight: 'bold',
@@ -2717,6 +2892,7 @@
                                          },
                                          subtitle: {
                                              text: ' Medication Details',
+                                             x: 50,
                                              align: 'left',
                                              fontSize: '55px',
                                              style: {
