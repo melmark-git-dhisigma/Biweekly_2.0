@@ -2045,6 +2045,13 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
                         {
                             lblCalcOpp.Visible = true;
                             chkOpportunities.Visible = true;                            
+                            try
+                            {
+                                chkOpportunities.Checked = Convert.ToBoolean(Dt.Rows[0]["Opportunities"]);
+                            }
+                            catch
+                            { 
+                            }
                         }
                         lblCalc.Visible = false;
                         rdoSumTotal.Visible = false;
