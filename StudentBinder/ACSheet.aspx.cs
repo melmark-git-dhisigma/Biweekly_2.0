@@ -2269,10 +2269,12 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             }
             else { c3 = 0; }
 
+
             string UpdateAcdsht = "UPDATE StdtAcdSheet SET NoOfTimes1='" + NumPos1 + "',NoOfTimes2='" + NumPos2 + "',NoOfTimes3='" + NumPos3 + "',NoOfTimes4='" + NumPos4 + "',NoOfTimes5='" + NumPos5 + "',NoOfTimes6='" + NumPos6 + "',NoOfTimes7='" + NumPos7 +
                                   "',Attendees='" + clsGeneral.convertQuotes(attendees) + "',IEPYear='" + clsGeneral.convertQuotes(IEPyear) + "',IEPSigDate='" + clsGeneral.convertQuotes(IEPDate) + "',Reviewed='" +clsGeneral.convertQuotes( review) + "',MetObjective='" + c1 + "',MetGoal='" + c2 + "',NotMaintaining='" + c3 +
                                   "',Progressing1='"+radBtnList1+"',Progressing2='"+radBtnList2+"',Progressing3='"+radBtnList3+"',Progressing4='"+radBtnList4+"',Progressing5='"+radBtnList5+"',Progressing6='"+radBtnList6+"',Progressing7='"+radBtnList7+"' " +
                                   "WHERE AccSheetId=" + AccShtId + "";
+
             objData.Execute(UpdateAcdsht);
 
             int personResp = 0;

@@ -1304,7 +1304,7 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
         ScriptManager.RegisterClientScriptBlock(UpdatePanel1, UpdatePanel1.GetType(), "", "loadDateJqry();", true);
         if (e.CommandName == "AddRow")
         {
-            if (gVRecChange.Rows.Count == 5) return;
+            if (gVRecChange.Rows.Count == 10) return;
             addRow();
         }
 

@@ -34,7 +34,10 @@
             document.getElementById('<%= printPrev.ClientID%>').value = '1';
         }
 
-
+        function closecheck() {
+            sessionStorage.setItem('DataCl', 'true');
+            Checkclose.value = 'true';
+        }
         function printpage1() {
             document.getElementById('<%= sessDate.ClientID%>').style.visibility = "visible";
             jQuery('#imgtest').removeAttr('src');
@@ -316,9 +319,21 @@
         function triggerSubmitAndRepeatClick() {
             $('#btnSubmitAndRepeat1').trigger("click");
         }
+        function checkclN() {
+            sessionStorage.setItem('DataCl', 'false');
+        }
 
+        function checkcl() {
+            var clch = document.getElementById('Checkclose').value;
+            if (clch == "true") {
+                sessionStorage.setItem('DataCl', 'true');
+            }
+            else {
+                sessionStorage.setItem('DataCl', 'false');
+            }
+        }
         
-		function triggerDiscardClick(qStat) {
+            function triggerDiscardClick(qStat) {
 			//$('#btnDiscard').trigger("click");
 		    
 		    if (qStat != 0) {
@@ -364,7 +379,7 @@
             parent.$('.fillLessons2').hide();
 
             parent.resetOverrideSessionfn(sheetId);
-
+			closeIframe1(frameId);
             parent.listLessonPlan();
             HideHdrDiv();
             //parent.$('#divContentPages').find('#divTF' + frameId).remove();
@@ -3147,7 +3162,8 @@
      var charCountSpan = document.getElementById('charCount');
      charCountSpan.style.display = 'none';
  }
-    </script></head>
+    </script>
+</head>
 <body>
     <form id="form1" runat="server">
         <div>
@@ -3164,6 +3180,7 @@
             <asp:HiddenField runat="server" ID="hdnRadBtnPrompt" />
             <asp:HiddenField runat="server" ID="hdnChkdRsn" />
             <asp:HiddenField runat="server" ID="hdnMissTrialRsn" />
+            <asp:HiddenField runat="server" ID="Checkclose" />
             <div class="containerMain">
                 <div class="lftPartContainer">
                     <div class="mainHeader">
@@ -3212,10 +3229,10 @@
 
 
                                             <asp:Button ID="btnSubmit1" runat="server" Text="Submit Scores" CssClass="NFButtonNew" Style="font-size: 12px; display: none;" OnClientClick="return loadBeforeSave('Submit');" OnClick=" btnSubmit_Click" />
-                                            <asp:Button ID="btnSubmit2" runat="server" Text="Submit Scores" CssClass="NFButtonNew" Style="font-size: 12px" OnClick="ConfirmSubmission" />
+                                            <asp:Button ID="btnSubmit2" runat="server" Text="Submit Scores" CssClass="NFButtonNew" Style="font-size: 12px" OnClientClick="closecheck(); " OnClick="ConfirmSubmission" />
                                             <asp:Button ID="btnSubmitAndRepeat1" runat="server" Text="Submit & Repeat" CssClass="NFButtonNew" Style="font-size: 12px; display: none;" OnClientClick="return submitMe(this);" OnClick="btnSubmitAndRepeat_Click" />
 <%--                                            <asp:Button ID="btnDiscard" runat="server" Text="Discard" CssClass="NFButtonNew" Style="font-size: 12px; display: none;" OnClientClick="return submitDisable(this);" OnClick="btnDiscard_ok_Click" />--%>
-                                            <asp:Button ID="btnSubmitAndRepeat3" runat="server" Text="Submit & Repeat" CssClass="NFButtonNew" Style="font-size: 12px" OnClick="ConfirmSubmission" />
+                                            <asp:Button ID="btnSubmitAndRepeat3" runat="server" Text="Submit & Repeat" CssClass="NFButtonNew" Style="font-size: 12px" OnClientClick="closecheck(); " OnClick="ConfirmSubmission" />
                                            <asp:Button ID="Print1" runat="server" Text="Print Blank" CssClass="NFButtonNew" Style="font-size: 12px" onclick ="btnSave2_Click" /> <!--OnClientClick="printpage1();SaveData();"-->
                                             <asp:Button ID="print2" runat="server" Text="Print" CssClass="NFButtonNew" Style="font-size: 12px" Visible="false" OnClientClick="printpage1(); printpage(); " OnClick="btnNotSave_Click"   />
 <%--                                        <asp:Button ID="btnDiscardDatasheet" Text="Discard Datasheet" runat="server" CssClass="NFButtonNew" Style="font-size: 12px" onclick="btnDiscardDatasheet_Click"/>--%>

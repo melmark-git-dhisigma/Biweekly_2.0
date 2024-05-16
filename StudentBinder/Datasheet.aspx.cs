@@ -356,6 +356,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             LblBanner.Text = bnrTxt+" – Criteria met, notify supervisor.";
             LessonBanner.Visible = true;
         }
+
+       string script = "checkcl();"; 
+       ScriptManager.RegisterStartupScript(this, this.GetType(), "CallFunction", script, true);
+            
         curesesid = this.Session.SessionID.ToString();
         preid = Convert.ToInt16(Session["Spreid"]);
         preuser = Session["Spreuser"].ToString();
@@ -1341,7 +1345,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 {
                     DataTable dtHdrs = new DataTable();
                     DataTable dtHdrsIOA = new DataTable();
-                    int[] orderarray={};
+                    int[] orderarray = {};
                     string ordervalue = "";
                     //string sqlStr = "SELECT [DSTempStepId],[StepCd]+' - '+[StepName] as StepCd,[StepName],SortOrder as StepId  FROM [dbo].[DSTempStep] " +
                     //" WHERE DSTempHdrId=" + oTemp.TemplateId + " AND  DsTempSetId=" + SetId + " AND ActiveInd='A' AND IsDynamic=0 ORDER BY [SortOrder]";
@@ -1355,8 +1359,8 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             Session["totalRandom"] = "Randomized";
                             if (ViewState["StdtSessHdr"] != null)
                             {
-                            if (Convert.ToBoolean(ViewState["IsHistory"]) != true)
-                            {
+								if (Convert.ToBoolean(ViewState["IsHistory"]) != true)
+                                {
                                     string currstatus = "select * from StdtSessionHdr where StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
                                     DataTable dtcstatus = new DataTable();
                                     dtcstatus = oData.ReturnDataTable(currstatus, false);
@@ -1401,12 +1405,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         else
                                         {
-                                sqlStr = "SELECT [DSTempStepId],[StepCd]+' - '+[StepName] as StepCd,[StepName],SortOrder as StepId  FROM [dbo].[DSTempStep] " +
-                            " WHERE DSTempHdrId=" + oTemp.TemplateId + " AND DsTempSetId=" + SetId + " AND ActiveInd='A'  AND IsDynamic=0 ORDER BY NEWID()";
-                            }
+                                    sqlStr = "SELECT [DSTempStepId],[StepCd]+' - '+[StepName] as StepCd,[StepName],SortOrder as StepId  FROM [dbo].[DSTempStep] " +
+                                            " WHERE DSTempHdrId=" + oTemp.TemplateId + " AND DsTempSetId=" + SetId + " AND ActiveInd='A'  AND IsDynamic=0 ORDER BY NEWID()";
+                                        }
                                     }
                                 }
-                            else
+                                else
                                 {
                                     string prior = "SELECT  StepOrder FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
                                     DataTable priortable = oData.ReturnDataTable(prior, false);
@@ -1415,15 +1419,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     {
                                         orderarray = ordervalue.Split(',').Select(int.Parse).ToArray();
                                     }
-                                    else
-                                    {
-                                sqlStr = "SELECT [DSTempStepId],[StepCd]+' - '+[StepName] as StepCd,[StepName],SortOrder as StepId  FROM [dbo].[DSTempStep] " +
-                                " WHERE DSTempHdrId=" + oTemp.TemplateId + " AND  DsTempSetId=" + SetId + "  AND ActiveInd='A'  AND IsDynamic=0 ORDER BY SortOrder";
-                        }
-                    }
-
+                                    sqlStr = "SELECT [DSTempStepId],[StepCd]+' - '+[StepName] as StepCd,[StepName],SortOrder as StepId  FROM [dbo].[DSTempStep] " +
+                                	" WHERE DSTempHdrId=" + oTemp.TemplateId + " AND  DsTempSetId=" + SetId + "  AND ActiveInd='A'  AND IsDynamic=0 ORDER BY SortOrder";
+                                }
                             }
-                            else {
+                            else
+                            {
 
                                 sqlStr = "SELECT [DSTempStepId],[StepCd]+' - '+[StepName] as StepCd,[StepName],SortOrder as StepId  FROM [dbo].[DSTempStep] " +
                                             " WHERE DSTempHdrId=" + oTemp.TemplateId + " AND DsTempSetId=" + SetId + " AND ActiveInd='A'  AND IsDynamic=0 ORDER BY NEWID()";
@@ -1441,8 +1442,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     if (ordervalue != "")
                     {
                         SortstepTable(dt, orderarray);
-                        
-                }
+                    }
                     else
                     {
                         string steporder = "";
@@ -3494,6 +3494,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         DateTime strEnd = DateTime.Parse(dts.Rows[0]["EndTs"].ToString());
                                         string strEndDate = strEnd.ToString("MM/dd/yyyy HH:mm:ss");
                                         tdMsg.InnerHtml = clsGeneral.failedMsg("Submit not possible: This session was started by '" + strCreatedBy + "' on '" + strStartDate + "' and completed by '" + strModifiedBy + "' on '" + strEndDate + "'. Please Close[X] this datasheet.");
+                                        Checkclose.Value = "false";
+                                        string scriptcl = "checkclN();";
+                                        ScriptManager.RegisterStartupScript(this, this.GetType(), "CallFunction", scriptcl, true);
+            
                                     }
                                 }
                             }
@@ -3576,6 +3580,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             {
                                 tdMsg.InnerHtml = clsGeneral.warningMsg("IOA Draft Submission not Possible when Teacher Session currently in Progress");
                                 valid_Ind = false;
+                                Checkclose.Value = "false";
+                                string scriptcl = "checkclN();";
+                                ScriptManager.RegisterStartupScript(this, this.GetType(), "CallFunction", scriptcl, true);
+            
                             }
                             else
                             {
@@ -4871,6 +4879,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             LblBanner.Text = bnrTxt+" – Criteria met, notify supervisor.";
             LessonBanner.Visible = true;
         }
+        Checkclose.Value = "false";
     }
     [System.Web.Services.WebMethod]
     #region comment
@@ -29971,6 +29980,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         repeatNo++;
 
         Response.Redirect("Datasheet.aspx?pageid=" + oTemp.TemplateId + "&studid=" + oSession.StudentId + "&SRMode=true&repeatNo=" + repeatNo + "&isMaint=" + isMaintStatus + "&currSetIdTemp=" + currSetIdTemp + "&exc=false");
+        Checkclose.Value = "false";
     }
     //protected void btnDiscard_ok_Click(object sender, EventArgs e)
     //{
@@ -29994,69 +30004,87 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         
 
         oData = new clsData();
-        int queryStat = 0;
-        string strqry = "select StdtSessionStepId stepId from StdtSessionStep WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
-        DataSet ds = oData.ReturnDataSet(strqry, false);
-        if (ds != null)
+        SqlConnection con = null;
+        SqlTransaction trans = null;
+        try
         {
-            int n = ds.Tables[0].Rows.Count;
-            for (int i = 0; i < n; i++)
+            int queryStat = 0;
+            string strqry = "select StdtSessionStepId stepId from StdtSessionStep WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+            DataSet ds = oData.ReturnDataSet(strqry, false);
+            con = oData.Open();
+            trans = con.BeginTransaction();
+            if (ds != null)
             {
-                string sessdel = "select * from StdtSessionDtl where StdtSessionStepId=" + Convert.ToInt32(ds.Tables[0].Rows[i]["stepId"]);
-                DataTable ses = new DataTable();
-                ses = oData.ReturnDataTable(sessdel, false);
-                if (ses != null)
+                int n = ds.Tables[0].Rows.Count;
+                for (int i = 0; i < n; i++)
                 {
-                    if (ses.Rows.Count > 0)
+                    string sessdel = "select * from StdtSessionDtl where StdtSessionStepId=" + Convert.ToInt32(ds.Tables[0].Rows[i]["stepId"]);
+                    DataTable ses = new DataTable();
+                    ses = oData.ReturnDataTable(sessdel, false);
+                    if (ses != null)
                     {
-                        foreach (DataRow dr in ses.Rows)
+                        if (ses.Rows.Count > 0)
                         {
-                            oData.Execute("Update StdtSessionDtl set StdtSessionStepId=" + (Convert.ToInt32(dr["StdtSessionStepId"]) * (-1)) + ",DSTempSetColId=" + (Convert.ToInt32(dr["DSTempSetColId"]) * (-1)) + "WHERE StdtSessionStepId=" + Convert.ToInt32(ds.Tables[0].Rows[i]["stepId"]));
+                            foreach (DataRow dr in ses.Rows)
+                            {
+                                oData.ExecuteWithTrans("Update StdtSessionDtl set StdtSessionStepId=" + (Convert.ToInt32(dr["StdtSessionStepId"]) * (-1)) + ",DSTempSetColId=" + (Convert.ToInt32(dr["DSTempSetColId"]) * (-1)) + "WHERE StdtSessionStepId=" + Convert.ToInt32(ds.Tables[0].Rows[i]["stepId"]), con, trans);
+                            }
                         }
                     }
                 }
             }
-        }
 
 
-        string sq = "select * from StdtSessColScore where StdtSessionHdrId=" + ViewState["StdtSessHdr"];
-        DataTable sco = new DataTable();
-        sco = oData.ReturnDataTable(sq, false);
-        if (sco != null)
-        {
-            if (sco.Rows.Count > 0)
+            string sq = "select * from StdtSessColScore where StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+            DataTable sco = new DataTable();
+            sco = oData.ReturnDataTable(sq, false);
+            if (sco != null)
             {
-                foreach (DataRow dr in sco.Rows)
+                if (sco.Rows.Count > 0)
                 {
-                    
-                    oData.Execute("Update   StdtSessColScore set StudentId=" + (Convert.ToInt32(dr["StudentId"]) * (-1)) + ",DSTempSetColId=" + (Convert.ToInt32(dr["DSTempSetColId"]) * (-1)) + ", DSTempSetColCalcId=" + (Convert.ToInt32(dr["DSTempSetColCalcId"]) * (-1)) + ",StdtSessionHdrId=" + (Convert.ToInt32(dr["StdtSessionHdrId"]) * (-1)) + " WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"]);              
+                    foreach (DataRow dr in sco.Rows)
+                    {
+
+                        oData.ExecuteWithTrans("Update   StdtSessColScore set StudentId=" + (Convert.ToInt32(dr["StudentId"]) * (-1)) + ",DSTempSetColId=" + (Convert.ToInt32(dr["DSTempSetColId"]) * (-1)) + ", DSTempSetColCalcId=" + (Convert.ToInt32(dr["DSTempSetColCalcId"]) * (-1)) + ",StdtSessionHdrId=" + (Convert.ToInt32(dr["StdtSessionHdrId"]) * (-1)) + " WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"], con, trans);
+                    }
                 }
             }
-        }
 
-        string disupdate = "select DSTempHdrId,LessonPlanId,StudentId from StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
-        DataTable dis = new DataTable();
-        dis = oData.ReturnDataTable(disupdate, false);
-        if (dis != null)
-        {
-            if (dis.Rows.Count > 0)
+            string disupdate = "select DSTempHdrId,LessonPlanId,StudentId from StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+            DataTable dis = new DataTable();
+            dis = oData.ReturnDataTable(disupdate, false);
+            if (dis != null)
             {
-                foreach (DataRow dr in dis.Rows)
+                if (dis.Rows.Count > 0)
                 {
+                    foreach (DataRow dr in dis.Rows)
+                    {
 
-                    queryStat= oData.Execute("Update   StdtSessionHdr set DSTempHdrId=" + (Convert.ToInt32(dr["DSTempHdrId"]) * (-1)) + ",LessonPlanId=" + (Convert.ToInt32(dr["LessonPlanId"]) * (-1)) + ",StudentId="+(Convert.ToInt32(dr["StudentId"]) * (-1)) +"WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"]);
+                        queryStat = oData.ExecuteWithTrans("Update   StdtSessionHdr set DSTempHdrId=" + (Convert.ToInt32(dr["DSTempHdrId"]) * (-1)) + ",LessonPlanId=" + (Convert.ToInt32(dr["LessonPlanId"]) * (-1)) + ",StudentId=" + (Convert.ToInt32(dr["StudentId"]) * (-1)) + "WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"], con, trans);
+                    }
                 }
             }
+            SaveBeforePrint.Visible = false;
+            dashMain.Visible = false;
+            printComplete.Visible = false;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "triggerDiscardClick('" + queryStat + "');", true);
+            oData.CommitTransation(trans, con);
+
         }
-        SaveBeforePrint.Visible = false;
-        dashMain.Visible = false;
-        printComplete.Visible = false;
-        ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "triggerDiscardClick('"+queryStat+"');", true);
-        
+        catch (Exception ex)
+        {
+            if (trans != null && trans.Connection.State == ConnectionState.Open)
+            {
+                oData.RollBackTransation(trans, con);
 
-        
+            }
+            if (con != null)
+                con.Close();
 
-      
+            ClsErrorLog clError = new ClsErrorLog();
+            clError.WriteToLog(ex.ToString());
+            throw ex;
+        }
     }
 
     protected void btn_new_continue_Click(object sender, EventArgs e)
@@ -30826,6 +30854,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     DateTime strEnd = DateTime.Parse(dts.Rows[0]["EndTs"].ToString());
                     string strEndDate = strEnd.ToString("MM/dd/yyyy HH:mm:ss");
                     tdMsg.InnerHtml = clsGeneral.failedMsg("Submit not possible: This session was started by '" + strCreatedBy + "' on '" + strStartDate + "' and completed by '" + strModifiedBy + "' on '" + strEndDate + "'. Please Close[X] this datasheet.");
+                    Checkclose.Value = "false";
+                    string scriptcl = "checkclN();";
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "CallFunction", scriptcl, true);
+            
                 }
             }
         }

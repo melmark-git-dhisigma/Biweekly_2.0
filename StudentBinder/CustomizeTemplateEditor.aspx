@@ -2928,6 +2928,12 @@
                                                             <asp:Button ID="btnMeasurementSystems" CssClass="bTnn" runat="server" Text="Update Approval Note" Style="margin-right: 20px; width: 140px" OnClick="btnCommentLessonInfo_Click" Visible="false" OnClientClick="scrollToTop();" />
                                                         </td>
                                                     </tr>
+													<tr>
+                                                        <td colspan="3" style="text-align: left;">
+                                                            <asp:Button ID="btUpdateMeasurement" runat="server" class="rbtn" Text="Update" OnClick="btUpdateMeasurement_Click" OnClientClick="scrollToTop();" ToolTip="Press to Save your work on this tab"/>
+
+                                                        </td>
+                                                    </tr>
                                                 </table>
                                             </div>
 
@@ -3220,6 +3226,12 @@
                                                     <tr>
                                                         <td style="text-align: right">
                                                             <asp:Button ID="btncommentset" CssClass="bTnn" runat="server" Text="Update Approval Note" Style="margin-right: 20px; width: 140px" OnClick="btnCommentLessonInfo_Click" Visible="false" OnClientClick="scrollToTop();" />
+                                                        </td>
+                                                    </tr>
+													<tr>
+                                                        <td colspan="3" style="text-align: left;">
+                                                            <asp:Button ID="btnUpdateset" runat="server" class="rbtn" Text="Update" OnClick="btnUpdateset_Click" OnClientClick="scrollToTop();" ToolTip="Press to Save your work on this tab"/>
+
                                                         </td>
                                                     </tr>
                                                 </table>
@@ -3597,6 +3609,12 @@
 
                                                         </td>
                                                     </tr>
+													<tr>
+                                                        <td colspan="3" style="text-align: left;">
+                                                            <asp:Button ID="btnUpdatesteps" runat="server" class="rbtn" Text="Update" OnClick="btnUpdatesteps_Click" OnClientClick="scrollToTop();" ToolTip="Press to Save your work on this tab"/>
+
+                                                        </td>
+                                                    </tr>
                                                 </table>
                                             </div>
                                             <div class="clear"></div>
@@ -3785,6 +3803,12 @@
                                                                 <asp:Button ID="btncommentPrompt" CssClass="bTnn" runat="server" Text="Update Approval Note" Style="margin-right: 20px; width: 140px" OnClick="btnCommentLessonInfo_Click" Visible="false" OnClientClick="scrollToTop();"/>
                                                             </td>
                                                         </tr>
+														<tr>
+                                                        <td colspan="3" style="text-align: left;">
+                                                            <asp:Button ID="btnupdateprompts" runat="server" class="rbtn" Text="Update" OnClick="btnupdateprompts_Click" OnClientClick="scrollToTop();" ToolTip="Press to Save your work on this tab"/>
+
+                                                        </td>
+														</tr>
                                                     </table>
                                                 </div>
 
@@ -6477,6 +6501,18 @@
             //setTimeout(function () {
             //    $(".topMessageBox").remove()
             //}, 2000);
+        }
+		if ($('#btUpdateMeasurement').is(":visible")) {
+            $("#btUpdateMeasurement").trigger("click");
+        }
+        if ($('#btnUpdateset').is(":visible")) {
+            $("#btnUpdateset").trigger("click");
+        }
+        if ($('#btnUpdatesteps').is(":visible")) {
+            $("#btnUpdatesteps").trigger("click");
+        }
+        if ($('#btnupdateprompts').is(":visible")) {
+            $("#btnupdateprompts").trigger("click");
         }
 
         if ($('#BtnUpdateLessonPlan').is(":visible")) {

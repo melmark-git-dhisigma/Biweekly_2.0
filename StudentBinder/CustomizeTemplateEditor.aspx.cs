@@ -422,7 +422,11 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             BtnRemvePrmptSelctd.Visible = false;
             BtnRemoveAllPrmpt.Visible = false;
             btUpdateLessonProc.Visible = false;
-            ddlPromptProcedure.Enabled = false;
+            btnupdateprompts.Visible = false;
+            btnUpdateset.Visible = false;
+            btnUpdatesteps.Visible = false;
+            btUpdateMeasurement.Visible = false;
+			ddlPromptProcedure.Enabled = false;
             lstCompletePrompts.Visible = true;
             lstSelectedPrompts.Visible = true;
             lstCompletePrompts.Enabled = false;
@@ -472,7 +476,11 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             BtnRemvePrmptSelctd.Visible = true;
             BtnRemoveAllPrmpt.Visible = true;
             btUpdateLessonProc.Visible = true;
-            lstCompletePrompts.Visible = true;
+            btnupdateprompts.Visible = true;
+            btnUpdatesteps.Visible = true;
+            btnUpdateset.Visible = true;
+            btUpdateMeasurement.Visible = true;
+			lstCompletePrompts.Visible = true;
             lstSelectedPrompts.Visible = true;
             lblSelctPrompt.Visible = true;
             ddlPromptProcedure.Enabled = true;
@@ -1096,17 +1104,17 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         if (totalTasktype != "1")
                         {
                             //Code added for approval popup issue [29-06-2020] dev 1 start
-                            if (Session["Selection"] == "1")
-                            {
-                                if (type == "Backward chain")
-                                {
-                                    int sOrder = Convert.ToInt32(Session["sortOrder"]);
-                                    int n = dt.Rows.Count;
-                                    int s = (sOrder - 1);
-                                    lblsteprev.Text = dt.Rows[(sOrder - 1)]["StepCd"].ToString();
-                                }
-                                Session["PrevStep"] = lblsteprev.Text;
-                            }
+                            //if (Session["Selection"] == "1")
+                            //{
+                            //    if (type == "Backward chain")
+                            //    {
+                            //        int sOrder = Convert.ToInt32(Session["sortOrder"]);
+                            //        int n = dt.Rows.Count;
+                            //        int s = (sOrder - 1);
+                            //        lblsteprev.Text = dt.Rows[(sOrder - 1)]["StepCd"].ToString();
+                            //    }
+                            //    Session["PrevStep"] = lblsteprev.Text;
+                            //}
                             //END  
                             RadioButtonListSteps.DataSource = dt;
                             RadioButtonListSteps.DataTextField = "StepCd";
@@ -1630,7 +1638,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         // strQuery = "select StepName,StepCd from dbo.DSTempStep where DSTempHdrId = " + TempId + " AND ActiveInd = 'A'";
 
         strQuery = "SELECT  DSTempParentStepId,SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames FROM DSTempParentStep"
-                       + " WHERE DSTempHdrId = " + TempId + " And ActiveInd = 'A' ORDER BY DSTempSetId,SortOrder";
+                       + " WHERE DSTempHdrId = " + TempId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + TempId + " AND ActiveInd = 'A') "
+                       + " And ActiveInd = 'A' ORDER BY DSTempSetId,SortOrder";
 
         strBinderStep = "<ul>";
         Dt = objData.ReturnDataTable(strQuery, false);
@@ -4547,7 +4556,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             headerId = Convert.ToInt32(ViewState["HeaderId"]);
         }
         try
-        {           
+        {
+			GetStepData(headerId);
             string txtCommentTypeofInstrP = txtCommentTypeofInstr.Text.Trim().Replace("'", "''");
             string UpdateAppr = "UPDATE DSTempHdr SET ApprNoteTypeInstruction='" + txtCommentTypeofInstrP + "' WHERE DSTempHdrId='" + headerId + "'";
             objData.Execute(UpdateAppr);
@@ -4555,11 +4565,19 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             if (chkDiscrete.Checked == true)
             {
                 skilltype = "Discrete";
+				dlStepDetails.Visible = false;
+                stepPanel.Style.Add("display", "None");
+                lblStepStart.Visible = false;
+                btnAddStepCriteria.Visible = false;
             }
             else
             {
                 skilltype = "Chained";
                 txtNoofTrail.Text = "";
+				dlStepDetails.Visible = true;
+                stepPanel.Style.Add("display", "Block");
+                lblStepStart.Visible = true;
+                btnAddStepCriteria.Visible = true;
             }
             try
             {
@@ -6586,7 +6604,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         List<String> CountryName_list = new List<string>();
         try
         {
-            string selQuerry = "SELECT DSTempSetId,StepCd,StepName,SetIds,SortOrder FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempParentStepId = " + stepId;
+            string selQuerry = "SELECT DSTempSetId,StepCd,StepName,SetIds,RANK() OVER(ORDER BY SortOrder) as SortOrder FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempParentStepId = " + stepId;
             DataTable dtList = objData.ReturnDataTable(selQuerry, false);
             if (dtList != null)
             {
@@ -10682,6 +10700,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         txtfreqIncrctResp.Text = "";
         chkFrequency.Checked = false;
         txtFrequency.Text = "";
+		tdMsgMeasure.InnerHtml = "";
     }
     protected void EditMeasureData(int columnId)
     {
@@ -11770,7 +11789,103 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
     }
     //--- [New Criteria] May 2020 - (End) ---//
+	protected void btUpdateMeasurement_Click(object sender, EventArgs e)
+    {
+        int headerId = 0;
+        if (ViewState["HeaderId"] != null)
+        {
+            headerId = Convert.ToInt32(ViewState["HeaderId"]);
+        }
+        try
+        {
+            string apprn = txtMeasurementSystems.Text.Trim().Replace("'", "''");
+            string UpdateAppr = "UPDATE DSTempHdr SET ApprNoteMeasurement='" + apprn + "' WHERE DSTempHdrId='" + headerId + "'";
+           int succ= objData.Execute(UpdateAppr);
+           if (succ == 1) {
+               ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AlertSuccessMsg();", true);
+           }
+        }
+        catch (Exception Ex)
+        {
+            string error = Ex.Message;
+            ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AlertFailedMsg();", true);
+            throw Ex;
+        }
+    }
+    protected void btnUpdateset_Click(object sender, EventArgs e)
+    {
+        int headerId = 0;
+        if (ViewState["HeaderId"] != null)
+        {
+            headerId = Convert.ToInt32(ViewState["HeaderId"]);
+        }
+        try
+        {
+            string apprn = txtcommentset.Text.Trim().Replace("'", "''");
+            string UpdateAppr = "UPDATE DSTempHdr SET ApprNoteSet='" + apprn + "' WHERE DSTempHdrId='" + headerId + "'";
+            int succ = objData.Execute(UpdateAppr);
+            if (succ == 1)
+            {
+                ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AlertSuccessMsg();", true);
+            }
+        }
+        catch (Exception Ex)
+        {
+            string error = Ex.Message;
+            ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AlertFailedMsg();", true);
+            throw Ex;
+        }
+    }
+    protected void btnUpdatesteps_Click(object sender, EventArgs e)
+    {
+        int headerId = 0;
+        if (ViewState["HeaderId"] != null)
+        {
+            headerId = Convert.ToInt32(ViewState["HeaderId"]);
+        }
+        try
+        {
+            string apprn = txtcommentStep.Text.Trim().Replace("'", "''");
+            string UpdateAppr = "UPDATE DSTempHdr SET ApprNoteStep='" + apprn + "' WHERE DSTempHdrId='" + headerId + "'";
+            int succ = objData.Execute(UpdateAppr);
+            if (succ == 1)
+            {
+                ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AlertSuccessMsg();", true);
+            }
+        }
+        catch (Exception Ex)
+        {
+            string error = Ex.Message;
+            ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AlertFailedMsg();", true);
+            throw Ex;
+        }
 
+    }
+    protected void btnupdateprompts_Click(object sender, EventArgs e)
+    {
+        int headerId = 0;
+        if (ViewState["HeaderId"] != null)
+        {
+            headerId = Convert.ToInt32(ViewState["HeaderId"]);
+        }
+        try
+        {
+            string apprn = txtcommentPrompt.Text.Trim().Replace("'", "''");
+            string UpdateAppr = "UPDATE DSTempHdr SET ApprNotePrompt='" + apprn + "' WHERE DSTempHdrId='" + headerId + "'";
+            int succ = objData.Execute(UpdateAppr);
+            if (succ == 1)
+            {
+                ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AlertSuccessMsg();", true);
+            }
+        }
+        catch (Exception Ex)
+        {
+            string error = Ex.Message;
+            ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AlertFailedMsg();", true);
+            throw Ex;
+        }
+    }
+    
     protected void btUpdateLessonProc_Click(object sender, EventArgs e)
     {
         this.ClientScript.RegisterOnSubmitStatement(this.GetType(), "EscapeField", "EscapeField();");
@@ -14543,6 +14658,9 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     drpTasklist_SelectedIndexChanged1(sender, e);
                     tdReadMsg.InnerHtml = clsGeneral.sucessMsg("Template Editor Successfully Approved...");
                     BtnApproval_hdn.Visible = false;
+					Hdfsavemeasure.Value = "1";
+                    DatalistVisibility(false);
+                    Hdfsavemeasure.Value = "";
                     string VerNbr = Convert.ToString(objData.FetchValue("Select VerNbr from DSTempHdr where DSTemphdrId = " + TemplateId + ""));
                     if (VerNbr != "")
                     {
@@ -18478,6 +18596,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             int apprvLessId = Convert.ToInt32(objData.FetchValue("SELECT COUNT(*) FROM DSTempHdr WHERE LessonPlanId= (SELECT LessonPlanId FROM DSTempHdr WHERE DSTempHdrId=" + tmpId + ") AND StudentId=" + sess.StudentId + " AND StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatuS' AND (LookupName='In Progress' OR LookupName='Pending Approval'))"));
             if (apprvLessId == 0)
             {
+				Hdfsavemeasure.Value = "";
                 BtnCopyTemplate_Click(sender, e);
                 //string Qury = "UPDATE DSTempHdr SET LessonSDate='" + lessonSDate.Text + "' and LessonEDate='" + lessonEDate.Text + "' and Reason_New='" + clsGeneral.convertQuotes(txtApLPReason.Text.Trim()) + "' WHERE DSTempHdrId=" + tmpId + "";  //---Commmented for Fixing Errorlog production log 2020
                 string Qury = "UPDATE DSTempHdr SET LessonSDate='" + lessonSDate.Text + "' ,LessonEDate='" + lessonEDate.Text + "' ,Reason_New='" + clsGeneral.convertQuotes(txtApLPReason.Text.Trim()) + "' WHERE DSTempHdrId=" + tmpId + ""; //Modifed query for above query prduction log
@@ -18772,13 +18891,35 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
     }
     protected void drp_teachingFormat_SelectedIndexChanged(object sender, EventArgs e)
     {
+		SqlTransaction Transs = null;
+        SqlConnection con = objData.Open();
+        try
+        {
         int TemplateId = Convert.ToInt32(ViewState["HeaderId"]);
 		int parentLookupId = Convert.ToInt16(drp_teachingFormat.SelectedValue);
 		drpTeachingProc.Items.Clear();
 		objData = new clsData();
 		objData.ReturnDropDown("Select LookupId as Id , LookupName as Name from dbo.LookUp where ParentLookupId=" + parentLookupId, drpTeachingProc);
-        objData.Execute("UPDATE DSTempStep SET ActiveInd = 'D' WHERE IsDynamic = 0 AND DSTempHdrId = " + TemplateId);
+			string selitem = drp_teachingFormat.SelectedItem.ToString();
+            if (selitem != "Task Analysis" && selitem != "Other")
+            {
+                clsData.blnTrans = true;
+                Transs = con.BeginTransaction();
+
+                objData.ExecuteWithTrans("UPDATE DSTempStep SET ActiveInd = 'D' WHERE IsDynamic = 0 AND DSTempHdrId = " + TemplateId,con,Transs);
+
+                objData.ExecuteWithTrans("UPDATE DSTempParentStep SET ActiveInd = 'D'  WHERE DSTempHdrId = " + TemplateId, con, Transs);
+                objData.CommitTransation(Transs, con);
+            }
 		hideAllOptions();
+    }
+	catch (Exception Ex)
+        {
+            objData.RollBackTransation(Transs, con);
+            con.Close();
+            throw Ex;
+        }
+        
     }
     protected void LoadEmailforSorting()
     {
@@ -18912,11 +19053,12 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 else
                 {
                     strQuery = "Insert into MailedLP (DstempHdrId,SchoolId,LessonId,LessonName,MailStatus,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn) " +
-                                "Values(" + headerid + "," + sess.SchoolId + "," + LessonPlanId + ",'" + LessonPlanName + "','1'," + sess.LoginId + ",getdate()," + sess.LoginId + ",getdate()) ";
+                                "Values(" + headerid + "," + sess.SchoolId + "," + LessonPlanId + ",'" + clsGeneral.convertQuotes(LessonPlanName) + "','1'," + sess.LoginId + ",getdate()," + sess.LoginId + ",getdate()) ";
                     int promptId = objData.Execute(strQuery);
                 }
                 emailFullReset(sender, e);
                 LoadData();
+				LoadTemplateData(headerid);
                 ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "alertMessage('Mail Send Successfully','green');", true);
                 if (buttonId.Equals("BtnEmailApproveSend"))
                 {
@@ -20236,7 +20378,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
                 DataTable newTable = new DataTable();
 
-                dv.RowFilter = "UserName Like '%" + SrchCondtn + "%'";
+                dv.RowFilter = "UserName Like '%" + SrchCondtn.Replace("'", "''") + "%'";
                 newTable = dv.ToTable();                
 
                 dlEmailforSorting_Copy.DataSource = newTable;
