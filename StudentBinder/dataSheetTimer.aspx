@@ -3172,13 +3172,19 @@
             var m = document.getElementById('txtTimeMin' + behaveId).value;
             var s = document.getElementById('txtTimeSec' + behaveId).value;
             var amOrPM = document.getElementById('drpTimeAmPm' + behaveId).value;
-            resetOther(thisElem);   
+            //resetOther(thisElem);   
             $('#txtTimeHr' + behaveId).val(h);
             $('#txtTimeMin' + behaveId).val(m);
             $('#txtTimeSec' + behaveId).val(s);
             $('#drpTimeAmPm' + behaveId).val(amOrPM);
         }
         function resetOther(thisElem) {
+
+        }
+        function resetOther1(thisElem) {
+            //resetOther calls are commented
+
+
             //var text=$(thisElem).parent().find('.txtFreq').val('');
             //var drp = $(thisElem).parent().parent().find('.drpcls');
             //drp.selectedIndex = 0;
@@ -3217,7 +3223,7 @@
 
                     saveOther(inputBtn, thisElem);
 
-                    resetOther(thisElem);
+                    //resetOther(thisElem);
                 }
                 else {
                     if (triggerEvntStatus == "false") {
@@ -3232,7 +3238,7 @@
             else {
                 saveOther(inputBtn, thisElem);
 
-                resetOther(thisElem);
+                //resetOther(thisElem);
             }
             if ($('#chkIOA_' + inputBtn).prop('checked'))
                 $('#chkIOA_' + inputBtn).prop('checked', false);
@@ -3251,7 +3257,7 @@
                     saveOther(inputBtn, thisElem);
                     saveYesOrNo(inputBtn, thisElem);
 
-                    resetOther(thisElem);
+                    //resetOther(thisElem);
                 }
                 else {
                     //var alertBox = "<div class='alertBox' style='height:20px; border:1px solid black; text-align:center; font-weight:bold; padding:3px; position: relative; background-color:red; top:10px; '>Time not selected</div>";
@@ -3266,7 +3272,7 @@
                 saveOther(inputBtn, thisElem);
                 saveYesOrNo(inputBtn, thisElem);
 
-                resetOther(thisElem);
+                //resetOther(thisElem);
             }
         }
 
@@ -3366,6 +3372,7 @@
                                 if ($('#' + selToe).hasClass('bselect')) {
                                     $('#' + selToe).removeClass('bselect');
                                 }
+                                        //resetOther(thisElem);
                                 $('#' + selToe).addClass('redBox');
                                 }
                             },
@@ -3387,7 +3394,7 @@
                         });
                     }
                     }
-            resetOther(thisElem);
+            //resetOther(thisElem);
             if ($('#chkIOA_' + inputBtn).prop('checked'))
                 $('#chkIOA_' + inputBtn).prop('checked', false);
             var display = $('#txtTOE' + inputBtn).css('display');
@@ -3496,6 +3503,7 @@
                                 if ($('#' + selToe).hasClass('bselect')) {
                                     $('#' + selToe).removeClass('bselect');
                                 }
+                                        //resetOther(thisElem);
                                 $('#' + selToe).addClass('redBox');
                                 }
                             },
@@ -3517,7 +3525,7 @@
                 }
                 }
 
-            resetOther(thisElem);
+                //resetOther(thisElem);
             if ($('#chkIOA_' + inputBtn).prop('checked'))
                 $('#chkIOA_' + inputBtn).prop('checked', false);
             var display = $('#txtTOE' + inputBtn).css('display');
@@ -3621,6 +3629,7 @@
                                 }
                                 $('#' + selToe).addClass('redBox');
                                 }
+                                //resetOther(thisElem);
                             },
                             error: function (request, status, error) {
                                 alert("Error");
@@ -3640,7 +3649,7 @@
                 }
                 }
 
-                resetOther(thisElem);
+                //resetOther(thisElem);
                 if ($('#chkIOA_' + inputBtn).prop('checked'))
                     $('#chkIOA_' + inputBtn).prop('checked', false);
                 var display = $('#txtTOE' + inputBtn).css('display');
@@ -3657,7 +3666,7 @@
                     saveDuration2(inputBtn, thisElem);
                     //saveOther(inputBtn, thisElem);
 
-                    resetOther(thisElem);
+                    //resetOther(thisElem);
                  
                 }
                 else {
@@ -3676,7 +3685,7 @@
                 saveDuration2(inputBtn, thisElem);
                 //saveOther(inputBtn, thisElem);
 
-                resetOther(thisElem);
+                //resetOther(thisElem);
             }
             //var parentBox = $(thisElem).parents('.tabContent');
             //var clockBtnStatus = $(parentBox).find('#btnStartStopTimer').val();
@@ -3712,7 +3721,7 @@
                     saveDuration2(inputBtn, thisElem);
                     saveOther(inputBtn, thisElem);
                     saveYesOrNo(inputBtn, thisElem);
-                    resetOther(thisElem);
+                    //resetOther(thisElem);
                     //alert($(thisElem).parents('#dvTimeId_' + thisElem).find('.bselect').length);
                     $(thisElem).parents('.behavCont').find('.stpSeconds').text('0');
                 }
@@ -3729,7 +3738,7 @@
                 saveDuration2(inputBtn, thisElem);
                 saveOther(inputBtn, thisElem);
                 saveYesOrNo(inputBtn, thisElem);
-                resetOther(thisElem);
+                //resetOther(thisElem);
                 //alert($(thisElem).parents('#dvTimeId_' + thisElem).find('.bselect').length);
                 $(thisElem).parents('.behavCont').find('.stpSeconds').text('0');
             }
@@ -3742,7 +3751,7 @@
                     saveDuration2(inputBtn, thisElem);
                     saveYesOrNoWithDur(inputBtn, thisElem); //For fix select interval issue with duration and YN with interval
 
-                    resetOther(thisElem);
+                    //resetOther(thisElem);
                     $(thisElem).parents('.behavCont').find('.stpSeconds').text('0');
                 }
                 else {
@@ -3760,7 +3769,7 @@
                 saveDuration2(inputBtn, thisElem);
                 saveYesOrNo(inputBtn, thisElem);
 
-                resetOther(thisElem);
+                //resetOther(thisElem);
                 $(thisElem).parents('.behavCont').find('.stpSeconds').text('0');
             }            
         }
