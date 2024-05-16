@@ -30709,7 +30709,8 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             else
                 Dt.Rows[0]["Status"] = "Current";
         }
-
+        if (sortNum != "")
+        {
         strQuery = "select SortOrder,SetCd as SETName from DSTempSet where DSTempHdrId=" + templateId + " and sortorder<" + Convert.ToInt32(sortNum) + "";
         DataTable dtOtherSetBelow = oData.ReturnDataTable(strQuery, false);
         if (dtOtherSetBelow != null)
@@ -30765,6 +30766,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         Dt.Columns[0].ColumnName = "SET";
         grdSetDetails.DataSource = Dt;
         grdSetDetails.DataBind();
+    }
+     else
+        {
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "scriptnoset", "alert('This lesson does not have any valid sets attached, please modify the lesson to assign sets...');", true);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "triggerDiscardClick('" + 0 + "');", true);
+        }
     }
     private string checkversion(string version)
     {
