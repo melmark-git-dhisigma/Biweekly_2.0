@@ -1104,17 +1104,17 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         if (totalTasktype != "1")
                         {
                             //Code added for approval popup issue [29-06-2020] dev 1 start
-                            if (Session["Selection"] == "1")
-                            {
-                                if (type == "Backward chain")
-                                {
-                                    int sOrder = Convert.ToInt32(Session["sortOrder"]);
-                                    int n = dt.Rows.Count;
-                                    int s = (sOrder - 1);
-                                    lblsteprev.Text = dt.Rows[(sOrder - 1)]["StepCd"].ToString();
-                                }
-                                Session["PrevStep"] = lblsteprev.Text;
-                            }
+                            //if (Session["Selection"] == "1")
+                            //{
+                            //    if (type == "Backward chain")
+                            //    {
+                            //        int sOrder = Convert.ToInt32(Session["sortOrder"]);
+                            //        int n = dt.Rows.Count;
+                            //        int s = (sOrder - 1);
+                            //        lblsteprev.Text = dt.Rows[(sOrder - 1)]["StepCd"].ToString();
+                            //    }
+                            //    Session["PrevStep"] = lblsteprev.Text;
+                            //}
                             //END  
                             RadioButtonListSteps.DataSource = dt;
                             RadioButtonListSteps.DataTextField = "StepCd";
@@ -10700,6 +10700,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         txtfreqIncrctResp.Text = "";
         chkFrequency.Checked = false;
         txtFrequency.Text = "";
+		tdMsgMeasure.InnerHtml = "";
     }
     protected void EditMeasureData(int columnId)
     {
@@ -14657,6 +14658,9 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     drpTasklist_SelectedIndexChanged1(sender, e);
                     tdReadMsg.InnerHtml = clsGeneral.sucessMsg("Template Editor Successfully Approved...");
                     BtnApproval_hdn.Visible = false;
+					Hdfsavemeasure.Value = "1";
+                    DatalistVisibility(false);
+                    Hdfsavemeasure.Value = "";
                     string VerNbr = Convert.ToString(objData.FetchValue("Select VerNbr from DSTempHdr where DSTemphdrId = " + TemplateId + ""));
                     if (VerNbr != "")
                     {
@@ -18592,6 +18596,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             int apprvLessId = Convert.ToInt32(objData.FetchValue("SELECT COUNT(*) FROM DSTempHdr WHERE LessonPlanId= (SELECT LessonPlanId FROM DSTempHdr WHERE DSTempHdrId=" + tmpId + ") AND StudentId=" + sess.StudentId + " AND StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatuS' AND (LookupName='In Progress' OR LookupName='Pending Approval'))"));
             if (apprvLessId == 0)
             {
+				Hdfsavemeasure.Value = "";
                 BtnCopyTemplate_Click(sender, e);
                 //string Qury = "UPDATE DSTempHdr SET LessonSDate='" + lessonSDate.Text + "' and LessonEDate='" + lessonEDate.Text + "' and Reason_New='" + clsGeneral.convertQuotes(txtApLPReason.Text.Trim()) + "' WHERE DSTempHdrId=" + tmpId + "";  //---Commmented for Fixing Errorlog production log 2020
                 string Qury = "UPDATE DSTempHdr SET LessonSDate='" + lessonSDate.Text + "' ,LessonEDate='" + lessonEDate.Text + "' ,Reason_New='" + clsGeneral.convertQuotes(txtApLPReason.Text.Trim()) + "' WHERE DSTempHdrId=" + tmpId + ""; //Modifed query for above query prduction log
