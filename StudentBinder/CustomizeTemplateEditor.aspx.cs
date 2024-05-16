@@ -422,7 +422,11 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             BtnRemvePrmptSelctd.Visible = false;
             BtnRemoveAllPrmpt.Visible = false;
             btUpdateLessonProc.Visible = false;
-            ddlPromptProcedure.Enabled = false;
+            btnupdateprompts.Visible = false;
+            btnUpdateset.Visible = false;
+            btnUpdatesteps.Visible = false;
+            btUpdateMeasurement.Visible = false;
+			ddlPromptProcedure.Enabled = false;
             lstCompletePrompts.Visible = true;
             lstSelectedPrompts.Visible = true;
             lstCompletePrompts.Enabled = false;
@@ -472,7 +476,11 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             BtnRemvePrmptSelctd.Visible = true;
             BtnRemoveAllPrmpt.Visible = true;
             btUpdateLessonProc.Visible = true;
-            lstCompletePrompts.Visible = true;
+            btnupdateprompts.Visible = true;
+            btnUpdatesteps.Visible = true;
+            btnUpdateset.Visible = true;
+            btUpdateMeasurement.Visible = true;
+			lstCompletePrompts.Visible = true;
             lstSelectedPrompts.Visible = true;
             lblSelctPrompt.Visible = true;
             ddlPromptProcedure.Enabled = true;
@@ -11780,7 +11788,103 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
     }
     //--- [New Criteria] May 2020 - (End) ---//
+	protected void btUpdateMeasurement_Click(object sender, EventArgs e)
+    {
+        int headerId = 0;
+        if (ViewState["HeaderId"] != null)
+        {
+            headerId = Convert.ToInt32(ViewState["HeaderId"]);
+        }
+        try
+        {
+            string apprn = txtMeasurementSystems.Text.Trim().Replace("'", "''");
+            string UpdateAppr = "UPDATE DSTempHdr SET ApprNoteMeasurement='" + apprn + "' WHERE DSTempHdrId='" + headerId + "'";
+           int succ= objData.Execute(UpdateAppr);
+           if (succ == 1) {
+               ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AlertSuccessMsg();", true);
+           }
+        }
+        catch (Exception Ex)
+        {
+            string error = Ex.Message;
+            ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AlertFailedMsg();", true);
+            throw Ex;
+        }
+    }
+    protected void btnUpdateset_Click(object sender, EventArgs e)
+    {
+        int headerId = 0;
+        if (ViewState["HeaderId"] != null)
+        {
+            headerId = Convert.ToInt32(ViewState["HeaderId"]);
+        }
+        try
+        {
+            string apprn = txtcommentset.Text.Trim().Replace("'", "''");
+            string UpdateAppr = "UPDATE DSTempHdr SET ApprNoteSet='" + apprn + "' WHERE DSTempHdrId='" + headerId + "'";
+            int succ = objData.Execute(UpdateAppr);
+            if (succ == 1)
+            {
+                ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AlertSuccessMsg();", true);
+            }
+        }
+        catch (Exception Ex)
+        {
+            string error = Ex.Message;
+            ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AlertFailedMsg();", true);
+            throw Ex;
+        }
+    }
+    protected void btnUpdatesteps_Click(object sender, EventArgs e)
+    {
+        int headerId = 0;
+        if (ViewState["HeaderId"] != null)
+        {
+            headerId = Convert.ToInt32(ViewState["HeaderId"]);
+        }
+        try
+        {
+            string apprn = txtcommentStep.Text.Trim().Replace("'", "''");
+            string UpdateAppr = "UPDATE DSTempHdr SET ApprNoteStep='" + apprn + "' WHERE DSTempHdrId='" + headerId + "'";
+            int succ = objData.Execute(UpdateAppr);
+            if (succ == 1)
+            {
+                ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AlertSuccessMsg();", true);
+            }
+        }
+        catch (Exception Ex)
+        {
+            string error = Ex.Message;
+            ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AlertFailedMsg();", true);
+            throw Ex;
+        }
 
+    }
+    protected void btnupdateprompts_Click(object sender, EventArgs e)
+    {
+        int headerId = 0;
+        if (ViewState["HeaderId"] != null)
+        {
+            headerId = Convert.ToInt32(ViewState["HeaderId"]);
+        }
+        try
+        {
+            string apprn = txtcommentPrompt.Text.Trim().Replace("'", "''");
+            string UpdateAppr = "UPDATE DSTempHdr SET ApprNotePrompt='" + apprn + "' WHERE DSTempHdrId='" + headerId + "'";
+            int succ = objData.Execute(UpdateAppr);
+            if (succ == 1)
+            {
+                ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AlertSuccessMsg();", true);
+            }
+        }
+        catch (Exception Ex)
+        {
+            string error = Ex.Message;
+            ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AlertFailedMsg();", true);
+            throw Ex;
+        }
+    }
+    
     protected void btUpdateLessonProc_Click(object sender, EventArgs e)
     {
         this.ClientScript.RegisterOnSubmitStatement(this.GetType(), "EscapeField", "EscapeField();");
