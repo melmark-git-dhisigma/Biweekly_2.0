@@ -18917,6 +18917,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 }
                 emailFullReset(sender, e);
                 LoadData();
+				LoadTemplateData(headerid);
                 ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "alertMessage('Mail Send Successfully','green');", true);
                 if (buttonId.Equals("BtnEmailApproveSend"))
                 {
