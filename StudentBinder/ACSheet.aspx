@@ -42,6 +42,31 @@
         el.parentNode.style.color = el.checked ? "red" : "#808080"
         el.parentNode.style.fontWeight = el.checked ? "bold" : "normal";
     }
+
+    function changeColorRadioBtnList(radioButtonList) {
+        var selectedValue = radioButtonList.querySelector("input:checked").value;
+        var listItems = radioButtonList.getElementsByTagName("label");
+        switch (selectedValue) {
+            case "Yes":
+                listItems[0].parentNode.style.color = "lightgreen";
+                listItems[1].parentNode.style.color = "";
+                listItems[2].parentNode.style.color = "";
+                break;
+            case "No":
+                listItems[0].parentNode.style.color = "";
+                listItems[1].parentNode.style.color = "red";
+                listItems[2].parentNode.style.color = "";
+
+                break;
+            case "No Change":
+                listItems[0].parentNode.style.color = "";
+                listItems[1].parentNode.style.color = "";
+                listItems[2].parentNode.style.color = "yellow";
+                break;
+            default:
+                break;
+        }
+    }
     function handleCheckboxChange(checkbox) {
         console.log("Checkbox ID: " + checkbox.id);
         var labelId = checkbox.id.replace("Checkbox", "c");
@@ -437,7 +462,10 @@
 
 
                     <div class="righMainContainer large" id="MainDiv" runat="server" visible="true">
-
+                            <tr>
+                                <td id="tdMsg" runat="server" colspan="2">
+                                </td>
+                            </tr>
                         
                         <tr>
                                 <td class="auto-style4" rowspan="2">
@@ -461,26 +489,78 @@
                                     <asp:TextBox ID="AttendeesText" runat="server" Height="57px" TextMode="MultiLine" Width="502px"></asp:TextBox>
                                 </td>
                                 <td id="tdMsg2" runat="server" class="auto-style3">
-                                    <asp:Label ID="IepyearLabel" runat="server" Text="IEP Year"></asp:Label>
+                                    <asp:Label ID="IepyearLabel" runat="server" Text="IEP/ISP Year"></asp:Label>
                                    &nbsp;:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;<asp:TextBox ID="Iepyeartxt" runat="server" Height="30px"></asp:TextBox>
                                     <br />
                                     <br />
-                                    <asp:Label ID="Ieplbl" runat="server" Text="IEP Signature Date"></asp:Label>
+                                    <asp:Label ID="Ieplbl" runat="server" Text="IEP/ISP Signature Date"></asp:Label>
                                     &nbsp;:&nbsp;
                                     <asp:TextBox ID="Ieptxt" runat="server" Height="30px"></asp:TextBox>
                                     </td>
                             </tr>
                             
-                            
-                            
-                            
+                            </table>
+                        <asp:UpdatePanel ID="UpdatePanelAgendaItem" runat="server">
+                            <ContentTemplate>
+
+                                                    <asp:GridView ID="gvAgendaItem" runat="server" Visible ="false"  AutoGenerateColumns="False" OnRowCommand="gvAgendaItem_RowCommand" 
+                                                         BackColor="White" BorderColor="#CCCCCC" BorderStyle="None" BorderWidth="1px" CellPadding="3" GridLines="None" >
+    <Columns>
+        <asp:TemplateField HeaderText="Agenda Item Id" Visible ="false">
+    <ItemTemplate>
+        <asp:Label ID="LblAgendaItemId" runat="server" Text='<%# Eval("AgendaItemId") %>'></asp:Label>
+    </ItemTemplate>
+</asp:TemplateField>
+        <asp:TemplateField HeaderText="Agenda Item">
+            <ItemTemplate>
+                <asp:TextBox ID="txtAgendaItem" runat="server" Text='<%# Eval("AgendaItem") %>'></asp:TextBox>
+            </ItemTemplate>
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="Staff Initials">
+    <ItemTemplate>
+        <asp:TextBox ID="txtStaffInitials" runat="server" Text='<%# Eval("StaffInitials") %>'></asp:TextBox>
+    </ItemTemplate>
+</asp:TemplateField>
+        <asp:TemplateField HeaderText="Date Added">
+    <ItemTemplate>
+        <asp:TextBox ID="txtDateAdded" runat="server" Text='<%# Eval("DateAdded") %>'></asp:TextBox>
+    </ItemTemplate>
+</asp:TemplateField>
+                <asp:TemplateField HeaderText="Discussed">
+    <ItemTemplate>
+        <asp:RadioButtonList ID="RBLDoneCarry" class="radBtnClass" runat="server" AutoPostBack="true" RepeatDirection="Horizontal" >
+            <asp:ListItem Text="Done" Value="Done" />
+            <asp:ListItem Text="Carry-over" Value="Carryover" />
+            </asp:RadioButtonList>
+    </ItemTemplate>
+</asp:TemplateField>
+        <asp:TemplateField>
+                        <ItemTemplate>
+                            <asp:ImageButton ID="btnDelRowAgendaItem" runat="server" CommandName="deleteRow" CommandArgument='<%# Eval("AgendaItemId") %>' CssClass="btn btn-blue" ImageUrl="~/Administration/images/trash.png" OnClientClick="return confirm('Are you sure you want to delete?');" Text="X" />
+                        </ItemTemplate>
+                    </asp:TemplateField>
+                    <asp:TemplateField>
+                        <ItemTemplate>
+                            <asp:ImageButton ID="btnAddRowAgendaItem" runat="server" CommandName="AddRow" CssClass="btn btn-blue" ImageUrl="~/Administration/images/plusNew.PNG" />
+                        </ItemTemplate>
+                    </asp:TemplateField>
+    </Columns>
+                                                        <FooterStyle BackColor="White" ForeColor="#000066" />
+                <HeaderStyle BackColor="#006699" Font-Bold="True" ForeColor="White" />
+                <PagerStyle BackColor="White" ForeColor="#000066" HorizontalAlign="Left" />
+                <RowStyle ForeColor="#000066" />
+                <SelectedRowStyle BackColor="#669999" Font-Bold="True" ForeColor="White" />
+                <SortedAscendingCellStyle BackColor="#F1F1F1" />
+                <SortedAscendingHeaderStyle BackColor="#007DBB" />
+                <SortedDescendingCellStyle BackColor="#CAC9C9" />
+                <SortedDescendingHeaderStyle BackColor="#00547E" />
+</asp:GridView>
+                                </ContentTemplate>
+                            </asp:UpdatePanel>
+                            <table style="width: 100%">
                                 <tr>
                             </tr>
-                                <tr>
-                                <td id="tdMsg" runat="server" colspan="2">                               
-                                    
-                                </td>
-                            </tr>
+                                
                             <tr>
                                 <td colspan="2">
 
@@ -528,8 +608,6 @@
                                                                                         </tr>
                                                                                         <tr>
                                                                                             <td style="width:90px" class="tdText bor">Benchmarks/ Objectives:</td>
-                                                                                            <asp:UpdatePanel id="checkupdate1" runat="server">
-                                                                                            <ContentTemplate>
                                                                                             <td id="td1" runat="server" colspan="2">
                                                                                                 <label id="ch4" runat="server" style="color: #808080; ">
                                                                                                  <input type="Checkbox" runat="server" name="termsChkbx4" id="Checkbox4"  onclick="updateColor(this)"/>
@@ -546,8 +624,6 @@
                                                                                                  <span>Not Maintaining</span>
                                                                                                  </label>                                                                                
                                                                                                     </td>
-                                                                                            </ContentTemplate>
-                                                                                         </asp:UpdatePanel>
                                                                                         </tr>
                                                                                         </table>
                                                                                         <table style="width: 100%;">
@@ -584,6 +660,59 @@
                                                                                                             <asp:Label ID="lblPeriod7" runat="server"></asp:Label>
                                                                                                         </td>
                                                                                                     </tr>
+                                                                                                    <tr>
+                                                                                                            <%--<br />--%>
+                                                                                                            <td style="background:#03507d; color:#fff;">Progressing :</td>
+                                                                                                            <td style="background:#03507d; color:#fff;">
+                                                                                                                <asp:RadioButtonList ID="RadioButtonList1" class="radBtnClass" runat="server" onchange="changeColorRadioBtnList(this)">
+                                                                                                                    <asp:ListItem Text="Yes" Value="Yes" />
+                                                                                                                    <asp:ListItem Text="No" Value="No" />
+                                                                                                                    <asp:ListItem Text="No Change" Value="No Change" />
+                                                                                                                </asp:RadioButtonList>
+                                                                                                            </td>
+                                                                                                            <td style="background:#03507d; color:#fff;">
+                                                                                                                 <asp:RadioButtonList ID="RadioButtonList2" class="radBtnClass" runat="server" onchange="changeColorRadioBtnList(this)">
+                                                                                                                    <asp:ListItem Text="Yes" Value="Yes" />
+                                                                                                                    <asp:ListItem Text="No" Value="No" />
+                                                                                                                    <asp:ListItem Text="No Change" Value="No Change" />
+                                                                                                                </asp:RadioButtonList>
+                                                                                                            </td>
+                                                                                                            <td style="background:#03507d; color:#fff;">
+                                                                                                                <asp:RadioButtonList ID="RadioButtonList3" class="radBtnClass" runat="server" onchange="changeColorRadioBtnList(this)">
+                                                                                                                    <asp:ListItem Text="Yes" Value="Yes" />
+                                                                                                                    <asp:ListItem Text="No" Value="No" />
+                                                                                                                    <asp:ListItem Text="No Change" Value="No Change" />
+                                                                                                                </asp:RadioButtonList>
+                                                                                                            </td>
+                                                                                                            <td style="background:#03507d; color:#fff;">
+                                                                                                                <asp:RadioButtonList ID="RadioButtonList4" class="radBtnClass" runat="server" onchange="changeColorRadioBtnList(this)">
+                                                                                                                    <asp:ListItem Text="Yes" Value="Yes" />
+                                                                                                                    <asp:ListItem Text="No" Value="No" />
+                                                                                                                    <asp:ListItem Text="No Change" Value="No Change" />
+                                                                                                                </asp:RadioButtonList>
+                                                                                                            </td>
+                                                                                                            <td style="background:#03507d; color:#fff;">
+                                                                                                                <asp:RadioButtonList ID="RadioButtonList5" class="radBtnClass" runat="server" onchange="changeColorRadioBtnList(this)">
+                                                                                                                    <asp:ListItem Text="Yes" Value="Yes" />
+                                                                                                                    <asp:ListItem Text="No" Value="No" />
+                                                                                                                    <asp:ListItem Text="No Change" Value="No Change" />
+                                                                                                                </asp:RadioButtonList>
+                                                                                                            </td>
+                                                                                                            <td style="background:#03507d; color:#fff;">
+                                                                                                                <asp:RadioButtonList ID="RadioButtonList6" class="radBtnClass" runat="server" onchange="changeColorRadioBtnList(this)">
+                                                                                                                    <asp:ListItem Text="Yes" Value="Yes" />
+                                                                                                                    <asp:ListItem Text="No" Value="No" />
+                                                                                                                    <asp:ListItem Text="No Change" Value="No Change" />
+                                                                                                                </asp:RadioButtonList>
+                                                                                                            </td>
+                                                                                                            <td style="background:#03507d; color:#fff;">
+                                                                                                                <asp:RadioButtonList ID="RadioButtonList7" class="radBtnClass" runat="server" onchange="changeColorRadioBtnList(this)">
+                                                                                                                    <asp:ListItem Text="Yes" Value="Yes" />
+                                                                                                                    <asp:ListItem Text="No" Value="No" />
+                                                                                                                    <asp:ListItem Text="No Change" Value="No Change" />
+                                                                                                                </asp:RadioButtonList>
+                                                                                                            </td>
+                                                                                                        </tr>
                                                                                                     <tr class="AltRowStyle">
                                                                                                         <td>Type of Instruction : </td>
                                                                                                         <td>
@@ -1103,7 +1232,69 @@
                                                                                                         <td>
                                                                                                             <asp:Label ID="lblPeriod14" runat="server" Text='<%#Eval("Period7") %>'></asp:Label>
                                                                                                         </td>
-                                                                                                    </tr>
+                                                                                                    </tr
+                                                                                                    <tr class="HeaderStyle">
+                                                                                                        <br />
+                                                                                                        <td style="background:#03507d; color:#fff;">Progressing :</td>
+                                                                                                        <td style="background:#03507d; color:#fff;">
+                                                                                                            <asp:RadioButtonList ID="RadioButtonList8" class="radBtnClass" runat="server" onchange="changeColorRadioBtnList(this)">
+                                                                                                                <asp:ListItem Text="Yes" Value="Yes" />
+                                                                                                                <asp:ListItem Text="No" Value="No" />
+                                                                                                                <asp:ListItem Text="No Change" Value="No Change" />
+                                                                                                            </asp:RadioButtonList>
+                                                                                                          
+                                                                                                        </td>
+                                                                                                        <td style="background:#03507d; color:#fff;">
+                                                                                                            <asp:RadioButtonList ID="RadioButtonList9" class="radBtnClass" runat="server" onchange="changeColorRadioBtnList(this)">
+                                                                                                                <asp:ListItem Text="Yes" Value="Yes" />
+                                                                                                                <asp:ListItem Text="No" Value="No" />
+                                                                                                                <asp:ListItem Text="No Change" Value="No Change" />
+                                                                                                            </asp:RadioButtonList>
+                                                                                                            
+                                                                                                        </td>
+                                                                                                        <td style="background:#03507d; color:#fff;">
+                                                                                                            <asp:RadioButtonList ID="RadioButtonList10" class="radBtnClass" runat="server" onchange="changeColorRadioBtnList(this)">
+                                                                                                                <asp:ListItem Text="Yes" Value="Yes" />
+                                                                                                                <asp:ListItem Text="No" Value="No" />
+                                                                                                                <asp:ListItem Text="No Change" Value="No Change" />
+                                                                                                            </asp:RadioButtonList>
+                                                                                                           
+                                                                                                        </td>
+                                                                                                        <td style="background:#03507d; color:#fff;">
+                                                                                                            <asp:RadioButtonList ID="RadioButtonList11" class="radBtnClass" runat="server" onchange="changeColorRadioBtnList(this)">
+                                                                                                                <asp:ListItem Text="Yes" Value="Yes" />
+                                                                                                                <asp:ListItem Text="No" Value="No" />
+                                                                                                                <asp:ListItem Text="No Change" Value="No Change" />
+                                                                                                            </asp:RadioButtonList>
+                                                                                                            
+                                                                                                        </td>
+                                                                                                        <td style="background:#03507d; color:#fff;">
+                                                                                                            <asp:RadioButtonList ID="RadioButtonList12" class="radBtnClass" runat="server" onchange="changeColorRadioBtnList(this)">
+                                                                                                                <asp:ListItem Text="Yes" Value="Yes" />
+                                                                                                                <asp:ListItem Text="No" Value="No" />
+                                                                                                                <asp:ListItem Text="No Change" Value="No Change" />
+                                                                                                            </asp:RadioButtonList>
+                                                                                                           
+                                                                                                        </td>
+                                                                                                        <td style="background:#03507d; color:#fff;">
+                                                                                                                <asp:RadioButtonList ID="RadioButtonList13" class="radBtnClass" runat="server" onchange="changeColorRadioBtnList(this)">
+                                                                                                                <asp:ListItem Text="Yes" Value="Yes" />
+                                                                                                                <asp:ListItem Text="No" Value="No" />
+                                                                                                                <asp:ListItem Text="No Change" Value="No Change" />
+                                                                                                            </asp:RadioButtonList>
+
+                                                                                                            
+                                                                                                        </td>
+                                                                                                        <td style="background:#03507d; color:#fff;">
+                                                                                                            <asp:RadioButtonList ID="RadioButtonList14" class="radBtnClass" runat="server" onchange="changeColorRadioBtnList(this)">
+                                                                                                                <asp:ListItem Text="Yes" Value="Yes" />
+                                                                                                                <asp:ListItem Text="No" Value="No" />
+                                                                                                                <asp:ListItem Text="No Change" Value="No Change" />
+                                                                                                            </asp:RadioButtonList>
+
+                                                                                                        </td>
+                                                                                                        </tr>
+
                                                                                                     <tr class="AltRowStyle">
                                                                                                         <td>Type of Instruction : </td>
                                                                                                         <td>
