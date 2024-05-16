@@ -1585,6 +1585,7 @@
                     $('.Schedule_View').css('color', 'grey');
                     $('.List_View').css('color', 'blue');
                     $('#tdTitle').html('');
+                    sessionStorage.setItem('DataCl', 'false');
                     PageMethods.FillSubMenu(Menu, OnSuccessDatasheet, OnFailure);
                     resetScroll();
                 }
@@ -2926,7 +2927,14 @@
                 //} else {
                 //    $('#ulStudents').find('#divStud' + frameId).find('#StuddivTF' + frameId + sheetId).remove();
                 //}
-               
+                var Data = sessionStorage.getItem('DataCl');
+                if (Data == "true")
+               { 
+                    alert("Datasheet submission is started ,please wait to complete the process.");
+                    return;
+               }
+                else
+                {               
                     
                 
                 r = confirm("Are you sure ?");
@@ -2938,6 +2946,7 @@
                 else {
                     return;
                 }
+            }
                 
 
             }

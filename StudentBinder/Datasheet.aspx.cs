@@ -356,6 +356,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             LblBanner.Text = bnrTxt+" – Criteria met, notify supervisor.";
             LessonBanner.Visible = true;
         }
+
+       string script = "checkcl();"; 
+       ScriptManager.RegisterStartupScript(this, this.GetType(), "CallFunction", script, true);
+            
         curesesid = this.Session.SessionID.ToString();
         preid = Convert.ToInt16(Session["Spreid"]);
         preuser = Session["Spreuser"].ToString();
@@ -3494,6 +3498,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         DateTime strEnd = DateTime.Parse(dts.Rows[0]["EndTs"].ToString());
                                         string strEndDate = strEnd.ToString("MM/dd/yyyy HH:mm:ss");
                                         tdMsg.InnerHtml = clsGeneral.failedMsg("Submit not possible: This session was started by '" + strCreatedBy + "' on '" + strStartDate + "' and completed by '" + strModifiedBy + "' on '" + strEndDate + "'. Please Close[X] this datasheet.");
+                                        Checkclose.Value = "false";
+                                        string scriptcl = "checkclN();";
+                                        ScriptManager.RegisterStartupScript(this, this.GetType(), "CallFunction", scriptcl, true);
+            
                                     }
                                 }
                             }
@@ -3576,6 +3584,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             {
                                 tdMsg.InnerHtml = clsGeneral.warningMsg("IOA Draft Submission not Possible when Teacher Session currently in Progress");
                                 valid_Ind = false;
+                                Checkclose.Value = "false";
+                                string scriptcl = "checkclN();";
+                                ScriptManager.RegisterStartupScript(this, this.GetType(), "CallFunction", scriptcl, true);
+            
                             }
                             else
                             {
@@ -4871,6 +4883,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             LblBanner.Text = bnrTxt+" – Criteria met, notify supervisor.";
             LessonBanner.Visible = true;
         }
+        Checkclose.Value = "false";
     }
     [System.Web.Services.WebMethod]
     #region comment
@@ -29971,6 +29984,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         repeatNo++;
 
         Response.Redirect("Datasheet.aspx?pageid=" + oTemp.TemplateId + "&studid=" + oSession.StudentId + "&SRMode=true&repeatNo=" + repeatNo + "&isMaint=" + isMaintStatus + "&currSetIdTemp=" + currSetIdTemp + "&exc=false");
+        Checkclose.Value = "false";
     }
     //protected void btnDiscard_ok_Click(object sender, EventArgs e)
     //{
@@ -30826,6 +30840,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     DateTime strEnd = DateTime.Parse(dts.Rows[0]["EndTs"].ToString());
                     string strEndDate = strEnd.ToString("MM/dd/yyyy HH:mm:ss");
                     tdMsg.InnerHtml = clsGeneral.failedMsg("Submit not possible: This session was started by '" + strCreatedBy + "' on '" + strStartDate + "' and completed by '" + strModifiedBy + "' on '" + strEndDate + "'. Please Close[X] this datasheet.");
+                    Checkclose.Value = "false";
+                    string scriptcl = "checkclN();";
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "CallFunction", scriptcl, true);
+            
                 }
             }
         }
