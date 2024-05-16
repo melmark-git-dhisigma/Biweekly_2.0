@@ -1452,10 +1452,10 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 "'" + hdnstep5.Value + "'," +
                 "'" + hdnstep6.Value + "'," +
                 "'" + hdnstep7.Value + "'," +
-                "'" + AttendeesText.Text + "'," +
-                "'" + Iepyeartxt.Text + "'," +
-                "'" + Ieptxt.Text + "'," +
-                "'" + ReviewbydateSave.Text + "'," +
+                "'" + clsGeneral.convertQuotes(AttendeesText.Text )+ "'," +
+                "'" + clsGeneral.convertQuotes(Iepyeartxt.Text) + "'," +
+                "'" + clsGeneral.convertQuotes(Ieptxt.Text) + "'," +
+                "'" + clsGeneral.convertQuotes(ReviewbydateSave.Text) + "'," +
                 "'" + c1 + "'," +
                 "'" + c2 + "'," +
                 "'" + c3 + "'" +
@@ -1934,7 +1934,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             }
             else { c3 = 0; }
 
-            string UpdateAcdsht = "UPDATE StdtAcdSheet SET NoOfTimes1='" + NumPos1 + "',NoOfTimes2='" + NumPos2 + "',NoOfTimes3='" + NumPos3 + "',NoOfTimes4='" + NumPos4 + "',NoOfTimes5='" + NumPos5 + "',NoOfTimes6='" + NumPos6 + "',NoOfTimes7='" + NumPos7 + "',Attendees='" + attendees + "',IEPYear='" + IEPyear + "',IEPSigDate='" + IEPDate + "',Reviewed='" + review + "',MetObjective='" + c1 + "',MetGoal='" + c2 + "',NotMaintaining='"+c3+"' WHERE AccSheetId=" + AccShtId + "";
+            string UpdateAcdsht = "UPDATE StdtAcdSheet SET NoOfTimes1='" + NumPos1 + "',NoOfTimes2='" + NumPos2 + "',NoOfTimes3='" + NumPos3 + "',NoOfTimes4='" + NumPos4 + "',NoOfTimes5='" + NumPos5 + "',NoOfTimes6='" + NumPos6 + "',NoOfTimes7='" + NumPos7 + "',Attendees='" + clsGeneral.convertQuotes(attendees) + "',IEPYear='" + clsGeneral.convertQuotes(IEPyear) + "',IEPSigDate='" + clsGeneral.convertQuotes(IEPDate) + "',Reviewed='" + clsGeneral.convertQuotes( review) + "',MetObjective='" + c1 + "',MetGoal='" + c2 + "',NotMaintaining='"+c3+"' WHERE AccSheetId=" + AccShtId + "";
             objData.Execute(UpdateAcdsht);
 
             int personResp = 0;
