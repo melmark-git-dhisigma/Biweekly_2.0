@@ -3332,8 +3332,16 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     string updSteps = "UPDATE StdtSessionStep SET Comments='" + txtStepCmnts.Text.Replace("'","''") + "',SessionStatusCd='" + mistrial + "',SelectedSample='" + hfSample.Value.Replace("'", "''").Trim() + "',ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() " +
                                         "WHERE StdtSessionStepId=" + hfStepid.Value + " AND StdtSessionHdrId=" + sessHdrId + "";
-                                    oData.Execute(updSteps);
-
+                                    if (hfStepid.Value != null && hfStepid.Value.ToString() != "")
+                                    {
+                                        oData.Execute(updSteps);
+                                    }
+                                    else
+                                    {
+                                        ClsErrorLog clError = new ClsErrorLog();
+                                        oTemp = (ClsTemplateSession)Session["BiweeklySession"];
+                                        clError.WriteToLog("Null hfStepid\nDatasheet/updateDatas()\nStudent ID = " + oSession.StudentId + "\nDSTempHdrId = " + oTemp.TemplateId + "\nStdtSessionStep.StdtSessionHdrId=" + sessHdrId);
+                                    }
                                 }
                                 mistrial = "N";
 
@@ -3365,7 +3373,16 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                 string updStpDtls = "UPDATE StdtSessionDtl SET StepVal='" + pair.Value[scoreIndex].Replace("'", "''") + "',CurrentPrompt='" + crntPrmpt + "',SessionStatusCd='" + mistrial + "',ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() " +
                                     "WHERE StdtSessionStepId=" + hfStepid.Value + " AND DSTempSetColId=" + pair.Key + "";
-                                oData.Execute(updStpDtls);
+                                if (hfStepid.Value != null && hfStepid.Value.ToString() != "")
+                                {
+                                    oData.Execute(updStpDtls);
+                                }
+                                else
+                                {
+                                    ClsErrorLog clError = new ClsErrorLog();
+                                    oTemp = (ClsTemplateSession)Session["BiweeklySession"];
+                                    clError.WriteToLog("Null hfStepid\nDatasheet/updateDatas()\nStudent ID = " + oSession.StudentId + "\nDSTempHdrId = " + oTemp.TemplateId + "\nStdtSessionDtl.DSTempSetColId = " + pair.Key);
+                                }
 
 
                                 scoreIndex++;
@@ -4231,7 +4248,15 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 "INNER JOIN StdtSessionHdr Hdr ON Hdr.StdtSessionHdrId=Step.StdtSessionHdrId " +
                                 "INNER JOIN StdtSessionDtl Dtl INNER JOIN DSTempSetCol Col ON Col.DSTempSetColId=Dtl.DSTempSetColId " +
                                 "ON Dtl.StdtSessionStepId=Step.StdtSessionStepId WHERE Hdr.StdtSessionHdrId=" + SessHdrID + " AND Dtl.StdtSessionStepId=" + hfStepid.Value;
-                        DataTable dtColmns = oData.ReturnDataTable(qry, false);
+                        DataTable dtColmns = new DataTable();
+                        if (hfStepid.Value != null && hfStepid.Value.ToString() != "")
+                        {
+                            dtColmns = oData.ReturnDataTable(qry, false);
+                        }
+                        else
+                        {
+                            clError.WriteToLog("Null hfStepid\nDatasheet/LoadDdata()\nStudent ID = " + oSession.StudentId + "\nDSTempHdrId = " +oTemp.TemplateId + "\nStdtSessionDtl.StdtSessionHdrId = " + SessHdrID);
+                        }
                         int statusFlag = 0;
                         if (dtColmns != null)
                         {
