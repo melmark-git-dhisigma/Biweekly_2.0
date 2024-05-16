@@ -248,6 +248,19 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
     }
 
 
+    protected void chkOpportunities_CheckedChanged(object sender, EventArgs e)
+    {
+        if(chkOpportunities.Checked)
+        {
+            chkDuration.Enabled = false;
+            chkFrequency.Enabled = false;
+        }
+        else
+        {
+            chkDuration.Enabled = true;
+            chkFrequency.Enabled = true;
+        }
+    }
 
 
     private void clearDataReset()
@@ -270,8 +283,11 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
         ddlRepeat.SelectedIndex = 0;
         //  ddlStudent.SelectedIndex = 0;
         chkDuration.Checked = false;
+        chkDuration.Enabled = true;
         chkFrequency.Checked = false;
+        chkFrequency.Enabled = true;
         chkYesOrNo.Checked = false;
+        chkOpportunities.Checked = false;
         lblCalc.Visible = false;
         rdoSumTotal.Visible = false;
         lblCalcOpp.Visible = false;
@@ -2497,6 +2513,9 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
         {
             lblCalcOpp.Visible = false;
             chkOpportunities.Visible = false;
+            chkOpportunities.Checked = false;
+            chkDuration.Enabled = true;
+            chkFrequency.Enabled = true;
             if (chkFrequency.Checked == true)
             {
                 chkYesOrNo.Checked = false;
@@ -2602,6 +2621,12 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
             {
                 lblCalcOpp.Visible = true;
                 chkOpportunities.Visible = true;
+            }
+            else if (chkYesOrNo.Checked == false)
+            {
+                chkOpportunities.Checked = false;
+                chkDuration.Enabled = true;
+                chkFrequency.Enabled = true;
             }
             lblCalc.Visible = false;
             rdoSumTotal.Visible = false;
