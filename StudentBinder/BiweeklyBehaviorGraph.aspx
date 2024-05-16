@@ -1515,7 +1515,15 @@
                             return '<b>' + Highcharts.dateFormat('%m/%d/%Y', new Date(this.x)) + '</b>: ' + this.y; // Format the date and display the y-value
                         }
                     },
-                    series:ser
+                    series: ser,
+                    exporting: {
+                        sourceWidth: 935.43307,
+                        sourceHeight: 688.901215752,
+                        // scale: 2 (default)
+                        //chartOptions: {
+                        //    subtitle: null
+                        //}
+                    }
                 });
                         }
             //rate  graph data start
@@ -1642,6 +1650,14 @@
                             }
                         },
                         series: ratefinal,
+                        exporting: {
+                            sourceWidth: 935.43307,
+                            sourceHeight: 688.901215752,
+                            // scale: 2 (default)
+                            //chartOptions: {
+                            //    subtitle: null
+                            //}
+                        }
                     });
                 }
                         
@@ -1766,7 +1782,15 @@
                                      }
                                  },
                                   
-                             }]
+                             }],
+                             exporting: {
+                                 sourceWidth: 935.43307,
+                                 sourceHeight: 164.05358746,
+                                 // scale: 2 (default)
+                                 //chartOptions: {
+                                 //    subtitle: null
+                                 //}
+                             }
                          });
                      },
                      error: OnErrorCall
@@ -2601,7 +2625,16 @@
                             return '<b>' + Highcharts.dateFormat('%m/%d/%Y', new Date(this.x)) + '</b>: ' + this.y; // Format the date and display the y-value
                         }
                     },
-                    series: ser
+                    series: ser,
+                    exporting: {
+                        sourceWidth: 935.43307,
+                        sourceHeight: 688.901215752,
+                        // scale: 2 (default)
+                        //chartOptions: {
+                        //    subtitle: null
+                        //}
+                    }
+                    
                 });
                         }
                         if ("<%=gategraph%>" == "1" && restemp!='') {
@@ -2725,6 +2758,14 @@
                             }
                         },
                         series: ratefinal,
+                        exporting: {
+                            sourceWidth: 935.43307,
+                            sourceHeight: 688.901215752,
+                            // scale: 2 (default)
+                            //chartOptions: {
+                            //    subtitle: null
+                            //}
+                        }
                     });
                 }
                 var medjson = JSON.stringify({ StartDate: sdate, enddate: edate, studid: sid, SchoolId: scid });
@@ -2848,7 +2889,15 @@
                                         }
                                     },
 
-                                }]
+                                }],
+                                exporting: {
+                                    sourceWidth: 935.43307,
+                                    sourceHeight: 164.05358746,
+                                    // scale: 2 (default)
+                                    //chartOptions: {
+                                    //    subtitle: null
+                                    //}
+                                }
                             });
                         },
                         error: OnErrorCall

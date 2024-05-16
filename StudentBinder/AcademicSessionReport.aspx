@@ -903,7 +903,15 @@
                                         }
                                     },
 
-                                }]
+                                }],
+                                exporting: {
+                                    sourceWidth: 935.43307,
+                                    sourceHeight: 164.05358746,
+                                    // scale: 2 (default)
+                                    //chartOptions: {
+                                    //    subtitle: null
+                                    //}
+                                }
                             });
                         },
                         error: OnErrorCal
@@ -1596,7 +1604,15 @@
                                             return '<b>' + Highcharts.dateFormat('%m/%d/%Y', new Date(this.point.dateval)) + '</b>: ' + this.y;
                                         }
                                     },
-                                series: ser,
+                                    series: ser,
+                                    exporting: {
+                                        sourceWidth: 935.43307,
+                                        sourceHeight: 688.901215725,
+                                        // scale: 2 (default)
+                                        //chartOptions: {
+                                        //    subtitle: null
+                                        //}
+                                    }
                             });
             }
                 
@@ -1775,6 +1791,14 @@
                         }
                     },
                     series: ser,
+                    exporting: {
+                        sourceWidth: 935.43307,
+                        sourceHeight: 688.901215725,
+                        // scale: 2 (default)
+                        //chartOptions: {
+                        //    subtitle: null
+                        //}
+                    }
                 });
             }
 
@@ -2155,7 +2179,15 @@ year
                                         }
                                     },
 
-                                }]
+                                }],
+                                exporting: {
+                                    sourceWidth: 935.43307,
+                                    sourceHeight: 164.05358746,
+                                    // scale: 2 (default)
+                                    //chartOptions: {
+                                    //    subtitle: null
+                                    //}
+                                }
                             });
                         },
                         error: OnErrorCal
