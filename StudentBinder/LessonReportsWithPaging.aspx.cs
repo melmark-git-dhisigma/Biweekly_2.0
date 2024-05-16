@@ -92,7 +92,7 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
                         chkbxIOA.Checked = true;
                         chktrend.Checked = true;
                         chkmedication.Checked = false;
-                        txtEdate.Text = DateTime.Now.Date.AddDays(1).ToString("MM/dd/yyyy").Replace("-", "/");
+                        txtEdate.Text = DateTime.Now.Date.ToString("MM/dd/yyyy").Replace("-", "/");
                         txtSdate.Text = DateTime.Now.Date.AddDays(-91).ToString("MM/dd/yyyy").Replace("-", "/");
                         //rbtnClassTypeall.SelectedValue = objdatacls.GetClassType(sess.Classid);
                         hdnallLesson.Value = "AllLessons";
@@ -428,7 +428,7 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
             tdMsg.InnerHtml = clsGeneral.warningMsg("Please Enter End Date");
             return result;
         }
-        else if (txtSdate.Text != "")
+         if (txtSdate.Text != "")
         {
             DateTime dtst = new DateTime();
             dtst = DateTime.ParseExact(txtSdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
@@ -436,10 +436,11 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
             {
                 result = false;
                 tdMsg.InnerHtml = clsGeneral.warningMsg("Invalid Start date");
+                return result;
             }
-            return result;
+           
         }
-        else if (txtEdate.Text != "")
+         if (txtEdate.Text != "")
         {
             DateTime dtst = new DateTime();
             dtst = DateTime.ParseExact(txtEdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
@@ -447,10 +448,11 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
             {
                 result = false;
                 tdMsg.InnerHtml = clsGeneral.warningMsg("Invalid End date");
+                return result;
             }
-            return result;
+           
         }
-        else if (txtSdate.Text != "" && txtEdate.Text != "")
+         if (txtSdate.Text != "" && txtEdate.Text != "")
         {
             DateTime dtst = new DateTime();
             DateTime dted = new DateTime();
@@ -459,9 +461,10 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
             if (dtst > dted)
             {
                 result = false;
-                tdMsg.InnerHtml = clsGeneral.warningMsg("Start date is must before the End date");
+                tdMsg.InnerHtml = clsGeneral.warningMsg("Start Date must be before the End Date.");
+                return result;
             }
-            return result;
+           
         }
         return result;
 
@@ -482,7 +485,7 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
             tdMsg1.InnerHtml = clsGeneral.warningMsg("Please Enter End Date");
             return result;
         }
-        else if (txtRepStart.Text != "")
+        if (txtRepStart.Text != "")
         {
             DateTime dtst = new DateTime();
             dtst = DateTime.ParseExact(txtRepStart.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
@@ -490,10 +493,10 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
             {
                 result = false;
                 tdMsg1.InnerHtml = clsGeneral.warningMsg("Invalid Start date");
+                return result;
             }
-            return result;
         }
-        else if (txtrepEdate.Text != "")
+        if (txtrepEdate.Text != "")
         {
             DateTime dtst = new DateTime();
             dtst = DateTime.ParseExact(txtrepEdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
@@ -501,10 +504,11 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
             {
                 result = false;
                 tdMsg1.InnerHtml = clsGeneral.warningMsg("Invalid End date");
+                return result;
             }
-            return result;
+            
         }
-        else if (txtRepStart.Text != "" && txtrepEdate.Text != "")
+         if (txtRepStart.Text != "" && txtrepEdate.Text != "")
         {
             DateTime dtst = new DateTime();
             DateTime dted = new DateTime();
@@ -513,50 +517,15 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
             if (dtst > dted)
             {
                 result = false;
-                tdMsg1.InnerHtml = clsGeneral.warningMsg("Start date is must before the End date");
+                tdMsg1.InnerHtml = clsGeneral.warningMsg("Start Date must be before the End Date");
+                return result;
             }
-            return result;
+            
         }
         return result;
 
     }
-    protected void btnsubmit_Clickhigh(object sender, EventArgs e)
-    {
-        try
-        {
-            
-                if (ListBox2.Items.Count > 0)
-                {
-                    if (Validation() == true)
-                    {
-                        hfPopUpValue.Value = "true";
-                        // saveLessonPlans();
-                        //btnPrevious.Visible = true;
-                        //ddlLessonplan.Visible = true;
-                        //btnNext.Visible = true;
-                        GenerateReport();
-
-                        
-                       
-                    }
-                    else
-                    {
-                        btnPrevious.Visible = false;
-                        ddlLessonplan.Visible = false;
-                        btnNext.Visible = false;
-                    }
-                }
-                else
-                {
-                    tdMsg.InnerHtml = clsGeneral.warningMsg("Please Select LessonPlan");
-                }
-           
-        }
-        catch (Exception Ex)
-        {
-            throw Ex;
-        }
-    }   
+    
     protected void btnsubmit_Click(object sender, EventArgs e)
     {
         try
@@ -574,15 +543,31 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
                 }
                 else
                 {
-                    RV_LPReport.Visible = false;
+                    if (highcheck.Checked == false)
+                    {
+                        RV_LPReport.Visible = false;
+                    }
+                    else
+                    {
+                        string script = "warningmsgpop();";
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), "hidepops", script, true);
+                    }
+                    hfPopUpValue.Value = "false";
                     btnPrevious.Visible = false;
                     ddlLessonplan.Visible = false;
                     btnNext.Visible = false;
+                    graphPopup.Visible = true;
                 }
             }
             else
             {
+                hfPopUpValue.Value = "false";
                 tdMsg.InnerHtml = clsGeneral.warningMsg("Please Select LessonPlan");
+                if (highcheck.Checked == true)
+                {
+                    string script = "warningmsgpop();";
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "hidepopss", script, true);
+                }
             }
         }
         catch (Exception Ex)
@@ -601,8 +586,13 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
         int LessonPlanId = 0;
         if (highcheck.Checked == false)
         {
-        RV_LPReport.Visible = true;
+            RV_LPReport.Visible = true;
         }
+        else
+        {
+            RV_LPReport.Visible = false;
+        }
+      
         sess = (clsSession)Session["UserSession"];
         ObjTempSess = (ClsTemplateSession)Session["BiweeklySession"];
         hdnType.Value = "MultipleLessonPlan";
@@ -1388,383 +1378,388 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
     {
         try
         {
-            if (highcheck.Checked == true) {
-                string scripts = "showPopup();";
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "Showpop", scripts, true);
-                graphPopup.Visible = false;
-            }
-            hdnType.Value = Session["hdnType"].ToString();
-            string LPStatus = "";
-            tdMsgExport.InnerHtml = "";
-            int LessonPlanId = 0;
-            ObjData = new clsData();
-            int studid = Convert.ToInt32(Request.QueryString["studid"].ToString());
-            ObjTempSess = (ClsTemplateSession)Session["BiweeklySession"];
-            //string ReportXML = "SELECT [Name],CAST(CAST([Content] AS VARBINARY(MAX)) AS XML) AS reportXML FROM [Catalog] WHERE type = 2";
-            //DataTable dt = ObjData.ReturnDataTable(ReportXML, false);
-            sess = (clsSession)Session["UserSession"];
-            string TrendType = "NotNeed";
-            string Events = "None,";
-            string IOA = "";
-            string Medication = "";
-            if (Convert.ToBoolean(chktrend.Checked) || Convert.ToBoolean(chkreptrend.Checked))
+            if (Validation() == true)
             {
-                TrendType = "Quarter";
-            }
-            ReportViewer AcademicReport = new ReportViewer();
-            string AllLesson = "";
-
-            if (Convert.ToInt32(Request.QueryString["pageid"].ToString()) == 0)
-            {
-                hdnallLesson.Value = "AllLessons";
-            }
-            else
-            {
-                LessonPlanId = Convert.ToInt32(ObjData.FetchValue("SELECT LessonPlanId FROM DSTempHdr WHERE DSTempHdrId=" + ObjTempSess.TemplateId));
-            }
-            if (hdnallLesson.Value.Trim() == "AllLessons")
-            {
-                string StrSelected = "";
-                for (int i = 0; i < ListBox2.Items.Count; i++)
+                if (highcheck.Checked == true)
                 {
-                    StrSelected += ListBox2.Items[i].Value + ",";
+                    string scripts = "showPopup();";
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "Showpop", scripts, true);
+                    graphPopup.Visible = false;
                 }
-                StrSelected = StrSelected.Substring(0, (StrSelected.Length - 1));
-                //string StrNewQry = "SELECT STUFF((SELECT ','+ CONVERT(VARCHAR(50),LessonPlanId) FROM (SELECT DISTINCT LessonPlanId FROM DSTempHdr WHERE DSTempHdrId IN (" + StrSelected + ")) DSTEMP FOR XML PATH('')) ,1,1,'')";
-                AllLesson = Convert.ToString(StrSelected);
-            }
-            else
-            {
-                AllLesson = LessonPlanId.ToString();
-            }
-            DateTime dtst = new DateTime();
-            DateTime dted = new DateTime();
-            string ClassType = "";
-            string GraphType = "";
-            if (hdnType.Value == "MultipleLessonPlan")
-            {
-                dtst = DateTime.ParseExact(txtSdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
-                dted = DateTime.ParseExact(txtEdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
-                //Events = Convert.ToBoolean(chkbxevents.Checked).ToString();
-                if (chkbxevents.Checked == true)
+                hdnType.Value = Session["hdnType"].ToString();
+                string LPStatus = "";
+                tdMsgExport.InnerHtml = "";
+                int LessonPlanId = 0;
+                ObjData = new clsData();
+                int studid = Convert.ToInt32(Request.QueryString["studid"].ToString());
+                ObjTempSess = (ClsTemplateSession)Session["BiweeklySession"];
+                //string ReportXML = "SELECT [Name],CAST(CAST([Content] AS VARBINARY(MAX)) AS XML) AS reportXML FROM [Catalog] WHERE type = 2";
+                //DataTable dt = ObjData.ReturnDataTable(ReportXML, false);
+                sess = (clsSession)Session["UserSession"];
+                string TrendType = "NotNeed";
+                string Events = "None,";
+                string IOA = "";
+                string Medication = "";
+                if (Convert.ToBoolean(chktrend.Checked) || Convert.ToBoolean(chkreptrend.Checked))
                 {
-                    Events = "Major,Minor,Arrow";
+                    TrendType = "Quarter";
+                }
+                ReportViewer AcademicReport = new ReportViewer();
+                string AllLesson = "";
+
+                if (Convert.ToInt32(Request.QueryString["pageid"].ToString()) == 0)
+                {
+                    hdnallLesson.Value = "AllLessons";
                 }
                 else
                 {
-                    if (chkbxmajor.Checked == true)
-                    {
-                        Events += "Major,";
-                    }
-                    if (chkbxminor.Checked == true)
-                    {
-                        Events += "Minor,";
-                    }
-                    if (chkbxarrow.Checked == true)
-                    {
-                        Events += "Arrow";
-                    }
+                    LessonPlanId = Convert.ToInt32(ObjData.FetchValue("SELECT LessonPlanId FROM DSTempHdr WHERE DSTempHdrId=" + ObjTempSess.TemplateId));
                 }
-                IOA = Convert.ToBoolean(chkbxIOA.Checked).ToString();
-                Medication = Convert.ToBoolean(chkmedication.Checked).ToString();
-                ClassType = rbtnClassTypeall.SelectedValue;
-                GraphType = rbtnIncidentalRegularall.SelectedValue;
-
-                ///checks the lesson status
-                ///                
-                foreach (ListItem item in chkStatus.Items)
+                if (hdnallLesson.Value.Trim() == "AllLessons")
                 {
-                    if (item.Selected == true)
+                    string StrSelected = "";
+                    for (int i = 0; i < ListBox2.Items.Count; i++)
                     {
-                        if (item.Text == "Active")
-                        {
-                            LPStatus += "'Approved',";
-                        }
-                        else if (item.Text == "Maintenance")
-                        {
-                            LPStatus += "'Maintenance',";
-                        }
-                        else if (item.Text == "Inactive")
-                        {
-                            LPStatus += "'Inactive',";
-                        }
+                        StrSelected += ListBox2.Items[i].Value + ",";
                     }
-                }
-                LPStatus = LPStatus.Substring(0, (LPStatus.Length - 1));
-
-                string strLpStat = "SELECT STUFF((SELECT ','+CONVERT(VARCHAR(25), LookupId) FROM (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND LookupName IN(" + LPStatus + ")) LookupId FOR XML PATH('')),1,1,'')";
-                LPStatus = ObjData.FetchValue(strLpStat).ToString();
-                ///end
-                ///
-            }
-            else
-            {
-                dtst = DateTime.ParseExact(txtRepStart.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
-                dted = DateTime.ParseExact(txtrepEdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
-                //Events = Convert.ToBoolean(chkrepevents.Checked).ToString();
-                if (chkrepevents.Checked == true)
-                {
-                    Events = "Major,Minor,Arrow";
+                    StrSelected = StrSelected.Substring(0, (StrSelected.Length - 1));
+                    //string StrNewQry = "SELECT STUFF((SELECT ','+ CONVERT(VARCHAR(50),LessonPlanId) FROM (SELECT DISTINCT LessonPlanId FROM DSTempHdr WHERE DSTempHdrId IN (" + StrSelected + ")) DSTEMP FOR XML PATH('')) ,1,1,'')";
+                    AllLesson = Convert.ToString(StrSelected);
                 }
                 else
                 {
-                    if (chkrepmajor.Checked == true)
-                    {
-                        Events += "Major,";
-                    }
-                    if (chkrepminor.Checked == true)
-                    {
-                        Events += "Minor,";
-                    }
-                    if (chkreparrow.Checked == true)
-                    {
-                        Events += "Arrow";
-                    }
+                    AllLesson = LessonPlanId.ToString();
                 }
-                IOA = Convert.ToBoolean(chkrepioa.Checked).ToString();
-                Medication = Convert.ToBoolean(chkrepmedi.Checked).ToString();
-                ClassType = rbtnClassType.SelectedValue;
-                GraphType = rbtnIncidentalRegular.SelectedValue;
-            }
-            string StartDate = dtst.ToString("yyyy-MM-dd");
-            string enddate = dted.ToString("yyyy-MM-dd");
-            AcademicReport.ProcessingMode = ProcessingMode.Remote;
-            AcademicReport.ServerReport.ReportServerCredentials = new CustomReportCredentials(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"], ConfigurationManager.AppSettings["Domain"]);
-            if (GraphType == "Regular")
-            {
+                DateTime dtst = new DateTime();
+                DateTime dted = new DateTime();
+                string ClassType = "";
+                string GraphType = "";
                 if (hdnType.Value == "MultipleLessonPlan")
                 {
-                    AcademicReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["ExportAcademic"];
-                }
-                else
-                {
-                    AcademicReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["ExportAcademicSet"];
-                }
-            }
-            else
-            {
-                if (hdnType.Value == "MultipleLessonPlan")
-                {
-                    AcademicReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["IncidentalExportAcademic"];
-                }
-                else
-                {
-                    AcademicReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["IncidentalExportAcademicSet"];
-                }
-            }
-            if (highcheck.Checked == true) {
-				if (HttpContext.Current.Request.UserAgent.ToLower().Contains("ipad"))
-                {
-                    reptype = true;
-                    if (rbtnIncidentalRegularall.SelectedValue == "Regular")
+                    dtst = DateTime.ParseExact(txtSdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                    dted = DateTime.ParseExact(txtEdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                    //Events = Convert.ToBoolean(chkbxevents.Checked).ToString();
+                    if (chkbxevents.Checked == true)
                     {
+                        Events = "Major,Minor,Arrow";
                     }
                     else
                     {
-                        inctype = true;
-                    }
-                }
-                else
-                {
-                    reptype = false;
-                    if (rbtnIncidentalRegularall.SelectedValue == "Regular")
-                    {
-                    }
-                    else
-                    {
-                        inctype = true;
-                    }
-                }
-                Session["StudName"] = sess.StudentName;
-                sDate = StartDate.ToString();
-                eDate = enddate.ToString();
-                sid = studid;
-                lid = AllLesson.ToString();
-                scid = sess.SchoolId;
-                evnt = Events;
-                trend = TrendType;
-                ioa = Convert.ToBoolean(chkbxIOA.Checked).ToString();
-                cls = rbtnClassTypeall.SelectedValue;
-                med = Convert.ToBoolean(chkmedication.Checked);
-                lpstatus = LPStatus;
-                if (med)
-                {
-                    ObjData = new clsData();
-                    string squery = "SELECT * FROM (SELECT        SchoolId, StudentId, EventName, StdtSessEventType, Comment, EvntTs,CASE WHEN ( CASE WHEN EndTime='1900-01-01 00:00:00.000'  THEN NULL ELSE EndTime END) IS NULL THEN DATEADD(DAY,1, '" + eDate + "') ELSE EndTime END AS EndTime, EventType FROM            StdtSessEvent WHERE        (StdtSessEventType = 'Medication') AND  SchoolId = " + scid + "   AND StudentId =" + sid + ") MEDICATION WHERE EvntTs BETWEEN  '" + sDate + "'  AND '" + eDate + "' OR EndTime BETWEEN '" + sDate + "' AND  '" + eDate + "' OR (EvntTs <= '" + sDate + "' AND EndTime >= '" + eDate + "')";
-                    DataTable medtab = ObjData.ReturnDataTable(squery, false);
-                    int i = medtab.Rows.Count;
-                    if (i < 1)
-                    {
-                        medno = true;
-                        mednodata.Text = "No Data Available";
-                        mednodata.Visible = true;
-                        medcont.Visible = false;
-                    }
-                    else
-                    {
-                        mednodata.Visible = false;
-                        medcont.Visible = true;
-                    }
-
-                }
-                lbgraph.Visible = false;
-                cont.Visible = true;
-                mel.Visible = true;
-                deftxt.Visible = true;
-                //ClientScript.RegisterStartupScript(GetType(), "", "exportChart();", true);
-                string script = "exportChart();";
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "newone", script, true);
-                tdMsgExport.InnerHtml = clsGeneral.sucessMsg("Export Successfully Created...");
-                hdnExport.Value = "true";
-            //    ClientScript.RegisterStartupScript(GetType(), "", "DownloadPopup();", true);
-            }
-            else
-            {
-            AcademicReport.ServerReport.ReportServerUrl = new Uri(ConfigurationManager.AppSettings["ReportUrl"]);
-            if (hdnType.Value == "MultipleLessonPlan")
-            {
-                ReportParameter[] parm = new ReportParameter[11];
-                parm[0] = new ReportParameter("SDate", StartDate.ToString());
-                parm[1] = new ReportParameter("EDate", enddate.ToString());
-                parm[2] = new ReportParameter("StudentId", studid.ToString());
-                parm[3] = new ReportParameter("AllLesson", AllLesson.ToString());
-                parm[4] = new ReportParameter("SchoolId", sess.SchoolId.ToString());
-                parm[5] = new ReportParameter("Events", Events);
-                parm[6] = new ReportParameter("IncludeIOA", IOA);
-                parm[7] = new ReportParameter("Trendtype", TrendType);
-                parm[8] = new ReportParameter("IncludeMedication", Medication);                                         //Parameter Value
-                parm[9] = new ReportParameter("ClsType", ClassType);
-                parm[10] = new ReportParameter("LPStatus", LPStatus);
-                AcademicReport.ServerReport.SetParameters(parm);
-            }
-            else
-            {
-                string SetId = "";
-                string ColCalcId = "";
-                string IsMaintanance = "";
-                foreach (ListItem item in (drpSetname as ListControl).Items)
-                {
-                    if (item.Selected)
-                    {
-                        SetId += item.Value + ",";
-                    }
-                }
-                if (SetId.TrimEnd(',') == "0")
-                {
-
-                    foreach (ListItem item in (drpSetname as ListControl).Items)
-                    {
-                        if (item.Value != "0")
+                        if (chkbxmajor.Checked == true)
                         {
-                            SetId += item.Value + ",";
+                            Events += "Major,";
+                        }
+                        if (chkbxminor.Checked == true)
+                        {
+                            Events += "Minor,";
+                        }
+                        if (chkbxarrow.Checked == true)
+                        {
+                            Events += "Arrow";
                         }
                     }
-                }
-                if (rbtnmainonly.Checked == false)
-                {
-                    IsMaintanance = "0,1";
+                    IOA = Convert.ToBoolean(chkbxIOA.Checked).ToString();
+                    Medication = Convert.ToBoolean(chkmedication.Checked).ToString();
+                    ClassType = rbtnClassTypeall.SelectedValue;
+                    GraphType = rbtnIncidentalRegularall.SelectedValue;
+
+                    ///checks the lesson status
+                    ///                
+                    foreach (ListItem item in chkStatus.Items)
+                    {
+                        if (item.Selected == true)
+                        {
+                            if (item.Text == "Active")
+                            {
+                                LPStatus += "'Approved',";
+                            }
+                            else if (item.Text == "Maintenance")
+                            {
+                                LPStatus += "'Maintenance',";
+                            }
+                            else if (item.Text == "Inactive")
+                            {
+                                LPStatus += "'Inactive',";
+                            }
+                        }
+                    }
+                    LPStatus = LPStatus.Substring(0, (LPStatus.Length - 1));
+
+                    string strLpStat = "SELECT STUFF((SELECT ','+CONVERT(VARCHAR(25), LookupId) FROM (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND LookupName IN(" + LPStatus + ")) LookupId FOR XML PATH('')),1,1,'')";
+                    LPStatus = ObjData.FetchValue(strLpStat).ToString();
+                    ///end
+                    ///
                 }
                 else
                 {
-                    IsMaintanance = "1";
-                }
-                foreach (ListItem item in (drpColumn as ListControl).Items)
-                {
-                    if (item.Selected)
+                    dtst = DateTime.ParseExact(txtRepStart.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                    dted = DateTime.ParseExact(txtrepEdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                    //Events = Convert.ToBoolean(chkrepevents.Checked).ToString();
+                    if (chkrepevents.Checked == true)
                     {
-                        ColCalcId += item.Value + ",";
+                        Events = "Major,Minor,Arrow";
+                    }
+                    else
+                    {
+                        if (chkrepmajor.Checked == true)
+                        {
+                            Events += "Major,";
+                        }
+                        if (chkrepminor.Checked == true)
+                        {
+                            Events += "Minor,";
+                        }
+                        if (chkreparrow.Checked == true)
+                        {
+                            Events += "Arrow";
+                        }
+                    }
+                    IOA = Convert.ToBoolean(chkrepioa.Checked).ToString();
+                    Medication = Convert.ToBoolean(chkrepmedi.Checked).ToString();
+                    ClassType = rbtnClassType.SelectedValue;
+                    GraphType = rbtnIncidentalRegular.SelectedValue;
+                }
+                string StartDate = dtst.ToString("yyyy-MM-dd");
+                string enddate = dted.ToString("yyyy-MM-dd");
+                AcademicReport.ProcessingMode = ProcessingMode.Remote;
+                AcademicReport.ServerReport.ReportServerCredentials = new CustomReportCredentials(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"], ConfigurationManager.AppSettings["Domain"]);
+                if (GraphType == "Regular")
+                {
+                    if (hdnType.Value == "MultipleLessonPlan")
+                    {
+                        AcademicReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["ExportAcademic"];
+                    }
+                    else
+                    {
+                        AcademicReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["ExportAcademicSet"];
                     }
                 }
-                LPStatus = ObjData.FetchValue("SELECT LookupName FROM LOOKUP LU INNER JOIN DSTempHdr HD ON LU.LookupId=HD.StatusId WHERE LookupType='TemplateStatus' AND DSTempHdrId=" + ObjTempSess.TemplateId).ToString();
-
-                ReportParameter[] parm = new ReportParameter[14];
-                parm[0] = new ReportParameter("SDate", StartDate.ToString());
-                parm[1] = new ReportParameter("EDate", enddate.ToString());
-                parm[2] = new ReportParameter("StudentId", sess.StudentId.ToString());
-                parm[3] = new ReportParameter("AllLesson", AllLesson.ToString());
-                parm[4] = new ReportParameter("SchoolId", sess.SchoolId.ToString());
-                parm[5] = new ReportParameter("Events", Events);
-                parm[6] = new ReportParameter("IncludeIOA", Convert.ToBoolean(chkrepioa.Checked).ToString());
-                parm[7] = new ReportParameter("Trendtype", TrendType);
-                parm[8] = new ReportParameter("IncludeMedication", Convert.ToBoolean(chkrepmedi.Checked).ToString());
-                parm[9] = new ReportParameter("ClsType", rbtnClassType.SelectedValue);
-                parm[10] = new ReportParameter("SetId", ((SetId == "") ? "0" : SetId.TrimEnd(',')));
-                parm[11] = new ReportParameter("DsTempSetColCalcId", ((ColCalcId == "") ? "0" : ColCalcId.TrimEnd(',')));
-                parm[12] = new ReportParameter("IsMaintanance", IsMaintanance);
-                parm[13] = new ReportParameter("LPStatus", LPStatus);
-                AcademicReport.ServerReport.SetParameters(parm);
-            }
-            AcademicReport.ServerReport.Refresh();
-            Warning[] warnings;
-            string[] streamids;
-            string mimeType, encoding, extension, deviceInfo;
-            if (Medication.ToLower() == "true")
-            {
-                deviceInfo = "<DeviceInfo><PageHeight>8.5in</PageHeight><PageWidth>11in</PageWidth></DeviceInfo>";
-            }
-            else
-            {
-                deviceInfo = "<DeviceInfo><PageHeight>8.5in</PageHeight><PageWidth>11in</PageWidth><MarginTop>1.5in</MarginTop></DeviceInfo>";
-            }
-            //deviceInfo = "<DeviceInfo><PageHeight>8.5in</PageHeight><PageWidth>11in</PageWidth><MarginTop>1.5in</MarginTop></DeviceInfo>";
-
-            byte[] bytes = AcademicReport.ServerReport.Render("PDF", deviceInfo, out mimeType, out encoding, out extension, out streamids, out warnings);
-
-
-            string outputPath = "";
-            if (hdnType.Value == "MultipleLessonPlan")
-            {
-                outputPath = Server.MapPath("~\\StudentBinder\\Reports\\" + sess.StudentName + "_AcademicReport.pdf");
-            }
-            else
-            {
-                string LessonName = Convert.ToString(ObjData.FetchValue("SELECT DSTemplateName FROM DSTempHdr WHERE DSTempHdrId='" + ObjTempSess.TemplateId + "'"));
-                string LPName = sess.StudentName.Replace(' ', '_') + "_" + LessonName.Replace(' ', '_');
-                LPName = LPName.Replace('-', '_').Replace(',', '_').Replace(':', '_').Replace('.', '_').Replace('"', '_').Replace(';', '_');
-                outputPath = Server.MapPath("~\\StudentBinder\\Reports\\" + LPName + ".pdf");
-            }
-
-            using (FileStream fs = new FileStream(outputPath, FileMode.Create))
-            {
-                fs.Write(bytes, 0, bytes.Length);
-                fs.Close();
-            }
-
-            Session["PdfPath"] = outputPath;
-            tdMsgExport.InnerHtml = clsGeneral.sucessMsg("Export Successfully Created...");
-            hdnExport.Value = "true";
-            ClientScript.RegisterStartupScript(GetType(), "", "DownloadPopup();", true);
+                else
+                {
+                    if (hdnType.Value == "MultipleLessonPlan")
+                    {
+                        AcademicReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["IncidentalExportAcademic"];
+                    }
+                    else
+                    {
+                        AcademicReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["IncidentalExportAcademicSet"];
+                    }
                 }
-            //string PdfPath = "";
-            //if (hdnType.Value == "MultipleLessonPlan")
-            //{
-            //    PdfPath = sess.StudentName + "_AcademicReport.pdf";
-            //}
-            //else
-            //{
-            //    string LessonName = Convert.ToString(ObjData.FetchValue("SELECT DSTemplateName FROM DSTempHdr WHERE DSTempHdrId='" + ObjTempSess.TemplateId + "'"));
-            //    PdfPath = sess.StudentName + "_" + LessonName + ".pdf";
-            //}
+                if (highcheck.Checked == true)
+                {
+                    if (HttpContext.Current.Request.UserAgent.ToLower().Contains("ipad"))
+                    {
+                        reptype = true;
+                        if (rbtnIncidentalRegularall.SelectedValue == "Regular")
+                        {
+                        }
+                        else
+                        {
+                            inctype = true;
+                        }
+                    }
+                    else
+                    {
+                        reptype = false;
+                        if (rbtnIncidentalRegularall.SelectedValue == "Regular")
+                        {
+                        }
+                        else
+                        {
+                            inctype = true;
+                        }
 
-            //Response.Write(string.Format("<script> window.open('{0}','_blank');</script>", "PrintReport.aspx?file=" + PdfPath));
+                    }
+                    Session["StudName"] = sess.StudentName;
+                    sDate = StartDate.ToString();
+                    eDate = enddate.ToString();
+                    sid = studid;
+                    lid = AllLesson.ToString();
+                    scid = sess.SchoolId;
+                    evnt = Events;
+                    trend = TrendType;
+                    ioa = Convert.ToBoolean(chkbxIOA.Checked).ToString();
+                    cls = rbtnClassTypeall.SelectedValue;
+                    med = Convert.ToBoolean(chkmedication.Checked);
+                    lpstatus = LPStatus;
+                    if (med)
+                    {
+                        ObjData = new clsData();
+                        string squery = "SELECT * FROM (SELECT        SchoolId, StudentId, EventName, StdtSessEventType, Comment, EvntTs,CASE WHEN ( CASE WHEN EndTime='1900-01-01 00:00:00.000'  THEN NULL ELSE EndTime END) IS NULL THEN DATEADD(DAY,1, '" + eDate + "') ELSE EndTime END AS EndTime, EventType FROM            StdtSessEvent WHERE        (StdtSessEventType = 'Medication') AND  SchoolId = " + scid + "   AND StudentId =" + sid + ") MEDICATION WHERE EvntTs BETWEEN  '" + sDate + "'  AND '" + eDate + "' OR EndTime BETWEEN '" + sDate + "' AND  '" + eDate + "' OR (EvntTs <= '" + sDate + "' AND EndTime >= '" + eDate + "')";
+                        DataTable medtab = ObjData.ReturnDataTable(squery, false);
+                        int i = medtab.Rows.Count;
+                        if (i < 1)
+                        {
+                            medno = true;
+                            mednodata.Text = "No Data Available";
+                            mednodata.Visible = true;
+                            medcont.Visible = false;
+                        }
+                        else
+                        {
+                            mednodata.Visible = false;
+                            medcont.Visible = true;
+                        }
+
+                    }
+                    lbgraph.Visible = false;
+                    cont.Visible = true;
+                    mel.Visible = true;
+                    deftxt.Visible = true;
+                    //ClientScript.RegisterStartupScript(GetType(), "", "exportChart();", true);
+                    string script = "exportChart();";
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "newone", script, true);
+                    tdMsgExport.InnerHtml = clsGeneral.sucessMsg("Export Successfully Created...");
+                    hdnExport.Value = "true";
+                    //    ClientScript.RegisterStartupScript(GetType(), "", "DownloadPopup();", true);
+                }
+                else
+                {
+                    AcademicReport.ServerReport.ReportServerUrl = new Uri(ConfigurationManager.AppSettings["ReportUrl"]);
+                    if (hdnType.Value == "MultipleLessonPlan")
+                    {
+                        ReportParameter[] parm = new ReportParameter[11];
+                        parm[0] = new ReportParameter("SDate", StartDate.ToString());
+                        parm[1] = new ReportParameter("EDate", enddate.ToString());
+                        parm[2] = new ReportParameter("StudentId", studid.ToString());
+                        parm[3] = new ReportParameter("AllLesson", AllLesson.ToString());
+                        parm[4] = new ReportParameter("SchoolId", sess.SchoolId.ToString());
+                        parm[5] = new ReportParameter("Events", Events);
+                        parm[6] = new ReportParameter("IncludeIOA", IOA);
+                        parm[7] = new ReportParameter("Trendtype", TrendType);
+                        parm[8] = new ReportParameter("IncludeMedication", Medication);                                         //Parameter Value
+                        parm[9] = new ReportParameter("ClsType", ClassType);
+                        parm[10] = new ReportParameter("LPStatus", LPStatus);
+                        AcademicReport.ServerReport.SetParameters(parm);
+                    }
+                    else
+                    {
+                        string SetId = "";
+                        string ColCalcId = "";
+                        string IsMaintanance = "";
+                        foreach (ListItem item in (drpSetname as ListControl).Items)
+                        {
+                            if (item.Selected)
+                            {
+                                SetId += item.Value + ",";
+                            }
+                        }
+                        if (SetId.TrimEnd(',') == "0")
+                        {
+
+                            foreach (ListItem item in (drpSetname as ListControl).Items)
+                            {
+                                if (item.Value != "0")
+                                {
+                                    SetId += item.Value + ",";
+                                }
+                            }
+                        }
+                        if (rbtnmainonly.Checked == false)
+                        {
+                            IsMaintanance = "0,1";
+                        }
+                        else
+                        {
+                            IsMaintanance = "1";
+                        }
+                        foreach (ListItem item in (drpColumn as ListControl).Items)
+                        {
+                            if (item.Selected)
+                            {
+                                ColCalcId += item.Value + ",";
+                            }
+                        }
+                        LPStatus = ObjData.FetchValue("SELECT LookupName FROM LOOKUP LU INNER JOIN DSTempHdr HD ON LU.LookupId=HD.StatusId WHERE LookupType='TemplateStatus' AND DSTempHdrId=" + ObjTempSess.TemplateId).ToString();
+
+                        ReportParameter[] parm = new ReportParameter[14];
+                        parm[0] = new ReportParameter("SDate", StartDate.ToString());
+                        parm[1] = new ReportParameter("EDate", enddate.ToString());
+                        parm[2] = new ReportParameter("StudentId", sess.StudentId.ToString());
+                        parm[3] = new ReportParameter("AllLesson", AllLesson.ToString());
+                        parm[4] = new ReportParameter("SchoolId", sess.SchoolId.ToString());
+                        parm[5] = new ReportParameter("Events", Events);
+                        parm[6] = new ReportParameter("IncludeIOA", Convert.ToBoolean(chkrepioa.Checked).ToString());
+                        parm[7] = new ReportParameter("Trendtype", TrendType);
+                        parm[8] = new ReportParameter("IncludeMedication", Convert.ToBoolean(chkrepmedi.Checked).ToString());
+                        parm[9] = new ReportParameter("ClsType", rbtnClassType.SelectedValue);
+                        parm[10] = new ReportParameter("SetId", ((SetId == "") ? "0" : SetId.TrimEnd(',')));
+                        parm[11] = new ReportParameter("DsTempSetColCalcId", ((ColCalcId == "") ? "0" : ColCalcId.TrimEnd(',')));
+                        parm[12] = new ReportParameter("IsMaintanance", IsMaintanance);
+                        parm[13] = new ReportParameter("LPStatus", LPStatus);
+                        AcademicReport.ServerReport.SetParameters(parm);
+                    }
+                    AcademicReport.ServerReport.Refresh();
+                    Warning[] warnings;
+                    string[] streamids;
+                    string mimeType, encoding, extension, deviceInfo;
+                    if (Medication.ToLower() == "true")
+                    {
+                        deviceInfo = "<DeviceInfo><PageHeight>8.5in</PageHeight><PageWidth>11in</PageWidth></DeviceInfo>";
+                    }
+                    else
+                    {
+                        deviceInfo = "<DeviceInfo><PageHeight>8.5in</PageHeight><PageWidth>11in</PageWidth><MarginTop>1.5in</MarginTop></DeviceInfo>";
+                    }
+                    //deviceInfo = "<DeviceInfo><PageHeight>8.5in</PageHeight><PageWidth>11in</PageWidth><MarginTop>1.5in</MarginTop></DeviceInfo>";
+
+                    byte[] bytes = AcademicReport.ServerReport.Render("PDF", deviceInfo, out mimeType, out encoding, out extension, out streamids, out warnings);
 
 
-            //Response.Buffer = true;
-            //Response.Clear();
-            //Response.ContentType = mimeType;
-            //if (hdnType.Value == "MultipleLessonPlan")
-            //{
-            //    Response.AddHeader("content-disposition", "attachment; filename=" + sess.StudentName + "_AcademicReport.pdf");
-            //}
-            //else
-            //{
-            //    string LessonName = Convert.ToString(ObjData.FetchValue("SELECT DSTemplateName FROM DSTempHdr WHERE DSTempHdrId='" + ObjTempSess.TemplateId + "'"));
-            //    Response.AddHeader("content-disposition", "attachment; filename=" + sess.StudentName + "_" + LessonName + ".pdf");
-            //}            
-            //Response.BinaryWrite(bytes); // create the file
-            //Response.End(); // send it to the client to download
-            //Response.Clear();
+                    string outputPath = "";
+                    if (hdnType.Value == "MultipleLessonPlan")
+                    {
+                        outputPath = Server.MapPath("~\\StudentBinder\\Reports\\" + sess.StudentName + "_AcademicReport.pdf");
+                    }
+                    else
+                    {
+                        string LessonName = Convert.ToString(ObjData.FetchValue("SELECT DSTemplateName FROM DSTempHdr WHERE DSTempHdrId='" + ObjTempSess.TemplateId + "'"));
+                        string LPName = sess.StudentName.Replace(' ', '_') + "_" + LessonName.Replace(' ', '_');
+                        LPName = LPName.Replace('-', '_').Replace(',', '_').Replace(':', '_').Replace('.', '_').Replace('"', '_').Replace(';', '_');
+                        outputPath = Server.MapPath("~\\StudentBinder\\Reports\\" + LPName + ".pdf");
+                    }
 
+                    using (FileStream fs = new FileStream(outputPath, FileMode.Create))
+                    {
+                        fs.Write(bytes, 0, bytes.Length);
+                        fs.Close();
+                    }
+
+                    Session["PdfPath"] = outputPath;
+                    tdMsgExport.InnerHtml = clsGeneral.sucessMsg("Export Successfully Created...");
+                    hdnExport.Value = "true";
+                    ClientScript.RegisterStartupScript(GetType(), "", "DownloadPopup();", true);
+                }
+                //string PdfPath = "";
+                //if (hdnType.Value == "MultipleLessonPlan")
+                //{
+                //    PdfPath = sess.StudentName + "_AcademicReport.pdf";
+                //}
+                //else
+                //{
+                //    string LessonName = Convert.ToString(ObjData.FetchValue("SELECT DSTemplateName FROM DSTempHdr WHERE DSTempHdrId='" + ObjTempSess.TemplateId + "'"));
+                //    PdfPath = sess.StudentName + "_" + LessonName + ".pdf";
+                //}
+
+                //Response.Write(string.Format("<script> window.open('{0}','_blank');</script>", "PrintReport.aspx?file=" + PdfPath));
+
+
+                //Response.Buffer = true;
+                //Response.Clear();
+                //Response.ContentType = mimeType;
+                //if (hdnType.Value == "MultipleLessonPlan")
+                //{
+                //    Response.AddHeader("content-disposition", "attachment; filename=" + sess.StudentName + "_AcademicReport.pdf");
+                //}
+                //else
+                //{
+                //    string LessonName = Convert.ToString(ObjData.FetchValue("SELECT DSTemplateName FROM DSTempHdr WHERE DSTempHdrId='" + ObjTempSess.TemplateId + "'"));
+                //    Response.AddHeader("content-disposition", "attachment; filename=" + sess.StudentName + "_" + LessonName + ".pdf");
+                //}            
+                //Response.BinaryWrite(bytes); // create the file
+                //Response.End(); // send it to the client to download
+                //Response.Clear();
+            }
         }
         catch (Exception Ex)
         {
@@ -2084,7 +2079,7 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
                 {
                     File.Delete(pdfFile);
                 }
-                btnsubmit_Clickhigh(sender, e);
+                btnsubmit_Click(sender, e);
 
             }
             catch (Exception ex)
@@ -2094,4 +2089,5 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
         }
        
     }
+   
 }

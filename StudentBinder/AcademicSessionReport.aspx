@@ -220,7 +220,7 @@
         }
 
         function HideAndDisplay() {
-
+            btnsubmitVisibility();
             var val = document.getElementById("hfPopUpValue").value;
             var valLesson = document.getElementById("hdnallLesson").value;
 
@@ -228,7 +228,14 @@
                 $('#graphPopup').fadeIn();
             }
         }
-
+        function warningmsgpop() {
+            $('#graphPopup').show();
+            $('#overlay').show();
+            var hchart = document.getElementById('<%= HighchartGraph.ClientID %>');
+            hchart.style.display = 'none';
+            var popup = document.getElementById('popup');
+            popup.style.display = 'none';
+        }
         function showPopup() {
             $('#graphPopup').hide();
             $('#overlay').hide();
@@ -386,7 +393,7 @@
                 Please Wait...
             </div>
         </div>
-        <div id="popup" class="popup" >
+        <div id="popup" class="popup" runat="server">
     <div class="popup-content" id="popup-content">
         <p>Please wait...</p>
     </div>
@@ -473,6 +480,8 @@
                     </tr>
                 </table>
             </div>
+            <asp:UpdatePanel ID="reportpanel" runat="server">
+                                    <ContentTemplate>
             <div>
                 
                 <table style="width: 100%">
@@ -494,6 +503,8 @@
 
             </div>
         </div>
+                                        </ContentTemplate>
+                                </asp:UpdatePanel> 
         <div id="overlay" class="web_dialog_overlay">
         </div>
         <div id="graphPopup" runat="server" class="web_dialog" style="width: 73%">
