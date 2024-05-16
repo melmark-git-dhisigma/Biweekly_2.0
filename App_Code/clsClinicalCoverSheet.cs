@@ -188,32 +188,32 @@ public class clsClinicalCoverSheet
                       " SE.StdtSessEventType, CONVERT(CHAR(10), SE.EvntTs,101) AS EvntTs, " +
                       "  B.Behaviour FROM  [StdtSessEvent] SE LEFT JOIN LessonPlan L ON SE.LessonPlanId = L.LessonPlanId " +
                       "LEFT JOIN BehaviourDetails B ON B.MeasurementId=SE.MeasurementId WHERE EventType='EV' AND SE.StudentId=" + StudentId + " AND SE.StdtSessEventType<>'Medication') " +
-                      "UNION ALL (SELECT NULL AS MeasurementId, NULL AS StdtSessEventId,  'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" +
-                      "+ ( " +
-                      "        (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
-                      "        FROM   [user] US" +
-                      "       WHERE  US.userid = (SELECT" +
-                      "             createdby" +
-                      "                         FROM" +
-                      "           stdtsessionhdr Hdr" +
-                      "                       WHERE" +
-                      "         Hdr.stdtsessionhdrid = SH.ioasessionhdrid" +
-                      "        AND SH.ioaind = 'Y'))" +
-                      " + '/'" +
-                      " + (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
-                      "   FROM   [user] US" +
-                      "  WHERE  SH.ioauserid = US.userid) ) AS EventName," +
-                      " 'Arrow notes'                         AS" +
-                      " StdtSessEventType," +
-                      "CONVERT(CHAR(10), SH.endts, 101)      AS EvntTs," +
-                      "NULL                                  AS Behaviour" +
-                      " FROM   stdtsessionhdr SH" +
-                      "       LEFT JOIN lessonplan" +
-                      "             ON SH.lessonplanid = lessonplan.lessonplanid" +
-                      " WHERE  SH.ioaperc IS NOT NULL" +
-                      "      AND SH.ioaind = 'Y'" +
-                      "     AND SH.sessionstatuscd = 'S'" +
-                      "    AND SH.studentid =" + StudentId + ")" +
+                      //"UNION ALL (SELECT NULL AS MeasurementId, NULL AS StdtSessEventId,  'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" +
+                      //"+ ( " +
+                      //"        (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
+                      //"        FROM   [user] US" +
+                      //"       WHERE  US.userid = (SELECT" +
+                      //"             createdby" +
+                      //"                         FROM" +
+                      //"           stdtsessionhdr Hdr" +
+                      //"                       WHERE" +
+                      //"         Hdr.stdtsessionhdrid = SH.ioasessionhdrid" +
+                      //"        AND SH.ioaind = 'Y'))" +
+                      //" + '/'" +
+                      //" + (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
+                      //"   FROM   [user] US" +
+                      //"  WHERE  SH.ioauserid = US.userid) ) AS EventName," +
+                      //" 'Arrow notes'                         AS" +
+                      //" StdtSessEventType," +
+                      //"CONVERT(CHAR(10), SH.endts, 101)      AS EvntTs," +
+                      //"NULL                                  AS Behaviour" +
+                      //" FROM   stdtsessionhdr SH" +
+                      //"       LEFT JOIN lessonplan" +
+                      //"             ON SH.lessonplanid = lessonplan.lessonplanid" +
+                      //" WHERE  SH.ioaperc IS NOT NULL" +
+                      //"      AND SH.ioaind = 'Y'" +
+                      //"     AND SH.sessionstatuscd = 'S'" +
+                      //"    AND SH.studentid =" + StudentId + ")" +
                       "UNION ALL (SELECT  BIOA.MeasurementId, NULL AS StdtSessEventId,  'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" +
                       "+ CASE WHEN BIOA.normalbehaviorid IS NULL THEN ((SELECT" +
                       "      TOP 1" +
@@ -373,32 +373,32 @@ public class clsClinicalCoverSheet
                       " SE.StdtSessEventType, CONVERT(CHAR(10), SE.EvntTs,101) AS EvntTs, " +
                       "  B.Behaviour FROM  [StdtSessEvent] SE LEFT JOIN LessonPlan L ON SE.LessonPlanId = L.LessonPlanId " +
                       "LEFT JOIN BehaviourDetails B ON B.MeasurementId=SE.MeasurementId WHERE EventType='EV' AND SE.StudentId=" + StudentId + " AND SE.StdtSessEventType<>'Medication') " +
-                      "UNION ALL (SELECT NULL AS MeasurementId, NULL AS StdtSessEventId,  'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" +
-                      "+ ( " +
-                      "        (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
-                      "        FROM   [user] US" +
-                      "       WHERE  US.userid = (SELECT" +
-                      "             createdby" +
-                      "                         FROM" +
-                      "           stdtsessionhdr Hdr" +
-                      "                       WHERE" +
-                      "         Hdr.stdtsessionhdrid = SH.ioasessionhdrid" +
-                      "        AND SH.ioaind = 'Y'))" +
-                      " + '/'" +
-                      " + (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
-                      "   FROM   [user] US" +
-                      "  WHERE  SH.ioauserid = US.userid) ) AS EventName," +
-                      " 'Arrow notes'                         AS" +
-                      " StdtSessEventType," +
-                      "CONVERT(CHAR(10), SH.endts, 101)      AS EvntTs," +
-                      "NULL                                  AS Behaviour" +
-                      " FROM   stdtsessionhdr SH" +
-                      "       LEFT JOIN lessonplan" +
-                      "             ON SH.lessonplanid = lessonplan.lessonplanid" +
-                      " WHERE  SH.ioaperc IS NOT NULL" +
-                      "      AND SH.ioaind = 'Y'" +
-                      "     AND SH.sessionstatuscd = 'S'" +
-                      "    AND SH.studentid =" + StudentId + ")" +
+                      //"UNION ALL (SELECT NULL AS MeasurementId, NULL AS StdtSessEventId,  'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" +
+                      //"+ ( " +
+                      //"        (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
+                      //"        FROM   [user] US" +
+                      //"       WHERE  US.userid = (SELECT" +
+                      //"             createdby" +
+                      //"                         FROM" +
+                      //"           stdtsessionhdr Hdr" +
+                      //"                       WHERE" +
+                      //"         Hdr.stdtsessionhdrid = SH.ioasessionhdrid" +
+                      //"        AND SH.ioaind = 'Y'))" +
+                      //" + '/'" +
+                      //" + (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
+                      //"   FROM   [user] US" +
+                      //"  WHERE  SH.ioauserid = US.userid) ) AS EventName," +
+                      //" 'Arrow notes'                         AS" +
+                      //" StdtSessEventType," +
+                      //"CONVERT(CHAR(10), SH.endts, 101)      AS EvntTs," +
+                      //"NULL                                  AS Behaviour" +
+                      //" FROM   stdtsessionhdr SH" +
+                      //"       LEFT JOIN lessonplan" +
+                      //"             ON SH.lessonplanid = lessonplan.lessonplanid" +
+                      //" WHERE  SH.ioaperc IS NOT NULL" +
+                      //"      AND SH.ioaind = 'Y'" +
+                      //"     AND SH.sessionstatuscd = 'S'" +
+                      //"    AND SH.studentid =" + StudentId + ")" +
                       "UNION ALL (SELECT  BIOA.MeasurementId, NULL AS StdtSessEventId,  'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" +
                       "+ CASE WHEN BIOA.normalbehaviorid IS NULL THEN ((SELECT" +
                       "      TOP 1" +

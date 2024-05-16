@@ -347,7 +347,7 @@
     <script>
         function allowBackSpace(e, obj) {
             var evt = e || window.event;
-            if (evt.keyCode == 8) {
+            if (evt.keyCode == 8 || evt.keyCode == 46) {
                 obj.value = '';
             }
         }
