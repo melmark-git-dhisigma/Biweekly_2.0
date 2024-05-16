@@ -30026,6 +30026,9 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         oData = new clsData();
         SqlConnection con = null;
         SqlTransaction trans = null;
+		oSession = (clsSession)Session["UserSession"];
+        if (ViewState["StdtSessHdr"] != null)
+        {
         try
         {
             int queryStat = 0;
@@ -30104,6 +30107,21 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             ClsErrorLog clError = new ClsErrorLog();
             clError.WriteToLog(ex.ToString());
             throw ex;
+        }
+    }
+        else
+        {
+            ClsErrorLog clError = new ClsErrorLog();
+            oTemp = (ClsTemplateSession)Session["BiweeklySession"];
+            if (oTemp != null)
+            {
+                clError.WriteToLog("Viewstate[StdtSessHdr] was NULL \nStudentId=" + oSession.StudentId.ToString() + ",\nClassId=" + oSession.Classid.ToString() + ",\nbtnDiscard_ok_Click,\nDSTempHdrId=" + oTemp.TemplateId.ToString());
+            }
+            else
+            {
+                clError.WriteToLog("Viewstate[StdtSessHdr] was NULL \nStudentId=" + oSession.StudentId.ToString() + ",\nClassId=" + oSession.Classid.ToString() + ",\nbtnDiscard_ok_Click");
+            }
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "scriptdisc", "alert('Discard failed');", true);
         }
     }
 
@@ -31800,7 +31818,9 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
     {
         string ioastatu = "";
         oData = new clsData();
-
+        oSession = (clsSession)Session["UserSession"];
+        if (ViewState["StdtSessHdr"] != null)
+        {
         string disupdate = "select * from StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
         DataTable dis = new DataTable();
         dis = oData.ReturnDataTable(disupdate, false);
@@ -31836,8 +31856,24 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             }
         }
          ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "DiscardCheck('" + ioastatu + "');", true);
-       
-    }  
+        }
+        else
+        {
+            ClsErrorLog clError = new ClsErrorLog();
+            oTemp = (ClsTemplateSession)Session["BiweeklySession"];
+            if (oTemp != null)
+            {
+                clError.WriteToLog("Viewstate[StdtSessHdr] was NULL \nStudentId=" + oSession.StudentId.ToString() + ",\nClassId=" + oSession.Classid.ToString() + ",\nbtnDiscardDatasheet_Click,\nDSTempHdrId=" + oTemp.TemplateId.ToString());
+            }
+            else
+            {
+                clError.WriteToLog("Viewstate[StdtSessHdr] was NULL \nStudentId=" + oSession.StudentId.ToString() + ",\nClassId=" + oSession.Classid.ToString() + ",\nbtnDiscardDatasheet_Click");
+            }
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "scriptdisc", "alert('Discard failed');", true);
+
+        }
+
+    }
 
     protected void LoadDropdown(object sender, EventArgs e)
     {
