@@ -2251,7 +2251,8 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
                                     if (columns[i] != "")
                                     {
                                         columns[i] = Server.HtmlDecode(Regex.Replace(columns[i].ToString().Trim(), "<(.|\n)*?>", ""));
-                                        replaceWithTextsSingle(theDoc.MainDocumentPart, placeHolders[i], columns[i]);
+                                        columns[i]=columns[i]+"<br>";
+										replaceWithTextsSingle(theDoc.MainDocumentPart, placeHolders[i], columns[i]);
 
                                     }
                                     else
