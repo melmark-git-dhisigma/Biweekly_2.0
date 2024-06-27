@@ -3332,8 +3332,16 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     string updSteps = "UPDATE StdtSessionStep SET Comments='" + txtStepCmnts.Text.Replace("'","''") + "',SessionStatusCd='" + mistrial + "',SelectedSample='" + hfSample.Value.Replace("'", "''").Trim() + "',ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() " +
                                         "WHERE StdtSessionStepId=" + hfStepid.Value + " AND StdtSessionHdrId=" + sessHdrId + "";
-                                    oData.Execute(updSteps);
-
+                                    if (hfStepid.Value != null && hfStepid.Value.ToString() != "")
+                                    {
+                                        oData.Execute(updSteps);
+                                    }
+                                    else
+                                    {
+                                        ClsErrorLog clError = new ClsErrorLog();
+                                        oTemp = (ClsTemplateSession)Session["BiweeklySession"];
+                                        clError.WriteToLog("Null hfStepid\nDatasheet/updateDatas()\nStudent ID = " + oSession.StudentId + "\nDSTempHdrId = " + oTemp.TemplateId + "\nStdtSessionStep.StdtSessionHdrId=" + sessHdrId);
+                                    }
                                 }
                                 mistrial = "N";
 
@@ -3365,7 +3373,16 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                 string updStpDtls = "UPDATE StdtSessionDtl SET StepVal='" + pair.Value[scoreIndex].Replace("'", "''") + "',CurrentPrompt='" + crntPrmpt + "',SessionStatusCd='" + mistrial + "',ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() " +
                                     "WHERE StdtSessionStepId=" + hfStepid.Value + " AND DSTempSetColId=" + pair.Key + "";
-                                oData.Execute(updStpDtls);
+                                if (hfStepid.Value != null && hfStepid.Value.ToString() != "")
+                                {
+                                    oData.Execute(updStpDtls);
+                                }
+                                else
+                                {
+                                    ClsErrorLog clError = new ClsErrorLog();
+                                    oTemp = (ClsTemplateSession)Session["BiweeklySession"];
+                                    clError.WriteToLog("Null hfStepid\nDatasheet/updateDatas()\nStudent ID = " + oSession.StudentId + "\nDSTempHdrId = " + oTemp.TemplateId + "\nStdtSessionDtl.DSTempSetColId = " + pair.Key);
+                                }
 
 
                                 scoreIndex++;
@@ -4231,7 +4248,15 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 "INNER JOIN StdtSessionHdr Hdr ON Hdr.StdtSessionHdrId=Step.StdtSessionHdrId " +
                                 "INNER JOIN StdtSessionDtl Dtl INNER JOIN DSTempSetCol Col ON Col.DSTempSetColId=Dtl.DSTempSetColId " +
                                 "ON Dtl.StdtSessionStepId=Step.StdtSessionStepId WHERE Hdr.StdtSessionHdrId=" + SessHdrID + " AND Dtl.StdtSessionStepId=" + hfStepid.Value;
-                        DataTable dtColmns = oData.ReturnDataTable(qry, false);
+                        DataTable dtColmns = new DataTable();
+                        if (hfStepid.Value != null && hfStepid.Value.ToString() != "")
+                        {
+                            dtColmns = oData.ReturnDataTable(qry, false);
+                        }
+                        else
+                        {
+                            clError.WriteToLog("Null hfStepid\nDatasheet/LoadDdata()\nStudent ID = " + oSession.StudentId + "\nDSTempHdrId = " +oTemp.TemplateId + "\nStdtSessionDtl.StdtSessionHdrId = " + SessHdrID);
+                        }
                         int statusFlag = 0;
                         if (dtColmns != null)
                         {
@@ -30001,6 +30026,9 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         oData = new clsData();
         SqlConnection con = null;
         SqlTransaction trans = null;
+		oSession = (clsSession)Session["UserSession"];
+        if (ViewState["StdtSessHdr"] != null)
+        {
         try
         {
             int queryStat = 0;
@@ -30079,6 +30107,21 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             ClsErrorLog clError = new ClsErrorLog();
             clError.WriteToLog(ex.ToString());
             throw ex;
+        }
+    }
+        else
+        {
+            ClsErrorLog clError = new ClsErrorLog();
+            oTemp = (ClsTemplateSession)Session["BiweeklySession"];
+            if (oTemp != null)
+            {
+                clError.WriteToLog("Viewstate[StdtSessHdr] was NULL \nStudentId=" + oSession.StudentId.ToString() + ",\nClassId=" + oSession.Classid.ToString() + ",\nbtnDiscard_ok_Click,\nDSTempHdrId=" + oTemp.TemplateId.ToString());
+            }
+            else
+            {
+                clError.WriteToLog("Viewstate[StdtSessHdr] was NULL \nStudentId=" + oSession.StudentId.ToString() + ",\nClassId=" + oSession.Classid.ToString() + ",\nbtnDiscard_ok_Click");
+            }
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "scriptdisc", "alert('Discard failed');", true);
         }
     }
 
@@ -30666,7 +30709,8 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             else
                 Dt.Rows[0]["Status"] = "Current";
         }
-
+        if (sortNum != "")
+        {
         strQuery = "select SortOrder,SetCd as SETName from DSTempSet where DSTempHdrId=" + templateId + " and sortorder<" + Convert.ToInt32(sortNum) + "";
         DataTable dtOtherSetBelow = oData.ReturnDataTable(strQuery, false);
         if (dtOtherSetBelow != null)
@@ -30722,6 +30766,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         Dt.Columns[0].ColumnName = "SET";
         grdSetDetails.DataSource = Dt;
         grdSetDetails.DataBind();
+    }
+     else
+        {
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "scriptnoset", "alert('This lesson does not have any valid sets attached, please modify the lesson to assign sets...');", true);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "triggerDiscardClick('" + 0 + "');", true);
+        }
     }
     private string checkversion(string version)
     {
@@ -31775,7 +31825,9 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
     {
         string ioastatu = "";
         oData = new clsData();
-
+        oSession = (clsSession)Session["UserSession"];
+        if (ViewState["StdtSessHdr"] != null)
+        {
         string disupdate = "select * from StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
         DataTable dis = new DataTable();
         dis = oData.ReturnDataTable(disupdate, false);
@@ -31811,8 +31863,24 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             }
         }
          ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "DiscardCheck('" + ioastatu + "');", true);
-       
-    }  
+        }
+        else
+        {
+            ClsErrorLog clError = new ClsErrorLog();
+            oTemp = (ClsTemplateSession)Session["BiweeklySession"];
+            if (oTemp != null)
+            {
+                clError.WriteToLog("Viewstate[StdtSessHdr] was NULL \nStudentId=" + oSession.StudentId.ToString() + ",\nClassId=" + oSession.Classid.ToString() + ",\nbtnDiscardDatasheet_Click,\nDSTempHdrId=" + oTemp.TemplateId.ToString());
+            }
+            else
+            {
+                clError.WriteToLog("Viewstate[StdtSessHdr] was NULL \nStudentId=" + oSession.StudentId.ToString() + ",\nClassId=" + oSession.Classid.ToString() + ",\nbtnDiscardDatasheet_Click");
+            }
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "scriptdisc", "alert('Discard failed');", true);
+
+        }
+
+    }
 
     protected void LoadDropdown(object sender, EventArgs e)
     {
