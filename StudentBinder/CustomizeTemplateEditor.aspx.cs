@@ -48,7 +48,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
     {
         divMessage.InnerHtml = "";
         sess = (clsSession)Session["UserSession"];
-
+        Prevsess = (clsSession)Session["PreSession"];
         ObjTempSess = (ClsTemplateSession)Session["BiweeklySession"];
         //rbtnPromptLevel.Visible = false;
         //rdoRandomMoveover.Visible = false;
@@ -4571,7 +4571,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         try
         {
-			GetStepData(headerId);
+			GetStepData(headerId);       
             string txtCommentTypeofInstrP = txtCommentTypeofInstr.Text.Trim().Replace("'", "''");
             string UpdateAppr = "UPDATE DSTempHdr SET ApprNoteTypeInstruction='" + txtCommentTypeofInstrP + "' WHERE DSTempHdrId='" + headerId + "'";
             objData.Execute(UpdateAppr);
@@ -8520,40 +8520,49 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         {
             headerId = Convert.ToInt32(ViewState["HeaderId"]);
         }
+        SqlTransaction Transs = null;
+        SqlConnection con = objData.Open();
         try
         {
+            
             /// GET THE CURRENT SORTORDER OF THE STEP TO DELETE
             strQurry = "SELECT SortOrder from  DSTempParentStep WHERE DSTempParentStepId = " + stepId + "AND ActiveInd = 'A'";
             int currentSortOrder = Convert.ToInt32(objData.FetchValue(strQurry).ToString());
 
+            strQurry = "SELECT  DSTempParentStepId,SortOrder FROM DSTempParentStep"
+                      + " WHERE DSTempHdrId = " + headerId + " And ActiveInd = 'A' AND SortOrder >" + currentSortOrder;
+            DataTable dtList = objData.ReturnDataTable(strQurry, false);
+
+            clsData.blnTrans = true;
+            Transs = con.BeginTransaction();
 
             /// DELETE STEPS FROM ALL SETS IN DSTEMPSTEP TABLE
             /// 
             strQurry = "DELETE FROM DSTempStep WHERE DSTempParentStepId= " + stepId;
-            int index = objData.Execute(strQurry);
+            int index = objData.ExecuteWithTrans(strQurry,con,Transs);
 
             /// DELETE STEP FROM THE PARENT TABLE IE. DSTEMPPARENTSTEP
             /// 
             strQurry = "UPDATE DSTempParentStep SET ActiveInd = 'D' WHERE DSTempParentStepId = " + stepId;
-            index = objData.Execute(strQurry);
+            index = objData.ExecuteWithTrans(strQurry, con, Transs);
 
             /// REORDER PARENTSTEP TABLE
             /// 
-            strQurry = "SELECT  DSTempParentStepId,SortOrder FROM DSTempParentStep"
-                        + " WHERE DSTempHdrId = " + headerId + " And ActiveInd = 'A' AND SortOrder >" + currentSortOrder;
-            DataTable dtList = objData.ReturnDataTable(strQurry, false);
+          
 
             for (int i = 0; i < dtList.Rows.Count; i++)
             {
                 int sortOderToChange = Convert.ToInt32(dtList.Rows[i]["SortOrder"].ToString()) - 1;
                 strQurry = "UPDATE DSTempParentStep SET SortOrder = " + sortOderToChange + " WHERE DSTempParentStepId = " + Convert.ToInt32(dtList.Rows[i]["DSTempParentStepId"].ToString());
-                objData.Execute(strQurry);
+                objData.ExecuteWithTrans(strQurry, con, Transs);
 
                 strQurry = "UPDATE DSTempStep SET SortOrder = " + sortOderToChange + " WHERE DSTempParentStepId = " + Convert.ToInt32(dtList.Rows[i]["DSTempParentStepId"].ToString());
-                objData.Execute(strQurry);
+                objData.ExecuteWithTrans(strQurry, con, Transs);
             }
 
-
+            objData.CommitTransation(Transs, con);
+            if (con != null)
+            con.Close();
             #region OLD CODE {COMMENTED}
             // ------------------- OLD CODE ------------------
 
@@ -8618,7 +8627,12 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+                objData.RollBackTransation(Transs, con);
+            if (con != null)
+            con.Close();
+            ClsErrorLog errlog = new ClsErrorLog();
+            errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\n" + Ex.ToString());
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "stepremovescript", "alert('" + " Step removal failed" + "');", true);
         }
         drpTasklist_SelectedIndexChanged1(sender, e);
     }
@@ -18991,6 +19005,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
     }
     protected void btnContinue_Click(object sender, EventArgs e)
     {
+        SqlTransaction Transs = null;
         SqlConnection con = objData.Open();
         try
         {
@@ -19009,12 +19024,15 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
                 objData.ExecuteWithTrans("UPDATE DSTempParentStep SET ActiveInd = 'D'  WHERE DSTempHdrId = " + TemplateId, con, Transs);
                 objData.CommitTransation(Transs, con);
+                if (con != null)
+                    con.Close();
             }
 		hideAllOptions();
     }
-	catch (Exception Ex)
+        catch (Exception Ex)
         {
             objData.RollBackTransation(Transs, con);
+            if (con != null)
             con.Close();
             ClsErrorLog clError = new ClsErrorLog();
             clError.WriteToLog(Ex.ToString());
