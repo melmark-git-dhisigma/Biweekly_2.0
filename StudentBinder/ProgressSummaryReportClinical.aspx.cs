@@ -310,6 +310,7 @@ public partial class StudentBinder_ProgressSummaryReportClinical : System.Web.UI
                 SqlDataAdapter da = new SqlDataAdapter();
                 cmd = new SqlCommand("PSR_GridData_Clinical", con);
                 cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandTimeout = 600;
                 cmd.Parameters.AddWithValue("@StartDate", StartDate);
                 cmd.Parameters.AddWithValue("@EndDate", enddate);
                 cmd.Parameters.AddWithValue("@Studentid", sess.StudentId);
@@ -321,6 +322,10 @@ public partial class StudentBinder_ProgressSummaryReportClinical : System.Web.UI
             catch (Exception ex)
             {
                 Console.WriteLine("Error: " + ex);
+                tdMsg.InnerHtml = clsGeneral.warningMsg("Some of the behaviours may not be displayed due to larger amount of data. Please select a shorter date range.");
+                tdMsg.Visible = true;
+                ClsErrorLog errlog = new ClsErrorLog();
+                errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\nBehaviour ID = " + BehaviorId + "\n" + ex.ToString());
             }
             finally
             {
