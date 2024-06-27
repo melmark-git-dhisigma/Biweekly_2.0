@@ -6604,7 +6604,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         List<String> CountryName_list = new List<string>();
         try
         {
-            string selQuerry = "SELECT DSTempSetId,StepCd,StepName,SetIds,RANK() OVER(ORDER BY SortOrder) as SortOrder FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempParentStepId = " + stepId;
+            string selQuerry = "SELECT DSTempSetId,StepCd,StepName,SetIds,SortOrder,DSTempHdrId FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempParentStepId = " + stepId;
             DataTable dtList = objData.ReturnDataTable(selQuerry, false);
             if (dtList != null)
             {
@@ -6612,8 +6612,42 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 {
                     txtStepName.Text = dtList.Rows[0]["StepCd"].ToString();
                     txtStepDesc.Text = dtList.Rows[0]["StepName"].ToString();
-
+                    bool valueExists = false;
+                    foreach (ListItem item in ddlSortOrder.Items)
+                    {
+                        if (item.Value == dtList.Rows[0]["SortOrder"].ToString())
+                        {
+                            valueExists = true;
+                            break;
+                        }
+                    }
+                    if (!valueExists)
+                    {
+                        string selcorder = "SELECT  DSTempParentStepId,SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,RANK() OVER(ORDER BY SortOrder) as SortOrder,SetIds,SetNames FROM DSTempParentStep " +
+                        " WHERE DSTempHdrId = " + dtList.Rows[0]["DSTempHdrId"].ToString() + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + dtList.Rows[0]["DSTempHdrId"].ToString() + " AND ActiveInd = 'A') " +
+                        " AND ActiveInd = 'A' ORDER BY SortOrder";
+                        DataTable orderlist = objData.ReturnDataTable(selcorder, false);
+                       int  index = -1;
+                        if (orderlist != null)
+                        {
+                            if (orderlist.Rows.Count > 0)
+                            {
+                                for (int i = 0; i < orderlist.Rows.Count; i++)
+                                {
+                                    if ((int)orderlist.Rows[i]["DSTempParentStepId"] == stepId)
+                                    {
+                                        index = i;
+                                        break; 
+                                    }
+                                }
+                            }
+                        }
+                        ddlSortOrder.SelectedValue = orderlist.Rows[index]["SortOrder"].ToString();
+                    }
+                    else
+                    {
                     ddlSortOrder.SelectedValue = dtList.Rows[0]["SortOrder"].ToString();
+                    }
 
                     setParentId = dtList.Rows[0]["SetIds"].ToString();
                     if (setParentId != "")
@@ -7833,7 +7867,30 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 {
                     currentSortOrder = Convert.ToInt32(objParentStep.ToString());
                 }
+
+                string selcorder = "SELECT  DSTempParentStepId,SortOrder,RANK() OVER(ORDER BY SortOrder) as RankSortOrder FROM DSTempParentStep " +
+                        " WHERE DSTempHdrId = " + headerId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + headerId + " AND ActiveInd = 'A') " +
+                        " AND ActiveInd = 'A' ORDER BY SortOrder";
+                DataTable orderlist = objData.ReturnDataTable(selcorder, false);
                 int newSortOrder = Convert.ToInt32(ddlSortOrder.SelectedValue);
+                int newsortorder2 = 0;
+                if (orderlist != null)
+                {
+                    if (orderlist.Rows.Count > 0)
+                    {
+                        for (int i = 0; i < orderlist.Rows.Count; i++)
+                        {
+                            if (Convert.ToInt32(orderlist.Rows[i]["RankSortOrder"]) == newSortOrder)
+                            {
+                                    newsortorder2 = Convert.ToInt32(orderlist.Rows[i]["SortOrder"]);
+                                    break;
+                            }
+                        }
+                    }
+                }
+                newSortOrder = newsortorder2;
+
+              //  int newSortOrder = Convert.ToInt32(ddlSortOrder.SelectedValue);
 
                 /// UPDATE PARENTSTEP TABLE WITH THE STEP DETAILS AND SORTORDER
                 /// 
