@@ -1116,6 +1116,10 @@
                             } else if (frqstat == 2) {
                                 leftY = "%Interval";
                                 leftmax = 100;
+                            }
+                            else if (frqstat == 3) {
+                                leftY = "%Opportunities";
+                                leftmax = 100;
                             } else {
                                 leftY = "Frequency";
                                 if(lmax==0)
@@ -2311,6 +2315,10 @@
                                 }
                             } else if (frqstat == 2) {
                                 leftY = "%Interval";
+                                leftmax = 100;
+                            }
+                            else if (frqstat == 3) {
+                                leftY = "%Opportunities";
                                 leftmax = 100;
                             } else {
                                 leftY = "Frequency";
