@@ -602,7 +602,7 @@
                                         <asp:Button ID="btnGenDelete" runat="server" Text="Delete" CssClass="NFButton" Style="float: right;" OnClick="btnGenDelete_Click" OnClientClick="javascript:return Delete();"/>
 									</td>
                                     <td>
-                                        <asp:Button ID="btnGenNewSheet" runat="server" CssClass="NFButton" ToolTip="Create new sheet" alt="Create New Document" OnClick="btnGenNewClinicalSheet_Click" Text="Create New Coversheet" Style="width: auto;" />
+                                        <asp:Button ID="btnGenNewSheet" runat="server" CssClass="NFButton" ToolTip="Create new sheet" alt="Create New Document" OnClick="btnGenNewClinicalSheet_Click" OnClientClick="showWait();" Text="Create New Coversheet" Style="width: auto;" />
                                         
                                     </td>
                                 </tr>
@@ -631,7 +631,7 @@
                                                     <div class='nobdrrcontainer'>
                                                         <asp:DataList ID="dlDateList" runat="server" OnItemCommand="dlDateList_ItemCommand">
                                                             <ItemTemplate>
-                                                                <asp:LinkButton ID="lnkDate" CssClass="grmb" runat="server" Text='<%# DataBinder.Eval(Container.DataItem,"EDate","{0:MM/dd/yyyy}") %>' ToolTip='<%# DataBinder.Eval(Container.DataItem,"EDate","{0:MM/dd/yyyy}") %>' CommandArgument='<%# DataBinder.Eval(Container.DataItem,"EDate","{0:MM/dd/yyyy}") %>'></asp:LinkButton>
+                                                                <asp:LinkButton ID="lnkDate" CssClass="grmb" runat="server" OnClientClick="showWait();" Text='<%# DataBinder.Eval(Container.DataItem,"EDate","{0:MM/dd/yyyy}") %>' ToolTip='<%# DataBinder.Eval(Container.DataItem,"EDate","{0:MM/dd/yyyy}") %>' CommandArgument='<%# DataBinder.Eval(Container.DataItem,"EDate","{0:MM/dd/yyyy}") %>'></asp:LinkButton>
                                                             </ItemTemplate>
                                                         </asp:DataList>
                                                             <div class='clear'></div>
@@ -1435,7 +1435,7 @@
                                                         </tr>
                                                         <tr>
                                                             <td colspan="3" style="text-align: center">
-                                                                <asp:Button ID="btnSave" runat="server" Text="Save" Width="80px" CssClass="NFButton" OnClick="btnSave_Click" OnClientClick="javascript: scrollToTop();"/></td>
+                                                                <asp:Button ID="btnSave" runat="server" Text="Save" Width="80px" CssClass="NFButton" OnClick="btnSave_Click" OnClientClick="javascript: scrollToTop(); showWait();"/></td>
                                                         </tr>
                                                     </table>
                                                     <br />
@@ -1476,7 +1476,7 @@
                                             </tr>
                                             <tr>
                                                 <td class="tdText" style="text-align: center" colspan="6">
-                                                    <asp:Button ID="btnGenCLS" runat="server" Text="Generate" OnClick="btnGenCLS_Click" CssClass="NFButton" />
+                                                    <asp:Button ID="btnGenCLS" runat="server" Text="Generate" OnClick="btnGenCLS_Click" OnClientClick="showWait();" CssClass="NFButton" />
                                                     <input type="button" id="CancalGen" class="NFButton" value="Cancel" />
                                                 </td>
                                             </tr>
