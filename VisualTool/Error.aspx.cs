@@ -7,7 +7,7 @@ using System.Web.UI.WebControls;
 
 public partial class Admin_Error : System.Web.UI.Page
 {
-    private static clsSession sess = null;
+    private clsSession sess = null;
     protected void Page_Load(object sender, EventArgs e)
     {
         sess = (clsSession)Session["UserSession"];

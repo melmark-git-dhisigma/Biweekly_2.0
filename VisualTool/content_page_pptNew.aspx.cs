@@ -11,7 +11,7 @@ public partial class content_page_pptNew : System.Web.UI.Page
     svc_contentPage.clsResponse response = new svc_contentPage.clsResponse();
     svc_contentPage.content_clsRequest request = new svc_contentPage.content_clsRequest();
     clsData oData = null;
-    public static clsSession sess = null;
+    public clsSession sess = null;
     protected void Page_Load(object sender, EventArgs e)
     {
         oData = new clsData();

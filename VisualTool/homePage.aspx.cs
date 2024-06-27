@@ -7,7 +7,7 @@ using System.Web.UI.WebControls;
 
 public partial class homePage : System.Web.UI.Page
 {
-    public static clsSession sess = null;
+    public clsSession sess = null;
     protected void Page_Load(object sender, EventArgs e)
     {
         sess = (clsSession)Session["UserSession"];

@@ -13,7 +13,7 @@ using System.Web.Script.Services;
 
 public partial class AdminMasterFree : System.Web.UI.MasterPage
 {
-    public static clsSession sess = null;
+    public clsSession sess = null;
 
     protected void Page_Load(object sender, EventArgs e)
     {
