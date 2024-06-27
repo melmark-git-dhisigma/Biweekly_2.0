@@ -1130,7 +1130,7 @@
                                     leftmax = lmax;
                                 }
                             }
-							var subtt =  res[0].Stratgy;
+                            var subtt =  res[0].Stratgy;
                             //left y axis name and max end
                             //right y axis name and max value
                             var durstat = res[0].DuratnStat;
@@ -1171,6 +1171,7 @@
                                         catdata['color'] = 'blue';
                                         catdata['symbol'] = { symbol: 'diamond', enabled: true, hover: { enabled: true } };
                                         catdata['IOAPerc'] = item.ioapercfrq;
+                                        catdata['arrownote'] = item.arrownote;
                                         catdata['date'] = date;
                                         catdata['yAxis'] = 0;
                                 changedData.push(catdata);
@@ -1185,6 +1186,7 @@
                                         catdata['color'] = 'red';
                                         catdata['symbol'] = { symbol: 'square', enabled: true, hover: { enabled: true } };
                                         catdata['IOAPerc'] = item.ioapercdur;
+                                        catdata['arrownote'] = item.arrownote;
                                         catdata['date'] = date;
                                         catdata['yAxis'] = 1;
                                 changedData.push(catdata);
@@ -1223,6 +1225,7 @@
                                        x: item.date,
                                        y: item.value,
                                        IOAPerc:item.IOAPerc,
+                                       arrownote:item.arrownote,
                                     };
                                 })
                                     
@@ -1418,11 +1421,11 @@
                 $.map(res, function (item, index) {
                     if (item['eventtype'] == "Arrow notes") {
                         if (item['frequency'] != null) {
-                            ar.push({ x: extractdate(item['aggredateddate']), y: item['frequency'], arrowval: item['eventname'] });
+                            ar.push({ x: extractdate(item['aggredateddate']), y: item['frequency'], arrowval: item['eventname'], arrow: item['arrownote'] });
                     }
                         else
                             {
-                            ar.push({ x: extractdate(item['aggredateddate']), y: item['duration'], arrowval: item['eventname'] });
+                            ar.push({ x: extractdate(item['aggredateddate']), y: item['duration'], arrowval: item['eventname'], arrow: item['arrownote'] });
                         }
                     }
                 });
@@ -1597,8 +1600,8 @@
                                                     newpoint += '<span style="font-size: 12px; font-family: Arial; color: black; font-weight:normal">' + words[i] + '</span><br> ';
                                                 } else {
                                                     newpoint += '<span style="font-size: 12px; font-family: Arial; color: black; font-weight:normal">' + words[i] + '</span> ';
-                                    }
-                                        }
+                                                }
+                                            }
                                             return '<div style="white-space: nowrap; font-weight: normal;font-size: 12px; font-family: Arial; color: black">' + newpoint + '</div>';
                                         }
                                         else {
@@ -1607,6 +1610,9 @@
                                     }
                                     else if (point.arrowval) {
                                         return '<span style="transform: rotate(-45deg); display: block; white-space: nowrap;font-size: 12px; font-family:Arial;font-color:black;text-shadow: none;font-weight:normal;">' + point.arrowval;
+                                    }
+                                    else if (point.arrownote) {
+                                        return '<span style="font-size: 14px; font-family: Arial; color: black; font-weight:normal">' + point.arrownote + '</span>';
                                     }
                                     else {
                                         return '';
@@ -2329,7 +2335,7 @@
                                     leftmax = lmax;
                                 }
                             }
-							var subtt = res[0].Stratgy;
+                            var subtt = res[0].Stratgy;
                             //left y axis name and max end
                             //right y axis name and max value
                             var durstat = res[0].DuratnStat;
@@ -2366,6 +2372,7 @@
                                         catdata['color'] = 'blue';
                                         catdata['symbol'] = { symbol: 'diamond', enabled: true, hover: { enabled: true } };
                                         catdata['IOAPerc'] = item.ioapercfrq;
+                                        catdata['arrownote'] = item.arrownote;
                                         catdata['date'] = date;
                                         catdata['yAxis'] = 0;
                                         changedData.push(catdata);
@@ -2380,6 +2387,7 @@
                                         catdata['color'] = 'red';
                                         catdata['symbol'] = { symbol: 'square', enabled: true, hover: { enabled: true } };
                                         catdata['IOAPerc'] = item.ioapercdur;
+                                        catdata['arrownote'] = item.arrownote;
                                         catdata['date'] = date;
                                         catdata['yAxis'] = 1;
                                         changedData.push(catdata);
@@ -2418,6 +2426,7 @@
                                             x: item.date,
                                             y: item.value,
                                             IOAPerc: item.IOAPerc,
+                                            arrownote: item.arrownote,
                                         };
                                     })
 
@@ -2611,10 +2620,10 @@
                 $.map(res, function (item, index) {
                     if (item['eventtype'] == "Arrow notes") {
                         if (item['frequency'] != null) {
-                            ar.push({ x: extractdate(item['aggredateddate']), y: item['frequency'], arrowval: item['eventname'] });
+                            ar.push({ x: extractdate(item['aggredateddate']), y: item['frequency'], arrowval: item['eventname'], arrow: item['arrownote'] });
                         }
                         else {
-                            ar.push({ x: extractdate(item['aggredateddate']), y: item['duration'], arrowval: item['eventname'] });
+                            ar.push({ x: extractdate(item['aggredateddate']), y: item['duration'], arrowval: item['eventname'], arrow: item['arrownote'] });
                         }
                     }
                 });
@@ -2800,6 +2809,9 @@
                                     }
                                     else if (point.arrowval) {
                                         return '<span style="transform: rotate(-45deg); display: block; white-space: nowrap;font-size: 14px; font-family:Arial;font-color:black;text-shadow: none;font-weight:normal;">' + point.arrowval;
+                                    }
+                                    else if (point.arrownote) {
+                                        return '<span style="font-size: 14px; font-family: Arial; color: black; font-weight:normal">' + point.arrownote + '</span>';
                                     }
                                     else {
                                         return '';
