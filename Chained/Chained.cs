@@ -667,7 +667,10 @@ namespace Chained
             //        tempCount++;
             //}
             float Consavgval = 0;
-            for (int i = 0; i < sArray.Length; i++)
+            int iStart = sArray.Length - TrialVal;
+            if (iStart < 0)
+                iStart = 0;
+            for (int i = iStart; i < sArray.Length; i++)
             {
                 Consavgval += sArray[i];
             }
@@ -706,9 +709,11 @@ namespace Chained
         // consecutive avg duration and frequency Start//
         public static int ConsecutiveCountTestNewAvgDur(float[] sArray, float sCheckFor, bool SuccessCount, int TrialVal,int fredurStat)
         {
-           
+            int iStart = sArray.Length - TrialVal;
+            if (iStart < 0)
+                iStart = 0;
             float Consavgval = 0;
-            for (int i = 0; i < sArray.Length; i++)
+            for (int i = iStart; i < sArray.Length; i++)
             {
                 Consavgval += sArray[i];
             }
@@ -822,7 +827,10 @@ namespace Chained
         {
            
             float Consavgval = 0;
-            for (int i = 0; i < sArray.Length; i++)
+            int iStart = sArray.Length - TrialVal;
+            if (iStart < 0)
+                iStart = 0;
+            for (int i = iStart; i < sArray.Length; i++)
             {
                 Consavgval += sArray[i];
             }
@@ -860,7 +868,7 @@ namespace Chained
             if (iStart < 0)
                 iStart = 0;
 
-            for (int i = 0; i < sArray.Length; i++)
+            for (int i = iStart; i < sArray.Length; i++)
             {
                 if (sArray[i] != -9999)
                 {
@@ -882,7 +890,7 @@ namespace Chained
             if (iStart < 0)
                 iStart = 0;
 
-            for (int i = 0; i < sArray.Length; i++)
+            for (int i = iStart; i < sArray.Length; i++)
             {
                 if (sArray[i] != -9999)
                 {
