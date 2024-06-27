@@ -1669,7 +1669,15 @@
                          }
                      },
 
-                                         series: ser,
+                     series: ser,
+                     exporting: {
+                         sourceWidth: 935.43307,
+                         sourceHeight: 688.901215752,
+                         // scale: 2 (default)
+                         //chartOptions: {
+                         //    subtitle: null
+                         //}
+                     }
                  });
              }
 
@@ -1798,7 +1806,16 @@
                                       }
                                   },
 
-                              }]
+                              }],
+                              exporting: {
+                                  sourceWidth: 935.43307,
+                                  sourceHeight: 164.05358746,
+                                  // scale: 2 (default)
+                                  //chartOptions: {
+                                  //    subtitle: null
+                                  //}
+                              }
+
                           });
                       },
                       error: OnErrorCall
@@ -2665,6 +2682,14 @@
                              },
 
                              series: ser,
+                             exporting: {
+                                 sourceWidth: 935.43307,
+                                 sourceHeight: 688.901215752,
+                                 // scale: 2 (default)
+                                 //chartOptions: {
+                                 //    subtitle: null
+                                 //}
+                             }
                          });
                          }
                          var medjson = JSON.stringify({ StartDate: sdate, enddate: edate, studid: sid, SchoolId: scid });
@@ -2792,7 +2817,15 @@
                                                  }
                                              },
 
-                                         }]
+                                         }],
+                                         exporting: {
+                                             sourceWidth: 935.43307,
+                                             sourceHeight: 164.05358746,
+                                             // scale: 2 (default)
+                                             //chartOptions: {
+                                             //    subtitle: null
+                                             //}
+                                         }
                                      });
                                  },
                                  error: OnErrorCall
