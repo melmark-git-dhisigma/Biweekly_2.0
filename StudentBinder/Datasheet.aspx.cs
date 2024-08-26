@@ -3418,7 +3418,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 }
             }
         }
+        object ValChk = oData.FetchValue("SELECT crntset FROM DSTempHdr WHERE DSTempHdrId=" + oTemp.TemplateId);
+        if (Convert.ToString(ValChk) != "")        
+        {
         oData.Execute("UPDATE DSTempHdr SET crntset=NULL,crntstep=NULL,crntprompt=NULL,nextsetno=NULL WHERE DSTempHdrId=" + oTemp.TemplateId);
+        }
         return rtrn;
     }
 
