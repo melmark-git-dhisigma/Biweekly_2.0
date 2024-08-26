@@ -442,7 +442,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             btnUpdateset.Visible = false;
             btnUpdatesteps.Visible = false;
             btUpdateMeasurement.Visible = false;
-			ddlPromptProcedure.Enabled = false;
+            ddlPromptProcedure.Enabled = false;
             lstCompletePrompts.Visible = true;
             lstSelectedPrompts.Visible = true;
             lstCompletePrompts.Enabled = false;
@@ -496,7 +496,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             btnUpdatesteps.Visible = true;
             btnUpdateset.Visible = true;
             btUpdateMeasurement.Visible = true;
-			lstCompletePrompts.Visible = true;
+            lstCompletePrompts.Visible = true;
             lstSelectedPrompts.Visible = true;
             lblSelctPrompt.Visible = true;
             ddlPromptProcedure.Enabled = true;
@@ -4592,7 +4592,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         try
         {
-			GetStepData(headerId);       
+            GetStepData(headerId);       
             string txtCommentTypeofInstrP = txtCommentTypeofInstr.Text.Trim().Replace("'", "''");
             string UpdateAppr = "UPDATE DSTempHdr SET ApprNoteTypeInstruction='" + txtCommentTypeofInstrP + "' WHERE DSTempHdrId='" + headerId + "'";
             objData.Execute(UpdateAppr);
@@ -4600,7 +4600,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             if (chkDiscrete.Checked == true)
             {
                 skilltype = "Discrete";
-				dlStepDetails.Visible = false;
+                dlStepDetails.Visible = false;
                 stepPanel.Style.Add("display", "None");
                 lblStepStart.Visible = false;
                 btnAddStepCriteria.Visible = false;
@@ -4610,7 +4610,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             {
                 skilltype = "Chained";
                 txtNoofTrail.Text = "";
-				dlStepDetails.Visible = true;
+                dlStepDetails.Visible = true;
                 stepPanel.Style.Add("display", "Block");
                 lblStepStart.Visible = true;
                 btnAddStepCriteria.Visible = true;
@@ -10802,7 +10802,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         txtfreqIncrctResp.Text = "";
         chkFrequency.Checked = false;
         txtFrequency.Text = "";
-		tdMsgMeasure.InnerHtml = "";
+        tdMsgMeasure.InnerHtml = "";
     }
     protected void EditMeasureData(int columnId)
     {
@@ -11891,7 +11891,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
     }
     //--- [New Criteria] May 2020 - (End) ---//
-	protected void btUpdateMeasurement_Click(object sender, EventArgs e)
+    protected void btUpdateMeasurement_Click(object sender, EventArgs e)
     {
         int headerId = 0;
         if (ViewState["HeaderId"] != null)
@@ -13070,6 +13070,29 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);            
                         return;
                     }
+
+                    if (skilltype == "Chained")
+                    {
+
+                        string strQrystepTot = "SELECT Count(DSTempParentStepId) from DSTempParentStep where DSTempHdrId=" + TemplateId + "  and ActiveInd='A'";
+                        int dtCheckstepTot = Convert.ToInt32(objData.FetchValue(strQrystepTot));
+                        if (dtCheckstepTot > 0)
+                        {
+                            string strQrystep = "SELECT Count(SetIds) from DSTempParentStep where DSTempHdrId=" + TemplateId + " and SetIds='' and ActiveInd='A'";
+                            int dtCheckstep = Convert.ToInt32(objData.FetchValue(strQrystep));
+                            if (dtCheckstep > 0)
+                            {
+                                tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting. Step to Set mapping is missing");
+                                alertmsg = "Please complete template details before submitting. Step to Set mapping is missing";
+                                FillTypeOfInstruction(TemplateId);
+                                ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
+                                return;
+                            }
+                        }
+                    }
+
+
+
                     if (hdrid != "")
                     {
                         if (dt != null)
@@ -13678,6 +13701,25 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     FillTypeOfInstruction(TemplateId);
                     return;
                 }
+
+                if (skilltype == "Chained")
+                    {
+                        string strQrystepTot = "SELECT Count(DSTempParentStepId) from DSTempParentStep where DSTempHdrId=" + TemplateId + "  and ActiveInd='A'";
+                        int dtCheckstepTot = Convert.ToInt32(objData.FetchValue(strQrystepTot));
+                        if (dtCheckstepTot > 0)
+                        {
+                            string strQrystep = "SELECT Count(SetIds) from DSTempParentStep where DSTempHdrId=" + TemplateId + " and SetIds='' and ActiveInd='A'";
+                            int dtCheckstep = Convert.ToInt32(objData.FetchValue(strQrystep));
+                            if (dtCheckstep > 0)
+                            {
+                                previewSuccess = false;
+                                tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before preview. Step to Set mapping is missing");
+                                FillTypeOfInstruction(TemplateId);
+                                return;
+                            }
+                        }
+                     }
+
                 if (hdrid != "")
                 {
                     if (dt != null)
@@ -14778,7 +14820,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     drpTasklist_SelectedIndexChanged1(sender, e);
                     tdReadMsg.InnerHtml = clsGeneral.sucessMsg("Template Editor Successfully Approved...");
                     BtnApproval_hdn.Visible = false;
-					Hdfsavemeasure.Value = "1";
+                    Hdfsavemeasure.Value = "1";
                     DatalistVisibility(false);
                     Hdfsavemeasure.Value = "";
                     string VerNbr = Convert.ToString(objData.FetchValue("Select VerNbr from DSTempHdr where DSTemphdrId = " + TemplateId + ""));
@@ -18716,7 +18758,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             int apprvLessId = Convert.ToInt32(objData.FetchValue("SELECT COUNT(*) FROM DSTempHdr WHERE LessonPlanId= (SELECT LessonPlanId FROM DSTempHdr WHERE DSTempHdrId=" + tmpId + ") AND StudentId=" + sess.StudentId + " AND StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatuS' AND (LookupName='In Progress' OR LookupName='Pending Approval'))"));
             if (apprvLessId == 0)
             {
-				Hdfsavemeasure.Value = "";
+                Hdfsavemeasure.Value = "";
                 BtnCopyTemplate_Click(sender, e);
                 //string Qury = "UPDATE DSTempHdr SET LessonSDate='" + lessonSDate.Text + "' and LessonEDate='" + lessonEDate.Text + "' and Reason_New='" + clsGeneral.convertQuotes(txtApLPReason.Text.Trim()) + "' WHERE DSTempHdrId=" + tmpId + "";  //---Commmented for Fixing Errorlog production log 2020
                 string Qury = "UPDATE DSTempHdr SET LessonSDate='" + lessonSDate.Text + "' ,LessonEDate='" + lessonEDate.Text + "' ,Reason_New='" + clsGeneral.convertQuotes(txtApLPReason.Text.Trim()) + "' WHERE DSTempHdrId=" + tmpId + ""; //Modifed query for above query prduction log
@@ -18960,6 +19002,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         if (promptDDL.SelectedValue != "")
                         {
                             Session["sCurrentPrompt"] = objData.FetchValue("SELECT PromptId FROM DSTempPrompt WHERE DSTempPromptId=" + promptDDL.SelectedValue);
+                            string prmptUpdQry = "UPDATE DSTempStep SET StepByStepPrompt = " + promptDDL.SelectedValue + " WHERE DSTempStepId = " + stepId.Value;
+                            objData.Execute(prmptUpdQry);
                         }
                     }
 
@@ -19054,7 +19098,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 		drpTeachingProc.Items.Clear();
 		objData = new clsData();
 		objData.ReturnDropDown("Select LookupId as Id , LookupName as Name from dbo.LookUp where ParentLookupId=" + parentLookupId, drpTeachingProc);
-			string selitem = drp_teachingFormat.SelectedItem.ToString();
+            string selitem = drp_teachingFormat.SelectedItem.ToString();
             if (selitem != "Task Analysis" && selitem != "Other")
             {
                 clsData.blnTrans = true;
@@ -19217,7 +19261,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 }
                 emailFullReset(sender, e);
                 LoadData();
-				LoadTemplateData(headerid);
+                LoadTemplateData(headerid);
                 ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "alertMessage('Mail Send Successfully','green');", true);
                 if (buttonId.Equals("BtnEmailApproveSend"))
                 {
@@ -19448,6 +19492,27 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
                             return;
                         }
+
+                   if (skilltype == "Chained")
+
+                    {   string strQrystepTot = "SELECT Count(DSTempParentStepId) from DSTempParentStep where DSTempHdrId=" + TemplateId + "  and ActiveInd='A'";
+                        int dtCheckstepTot = Convert.ToInt32(objData.FetchValue(strQrystepTot));
+                        if (dtCheckstepTot > 0)
+                        {
+                            string strQrystep = "SELECT Count(SetIds) from DSTempParentStep where DSTempHdrId=" + TemplateId + " and SetIds= '' and ActiveInd='A'";
+                            int dtCheckstep = Convert.ToInt32(objData.FetchValue(strQrystep));
+                            if (dtCheckstep > 0)
+                            {
+                                tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting. Step to Set mapping is missing");
+                                alertmsg = "Please complete template details before submitting. Step to Set mapping is missing";
+                                FillTypeOfInstruction(TemplateId);
+                                ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
+                                return;
+                            }
+                        }
+                     }
+
+
                         if (hdrid != "")
                         {
                             if (dt != null)
