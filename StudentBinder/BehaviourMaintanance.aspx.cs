@@ -37,6 +37,7 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
     {
         Session["Visibility"] = "0";
         sess = (clsSession)Session["UserSession"];
+        Prevsess = (clsSession)Session["PreSession"];
 
         if (sess == null)
         {
@@ -445,21 +446,25 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
                 if (txtPeriod.Text == "")
                 {
                     tdMsg.InnerHtml = clsGeneral.warningMsg("Please enter period...");
+                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                     return;
                 }
                 if (txtInterval.Text == "")
                 {
                     tdMsg.InnerHtml = clsGeneral.warningMsg("Please enter interval...");
+                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                     return;
                 }
                 if (ddlHour.SelectedItem.Text == "Hr" || ddlMinute.SelectedItem.Text == "Min")
                 {
                     tdMsg.InnerHtml = clsGeneral.warningMsg("Please select start time");
+                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                     return;
                 }
                 if (ddlEndHr.SelectedItem.Text == "Hr" || ddlEndMin.SelectedItem.Text == "Min")
                 {
                     tdMsg.InnerHtml = clsGeneral.warningMsg("Please select End Time");
+                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                     return;
                 }
                 ///date picker validation
@@ -467,11 +472,13 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
                 if (txtStartDate.Text == "")
                 {
                     tdMsg.InnerHtml = clsGeneral.warningMsg("Please select start date");
+                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                     return;
                 }
                 if (txtEndsOn.Text == "")
                 {
                     tdMsg.InnerHtml = clsGeneral.warningMsg("Please select end date");
+                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                     return;
                 }
                 ///end date picker validation
@@ -483,12 +490,13 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
                     if (interval < period)
                     {
                         tdMsg.InnerHtml = clsGeneral.warningMsg("Period should not be greater than Interval");
+                        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                         return;
                     }
                 }
                 catch
                 {
-
+                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                 }
             }
 
@@ -506,6 +514,7 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
                     if (StartTime >= EndTime)
                     {
                         tdMsg.InnerHtml = clsGeneral.warningMsg("End time must be after start time");
+                        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                         return;
                     }
                 }
@@ -516,6 +525,7 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
             catch (Exception Ex)
             {
                 flag = 0;
+                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                 //throw Ex;
             }
         }
@@ -858,6 +868,7 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
                                                     }
                                                     catch (Exception Ex)
                                                     {
+                                                        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                                                         errorflg++;
                                                         tdMsg.InnerHtml = clsGeneral.failedMsg("....Partial Interval Entry Failed !");
                                                         throw Ex;
@@ -926,6 +937,7 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
                                                 }
                                                 catch (Exception eX)
                                                 {
+                                                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                                                     tdMsg.InnerHtml = clsGeneral.failedMsg("Failed !");
                                                     throw eX;
                                                 }
@@ -1244,6 +1256,7 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
                                             }
                                             catch (Exception Ex)
                                             {
+                                                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                                                 errorflg++;
                                                 tdMsg.InnerHtml = clsGeneral.failedMsg("Partial Interval Entry Failed !");
                                                 throw Ex;
@@ -1294,6 +1307,7 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
                                         }
                                         catch (Exception eX)
                                         {
+                                            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                                             errorflg++;
                                             tdMsg.InnerHtml = clsGeneral.failedMsg("Updating Failed !");
                                             throw eX;
@@ -1507,6 +1521,7 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
         {
             tdMsg.InnerHtml = clsGeneral.warningMsg("Please Select Student");
         }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
 
 
@@ -2075,7 +2090,7 @@ public partial class StudentBinder_BehaviourMaintanance : System.Web.UI.Page
                         if (chkYesOrNo.Checked == true && chkDuration.Checked == false && chkFrequency.Checked == false)
                         {
                             lblCalcOpp.Visible = true;
-                            chkOpportunities.Visible = true;                            
+                            chkOpportunities.Visible = true;
                             try
                             {
                                 chkOpportunities.Checked = Convert.ToBoolean(Dt.Rows[0]["Opportunities"]);
