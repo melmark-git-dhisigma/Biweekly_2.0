@@ -565,7 +565,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                     if (SkillType == "Discrete")
                     {
-                        sqlQry = "SELECT * FROM StdtSessionStep WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
+                        sqlQry = "SELECT * FROM StdtSessionStep WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString() +" ORDER BY TrialNbr";
                     }
                     DataTable dtstepIDs = new DataTable();
                     dtstepIDs = oData.ReturnDataTable(sqlQry, false);
