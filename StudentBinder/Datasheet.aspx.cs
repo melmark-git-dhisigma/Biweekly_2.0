@@ -47,6 +47,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
     string ip = "";
     string HostName = "";
     string userAgent = "";
+    bool updateCheck = true;
     DateTime now = DateTime.Now;
     DateTime today = DateTime.Today;
 
@@ -134,6 +135,17 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                 }
 
+                string strModqry = "SELECT ModifiedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + Request.QueryString["SessHdrID"];
+                object objModDate = oData.FetchValue(strModqry);
+                if (objModDate != null)
+                {
+                    Session["HdrModifiedDate"] = objModDate.ToString();
+                }
+                else { 
+                    string strcrqry = "SELECT CreatedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + Request.QueryString["SessHdrID"];
+                    object creatobj=oData.FetchValue(strcrqry);
+                    Session["HdrModifiedDate"] = creatobj.ToString();
+                }
 
                 hdnTemplateId.Value = oTemp.TemplateId.ToString();
                 DatasheetKey = "DataSht_Sess-" + hdnTemplateId.Value.ToString();
@@ -553,7 +565,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                     if (SkillType == "Discrete")
                     {
-                        sqlQry = "SELECT * FROM StdtSessionStep WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
+                        sqlQry = "SELECT * FROM StdtSessionStep WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString() +" ORDER BY TrialNbr";
                     }
                     DataTable dtstepIDs = new DataTable();
                     dtstepIDs = oData.ReturnDataTable(sqlQry, false);
@@ -1356,10 +1368,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     {
                         if (totalTaskType == "Randomized")
                         {
+                            sqlStr = "SELECT [DSTempStepId],[StepCd]+' - '+[StepName] as StepCd,[StepName],SortOrder as StepId  FROM [dbo].[DSTempStep] " +
+                                " WHERE DSTempHdrId=" + oTemp.TemplateId + " AND  DsTempSetId=" + SetId + " AND ActiveInd='A' AND IsDynamic=0 ORDER BY [SortOrder]";
                             Session["totalRandom"] = "Randomized";
                             if (ViewState["StdtSessHdr"] != null)
                             {
-								if (Convert.ToBoolean(ViewState["IsHistory"]) != true)
+                                if (Convert.ToBoolean(ViewState["IsHistory"]) != true)
                                 {
                                     string currstatus = "select * from StdtSessionHdr where StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
                                     DataTable dtcstatus = new DataTable();
@@ -1405,7 +1419,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         else
                                         {
-                                    sqlStr = "SELECT [DSTempStepId],[StepCd]+' - '+[StepName] as StepCd,[StepName],SortOrder as StepId  FROM [dbo].[DSTempStep] " +
+                                            sqlStr = "SELECT [DSTempStepId],[StepCd]+' - '+[StepName] as StepCd,[StepName],SortOrder as StepId  FROM [dbo].[DSTempStep] " +
                                             " WHERE DSTempHdrId=" + oTemp.TemplateId + " AND DsTempSetId=" + SetId + " AND ActiveInd='A'  AND IsDynamic=0 ORDER BY NEWID()";
                                         }
                                     }
@@ -1422,6 +1436,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     sqlStr = "SELECT [DSTempStepId],[StepCd]+' - '+[StepName] as StepCd,[StepName],SortOrder as StepId  FROM [dbo].[DSTempStep] " +
                                 	" WHERE DSTempHdrId=" + oTemp.TemplateId + " AND  DsTempSetId=" + SetId + "  AND ActiveInd='A'  AND IsDynamic=0 ORDER BY SortOrder";
                                 }
+
                             }
                             else
                             {
@@ -1503,22 +1518,103 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
     }
     protected void SortstepTable(DataTable sorttable, int[] sortOrder)
     {
-        DataTable sortedTable = sorttable.Clone();
+            //DataTable sortedTable = sorttable.Clone();
 
-        foreach (int id in sortOrder)
-        {
+            //foreach (int id in sortOrder)
+            //{
+            //    foreach (DataRow row in sorttable.Rows)
+            //    {
+            //        if (Convert.ToInt32(row["StepId"]) == id)
+            //        {
+            //            sortedTable.ImportRow(row);
+            //            break;
+            //        }
+            //    }
+            //}
+
+            //sorttable.Rows.Clear();
+            //sorttable.Merge(sortedTable
+
+
+            // Check if sorttable is null
+            if (sorttable == null)
+            {
+                throw new ArgumentNullException("sorttable");
+            }
+            if (!sorttable.Columns.Contains("StepId"))
+            {
+                throw new ArgumentException("The DataTable must contain a 'StepId' column.");
+            }
+
+            // Create a HashSet for quick lookup of StepId values in the DataTable
+            HashSet<int> stepIdsInTable = new HashSet<int>();
             foreach (DataRow row in sorttable.Rows)
             {
-                if (Convert.ToInt32(row["StepId"]) == id)
+                stepIdsInTable.Add(Convert.ToInt32(row["StepId"]));
+            }
+
+            // Check if sortOrder contains matching StepIds
+            bool allMatch = true;
+            foreach (int id in sortOrder)
+            {
+                if (!stepIdsInTable.Contains(id))
                 {
-                    sortedTable.ImportRow(row);
+                    allMatch = false;
                     break;
                 }
             }
-        }
 
-        sorttable.Rows.Clear();
-        sorttable.Merge(sortedTable);
+            // If not all StepIds in sortOrder match those in the DataTable, run the query function
+            if (!allMatch)
+            {
+                sortOrder = createSortOrder();
+            }
+
+            // Create a dictionary to map StepId to DataRow for faster lookup
+            Dictionary<int, DataRow> rowMap = new Dictionary<int, DataRow>();
+            foreach (DataRow row in sorttable.Rows)
+            {
+                int stepId = Convert.ToInt32(row["StepId"]);
+                if (!rowMap.ContainsKey(stepId))
+                {
+                    rowMap[stepId] = row;
+                }
+            }
+
+            // Create a new DataTable with the same structure
+            DataTable sortedTable = sorttable.Clone();
+
+            // Add rows to sortedTable in the order specified by sortOrder
+            foreach (int id in sortOrder)
+            {
+                DataRow matchedRow;
+                if (rowMap.TryGetValue(id, out matchedRow))
+                {
+                    sortedTable.ImportRow(matchedRow);
+                }
+            }
+
+            // Clear the original table and merge sorted rows back
+            sorttable.Rows.Clear();
+            sorttable.Merge(sortedTable);
+    }
+
+    private int[] createSortOrder()
+    {
+        // Initialize a list to store the sort order values
+        List<int> orderValues = new List<int>();
+
+        // Safely construct the SQL query to prevent SQL injection
+        string sqlStr = "SELECT Step.StdtSessionStepId as SessStepID, TempStep.[DSTempStepId],TempStep.[StepName] as StepCd,TempStep.[StepName],TempStep.SortOrder as StepId  FROM [dbo].[DSTempStep] TempStep  INNER JOIN StdtSessionStep Step " +
+                                         " ON TempStep.DSTempStepId=Step.DSTempStepId  WHERE TempStep.DSTempHdrId=" + oTemp.TemplateId + " AND TempStep.DsTempSetId=" + oDS.CrntSet + " AND TempStep.ActiveInd='A' AND IsDynamic=0 AND TempStep.SortOrder IS NOT NULL AND  Step.StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString() + " ORDER BY NEWID()";
+
+        DataTable dt = oData.ReturnDataTable(sqlStr,false);
+
+        foreach (DataRow row in dt.Rows)
+        {
+            orderValues.Add(Convert.ToInt32(row["StepId"]));
+        }
+        return orderValues.ToArray();
     }
     
     private string getTeachingMethod(string templateId)
@@ -1945,7 +2041,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         }
         catch (Exception ex)
         {
-            if (trans != null && trans.Connection.State == ConnectionState.Open)
+            if (trans != null && trans.Connection != null && trans.Connection.State == ConnectionState.Open)
             {
                 oData.RollBackTransation(trans, con);
 
@@ -1962,10 +2058,20 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         {
             if (Session["random"].ToString() == "total task random")
             {
-                string qry = "Update StdtSessionHdr set StepOrder='" + Session["steporder"].ToString() + "' where StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
-                oData.Execute(qry);
-                Session["random"] = null;
-                Session["steporder"] = null;
+                string idqry = "SELECT  StepOrder FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
+                DataTable idqryTable = oData.ReturnDataTable(idqry, false);
+                string ordervalue = idqryTable.Rows[0]["stepOrder"].ToString();
+
+                if (idqryTable.Rows.Count > 0)
+                {
+                    if (idqryTable.Rows[0]["StepOrder"].ToString() == "")
+                    {
+                        string qry = "Update StdtSessionHdr set StepOrder='" + Session["steporder"].ToString() + "' where StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
+                        oData.Execute(qry);
+                        Session["random"] = null;
+                        Session["steporder"] = null;
+                    }
+                }
             }
         }
         
@@ -2046,6 +2152,22 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         string selSteps = "SELECT DSS.StepCd,Step.DSTempStepId FROM StdtSessionStep Step INNER JOIN DSTempStep DSS ON DSS.DSTempStepId=Step.DSTempStepId WHERE StdtSessionHdrId=" + Convert.ToInt32(ViewState["StdtSessHdr"].ToString()) + "  AND IsDynamic=0 order by SortOrder";
         DataTable dtSteps = new DataTable();
         dtSteps = oData.ReturnDataTable(selSteps, false);
+        string selSessNbrQry = "SELECT SessionNbr FROM StdtSessionHdr WHERE StdtSessionHdrId = " + Convert.ToInt32(ViewState["StdtSessHdr"].ToString());
+        int sessNum = Convert.ToInt32(oData.FetchValue(selSessNbrQry));
+        if(sessNum == 1)
+        {
+            for (int i = 0; i < dtSteps.Rows.Count; i++)
+            {
+                string selqry = "SELECT ISNULL (StepByStepPrompt,-1) FROM DSTempStep WHERE DSTempStepId = " + dtSteps.Rows[i]["DSTempStepId"].ToString() + "";
+                int stepPtompId = Convert.ToInt32(oData.FetchValue(selqry));
+                if(stepPtompId>0)
+                {
+                    string updQry = "UPDATE StdtDSStepStat SET PromptId = (SELECT StepByStepPrompt FROM DSTempStep WHERE DSTempStepId = " + dtSteps.Rows[i]["DSTempStepId"].ToString() + ") WHERE DSTempStepId = " + dtSteps.Rows[i]["DSTempStepId"].ToString();
+                    oData.Execute(updQry);
+                }
+                
+            }
+        }
         string table = "<table>";
         for (int i = 0; i < dtSteps.Rows.Count + 1; i++)
         {
@@ -3169,6 +3291,28 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                     }
 
+                                    //Save draft/submit time check start
+                                    string strModqry = "SELECT ModifiedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+                                    object objModDate = null;
+                                    using (SqlCommand cm1 = new SqlCommand(strModqry, con, trans))
+                                    {
+                                        objModDate = cm1.ExecuteScalar();
+                                    }
+                                    if (objModDate != null && objModDate.ToString() != "")
+                                    {
+                                        Session["HdrModifiedDate"] = objModDate.ToString();
+                                    }
+                                    else
+                                    {
+                                        string strcrqry = "SELECT CreatedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+                                        object creatobj = null;
+                                        using (SqlCommand cm1 = new SqlCommand(strcrqry, con, trans))
+                                        {
+                                            creatobj = cm1.ExecuteScalar();
+                                        }
+                                        Session["HdrModifiedDate"] = creatobj.ToString();
+                                    }
+                                    //Save draft/submit time check end
                                     if (dtsteps != null)
                                     {
                                         int index = 0;
@@ -3278,7 +3422,70 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         return rtrn;
     }
 
-    protected void updateDatas(int sessHdrId)
+    protected void btnTriggerProcess_Click(object sender, EventArgs e)
+    {
+        string modon = "";
+        string modby = "";
+        string mod = "select modifiedon,(SELECT CONCAT(UserFName, ' ', UserLName)  FROM dbo.[User] where UserId=StdtSessionHdr.ModifiedBy)AS fullname from StdtSessionHdr where StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+        DataTable dtmod = oData.ReturnDataTable(mod, false);
+        if (dtmod != null && dtmod.Rows.Count>0)
+        {
+            modon = dtmod.Rows[0]["modifiedon"].ToString();
+            modby = dtmod.Rows[0]["fullname"].ToString();
+        }
+        // Register a script to open the popup
+        ScriptManager.RegisterStartupScript(this, this.GetType(), "Popup", "openPopup('The lesson has been updated by "+modby+ " at "+modon+ ", are you sure you want to overwrite their changes?', 'Operation1');", true);
+    }
+    protected void btnAnotherOperation_Click(object sender, EventArgs e)
+    {
+        string modon = "";
+        string modby = "";
+        string mod = "select modifiedon,(SELECT CONCAT(UserFName, ' ', UserLName)  FROM dbo.[User] where UserId=StdtSessionHdr.ModifiedBy)AS fullname from StdtSessionHdr where StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+        DataTable dtmod = oData.ReturnDataTable(mod, false);
+        if (dtmod != null && dtmod.Rows.Count > 0)
+        {
+            modon = dtmod.Rows[0]["modifiedon"].ToString();
+            modby = dtmod.Rows[0]["fullname"].ToString();
+        }
+        // Register a script to open the popup with a custom message for the second operation
+        ScriptManager.RegisterStartupScript(this, this.GetType(), "Popup2", "openPopup('The lesson has been updated by " + modby + " at " + modon + ", are you sure you want to overwrite their changes?', 'Operation2');", true);
+    }
+
+    [WebMethod]
+    public static bool SetDecisionOperation(bool decision, string operation)
+    {
+        // Store the decision in a session variable
+        HttpContext.Current.Session["UserDecision"] = decision;
+        HttpContext.Current.Session["Operation"] = operation;
+        return decision;
+    }
+
+    protected void btnContinueProcess_Click(object sender, EventArgs e)
+    {
+        if (Session["UserDecision"] != null && (bool)Session["UserDecision"])
+        {
+             string operation = Session["Operation"] as string;
+
+             if (operation == "Operation1")
+             {
+                 // Continue with the process
+                 btnSave_Click(sender, e);
+             }
+             else if (operation == "Operation2")
+             {
+                 // Continue with the second operation
+                 ConfirmSubmission(sender, e);
+                 //Response.Write("Operation 2 continued...");
+             }
+        }
+        else
+        {
+            // Exit the process
+            //Response.Write("Process exited...");
+        }
+    }
+
+    protected void updateDatas(int sessHdrId, SqlConnection con, SqlTransaction trans)
     {
         oSession = (clsSession)Session["UserSession"];
         oData = new clsData();
@@ -3338,7 +3545,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         "WHERE StdtSessionStepId=" + hfStepid.Value + " AND StdtSessionHdrId=" + sessHdrId + "";
                                     if (hfStepid.Value != null && hfStepid.Value.ToString() != "")
                                     {
-                                        oData.Execute(updSteps);
+                                        oData.ExecuteWithTrans(updSteps, con, trans);
                                     }
                                     else
                                     {
@@ -3379,7 +3586,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     "WHERE StdtSessionStepId=" + hfStepid.Value + " AND DSTempSetColId=" + pair.Key + "";
                                 if (hfStepid.Value != null && hfStepid.Value.ToString() != "")
                                 {
-                                    oData.Execute(updStpDtls);
+                                    oData.ExecuteWithTrans(updStpDtls, con, trans);
                                 }
                                 else
                                 {
@@ -3427,7 +3634,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if (drColmn["ColTypeCd"].ToString() != "Prompt" && colt != "true")
                                     {
                                         string updStpDtls = "UPDATE StdtSessionDtl SET CurrentPrompt='" + crntPrmpt + "' WHERE StdtSessionStepId=" + drStep["SessStepID"] + " AND DSTempSetColId=" + drColmn["DSTempSetColId"].ToString() + "";
-                                        oData.Execute(updStpDtls);
+                                        oData.ExecuteWithTrans(updStpDtls, con, trans);
                                     }
                                 }
                             }
@@ -3439,7 +3646,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
         }
     }
-    protected bool updateDraft(int sessHdrId, string updateMode)
+    protected bool updateDraft(int sessHdrId, string updateMode, SqlConnection con, SqlTransaction trans)
     {
         bool valid_Ind = false;
         oSession = (clsSession)Session["UserSession"];
@@ -3510,9 +3717,6 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         string strEndDate = strEnd.ToString("MM/dd/yyyy HH:mm:ss");
                                         tdMsg.InnerHtml = clsGeneral.failedMsg("Submit not possible: This session was started by '" + strCreatedBy + "' on '" + strStartDate + "' and completed by '" + strModifiedBy + "' on '" + strEndDate + "'. Please Close[X] this datasheet.");
                                         Checkclose.Value = "false";
-                                        string scriptcl = "checkclN();";
-                                        ScriptManager.RegisterStartupScript(this, this.GetType(), "CallFunction", scriptcl, true);
-            
                                     }
                                 }
                             }
@@ -3532,16 +3736,28 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         }
                         if (updQry != "")
                         {
-                            if (oData.Execute(updQry) > 0)
+                            if (oData.ExecuteWithTrans(updQry, con, trans) > 0)
                             {
 
-                                updateDatas(sessHdrId);
+                                updateDatas(sessHdrId, con, trans);
                                 valid_Ind = true;
+                                updateCheck = true;
                             }
                         }
                         else
                             valid_Ind = false;
                     }
+                }
+                string strModqry = "SELECT ModifiedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + sessHdrId + "";
+                object objModDate = null;
+                using (SqlCommand cm1 = new SqlCommand(strModqry, con, trans))
+                {
+                 objModDate = cm1.ExecuteScalar();
+                }
+                //object objModDate = oData.FetchValue(strModqry);
+                if (objModDate != null)
+                {
+                    Session["HdrModifiedDate"] = objModDate.ToString();
                 }
             }
             if (updateMode == "Submit")
@@ -3571,11 +3787,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         }
                         if (Ismaint)
                             iIsmaintain = 1;
-                        updQry = "update StdtSessionHdr SET IsMaintanace=" + iIsmaintain + ", AssignedToId=1,EndTs=GETDATE(),SessionStatusCd='S',SessMissTrailStus='" + sessMistrial + "',SessMissTrailRsn='" + hdnMissTrialRsn.Value + "',"
+                        updQry = "update StdtSessionHdr SET IsMaintanace=" + iIsmaintain + ", AssignedToId=1,EndTs=GETDATE(),SessionStatusCd='D',SessMissTrailStus='" + sessMistrial + "',SessMissTrailRsn='" + hdnMissTrialRsn.Value + "',"
                         + "Comments='" + clsGeneral.convertQuotes(txtNote.Text.Trim()) + "',ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE StdtSessionHdrId=" + sessHdrId + "";
-                        int retrn = oData.Execute(updQry);
-                        if (retrn > 0) { updateDatas(sessHdrId); valid_Ind = true; }
-                        else { tdMsg.InnerHtml = clsGeneral.failedMsg("Submission Failed"); valid_Ind = false; }
+                        int retrn = oData.ExecuteWithTrans(updQry, con, trans);
+                        if (retrn > 0) { updateDatas(sessHdrId, con, trans); valid_Ind = true; updateCheck = true; }
+                        else
+                        {
+                            oData.RollBackTransation(trans, con);
+                            tdMsg.InnerHtml = clsGeneral.failedMsg("Submission Failed");
+                            updateCheck = false;
+                            ScriptManager.RegisterStartupScript(this, this.GetType(), "RemoveOverlay", "hideOverlay();", true);
+                            valid_Ind = false;
+                        }
                     }
                     else if (oDS.IOAInd == "Y")
                     {
@@ -3596,13 +3819,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 tdMsg.InnerHtml = clsGeneral.warningMsg("IOA Draft Submission not Possible when Teacher Session currently in Progress");
                                 valid_Ind = false;
                                 Checkclose.Value = "false";
-                                string scriptcl = "checkclN();";
-                                ScriptManager.RegisterStartupScript(this, this.GetType(), "CallFunction", scriptcl, true);
-            
                             }
                             else
                             {
                                 valid_Ind = true;
+                                updateCheck = true;
                             }
 
                         }
@@ -3613,10 +3834,15 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                             tdMsg.InnerHtml = clsGeneral.warningMsg("IOA not possible because the partner session to your IOA was closed. Please close (X) this datasheet and try again");
                             valid_Ind = false;
+                            updateCheck = false;
                         }
                     }
                 }
-                else valid_Ind = false;
+                else
+                {
+                    valid_Ind = false;
+                    updateCheck = false;
+                }
             }
         }
         hdn_isMaintainance.Value = "false";
@@ -4174,6 +4400,20 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         {
             //con = oData.Open();
             //trans = con.BeginTransaction();
+            //Save draft/submit time check start
+            string strModqry = "SELECT ModifiedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+            object objModDate = oData.FetchValue(strModqry);
+            if (objModDate != null && objModDate.ToString() != "")
+            {
+                Session["HdrModifiedDate"] = objModDate.ToString();
+            }
+            else
+            {
+                string strcrqry = "SELECT CreatedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+                object creatobj = oData.FetchValue(strcrqry);
+                Session["HdrModifiedDate"] = creatobj.ToString();
+            }
+            //Save draft/submit time check end
             string strqry = "SELECT DSTempHdrId FROM StdtSessionHdr WHERE StdtSessionHdrId=" + SessHdrID;
             object objSessHdrID = oData.FetchValue(strqry);
             if (objSessHdrID != null)
@@ -4440,7 +4680,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 string qry = "Update StdtSessionHdr set StepOrder='" + Session["steporder"].ToString() + "' where StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
                 oData.Execute(qry);
                 Session["steporder"] = null;
-            }
+            	}
             }
             btnSubmitAndRepeat1.Visible = false;
             btnSubmitAndRepeat2.Visible = false;
@@ -4449,7 +4689,8 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         }
         catch (Exception ex)
         {
-            if (trans != null && trans.Connection.State == ConnectionState.Open)
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
+            if (trans != null && trans.Connection != null && trans.Connection.State == ConnectionState.Open)
             {
                 oData.RollBackTransation(trans, con);
 
@@ -4461,6 +4702,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             clError.WriteToLog(ex.ToString());
             throw ex;
         }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
     protected void btnNoIOA_Click(object sender, EventArgs e)
     {
@@ -4573,15 +4815,69 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
     //        }
     //}
+
+    protected void btnSave_ClickCheck(object sender, EventArgs e)
+    {
+        oData = new clsData();
+        oTemp = (ClsTemplateSession)Session["BiweeklySession"];
+        oSession = (clsSession)Session["UserSession"];
+        string InstantHdrModifiedDate = "";
+        object exist_object = null;
+        string existquery = "SELECT StdtSessionHdrID FROM StdtSessionHdr WHERE DSTempHdrId = " + oTemp.TemplateId + " AND StudentId = " + oSession.StudentId + "";
+        exist_object = oData.FetchValue(existquery);
+
+        string updateTime = "SELECT ModifiedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+        object objSessHdrUpdateTime = oData.FetchValue(updateTime);
+        string HdrModifiedDate = Session["HdrModifiedDate"].ToString();
+        if ((objSessHdrUpdateTime != null) && (objSessHdrUpdateTime.ToString())!="")
+        {
+            InstantHdrModifiedDate = objSessHdrUpdateTime.ToString();
+        }
+        else {
+            string strcrqry = "SELECT CreatedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+            object creatobj = oData.FetchValue(strcrqry);
+            InstantHdrModifiedDate = creatobj.ToString();
+        }
+        if ((InstantHdrModifiedDate != HdrModifiedDate))
+        {
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "popupTrigger", "popUpTriggerClick();", true);
+        }
+        else
+        {
+            btnSave_Click(sender,e);
+        }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
+    }
+
     protected void btnSave_Click(object sender, EventArgs e)
     {
+        oTemp = (ClsTemplateSession)Session["BiweeklySession"];
+          int sessHdrId1 = Convert.ToInt32(ViewState["StdtSessHdr"]);
+        bool alreadydisc = false;
+        string checkdis = "select DSTempHdrId from StdtSessionHdr where StdtSessionHdrId=" + sessHdrId1;
+        object disc = oData.FetchValue(checkdis);
+        if (disc != null)
+        {
+            if ((-1*(oTemp.TemplateId)) == Convert.ToInt32(disc))
+            {
+                alreadydisc = true;
+            }
+        }
+        if (!alreadydisc)
+        {
         SaveDraft();
         if (Convert.ToBoolean(ViewState["IsHistory"]) == true)
         {
             oDS.VTLessonId = 0;
             //ScriptManager.RegisterStartupScript(this, this.GetType(), "closewindow", "closeIframe1(" + oSession.StudentId + ");", true);
         }
-
+        }
+        else
+        {
+            tdMsg.InnerHtml = clsGeneral.failedMsg("Submit not possible: This session was discarded by another user. Please Close[X] this datasheet.");
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "closedatasheet", "closedatasheet();", true);
+        }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
 
     private void SaveDraft()
@@ -4596,21 +4892,23 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             int sessHdrId1 = Convert.ToInt32(ViewState["StdtSessHdr"]);
             string sqlStr1 = "select SessionStatusCd from StdtSessionHdr where StdtSessionHdrId=" + sessHdrId1;
             oData = new clsData();
-            if (updateDraft(Convert.ToInt32(ViewState["StdtSessHdr"]), "Save"))
-            {
-                con = oData.Open();
-                trans = con.BeginTransaction();
-
+            con = oData.Open();
+            trans = con.BeginTransaction();
+            if (updateDraft(Convert.ToInt32(ViewState["StdtSessHdr"]), "Save", con, trans))
+            {               
                 bool reslt2 = SaveMeasuremnts(Convert.ToInt32(ViewState["StdtSessHdr"].ToString()), con, trans);
                 if (reslt2)
                 {
-                    object sesst1 = oData.FetchValue(sqlStr1);
+                    SqlCommand cmd = new SqlCommand(sqlStr1, con);
+                    cmd.Transaction = trans;
+                    object sesst1 = cmd.ExecuteScalar();
                     if (sesst1.ToString() == "S")
                     {
-                        SaveIOAPercentage();
+                        SaveIOAPercentage(con, trans);
                     }
                     oData.CommitTransation(trans, con);
                     tdMsg.InnerHtml = clsGeneral.sucessMsg("Data Successfully Saved");
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "closedatasheet2", "closedatasheet();", true);
 
                     oDS = (clsDataSheet)Session[DatasheetKey];
                     if (oDS != null)
@@ -4633,7 +4931,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         }
         catch (Exception ex)
         {
-            if (trans != null && trans.Connection.State == ConnectionState.Open)
+            if (trans != null && trans.Connection != null && trans.Connection.State == ConnectionState.Open)
             {
                 oData.RollBackTransation(trans, con);
 
@@ -4647,7 +4945,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         }
     }
 
-    private void SaveIOAPercentage()
+    private void SaveIOAPercentage(SqlConnection con, SqlTransaction trans)
     {
         oData = new clsData();
         oSession = (clsSession)Session["UserSession"];
@@ -4655,13 +4953,15 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         oDS = (clsDataSheet)Session[DatasheetKey];
         if (oDS.IOAInd == "Y")
         {
-            int IOAsesshdrId = Convert.ToInt32(oData.FetchValue("SELECT IOASessionHdrId FROM StdtSessionHdr WHERE StdtSessionHdrId=" + sessHdrId));
+            SqlCommand cmd = new SqlCommand("SELECT IOASessionHdrId FROM StdtSessionHdr WHERE StdtSessionHdrId=" + sessHdrId, con);
+            cmd.Transaction = trans;
+            int IOAsesshdrId = Convert.ToInt32(cmd.ExecuteScalar());
             string UpdateIOA = "UPDATE StdtSessionHdr SET EndTs=GETDATE(),SessionStatusCd='S',Comments='" + clsGeneral.convertQuotes(txtNote.Text.Trim()) + "',ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE StdtSessionHdrId=" + sessHdrId;
-            int retrn = oData.Execute(UpdateIOA);
+            int retrn = oData.ExecuteWithTrans(UpdateIOA, con, trans);
             if (retrn > 0)
             {
-                updateDatas(sessHdrId);
-                oData.ExecuteIOAPercCalculation(IOAsesshdrId, sessHdrId);
+                updateDatas(sessHdrId, con, trans);
+                oData.ExecuteIOAPercCalculation(IOAsesshdrId, sessHdrId, con, trans);
             }
             else { tdMsg.InnerHtml = clsGeneral.failedMsg("Submission Failed"); }
         }
@@ -4670,8 +4970,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
     {
         SqlConnection con = null;
         SqlTransaction trans = null;
+        SqlConnection con2 = null;
+        SqlTransaction trans2 = null;
         bool IsMaintanace = false;
         oData = new clsData();
+        bool transCheck1 = false;
+        bool transCheck2 = false;
         IsMaintanace = Convert.ToBoolean(hdn_isMaintainance.Value);
         try
         {
@@ -4683,12 +4987,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     IsMaintanace = true;
 
             }
-            if (updateDraft(Convert.ToInt32(ViewState["StdtSessHdr"]), "Submit"))
+            con = oData.Open();
+            trans = con.BeginTransaction();
+            if (updateDraft(Convert.ToInt32(ViewState["StdtSessHdr"]), "Submit", con, trans))
             {
                 oSession = (clsSession)Session["UserSession"];
                 oTemp = (ClsTemplateSession)HttpContext.Current.Session["BiweeklySession"];
-                con = oData.Open();
-                trans = con.BeginTransaction();
+
                 bool reslt2 = SaveMeasuremnts(Convert.ToInt32(ViewState["StdtSessHdr"].ToString()), con, trans);
 
                 string curesesid = this.Session.SessionID.ToString();
@@ -4739,11 +5044,14 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                     }
                     oDS = (clsDataSheet)Session[DatasheetKey];
-                    oData.CommitTransation(trans, con);
-                    con.Close();
+                    
                     if (!oDS.SessionMistrial)
                     {
-                        SaveIOAPercentage();
+                        SaveIOAPercentage(con, trans);
+                        oData.CommitTransation(trans, con);
+                        con.Close();
+                        transCheck1 = true;
+                        updateCheck = true;
                         //if (!IsMaintanace)
                         //{
                            // SaveIOAPercentage();
@@ -4800,16 +5108,30 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                             #endregion MultiColumn_and_Criteria_Check
 
-                            if (count > 1 && measureCount > 1)
+                        con2 = oData.Open();
+                        trans2 = con2.BeginTransaction();
+
+                        if (count > 1 && measureCount > 1)
                             {
-                                checkScoreMulty(Convert.ToInt32(ViewState["StdtSessHdr"].ToString()));
+                                checkScoreMulty(Convert.ToInt32(ViewState["StdtSessHdr"].ToString()), con2, trans2);
                             }
                             else
                             {
-                                checkScore(Convert.ToInt32(ViewState["StdtSessHdr"].ToString()));
+                                checkScore(Convert.ToInt32(ViewState["StdtSessHdr"].ToString()), con2, trans2);
                             }
+                        oData.CommitTransation(trans2, con2);
+                        con2.Close();
+                        transCheck2 = true;
                         //}
 
+                    }
+                    else
+                    {
+                        oData.CommitTransation(trans, con);
+                        con.Close();
+                        transCheck1 = true;
+                        transCheck2 = true;
+                        updateCheck = true;
                     }
 
                     ///save the Drafted IOA session in the maintenance mode
@@ -4852,10 +5174,9 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         Session["tempOverrideHT"] = htLpList;
                     }
                     //code_end
-                    //Page.ClientScript.RegisterStartupScript(this.GetType(), "closewindow", "closeIframe();", true);
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "closewindow", "closeIframe1(" + oSession.StudentId + ");", true);
-                    Session.Remove(DatasheetKey);
-                    //Response.Redirect("Home.aspx?LPid=" + oDS.LessonPlanID);
+
+                    //ScriptManager.RegisterStartupScript(this, this.GetType(), "closewindow", "closeIframe1(" + oSession.StudentId + ");", true);
+                    //Session.Remove(DatasheetKey);
 
                     //code_start
                     if (htLpList != null)
@@ -4868,28 +5189,54 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             }
                         }
                     }
+                    if(transCheck1 && transCheck2)
+                    {
+                        string updQry = "update StdtSessionHdr SET SessionStatusCd='S' WHERE StdtSessionHdrId=" + Convert.ToInt32(ViewState["StdtSessHdr"]) + "";
+                        int retrn = oData.Execute(updQry);
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), "closewindow", "closeIframe1(" + oSession.StudentId + ");", true);
+                        Session.Remove(DatasheetKey);
+                    }
+                    else
+                    {
+                        updateCheck = false;
+                        tdMsg.InnerHtml = clsGeneral.failedMsg("Submission Failed");
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), "RemoveOverlay", "hideOverlay();", true);
+                    }
+                    
                     //code_end
                 }
                 else
                 {
+                    updateCheck = false;
                     oData.RollBackTransation(trans, con);
                     tdMsg.InnerHtml = clsGeneral.failedMsg("Submission Failed");
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "RemoveOverlay", "hideOverlay();", true);
                 }
             }
         }
         catch (Exception ex)
         {
-            if (trans != null && trans.Connection.State == ConnectionState.Open)
-            {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
+            if (trans != null && trans.Connection != null && trans.Connection.State == ConnectionState.Open)
                 oData.RollBackTransation(trans, con);
 
-            }
             if (con != null)
                 con.Close();
 
+            if (trans2 != null && trans2.Connection != null && trans2.Connection.State == ConnectionState.Open)
+                oData.RollBackTransation(trans2, con2);
+
+            if (con2 != null)
+                con2.Close();
+
+            string qry = "Update StdtSessionHdr set SessionStatusCd = 'D' where StdtSessionHdrId = " + Convert.ToInt32(ViewState["StdtSessHdr"]);
+            oData.Execute(qry);
+            updateCheck = false;
             ClsErrorLog clError = new ClsErrorLog();
             clError.WriteToLog(ex.ToString());
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "closewindow", "closeIframe1(" + oSession.StudentId + ");", true);
+            tdMsg.InnerHtml = clsGeneral.failedMsg("Submission Failed");
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "RemoveOverlay", "hideOverlay();", true);
+            //ScriptManager.RegisterStartupScript(this, this.GetType(), "closewindow", "closeIframe1(" + oSession.StudentId + ");", true);
         }
 
         string sqlBnrChk = "SELECT LessonStatusforBanner from DSTempHdr WHERE StudentId= " + oSession.StudentId + " AND DSTempHdrId = " + oTemp.TemplateId;
@@ -4901,6 +5248,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             LessonBanner.Visible = true;
         }
         Checkclose.Value = "false";
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
     [System.Web.Services.WebMethod]
     #region comment
@@ -5094,7 +5442,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
     int acc_trainId = 0; int iSessionNmbr = 0;
     int colCalId = 0;
 
-    protected void checkScore(int StdtSessHdrId)
+    protected void checkScore(int StdtSessHdrId, SqlConnection con, SqlTransaction trans)
     {
         oSession = (clsSession)HttpContext.Current.Session["UserSession"];
         oTemp = (ClsTemplateSession)HttpContext.Current.Session["BiweeklySession"];
@@ -10002,10 +10350,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                                     {
                                                                         string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
                                                                         "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
-                                                                        oData.Execute(insqry);
+                                                                        oData.ExecuteWithTrans(insqry, con, trans);
 
                                                                         string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                                                        oData.Execute(updqry);
+                                                                        oData.ExecuteWithTrans(updqry, con, trans);
                                                                     }
                                                                 }
                                                             }
@@ -10031,9 +10379,9 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     int retunID = Convert.ToInt32(oData.FetchValue(strQuery));
                                                     sEventType = "STEP MOVEDOWN";
                                                     if (bPrompt)
-                                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompts, istep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompts, istep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                                     else
-                                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, retunID, iCurrentSetId, oTemp.TemplateId, istep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, retunID, iCurrentSetId, oTemp.TemplateId, istep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                                     //oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].NextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId);
                                                     //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                                     //{
@@ -10791,12 +11139,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                                     if (sesResultchain[0].CompletionStatus == "COMPLETED" || CompletionStatusSet == "COMPLETED")
                                                     {
-                                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
 
                                                     }
                                                     else
                                                     {
-                                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                                     }
                                                 }
                                                 else
@@ -10820,19 +11168,19 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                             //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                                             if (sesResultchain[0].CompletionStatus == "COMPLETED" || CompletionStatusSet == "COMPLETED")
                                                             {
-                                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
 
                                                             }
                                                             else
                                                             {
-                                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                                             }
                                                         }
                                                         else
-                                                            oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                            oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                                     }
                                                     else
-                                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
 
                                                 }
                                                 bPromptMoveUp = false;
@@ -10845,11 +11193,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 {
                                                     if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                                     {
-                                                        oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, oSession.StudentId, oSession.LoginId, Convert.ToInt32(LessonTargetPrompt));
+                                                        oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, oSession.StudentId, oSession.LoginId, Convert.ToInt32(LessonTargetPrompt), con, trans);
                                                     }
                                                     else
                                                     {
-                                                        oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, oSession.StudentId, oSession.LoginId, iPrompt);
+                                                        oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, oSession.StudentId, oSession.LoginId, iPrompt, con, trans);
                                                     }
                                                 }
                                             }
@@ -10926,10 +11274,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                             {
                                                                 string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
                                                                 "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
-                                                                oData.Execute(insqry);
+                                                                oData.ExecuteWithTrans(insqry, con, trans);
 
                                                                 string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                                                oData.Execute(updqry);
+                                                                oData.ExecuteWithTrans(updqry, con, trans);
                                                             }
                                                         }
                                                     }
@@ -10953,7 +11301,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             sEventType = "SET MOVEDOWN";
                                             if (bPrompt)
-                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                             else
                                             {
                                                 if (LessonpromptUsed.Length > 0)
@@ -10972,13 +11320,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                                 iPrompt = Convert.ToInt32(LessonpromptUsed[0]);
                                                             }
                                                         }
-                                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                                     }
                                                     else
-                                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                                 }
                                                 else
-                                                    oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                    oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
 
 
                                             }
@@ -10989,7 +11337,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             //}
                                             if (oDS.ChainType == "Total Task")
                                             {
-                                                oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, oSession.StudentId, oSession.LoginId, Convert.ToInt32(iPrompt));
+                                                oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, oSession.StudentId, oSession.LoginId, Convert.ToInt32(iPrompt), con, trans);
                                             }
                                         }
                                     }
@@ -11050,7 +11398,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             sEventType = "STEP MOVEUP";
                                             if (bPrompt)
-                                                oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                             else
                                             {
                                                 if (LessonpromptUsed.Length > 0)
@@ -11069,13 +11417,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                                 iPrompt = Convert.ToInt32(LessonpromptUsed[0]);
                                                             }
                                                         }
-                                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                                     }
                                                     else
-                                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                                 }
                                                 else
-                                                    oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                    oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                             }
                                             bPromptMoveUp = false;
                                             //oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].NextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId);
@@ -11143,10 +11491,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                             {
                                                                 string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
                                                                 "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
-                                                                oData.Execute(insqry);
+                                                                oData.ExecuteWithTrans(insqry, con, trans);
 
                                                                 string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                                                oData.Execute(updqry);
+                                                                oData.ExecuteWithTrans(updqry, con, trans);
                                                             }
                                                         }
                                                     }
@@ -11169,7 +11517,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             sEventType = "STEP MOVEDOWN";
                                             if (bPrompt)
-                                                oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                             else
                                             {
                                                 if (LessonpromptUsed.Length > 0)
@@ -11188,13 +11536,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                                 iPrompt = Convert.ToInt32(LessonpromptUsed[0]);
                                                             }
                                                         }
-                                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                                     }
                                                     else
-                                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                                 }
                                                 else
-                                                    oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                    oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                             }
                                             //oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].NextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId);
                                             //if (sesResultchain[0].CompletionStatus == "COMPLETED")
@@ -11244,7 +11592,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (sCurrentLessonPrompt == sNextLessonPrompt)
                                         { }
                                         else
-                                            oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId);
+                                            oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                                         //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                         //{
                                         //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
@@ -11305,10 +11653,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                         {
                                                             string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
                                                             "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
-                                                            oData.Execute(insqry);
+                                                            oData.ExecuteWithTrans(insqry, con, trans);
 
                                                             string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                                            oData.Execute(updqry);
+                                                            oData.ExecuteWithTrans(updqry, con, trans);
                                                         }
                                                     }
                                                 }
@@ -11317,7 +11665,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
 
                                         sEventType = "PROMPT MOVEDOWN";
-                                        oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId);
+                                        oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                                         //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                         //{
                                         //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
@@ -11363,7 +11711,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     //else
                                     //    oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, oDS.CrntStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
                                     //oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
-                                    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                     //oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId);
 
                                 }
@@ -14098,11 +14446,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             //if (sesResult[0].CompletionStatus == "COMPLETED")
                                             if (sesResult[0].CompletionStatus == "COMPLETED" || CompletionStatusSet == "COMPLETED")
                                             {
-                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                             }
                                             else
                                             {
-                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                             }
                                         }
                                         else
@@ -14111,11 +14459,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             {
                                                 if (CompletionStatusSet == "COMPLETED")
                                                 {
-                                                    oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                    oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                                 }
                                                 else
                                                 {
-                                                    oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                    oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                                 }
                                             }
                                         }
@@ -14195,10 +14543,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     {
                                                         string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
                                                         "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
-                                                        oData.Execute(insqry);
+                                                        oData.ExecuteWithTrans(insqry, con, trans);
 
                                                         string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                                        oData.Execute(updqry);
+                                                        oData.ExecuteWithTrans(updqry, con, trans);
                                                     }
                                                 }
                                             }
@@ -14224,12 +14572,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     sEventType = "SET MOVEDOWN";
                                     if (sesResult[0] != null) //liju
-                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResult[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResult[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                     else
                                     {
                                         if (FreqDurTextFlag)
                                         {
-                                            oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                            oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                         }
                                     }
                                     bPromptMoveUp = false;
@@ -14280,12 +14628,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 { }
                                 else
                                     if (sesResult[0] != null)
-                                        oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResult[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId);
+                                        oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResult[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                                     else
                                     {
                                         if (FreqDurTextFlag)
                                         {
-                                            oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId);
+                                            oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                                         }
                                     }
                                 //if (sesResult[0].CompletionStatus == "COMPLETED")
@@ -14347,10 +14695,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 {
                                                     string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
                                                     "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
-                                                    oData.Execute(insqry);
+                                                    oData.ExecuteWithTrans(insqry, con, trans);
 
                                                     string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                                    oData.Execute(updqry);
+                                                    oData.ExecuteWithTrans(updqry, con, trans);
                                                 }
                                             }
                                         }
@@ -14360,12 +14708,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                 sEventType = "PROMPT MOVEDOWN";
                                 if (sesResult[0] != null)
-                                    oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResult[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId);
+                                    oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResult[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                                 else
                                 {
                                     if (FreqDurTextFlag)
                                     {
-                                        oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId);
+                                        oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                                     }
                                 }
                                 //if (sesResult[0].CompletionStatus == "COMPLETED")
@@ -14407,7 +14755,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if (bSetCompleted)
                                     {
                                         //bStatusFlag = true;
-                                        oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                        oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                     }
                                     else if (bSetMoveUp == true)
                                     {
@@ -14422,7 +14770,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     {
                                         if (bSetCompleted)
                                         {
-                                            oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                            oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                         }
                                         else if (bSetMoveUp == true)
                                         {
@@ -14438,7 +14786,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 {
                                     if (bSetCompleted)
                                     {
-                                        oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                        oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                     }
                                     else if (bSetMoveUp == true)
                                     {
@@ -14455,7 +14803,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         }
     }
 
-    protected void checkScoreMulty(int StdtSessHdrId)
+    protected void checkScoreMulty(int StdtSessHdrId,SqlConnection con, SqlTransaction trans)
     {
         oSession = (clsSession)HttpContext.Current.Session["UserSession"];
         oTemp = (ClsTemplateSession)HttpContext.Current.Session["BiweeklySession"];
@@ -19682,7 +20030,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             {
                                                 string updStepStat = "UPDATE StdtDSStepStat SET PromptId=" + sesResultchain[index].StepPrompts[indexB] + ",ModifiedBy=" + oSession.LoginId + " ,ModifiedOn=GETDATE() WHERE " +
                                                     "DSTempSetColId=" + dr["DSTempSetColId"].ToString() + " AND DSTempStepId=" + drstepID["DSTempStepId"].ToString() + "";
-                                                oData.Execute(updStepStat);
+                                                oData.ExecuteWithTrans(updStepStat, con, trans);
                                                 indexB++;
                                             }
                                         }
@@ -20167,10 +20515,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                                         {
                                                                             string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
                                                                             "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
-                                                                            oData.Execute(insqry);
+                                                                            oData.ExecuteWithTrans(insqry, con, trans);
 
                                                                             string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                                                            oData.Execute(updqry);
+                                                                            oData.ExecuteWithTrans(updqry, con, trans);
                                                                         }
                                                                     }
                                                                 }
@@ -20196,9 +20544,9 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                         int retunID = Convert.ToInt32(oData.FetchValue(strQuery));
                                                         sEventType = "STEP MOVEDOWN";
                                                         if (bPrompt)
-                                                            oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompts, (iCurrentStep-1).ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                            oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompts, (iCurrentStep-1).ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                                         else
-                                                            oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, retunID, iCurrentSetId, oTemp.TemplateId, istep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                            oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, retunID, iCurrentSetId, oTemp.TemplateId, istep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                                         //oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].NextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId);
                                                         //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                                         //{
@@ -24022,12 +24370,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         {
                                             if (sesResultchain[0].CompletionStatus == "COMPLETED" || CompletionStatusSet == "COMPLETED")
                                             {
-                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
 
                                             }
                                             else
                                             {
-                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                             }
                                         }
                                         else
@@ -24050,19 +24398,19 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     }
                                                     if (sesResultchain[0].CompletionStatus == "COMPLETED" || CompletionStatusSet == "COMPLETED")
                                                     {
-                                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
 
                                                     }
                                                     else
                                                     {
-                                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                                     }
                                                 }
                                                 else
-                                                    oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                    oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                             }
                                             else
-                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
 
                                         }
                                         bPromptMoveUp = false;
@@ -24076,11 +24424,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         {
                                             if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                             {
-                                                oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, oSession.StudentId, oSession.LoginId, Convert.ToInt32(LessonTargetPrompt));
+                                                oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, oSession.StudentId, oSession.LoginId, Convert.ToInt32(LessonTargetPrompt), con, trans);
                                             }
                                             else
                                             {
-                                                oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, oSession.StudentId, oSession.LoginId, iPrompt);
+                                                oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, oSession.StudentId, oSession.LoginId, iPrompt, con, trans);
                                             }
                                         }
                                     }
@@ -24157,10 +24505,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     {
                                                         string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
                                                         "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
-                                                        oData.Execute(insqry);
+                                                        oData.ExecuteWithTrans(insqry, con, trans);
 
                                                         string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                                        oData.Execute(updqry);
+                                                        oData.ExecuteWithTrans(updqry, con, trans);
                                                     }
                                                 }
                                             }
@@ -24184,7 +24532,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     sEventType = "SET MOVEDOWN";
                                     if (bPrompt)
-                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                     else
                                     {
                                         if (LessonpromptUsed.Length > 0)
@@ -24203,13 +24551,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                         iPrompt = Convert.ToInt32(LessonpromptUsed[0]);
                                                     }
                                                 }
-                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                             }
                                             else
-                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                         }
                                         else
-                                            oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                            oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
 
 
                                     }
@@ -24220,7 +24568,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     //}
                                     if (oDS.ChainType == "Total Task")
                                     {
-                                        oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, oSession.StudentId, oSession.LoginId, Convert.ToInt32(iPrompt));
+                                        oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, oSession.StudentId, oSession.LoginId, Convert.ToInt32(iPrompt), con, trans);
                                     }
                                 }
                             }
@@ -24281,7 +24629,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     sEventType = "STEP MOVEUP";
                                     if (bPrompt)
-                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                     else
                                     {
                                         if (LessonpromptUsed.Length > 0)
@@ -24300,13 +24648,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                         iPrompt = Convert.ToInt32(LessonpromptUsed[0]);
                                                     }
                                                 }
-                                                oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                             }
                                             else
-                                                oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                         }
                                         else
-                                            oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                            oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                     }
                                     bPromptMoveUp = false;
                                     GlobalPromptMoveUp = false;
@@ -24375,10 +24723,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     {
                                                         string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
                                                         "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
-                                                        oData.Execute(insqry);
+                                                        oData.ExecuteWithTrans(insqry, con, trans);
 
                                                         string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                                        oData.Execute(updqry);
+                                                        oData.ExecuteWithTrans(updqry, con, trans);
                                                     }
                                                 }
                                             }
@@ -24401,7 +24749,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     sEventType = "STEP MOVEDOWN";
                                     if (bPrompt)
-                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                     else
                                     {
                                         if (LessonpromptUsed.Length > 0)
@@ -24420,13 +24768,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                         iPrompt = Convert.ToInt32(LessonpromptUsed[0]);
                                                     }
                                                 }
-                                                oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                             }
                                             else
-                                                oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                                oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                         }
                                         else
-                                            oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                            oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                     }
                                     //oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].NextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId);
                                     //if (sesResultchain[0].CompletionStatus == "COMPLETED")
@@ -24476,7 +24824,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (sCurrentLessonPrompt == sNextLessonPrompt)
                                 { }
                                 else
-                                    oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId);
+                                    oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                                 //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                 //{
                                 //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
@@ -24537,10 +24885,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 {
                                                     string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
                                                     "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
-                                                    oData.Execute(insqry);
+                                                    oData.ExecuteWithTrans(insqry, con, trans);
 
                                                     string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                                    oData.Execute(updqry);
+                                                    oData.ExecuteWithTrans(updqry, con, trans);
                                                 }
                                             }
                                         }
@@ -24549,7 +24897,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
 
                                 sEventType = "PROMPT MOVEDOWN";
-                                oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId);
+                                oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                                 //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                 //{
                                 //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
@@ -24595,7 +24943,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             //else
                             //    oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, oDS.CrntStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
                             //oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
-                            oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                            oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                             //oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId);
 
                         }
@@ -24759,11 +25107,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 {
                                     if (sesResult[0].CompletionStatus == "COMPLETED" || CompletionStatusSet == "COMPLETED")
                                     {
-                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                     }
                                     else
                                     {
-                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                     }
                                 }
                                 else
@@ -24772,11 +25120,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     {
                                         if (CompletionStatusSet == "COMPLETED")
                                         {
-                                            oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                            oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                         }
                                         else
                                         {
-                                            oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                            oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                         }
                                     }
                                 }
@@ -24856,10 +25204,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             {
                                                 string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
                                                 "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
-                                                oData.Execute(insqry);
+                                                oData.ExecuteWithTrans(insqry, con, trans);
 
                                                 string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                                oData.Execute(updqry);
+                                                oData.ExecuteWithTrans(updqry, con, trans);
                                             }
                                         }
                                     }
@@ -24885,12 +25233,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             }
                             sEventType = "SET MOVEDOWN";
                             if (sesResult[0] != null) //liju
-                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResult[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResult[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                             else
                             {
                                 if (DiscreteFreqDurTextFlag)
                                 {
-                                    oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                    oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                 }
                             }
                             bPromptMoveUp = false;
@@ -24941,12 +25289,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         { }
                         else
                             if (sesResult[0] != null)
-                                oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResult[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId);
+                                oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResult[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                             else
                             {
                                 if (DiscreteFreqDurTextFlag)
                                 {
-                                    oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId);
+                                    oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                                 }
                             }
                         //if (sesResult[0].CompletionStatus == "COMPLETED")
@@ -25008,10 +25356,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         {
                                             string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
                                             "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
-                                            oData.Execute(insqry);
+                                            oData.ExecuteWithTrans(insqry, con, trans);
 
                                             string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                            oData.Execute(updqry);
+                                            oData.ExecuteWithTrans(updqry, con, trans);
                                         }
                                     }
                                 }
@@ -25021,12 +25369,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                         sEventType = "PROMPT MOVEDOWN";
                         if (sesResult[0] != null)
-                            oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResult[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId);
+                            oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResult[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                         else
                         {
                             if (DiscreteFreqDurTextFlag)
                             {
-                                oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId);
+                                oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                             }
                         }
                         //if (sesResult[0].CompletionStatus == "COMPLETED")
@@ -25068,7 +25416,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             if (bSetCompleted)
                             {
                                 //bStatusFlag = true;
-                                oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                             }
                             else if (bSetMoveUp == true)
                             {
@@ -25083,7 +25431,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             {
                                 if (bSetCompleted)
                                 {
-                                    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                                 }
                                 else if (bSetMoveUp == true)
                                 {
@@ -25099,7 +25447,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         {
                             if (bSetCompleted)
                             {
-                                oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId);
+                                oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
                             }
                             else if (bSetMoveUp == true)
                             {
@@ -28185,11 +28533,35 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
     protected void Timer1_Tick(object sender, EventArgs e)
     {
-        if (Convert.ToInt32(hfAutoSaveCount.Value) > 0)
+        oData = new clsData();
+        SqlConnection con = null;
+        SqlTransaction trans = null;
+        try
         {
-            updateDraft(Convert.ToInt32(ViewState["StdtSessHdr"]), "Save");
+            con = oData.Open();
+            trans = con.BeginTransaction();
+            if (Convert.ToInt32(hfAutoSaveCount.Value) > 0)
+            {
+                updateDraft(Convert.ToInt32(ViewState["StdtSessHdr"]), "Save", con, trans);
+                oData.CommitTransation(trans, con);
+                con.Close();
+            }
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "stopTimer();", true);
         }
-        ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "stopTimer();", true);
+        catch (Exception ex)
+        {
+            if (trans != null && trans.Connection != null && trans.Connection.State == ConnectionState.Open)
+            {
+                oData.RollBackTransation(trans, con);
+
+            }
+            if (con != null)
+                con.Close();
+
+            ClsErrorLog clError = new ClsErrorLog();
+            clError.WriteToLog(ex.ToString());
+            throw ex;
+        }
     }
 
 
@@ -28261,6 +28633,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         if (oDS != null)
             lpId = oTemp.TemplateId.ToString();
         clearOverrideSession(lpId);
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
         Response.Redirect("DSTempHistory.aspx?LPid=" + oDS.LessonPlanID);
     }
     //protected void grdDataSht_RowDataBound(object sender, GridViewRowEventArgs e)
@@ -29994,8 +30367,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             repeatNo = Convert.ToInt32(lblSubmitAndRepeatCount.Text);
         }
         repeatNo++;
+        if (updateCheck)
+            Response.Redirect("Datasheet.aspx?pageid=" + oTemp.TemplateId + "&studid=" + oSession.StudentId + "&SRMode=true&repeatNo=" + repeatNo + "&isMaint=" + isMaintStatus + "&currSetIdTemp=" + currSetIdTemp + "&exc=false");
+        else
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
 
-        Response.Redirect("Datasheet.aspx?pageid=" + oTemp.TemplateId + "&studid=" + oSession.StudentId + "&SRMode=true&repeatNo=" + repeatNo + "&isMaint=" + isMaintStatus + "&currSetIdTemp=" + currSetIdTemp + "&exc=false");
         Checkclose.Value = "false";
     }
     //protected void btnDiscard_ok_Click(object sender, EventArgs e)
@@ -30037,7 +30413,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 int n = ds.Tables[0].Rows.Count;
                 for (int i = 0; i < n; i++)
                 {
-                    string sessdel = "select * from StdtSessionDtl where StdtSessionStepId=" + Convert.ToInt32(ds.Tables[0].Rows[i]["stepId"]);
+                    string sessdel = "select StdtSessionStepId,DSTempSetColId from StdtSessionDtl where StdtSessionStepId=" + Convert.ToInt32(ds.Tables[0].Rows[i]["stepId"]);
                     DataTable ses = new DataTable();
                     ses = oData.ReturnDataTable(sessdel, false);
                     if (ses != null)
@@ -30059,6 +30435,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             if (con != null)
                                 con.Close();
                             ScriptManager.RegisterStartupScript(this, this.GetType(), "scriptdisc", "alert('Discard failed');", true);
+                            ScriptManager.RegisterStartupScript(this, this.GetType(), "closedatasheet3", "closedatasheet();", true);
                             return;
                         }
                     }
@@ -30066,7 +30443,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             }
 
 
-            string sq = "select * from StdtSessColScore where StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+            string sq = "select StudentId,DSTempSetColId,DSTempSetColCalcId,StdtSessionHdrId from StdtSessColScore where StdtSessionHdrId=" + ViewState["StdtSessHdr"];
             DataTable sco = new DataTable();
             sco = oData.ReturnDataTable(sq, false);
             if (sco != null)
@@ -30116,6 +30493,8 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     if (con != null)
                         con.Close();
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "scriptdisc", "alert('Discard failed');", true);
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "closedatasheet4", "closedatasheet();", true);
+
                     return;
                 }
             }
@@ -30128,7 +30507,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         }
         catch (Exception ex)
         {
-            if (trans != null && trans.Connection.State == ConnectionState.Open)
+            if (trans != null && trans.Connection != null && trans.Connection.State == ConnectionState.Open)
             {
                 oData.RollBackTransation(trans, con);
 
@@ -30154,6 +30533,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 clError.WriteToLog("Viewstate[StdtSessHdr] was NULL \nStudentId=" + oSession.StudentId.ToString() + ",\nClassId=" + oSession.Classid.ToString() + ",\nbtnDiscard_ok_Click");
             }
             ScriptManager.RegisterStartupScript(this, this.GetType(), "scriptdisc", "alert('Discard failed');", true);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "closedatasheet5", "closedatasheet();", true);
         }
     }
 
@@ -30276,6 +30656,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         con.Close();
                     }
                     ClientScript.RegisterStartupScript(this.GetType(), "", "probe();", true);
+                    NewSessionStep();
                 }
             }
             if (dtHdrs.Rows.Count == 1)
@@ -30298,6 +30679,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         Response.Redirect("Datasheet.aspx?SessHdrID=" + dtHdrs.Rows[0]["StdtSessionHdrId"].ToString() + "&isMaint=true&exc=true");
                     }
                     ClientScript.RegisterStartupScript(this.GetType(), "", "probe();", true);
+                    NewSessionStep();
                 }
                 else
                 {
@@ -30653,8 +31035,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         }
         catch (Exception ex)
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             throw ex;
         }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
 
     private string[] Shuffle(string[] Objects)
@@ -30896,6 +31280,42 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
     }
 
+    public void ConfirmSubmissionCheck(object sender, EventArgs e)
+    {
+        oData = new clsData();
+        oTemp = (ClsTemplateSession)Session["BiweeklySession"];
+        oSession = (clsSession)Session["UserSession"];
+        Button b1 = (Button)sender;
+        Session["SubmissionAction"] = b1.Text;
+        string InstantHdrModifiedDate = "";
+        object exist_object = null;
+        string existquery = "SELECT StdtSessionHdrID FROM StdtSessionHdr WHERE DSTempHdrId = " + oTemp.TemplateId + " AND StudentId = " + oSession.StudentId + "";
+        exist_object = oData.FetchValue(existquery);
+
+        string updateTime = "SELECT ModifiedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+        object objSessHdrUpdateTime = oData.FetchValue(updateTime);
+        string HdrModifiedDate = Session["HdrModifiedDate"].ToString();
+        string SubmissionAction = Session["SubmissionAction"].ToString();
+        if ((objSessHdrUpdateTime != null) && (objSessHdrUpdateTime.ToString()) != "")
+        {
+            InstantHdrModifiedDate = objSessHdrUpdateTime.ToString();
+        }
+        else
+        {
+            string strcrqry = "SELECT CreatedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+            object creatobj = oData.FetchValue(strcrqry);
+            InstantHdrModifiedDate = creatobj.ToString();
+        }
+        if ((InstantHdrModifiedDate != HdrModifiedDate))
+        {
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "popupTrigger2", "popUpTriggerAnotherClick();", true);
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
+        }
+        else
+        {
+            ConfirmSubmission(sender, e);
+        }
+    }
 
     public void ConfirmSubmission(object sender, EventArgs e)
     {
@@ -30907,11 +31327,24 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         string NACols2 = "";
 
         Button b1 = (Button)sender;
-        string bText = b1.Text;
+        //string bText = b1.Text;
+        string bText = Session["SubmissionAction"].ToString();
 
         //Dictionary<int, Dictionary<string, string>> dict1 = new Dictionary<int, Dictionary<string, string>>();
         //Dictionary<string, string> dict2 = new Dictionary<string, string>();
         int sessHdrId1 = Convert.ToInt32(ViewState["StdtSessHdr"]);
+        bool alreadydisc = false;
+        string checkdis = "select DSTempHdrId from StdtSessionHdr where StdtSessionHdrId=" + sessHdrId1;
+        object disc = oData.FetchValue(checkdis);
+        if (disc != null)
+        {
+            if ((-1*(oTemp.TemplateId)) == Convert.ToInt32(disc))
+            {
+                alreadydisc = true;
+            }
+        }
+        if (!alreadydisc)
+        {
         string sqlStr1 = "select SessionStatusCd from StdtSessionHdr where StdtSessionHdrId=" + sessHdrId1;
         object sesst1 = oData.FetchValue(sqlStr1);
         if (sesst1.ToString() == "S")
@@ -30932,9 +31365,6 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     string strEndDate = strEnd.ToString("MM/dd/yyyy HH:mm:ss");
                     tdMsg.InnerHtml = clsGeneral.failedMsg("Submit not possible: This session was started by '" + strCreatedBy + "' on '" + strStartDate + "' and completed by '" + strModifiedBy + "' on '" + strEndDate + "'. Please Close[X] this datasheet.");
                     Checkclose.Value = "false";
-                    string scriptcl = "checkclN();";
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "CallFunction", scriptcl, true);
-            
                 }
             }
         }
@@ -31134,20 +31564,29 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 {
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "", "showConfirmPopUp('" + NACols2 + "','" + bText + "');", true);
                 }
+                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             }
             else
             {
                 if (bText == "Submit Scores")
                 {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "", "triggerSubmitClick();", true);
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "triggerSubmitClick();", true);
                 }
                 else
                 {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "", "triggerSubmitAndRepeatClick();", true);
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "triggerSubmitAndRepeatClick();", true);
                 }
             }
         }
         
+    }
+        else
+        {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
+            tdMsg.InnerHtml = clsGeneral.failedMsg("Submit not possible: This session was discarded by another user. Please Close[X] this datasheet.");
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "closedatasheet1", "closedatasheet();", true);
+
+        }
     }
     protected bool checkIfScoreIsNA(bool IsInfluencedBy, int ColId)
     {
@@ -31469,7 +31908,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             oDS.VTLessonId = 0;
         }
         promptPrintBefore(printSave);
-
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
     protected void btnNotSave_Click(object sender, EventArgs e)
     {
@@ -31846,42 +32285,68 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         oSession = (clsSession)Session["UserSession"];
         if (ViewState["StdtSessHdr"] != null)
         {
-        string disupdate = "select * from StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+        object checkstatus = null;
+        string qrychk = " select SessionStatusCd from stdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+        checkstatus = oData.FetchValue(qrychk);
+        if (checkstatus != null)
+        {
+            if (checkstatus.ToString() == "S")
+            {
+                string modon = "";
+                string modby = "";
+                string mod = "select modifiedon,(SELECT CONCAT(UserFName, ' ', UserLName)  FROM dbo.[User] where UserId=StdtSessionHdr.ModifiedBy)AS fullname from StdtSessionHdr where StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+                DataTable dtmod = oData.ReturnDataTable(mod, false);
+                if (dtmod != null && dtmod.Rows.Count > 0)
+                {
+                    modon = dtmod.Rows[0]["modifiedon"].ToString();
+                    modby = dtmod.Rows[0]["fullname"].ToString();
+                }
+                tdMsg.InnerHtml = clsGeneral.failedMsg("Discard not possible: This session was Submitted by '" + modby + "' on '" + modon + "'. Please Close[X] this datasheet.");
+
+            }
+         else
+         {
+
+            string disupdate = "select DSTempHdrId,LessonPlanId,StudentId from StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
         DataTable dis = new DataTable();
         dis = oData.ReturnDataTable(disupdate, false);
         if (dis != null)
         {
             if (dis.Rows.Count > 0)
             {
-                foreach (DataRow dr in dis.Rows)
+                     object checkioa = null;
+                    string ioacheck = " select stdtSessionHdrId from stdtSessionHdr where DSTempHdrId=" + Convert.ToInt32(dis.Rows[0]["DSTempHdrId"]) + "AND LessonPlanId=" + Convert.ToInt32(dis.Rows[0]["LessonPlanId"]) + "AND StudentId=" + Convert.ToInt32(dis.Rows[0]["StudentId"]) + " AND SessionStatusCd='D' AND IOAInd='Y' AND StdtSessionHdrId>" + ViewState["StdtSessHdr"];
+                    checkioa = oData.FetchValue(ioacheck);
+                    if (checkioa != null)
                 {
-                    string ioacheck = " select * from stdtSessionHdr where DSTempHdrId=" + Convert.ToInt32(dr["DSTempHdrId"]) + "AND LessonPlanId=" + Convert.ToInt32(dr["LessonPlanId"]) + "AND StudentId=" + Convert.ToInt32(dr["StudentId"]) + " AND SessionStatusCd='D' AND IOAInd='Y' AND StdtSessionHdrId>=" + ViewState["StdtSessHdr"];
-
-                    DataTable db = new DataTable();
-                    db = oData.ReturnDataTable(ioacheck, false);
-                    if (db != null)
-                    {
-                        if (db.Rows.Count > 0)
+                        if (checkioa.ToString() == ViewState["StdtSessHdr"].ToString())
                         {
-                            foreach (DataRow dr2 in db.Rows)
-                            {
-                                if (dr2["StdtSessionHdrId"].ToString() == ViewState["StdtSessHdr"].ToString())
                                     ioastatu = "NoIOA";
+                        }
                                 else
+                        {
+                            if( Convert.ToInt32(dis.Rows[0]["DSTempHdrId"])>0)
+                            {
                                     ioastatu = "IOA";
                             }
-                        }
+                            else{
+                                    ioastatu = "NoIOA";
 
+                            }
+                        }
                     }
                     else
                     {
                         ioastatu = "NoIOA";
                     }
                 }
+              
+
             }
-        }
          ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "DiscardCheck('" + ioastatu + "');", true);
         }
+        }
+             }
         else
         {
             ClsErrorLog clError = new ClsErrorLog();
@@ -31897,6 +32362,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             ScriptManager.RegisterStartupScript(this, this.GetType(), "scriptdisc", "alert('Discard failed');", true);
 
         }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
 
     }
 
