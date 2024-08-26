@@ -1161,10 +1161,10 @@
                                         processedNames.push(name);
                                     }
                                 });
-                                
+                                var rotangle = -90;
                                 var finalsort = catarr.map(function (order, key) {
                                     var oldname = order.name.split('/');
-                                    var newname = oldname[0] + '-' + oldname[1];
+                                    var newname = oldname[0] + '/' + oldname[1] + '/' + oldname[2].substring(oldname[2].length - 2);
                                     var narr = {
 
                                         "name": newname,
@@ -1174,6 +1174,10 @@
 
                                     return narr;
                                 });
+                                if (finalsort.length == 1)
+                                {
+                                    rotangle = 0;
+                                }
                             // regular graph category end
                             var incCat = [];
                             // incident graph category start
@@ -1510,7 +1514,7 @@
                                     drawGraphInc(treatment, secstatus, leftY, rightY, ser, plotdata, incCat, leftmax, rightmax, minxvalue, maxxvalue)
                                 }
                                 else {
-                                    drawGraph(treatment, secstatus, leftY, rightY, ser, plotdata, rownum, leftmax, rightmax, minxvalue, maxxvalue)
+                                    drawGraph(treatment, secstatus, leftY, rightY, ser, plotdata, rownum, leftmax, rightmax, minxvalue, maxxvalue, rotangle)
                                 }
 
                             }
@@ -1527,7 +1531,7 @@
 
             }
             
-            function drawGraph(treatment, secstatus, leftY, rightY, ser, plotdata, rownum, leftmax, rightmax, minxvalue, maxxvalue) {
+            function drawGraph(treatment, secstatus, leftY, rightY, ser, plotdata, rownum, leftmax, rightmax, minxvalue, maxxvalue, rotangle) {
                             var chart = Highcharts.chart('cont', {
                                 chart: {
                                     plotBorderWidth: 2,
@@ -1632,6 +1636,7 @@
 
                                 },
                                     labels: {
+                                        rotation: rotangle,
                                         style: {
                                             color: 'black',
                                             fontSize: '12px',
@@ -2508,12 +2513,11 @@ year
                                     processedNames.push(name);
                                 }
                             });
-
+                            var rotangle = -90;
                             var finalsort = catarr.map(function (order, key) {
                                 var oldname = order.name.split('/');
-                                var newname = oldname[0] + '-' + oldname[1];
+                                var newname = oldname[0] + '/' + oldname[1] + '/' + oldname[2].substring(oldname[2].length - 2);
                                 var narr = {
-
                                     "name": newname,
                                     "categories": order.categories
 
@@ -2521,6 +2525,9 @@ year
 
                                 return narr;
                             });
+                            if (finalsort.length == 1) {
+                                rotangle = 0;
+                            }
                             // regular graph category end
                             var incCat = [];
                             // incident graph category start
@@ -2856,7 +2863,7 @@ year
                                     drawGraphInc(treatment, secstatus, leftY, rightY, ser, plotdata, incCat, leftmax, rightmax, minxvalue, maxxvalue)
                                 }
                                 else {
-                                    drawGraph(treatment, secstatus, leftY, rightY, ser, plotdata, rownum, leftmax, rightmax, minxvalue, maxxvalue)
+                                    drawGraph(treatment, secstatus, leftY, rightY, ser, plotdata, rownum, leftmax, rightmax, minxvalue, maxxvalue, rotangle)
                                 }
 
                             }
