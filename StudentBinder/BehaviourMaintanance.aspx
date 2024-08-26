@@ -59,6 +59,20 @@
             }
         });
 
+        var multiClickSave = false;
+        function enableButton() {
+            multiClickSave = false;
+            document.getElementById('BtnSave').style.opacity = '1';
+        }
+        function multiClickCheckSave(btn) {
+            if (!multiClickSave) {
+                multiClickSave = true;
+                btn.style.opacity = '0.5';
+                scrollToTop();
+                return true;
+            }
+            return false;
+        }
         function drpChanged() {
 
             if ($('#txtInterval').val() != "" &&
@@ -756,7 +770,7 @@
 
                             <tr>
                                 <td style="text-align: center" colspan="2">
-                                    <asp:Button ID="btnSave" runat="server" CssClass="NFButton" OnClick="btnSubmitIEP1_Click" Text="Save" Width="80px" OnClientClick="scrollToTop();"/>
+                                    <asp:Button ID="btnSave" runat="server" CssClass="NFButton" OnClick="btnSubmitIEP1_Click" Text="Save" Width="80px" OnClientClick="return multiClickCheckSave(this);"/>
                                     <asp:Button ID="btnCancel" runat="server" CssClass="NFButton" Text="Cancel" Width="80px" OnClick="btnCancel_Click" OnClientClick="scrollToTop();"/>
                                 </td>
                             </tr>
