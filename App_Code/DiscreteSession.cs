@@ -587,7 +587,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
                 arrowSymbol = "↓ SET ";
             }
             strQuery = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,CheckUp_Down,EventName,StdtSessEventType,SetId,EvntTs,SessionNbr,EventType,LessonPlanId,TimeStampForReport)VALUES" +
-                "(" + schoolId + "," + classId + "," + studentId + "," + templateId + ",'" + Type + "',N'" + arrowSymbol + setName + "','Major'," + SetId + ",GETDATE()," + iSessionNmbr + ",'EV', " + sLessonPlanId + ",DATEADD(HH,(SELECT (COUNT(*)+1) FROM StdtSessEvent WHERE CONVERT(DATE,EvntTs)=CONVERT(DATE,getdate()) AND " + "SchoolId=" + schoolId + " AND StudentId=" + studentId + " AND EventType='EV' AND LessonPlanId=" + sLessonPlanId + ")," + "CONVERT(datetime,getdate())))";
+                "(" + schoolId + "," + classId + "," + studentId + "," + templateId + ",'" + Type + "',N'" + arrowSymbol + clsGeneral.convertQuotes(setName) + "','Major'," + SetId + ",GETDATE()," + iSessionNmbr + ",'EV', " + sLessonPlanId + ",DATEADD(HH,(SELECT (COUNT(*)+1) FROM StdtSessEvent WHERE CONVERT(DATE,EvntTs)=CONVERT(DATE,getdate()) AND " + "SchoolId=" + schoolId + " AND StudentId=" + studentId + " AND EventType='EV' AND LessonPlanId=" + sLessonPlanId + ")," + "CONVERT(datetime,getdate())))";
             objData.ExecuteWithScope(strQuery);
             if (Type != "SET MOVEDOWN")
             {
