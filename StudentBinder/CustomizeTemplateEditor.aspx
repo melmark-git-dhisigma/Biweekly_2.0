@@ -107,6 +107,29 @@
         }
     </style>
     <script>
+
+        //Multiple click prevention
+        var multiClickSet = false;
+        var multiClickStep = false;
+        var multiClickCriteria = false;
+        var multiClickSubmit = false;
+        var multiClickDelete = false;
+        var multiClickCopy = false;
+        var multiClickVersion = false;
+        var multiClickActive = false;
+        var multiClickReject = false;
+        function enableButton() {
+            multiClickSet = false;
+            multiClickStep = false;
+            multiClickCriteria = false;
+            multiClickSubmit = false;
+            multiClickDelete = false;
+            multiClickCopy = false;
+            multiClickVersion = false;
+            multiClickActive = false;
+            multiClickReject = false;
+        }
+
         function PlusminusAoTb1() {
             var x = document.getElementById('<%= aoTb.ClientID %>');
             z = x.style.display;
@@ -337,65 +360,48 @@
             }
             return isChecked;
         }
-
-        function ValidateRadio() {
-            $('#divApprMsg').css("display", "none");
-            $('#divApprMsg').html('');
-            var isChecked = false;
-            var panel = document.getElementById("<%= normalOverride.ClientID %>");
-            if (panel) {
-                var RB1 = document.getElementById("<%=RadioButtonListSets.ClientID%>");
-                var radio = RB1.getElementsByTagName("input");
-                isChecked = false;
-                for (var i = 0; i < radio.length; i++) {
-                    if (radio[i].checked) {
-                        isChecked = true;
-                        break;
-                    }
-                }
-                if (!isChecked) {
-                    $('#divApprMsg').css("display", "block");
-                    $('#divApprMsg').html('You must complete your selections above before hitting Save');
-                }
-                if (isChecked) {
-                    var RB2 = document.getElementById("<%=RadioButtonListSteps.ClientID%>");
-                    if (RB2 != null) {
-                        isChecked = false;
-                        var radio1 = RB2.getElementsByTagName("input");
-                        for (var i = 0; i < radio1.length; i++) {
-                            if (radio1[i].checked) {
-                                isChecked = true;
-                                break;
-                            }
-                        }
-                        if (!isChecked) {
-                            $('#divApprMsg').css("display", "block");
-                            $('#divApprMsg').html('You must complete your selections above before hitting Save');
-                            return isChecked;
-                        }
-                    }
-                    var RB3 = document.getElementById("<%=RadioButtonListPrompts.ClientID%>");
-                    if (RB3 != null) {
-                        isChecked = false;
-                        var radio2 = RB3.getElementsByTagName("input");
-                        for (var i = 0; i < radio2.length; i++) {
-                            if (radio2[i].checked) {
-                                isChecked = true;
-                                break;
-                            }
-                        }
-                        if (!isChecked) {
-                            $('#divApprMsg').css("display", "block");
-                            $('#divApprMsg').html('You must complete your selections above before hitting Save');
-                        }
-                    }
-                }
+        function multiClickCheck(btn) {
+            if (!multiClickSubmit) {
+                btn.style.opacity = '0.5';
+                multiClickSubmit = true;
+                return true;
             }
-            else {
-                isChecked = false;
-                var RB4 = document.getElementById("<%=RadioButtonListSets_tt.ClientID%>");
-                if (RB4 != null) {
-                    var radio = RB4.getElementsByTagName("input");
+            return false;
+        }
+        function multiClickCheckVersion(btn){
+            if (!multiClickVersion) {
+                btn.style.opacity = '0.5';
+                multiClickVersion = true;
+                return true;
+            }
+            return false;
+        }
+        function multiClickCheckActive(btn) {
+            if (!multiClickActive) {
+                btn.style.opacity = '0.5';
+                multiClickActive = true;
+                return true;
+            }
+            return false;
+        }
+        function multiClickCheckReject(btn) {
+            if (!multiClickReject) {
+                btn.style.opacity = '0.5';
+                multiClickReject = true;
+                return true;
+            }
+            return false;
+        }
+        function ValidateRadio(btn) {
+            if (!multiClickSubmit) {
+                $('#divApprMsg').css("display", "none");
+                $('#divApprMsg').html('');
+                var isChecked = false;
+                var panel = document.getElementById("<%= normalOverride.ClientID %>");
+                if (panel) {
+                    var RB1 = document.getElementById("<%=RadioButtonListSets.ClientID%>");
+                    var radio = RB1.getElementsByTagName("input");
+                    isChecked = false;
                     for (var i = 0; i < radio.length; i++) {
                         if (radio[i].checked) {
                             isChecked = true;
@@ -407,21 +413,80 @@
                         $('#divApprMsg').html('You must complete your selections above before hitting Save');
                     }
                     if (isChecked) {
-                        if ($(".stepDiv").length > 0) {
-                            if ($(".stepDiv_sel").length == 0) {
-                                isChecked = false;
+                        var RB2 = document.getElementById("<%=RadioButtonListSteps.ClientID%>");
+                        if (RB2 != null) {
+                            isChecked = false;
+                            var radio1 = RB2.getElementsByTagName("input");
+                            for (var i = 0; i < radio1.length; i++) {
+                                if (radio1[i].checked) {
+                                    isChecked = true;
+                                    break;
+                                }
+                            }
+                            if (!isChecked) {
+                                $('#divApprMsg').css("display", "block");
+                                $('#divApprMsg').html('You must complete your selections above before hitting Save');
+                                if (isChecked) {
+                                    multiClickSubmit = true;
+                                    btn.style.opacity = '0.5';
+                                }
+                                return isChecked;
+                            }
+                        }
+                        var RB3 = document.getElementById("<%=RadioButtonListPrompts.ClientID%>");
+                        if (RB3 != null) {
+                            isChecked = false;
+                            var radio2 = RB3.getElementsByTagName("input");
+                            for (var i = 0; i < radio2.length; i++) {
+                                if (radio2[i].checked) {
+                                    isChecked = true;
+                                    break;
+                                }
+                            }
+                            if (!isChecked) {
                                 $('#divApprMsg').css("display", "block");
                                 $('#divApprMsg').html('You must complete your selections above before hitting Save');
                             }
                         }
                     }
                 }
+                else {
+                    isChecked = false;
+                    var RB4 = document.getElementById("<%=RadioButtonListSets_tt.ClientID%>");
+                    if (RB4 != null) {
+                        var radio = RB4.getElementsByTagName("input");
+                        for (var i = 0; i < radio.length; i++) {
+                            if (radio[i].checked) {
+                                isChecked = true;
+                                break;
+                            }
+                        }
+                        if (!isChecked) {
+                            $('#divApprMsg').css("display", "block");
+                            $('#divApprMsg').html('You must complete your selections above before hitting Save');
+                        }
+                        if (isChecked) {
+                            if ($(".stepDiv").length > 0) {
+                                if ($(".stepDiv_sel").length == 0) {
+                                    isChecked = false;
+                                    $('#divApprMsg').css("display", "block");
+                                    $('#divApprMsg').html('You must complete your selections above before hitting Save');
+                                }
+                            }
+                        }
+                    }
 
+                }
+                //if (isChecked) {
+                //    loadEmailOrder(this.id);
+                //}
+                if (isChecked) {
+                    multiClickSubmit = true;
+                    btn.style.opacity = '0.5';
+                }
+                return isChecked;
             }
-            //if (isChecked) {
-            //    loadEmailOrder(this.id);
-            //}
-            return isChecked;
+            return false;
         }
 
 
@@ -510,17 +575,21 @@
             ViewLessonName();
         }
 
-        function ExecuteLPExist() {
-            if (LPExist() == true) {
-                var Name = $("#txtCopyTempAdmin").val();
-                $("#hdLessonName").val(Name);
-                return true;
+        function ExecuteLPExist(btn) {
+            if (!multiClickCopy) {
+                if (LPExist() == true) {
+                    var Name = $("#txtCopyTempAdmin").val();
+                    $("#hdLessonName").val(Name);
+                    btn.style.opacity = '0.5';
+                    multiClickCopy = true;
+                    return true;
+                }
+                else {
+                    $("#hdLessonName").val("");
+                    return false;
+                }
             }
-            else {
-                $("#hdLessonName").val("");
-                return false;
-            }
-
+            return false;
         }
 
         function LPExist() {
@@ -733,10 +802,17 @@
             $("#<%=divMessage.ClientID%>").hide();
         }
 
-        function deleteDoc() {
-            var flag;
-            flag = confirm("Are you sure you want to delete this document?");
-            return flag;
+        function deleteDoc(btn) {
+            if (!multiClickDelete) {
+                var flag;
+                flag = confirm("Are you sure you want to delete this document?");
+                if (flag) {
+                    multiClickDelete = true;
+                    btn.style.opacity = '0.5';
+                }
+                return flag;
+            }
+            return false;
         }
 
        
@@ -753,16 +829,21 @@
                 $('#ViewRejectedNotes').show();
             });
         }
-        function checkNull() {
-            var text = document.getElementById("txtApLPReason").value;
-            if (text == "") {
-                document.getElementById("NewLPValidMsg").style.visibility = "visible";
-                return false;
+        function checkNull(btn) {
+            if (!multiClickCriteria) {
+                var text = document.getElementById("txtApLPReason").value;
+                if (text == "") {
+                    document.getElementById("NewLPValidMsg").style.visibility = "visible";
+                    return false;
+                }
+                else {
+                    document.getElementById("NewLPValidMsg").style.visibility = "hidden";
+                    multiClickCriteria = true;
+                    btn.style.opacity = '0.5';
+                    return true;
+                }
             }
-            else {
-                document.getElementById("NewLPValidMsg").style.visibility = "hidden";
-                return true;
-            }
+            return false;
         }
 
         function checkForIIG(elm) {
@@ -915,19 +996,19 @@
         }
 
         function ExportTemplatePopup() {
-            $('#LBLClassnotfound').text('');
-            $('#txtSname').val('Individual Name');
-            $('#<%=btnCopyTempAdmin.ClientID%>').hide();
-            $('#divCopyTempAdmin').hide();
+                $('#LBLClassnotfound').text('');
+                $('#txtSname').val('Individual Name');
+                $('#<%=btnCopyTempAdmin.ClientID%>').hide();
+                $('#divCopyTempAdmin').hide();
 
-            $('#HdrExportTemplate').fadeIn('slow');
-            //$('#HdrExportTemplate').css('display', 'block');
-            $('#classDivs').empty();
-            $('#chkCpyStdtTemplate').attr('checked', false);
-            $('#tdMsgExprt').empty();
-            TempSelected();
-            $('#<%=txtSname.ClientID %>').show();
-            $('#<%=imgsearch.ClientID %>').show();
+                $('#HdrExportTemplate').fadeIn('slow');
+                //$('#HdrExportTemplate').css('display', 'block');
+                $('#classDivs').empty();
+                $('#chkCpyStdtTemplate').attr('checked', false);
+                $('#tdMsgExprt').empty();
+                TempSelected();
+                $('#<%=txtSname.ClientID %>').show();
+                $('#<%=imgsearch.ClientID %>').show();
         }
 
         function closePOP() {
@@ -1973,23 +2054,23 @@
                                     <asp:Panel runat="server" ID="panelButtons">
                                         <span style="float: right; margin: -20px 0 0 23px;" class="spnClass">
                                             <asp:Button ID="btnFromRejectDup" runat="server" CssClass="NFButton" Width="140px" Text="Move to Drafts" Style="margin: 8px 10px 0 0; float: left;" OnClick="drpTasklist_SelectedIndexChanged1" OnClientClick="alert('Cannot be moved to Drafts because another version is already available');" title="After reviewing the Rejected Note, staff choose Move to Drafts to start working on fixing it up." />
-                                            <asp:Button ID="btnFromReject" runat="server" CssClass="NFButton" Width="140px" Text="Move to Drafts" Style="margin: 8px 10px 0 0; float: left;" OnClick="btnFromReject_Click" title="After reviewing the Rejected Note, staff choose Move to Drafts to start working on fixing it up." />
+                                            <asp:Button ID="btnFromReject" runat="server" CssClass="NFButton" Width="140px" Text="Move to Drafts" Style="margin: 8px 10px 0 0; float: left;" OnClick="btnFromReject_Click" OnClientClick="return multiClickCheckReject(this);" title="After reviewing the Rejected Note, staff choose Move to Drafts to start working on fixing it up." />
                                             <%--<input type="button" id="BtnEmail" runat="server" class="NFButton" value="Email for review" Visible="false" Style="Width:110px;margin: 8px 10px 0 0; float: left;" title="Email review" onclick="loadEmailOrder();" />--%>
-                                            <asp:Button ID="BtnEmail" runat="server" class="NFButton" Text="Email for review" Visible="false" Style="Width:110px;margin: 8px 10px 0 0; float: left;" title="Email review" OnClick="LoadEmail_Click"/>
-                                            <asp:Button ID="BtnPreview" runat="server" CssClass="NFButton" Text="Preview" Visible="false" Style="margin: 8px 10px 0 0; float: left;" title="This will give a simplified preview of the custom datasheet for this lesson. You must complete the mandatory fields in these tabs for it to proceed (don't forget IEP start/end dates and setting move criteria for all Steps/Sets/Prompts. You must set criteria for up and down even if you are using NA so the application knows your decision is intentional.  The application has automatically built this datasheet based on all the answers you've provided in these tabs and will change as you change the requirements." OnClick="BtnPreview_Click" />
-                                            <asp:Button ID="BtnSubmit" runat="server" CssClass="lessonUpload NFButton" Text="Submit"  title="After previewing the datasheet and reviewing all the fields, if you are complete you hit Submit. The lesson will move out of the 'Drafts' box and into the 'Pending Approval' box for an approver to review and approve/reject." OnClick="BtnSubmit_Click" OnClientClick="autoSave()"/>
+                                            <asp:Button ID="BtnEmail" runat="server" class="NFButton" Text="Email for review" Visible="false" Style="Width:110px;margin: 8px 10px 0 0; float: left;" title="Email review" OnClick="LoadEmail_Click" OnClientClick="return multiClickCheck(this);"/>
+                                            <asp:Button ID="BtnPreview" runat="server" CssClass="NFButton" Text="Preview" Visible="false" Style="margin: 8px 10px 0 0; float: left;" title="This will give a simplified preview of the custom datasheet for this lesson. You must complete the mandatory fields in these tabs for it to proceed (don't forget IEP start/end dates and setting move criteria for all Steps/Sets/Prompts. You must set criteria for up and down even if you are using NA so the application knows your decision is intentional.  The application has automatically built this datasheet based on all the answers you've provided in these tabs and will change as you change the requirements." OnClick="BtnPreview_Click" OnClientClick="return multiClickCheck(this);" />
+                                            <asp:Button ID="BtnSubmit" runat="server" CssClass="lessonUpload NFButton" Text="Submit"  title="After previewing the datasheet and reviewing all the fields, if you are complete you hit Submit. The lesson will move out of the 'Drafts' box and into the 'Pending Approval' box for an approver to review and approve/reject." OnClick="BtnSubmit_Click" OnClientClick="return autoSave(false)"/>
                                             <asp:Button ID="BtnApproval_hdn" runat="server" Text="Approve" Visible="false" CssClass="NFButton" Style="margin: 8px 10px 0 0; float: left;" OnClick="BtnApproval_Click" />
                                             <asp:Button ID="BtnApproval" runat="server" UseSubmitBehavior="false" Text="Approve" OnClientClick="return showOverride();" Visible="false" CssClass="NFButton" Style="margin: 8px 10px 0 0; float: left;" title="Approve moves the lesson to Approved and it is immediately available for teaching. If this is a new version, the old version immediately moves to Inactive and this new version takes its place. If you want to delay releasing the lesson until a certain date, do not hit Approve, just leave the lesson in Pending Approval until the date you want to release it."/>
                                             <asp:Button ID="BtnReject" runat="server" Text="Reject" CssClass="NFButton" Visible="false" Style="margin: 8px 10px 0 0; float: left;" OnClick="BtnReject_Click1"  title="Reject immediately moves the lesson to Rejected and unlocks it so staff can continue to work on it and resubmit it. You can leave Approval Notes on each page specifying the issues and you can also specify the issues on the Reason pop-up after hitting Reject. The user can see the Approval Notes and the Reason. "/>
-                                            <asp:Button ID="BtnMaintenance" runat="server" Text="Maintenance" CssClass="NFButton" Visible="false" Style="margin: 8px 10px 0 0; float: left;" OnClick="BtnMaintenanace_Click" title="Moves lesson to Maintenance. Lesson will still be available to be taught for maintenance; the button will be yellow instead of green on the datasheet page to indicate it's a maintenance program versus active lesson." />
-                                            <asp:Button ID="BtnInactive" runat="server" Text="Inactive" CssClass="NFButton" Visible="false" Style="margin: 8px 10px 0 0; float: left;" OnClick="BtnInactive_Click" title="Moves lesson to Inactive, removes lesson from default datasheet tab." />
-                                            <asp:Button ID="BtnActive" runat="server" Text="Activate" CssClass="NFButton" Visible="false" Style="margin: 8px 10px 0 0; float: left;" OnClick="BtnActive_Click" title="Moves the lesson back to Approved and active."/>
-                                            <asp:Button ID="BtnMakeRegular" runat="server" Text="Make Active " CssClass="NFButton" Visible="false" Width="140px" Style="margin: 8px 10px 0 0; float: left;" OnClick="BtnMakeRegular_Click" title="Moves it from Maintenance to Active (Approved) again."/>
+                                            <asp:Button ID="BtnMaintenance" runat="server" Text="Maintenance" CssClass="NFButton" Visible="false" Style="margin: 8px 10px 0 0; float: left;" OnClick="BtnMaintenanace_Click" OnClientClick ="return multiClickCheckVersion(this);" title="Moves lesson to Maintenance. Lesson will still be available to be taught for maintenance; the button will be yellow instead of green on the datasheet page to indicate it's a maintenance program versus active lesson." />
+                                            <asp:Button ID="BtnInactive" runat="server" Text="Inactive" CssClass="NFButton" Visible="false" Style="margin: 8px 10px 0 0; float: left;" OnClick="BtnInactive_Click" OnClientClick="return multiClickCheckActive(this);" title="Moves lesson to Inactive, removes lesson from default datasheet tab." />
+                                            <asp:Button ID="BtnActive" runat="server" Text="Activate" CssClass="NFButton" Visible="false" Style="margin: 8px 10px 0 0; float: left;" OnClick="BtnActive_Click" OnClientClick="return multiClickCheckActive(this);" title="Moves the lesson back to Approved and active."/>
+                                            <asp:Button ID="BtnMakeRegular" runat="server" Text="Make Active " CssClass="NFButton" Visible="false" Width="140px" Style="margin: 8px 10px 0 0; float: left;" OnClick="BtnMakeRegular_Click" OnClientClick="return multiClickCheckActive(this);" title="Moves it from Maintenance to Active (Approved) again."/>
                                             <asp:Button ID="btnrejectedNotes" runat="server" Text="Rejected Note" CssClass="NFButton" Visible="false" Style="margin: 8px 10px 0 0; float: left;" OnClick="btnrejectedNotes_Click"  title="Choose this first to read the rejected reason notes from the approver, then Move to Drafts to make the changes."/>
                                             <input type="button" id="btndoc" runat="server" value="Add Doc/Video" onclick="popPrompts()" class="lessonUpload NFButton" style="margin: 8px 10px 0 0; width:98px; float: left;" title="If you have additional files that you want to give the teacher access to when opening this datasheet, attach them here." />
-                                            <asp:Button ID="BtnCopyTemplate" runat="server" Text="" CssClass="newDoc" OnClick="BtnCopyTemplate_Approve" Visible="false" Style="float: right;" ToolTip="Create new version" />
+                                            <asp:Button ID="BtnCopyTemplate" runat="server" Text="" CssClass="newDoc" OnClick="BtnCopyTemplate_Approve" OnClientClick="return multiClickCheck(this);" Visible="false" Style="float: right;" ToolTip="Create new version" />
                                             <asp:Button ID="BtnExportTemplate" runat="server" CssClass="lessonUpload NFButton" Enabled="True" OnClientClick="ExportTemplatePopup()" Text="Copy" Visible="False" style="margin: 8px 10px 0 0; float: left;" title="Copy lesson to either the Curriculum Databank by checking 'Copy Lesson as Template' or to another specific student. To copy to another student, type the name, click on the face button to search, then select the name to copy. The lesson will appear in the Drafts box of the student to which you copied it." />
-                                            <asp:Button ID="btnDelLp" runat="server" Text="Delete" CssClass="NFButton" Visible="false" Style="margin: 8px 10px 0 0; float: left;" OnClientClick="javascript: return deleteDoc();" OnClick="btnDelLp_Click1" title="Deletes the lesson you are currently working on."/>
+                                            <asp:Button ID="btnDelLp" runat="server" Text="Delete" CssClass="NFButton" Visible="false" Style="margin: 8px 10px 0 0; float: left;" OnClientClick="javascript: return deleteDoc(this);" OnClick="btnDelLp_Click1" title="Deletes the lesson you are currently working on."/>
                                             <img src="images/sort.png" style="height: 25px; width: 25px; cursor: pointer; margin: 0 10px 3px 0;" onclick="loadLPOrder();" />
                                             <asp:ImageButton ID="btnRefresh" runat="server" Text="Refresh" ImageUrl="~/Administration/images/RefreshStudentBinder.png" OnClick="btnRefresh_Click" ToolTip="Refresh" title="Refresh." />
 
@@ -2002,7 +2083,7 @@
                                             <asp:Button ID="BtnAdminPreview" runat="server" CssClass="NFButton" Text="Preview" Visible="false" Style="margin: 8px 10px 0 0; float: left;" title="" OnClick="BtnAdminPreview_Click" />
                                             <input type="button" id="btnNew" runat="server" value="Add Doc/Video" onclick="popPrompts()" class="lessonUpload NFButton" style="display: none; margin: 8px 10px 0 0; float: left;width:100px! important" />
                                             <asp:Button ID="BtnAddNewLessonPlan" runat="server" Text="Add New" CssClass="NFButton" Style="margin: 8px 10px 0 0; float: left;" OnClick="BtnAddNewLessonPlan_Click" />
-                                            <asp:Button ID="btnDeleteLPAdmin" runat="server" Text="Delete" CssClass="NFButton" Style="margin: 8px 10px 0 0; float: left;" OnClick="btnDeleteLPAdmin_Click" Visible="false" OnClientClick="javascript: return deleteDoc();" />
+                                            <asp:Button ID="btnDeleteLPAdmin" runat="server" Text="Delete" CssClass="NFButton" Style="margin: 8px 10px 0 0; float: left;" OnClick="btnDeleteLPAdmin_Click" Visible="false" OnClientClick="javascript: return deleteDoc(this);" />
                                         </span>
                                     </asp:Panel>
                                 </h3>
@@ -2186,13 +2267,13 @@
                         <div class="topper">
                             <ul class="navigationTabs">
                                 <span class="bgb"></span>
-                                <li><a href="#" rel="info" style="width: 70px !Important;" onclick="autoSave()" >Lesson Info</a></li>
-                                <li><a href="#" rel="about" style="width: 100px !Important;" onclick="autoSave()">Type of Instruction</a></li>
-                                <li><a href="#" rel="download" style="width: 85px !Important;" onclick="autoSave()">Measurement Systems</a></li>
-                                <li><a href="#" rel="implement" style="width: 60px !Important;" onclick="autoSave()">Sets</a></li>
-                                <li><a href="#" rel="implement" style="width: 60px;" onclick="autoSave()">Steps</a></li>
-                                <li><a href="#" rel="download" style="width: 60px;" onclick="autoSave()">Prompts</a></li>
-                                <li class="nobg"><a href="#" rel="implement" style="width: 110px !Important;" onclick="autoSave()">Lesson procedure</a></li>
+                                <li><a href="#" rel="info" style="width: 70px !Important;" onclick="autoSave(true)" >Lesson Info</a></li>
+                                <li><a href="#" rel="about" style="width: 100px !Important;" onclick="autoSave(true)">Type of Instruction</a></li>
+                                <li><a href="#" rel="download" style="width: 85px !Important;" onclick="autoSave(true)">Measurement Systems</a></li>
+                                <li><a href="#" rel="implement" style="width: 60px !Important;" onclick="autoSave(true)">Sets</a></li>
+                                <li><a href="#" rel="implement" style="width: 60px;" onclick="autoSave(true)">Steps</a></li>
+                                <li><a href="#" rel="download" style="width: 60px;" onclick="autoSave(true)">Prompts</a></li>
+                                <li class="nobg"><a href="#" rel="implement" style="width: 110px !Important;" onclick="autoSave(true)">Lesson procedure</a></li>
                             </ul>
 
                             <div class="tabsContent">
@@ -2935,7 +3016,7 @@
 
 
 
-                                            <asp:Button ID="BtnAddMeasure" runat="server" class="rbtn" Text="Add Measure" OnClick="BtnAddMeasure_Click" />
+                                            <asp:Button ID="BtnAddMeasure" runat="server" class="rbtn" Text="Add Measure" OnClick="BtnAddMeasure_Click" OnClientClick="return multiClickCheckVersion(this);"/>
 
 
                                             <asp:Button ID="BtnVTSavePrompt" runat="server" Text="Add Prompt" class="rbtn" OnClick="BtnVTSavePrompt_Click" Visible="false" OnClientClick="return confirm($(this).val()+'\nClick OK to proceed?');" />
@@ -2978,7 +3059,7 @@
                                                             <asp:Button ID="btnMeasurementSystems" CssClass="bTnn" runat="server" Text="Update Approval Note" Style="margin-right: 20px; width: 140px" OnClick="btnCommentLessonInfo_Click" Visible="false" OnClientClick="scrollToTop();" />
                                                         </td>
                                                     </tr>
-													<tr>
+                                                     <tr>
                                                         <td colspan="3" style="text-align: left;">
                                                             <asp:Button ID="btUpdateMeasurement" runat="server" class="rbtn" Text="Update" OnClick="btUpdateMeasurement_Click" OnClientClick="scrollToTop();" ToolTip="Press to Save your work on this tab"/>
 
@@ -3123,9 +3204,9 @@
                                                                     </tr>
                                                                     <tr>
                                                                         <td colspan="2" style="text-align: center;">
-                                                                            <asp:Button ID="btnAddSetDetails" runat="server" Text="Save" CssClass="NFButton" OnClick="btnAddSetDetails_Click" OnClientClick=" return ValidateSet()" TabIndex="7" />
+                                                                            <asp:Button ID="btnAddSetDetails" runat="server" Text="Save" CssClass="NFButton" OnClick="btnAddSetDetails_Click" OnClientClick=" return ValidateSet(this)" TabIndex="7" />
 
-                                                                            <asp:Button ID="BtnUpdateSetDetails" runat="server" Text="Update" CssClass="NFButton" Visible="false" OnClick="BtnUpdateSetDetails_Click" OnClientClick=" return ValidateSet()" TabIndex="7" />
+                                                                            <asp:Button ID="BtnUpdateSetDetails" runat="server" Text="Update" CssClass="NFButton" Visible="false" OnClick="BtnUpdateSetDetails_Click" OnClientClick=" return ValidateSet(this)" TabIndex="7" />
 
                                                                             <asp:Button ID="btnAddSet" class="rbtn" runat="server" Text="Clear" OnClick="btnAddSet_Click" Style="float: none;" TabIndex="8" />
 
@@ -3278,7 +3359,7 @@
                                                             <asp:Button ID="btncommentset" CssClass="bTnn" runat="server" Text="Update Approval Note" Style="margin-right: 20px; width: 140px" OnClick="btnCommentLessonInfo_Click" Visible="false" OnClientClick="scrollToTop();" />
                                                         </td>
                                                     </tr>
-													<tr>
+                                                                                                         <tr>
                                                         <td colspan="3" style="text-align: left;">
                                                             <asp:Button ID="btnUpdateset" runat="server" class="rbtn" Text="Update" OnClick="btnUpdateset_Click" OnClientClick="scrollToTop();" ToolTip="Press to Save your work on this tab"/>
 
@@ -3496,9 +3577,9 @@
 
 
 
-                                                                            <asp:Button ID="btnAddStepDetails" runat="server" Text="Save" CssClass="NFButton" OnClick="btnAddStepDetails_Click" OnClientClick="return ValidateStep();" TabIndex="4" />
+                                                                            <asp:Button ID="btnAddStepDetails" runat="server" Text="Save" CssClass="NFButton" OnClick="btnAddStepDetails_Click" OnClientClick="return ValidateStep(this);" TabIndex="4" />
 
-                                                                            <asp:Button ID="BtnUpdateStep" runat="server" Text="Update" CssClass="NFButton" Visible="false" OnClick="BtnUpdateStep_Click" OnClientClick="scrollToTop(); return ValidateStep(); " TabIndex="4" />
+                                                                            <asp:Button ID="BtnUpdateStep" runat="server" Text="Update" CssClass="NFButton" Visible="false" OnClick="BtnUpdateStep_Click" OnClientClick="scrollToTop(); return ValidateStep(this); " TabIndex="4" />
 
 
 
@@ -3659,7 +3740,7 @@
 
                                                         </td>
                                                     </tr>
-													<tr>
+                                                     <tr>
                                                         <td colspan="3" style="text-align: left;">
                                                             <asp:Button ID="btnUpdatesteps" runat="server" class="rbtn" Text="Update" OnClick="btnUpdatesteps_Click" OnClientClick="scrollToTop();" ToolTip="Press to Save your work on this tab"/>
 
@@ -3853,12 +3934,12 @@
                                                                 <asp:Button ID="btncommentPrompt" CssClass="bTnn" runat="server" Text="Update Approval Note" Style="margin-right: 20px; width: 140px" OnClick="btnCommentLessonInfo_Click" Visible="false" OnClientClick="scrollToTop();"/>
                                                             </td>
                                                         </tr>
-														<tr>
+                                                        <tr>
                                                         <td colspan="3" style="text-align: left;">
                                                             <asp:Button ID="btnupdateprompts" runat="server" class="rbtn" Text="Update" OnClick="btnupdateprompts_Click" OnClientClick="scrollToTop();" ToolTip="Press to Save your work on this tab"/>
 
                                                         </td>
-														</tr>
+                                                    </tr>
                                                     </table>
                                                 </div>
 
@@ -4160,7 +4241,7 @@
                                 </table>
                             </div>
 
-                            <asp:Button ID="btnCopyTempAdmin" runat="server" CssClass="NFButton" Style="width: 180px; display: none" Text="Copy Lesson Plan" OnClick="btnCopyTempAdmin_click" OnClientClick="return ExecuteLPExist();" />
+                            <asp:Button ID="btnCopyTempAdmin" runat="server" CssClass="NFButton" Style="width: 180px; display: none" Text="Copy Lesson Plan" OnClick="btnCopyTempAdmin_click" OnClientClick="return ExecuteLPExist(this);" />
 
                         </div>
                     </div>
@@ -4399,12 +4480,12 @@
 
                                                     <tr>
                                                         <td colspan="4" style="text-align: center;">
-                                                            <asp:Button ID="BtnAddSetDCriteria" runat="server" Text="Save" CssClass="NFButton" OnClick="BtnAddSetDCriteria_Click" OnClientClick=" return ValidateCriteria()" />
-                                                            <asp:Button ID="BtnAddStepDCriteria" runat="server" Text="Save" CssClass="NFButton" OnClick="BtnAddStepDCriteria_Click" OnClientClick=" return ValidateCriteria()" />
-                                                            <asp:Button ID="BtnAddPromptDCriteria" runat="server" Text="Save" CssClass="NFButton" OnClick="BtnAddPromptDCriteria_Click" OnClientClick=" return ValidateCriteria()" />
-                                                            <asp:Button ID="BtnUpdateSetDCriteria" runat="server" Text="Update" CssClass="NFButton" Visible="false" OnClick="BtnUpdateSetDCriteria_Click" OnClientClick=" return ValidateCriteria()" />
-                                                            <asp:Button ID="BtnUpdateStepDCriteria" runat="server" Text="Update" CssClass="NFButton" Visible="false" OnClick="BtnUpdateStepDCriteria_Click" OnClientClick=" return ValidateCriteria()" />
-                                                            <asp:Button ID="BtnUpdatePromptDCriteria" runat="server" Text="Update" CssClass="NFButton" Visible="false" OnClick="BtnUpdatePromptDCriteria_Click" OnClientClick=" return ValidateCriteria()" />
+                                                            <asp:Button ID="BtnAddSetDCriteria" runat="server" Text="Save" CssClass="NFButton" OnClick="BtnAddSetDCriteria_Click" OnClientClick=" return ValidateCriteria(this)" />
+                                                            <asp:Button ID="BtnAddStepDCriteria" runat="server" Text="Save" CssClass="NFButton" OnClick="BtnAddStepDCriteria_Click" OnClientClick=" return ValidateCriteria(this)" />
+                                                            <asp:Button ID="BtnAddPromptDCriteria" runat="server" Text="Save" CssClass="NFButton" OnClick="BtnAddPromptDCriteria_Click" OnClientClick=" return ValidateCriteria(this)" />
+                                                            <asp:Button ID="BtnUpdateSetDCriteria" runat="server" Text="Update" CssClass="NFButton" Visible="false" OnClick="BtnUpdateSetDCriteria_Click" OnClientClick=" return ValidateCriteria(this)" />
+                                                            <asp:Button ID="BtnUpdateStepDCriteria" runat="server" Text="Update" CssClass="NFButton" Visible="false" OnClick="BtnUpdateStepDCriteria_Click" OnClientClick=" return ValidateCriteria(this)" />
+                                                            <asp:Button ID="BtnUpdatePromptDCriteria" runat="server" Text="Update" CssClass="NFButton" Visible="false" OnClick="BtnUpdatePromptDCriteria_Click" OnClientClick=" return ValidateCriteria(this)" />
                                                         </td>
                                                     </tr>
 													
@@ -4513,8 +4594,8 @@
                             <asp:TextBox ID="OptMessage" runat="server" Width="96.5%" TextMode="MultiLine" Rows="4" Columns="5" style = "resize:none"></asp:TextBox>
                         </div>
                         <div style="text-align: center; margin: 10px 0 10px 0">
-                            <asp:Button runat="server" class="NFButton" ID="BtnEmailSend" Text="Send" OnClick="btnEmailSend_Click" OnClientClick="return checkEmailSelection();"/>
-                            <asp:Button runat="server" class="NFButton" ID="BtnEmailApproveSend" Text="Send" OnClick="btnEmailSend_Click" OnClientClick="return checkEmailSelection();"/>
+                            <asp:Button runat="server" class="NFButton" ID="BtnEmailSend" Text="Send" OnClick="btnEmailSend_Click" OnClientClick="return checkEmailSelection(this);"/>
+                            <asp:Button runat="server" class="NFButton" ID="BtnEmailApproveSend" Text="Send" OnClick="btnEmailSend_Click" OnClientClick="return checkEmailSelection(this);"/>
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             <span style="display:inline-block">
                             <asp:updatepanel ID="Updatepanel14" runat="server">
@@ -4524,7 +4605,7 @@
                             </ContentTemplate>
                             </asp:updatepanel>
                             </span>
-                            <asp:Button runat="server" class="NFButton" ID="BtnSkip" Text="Skip" OnClick="btnPriorLevel_Click" />
+                            <asp:Button runat="server" class="NFButton" ID="BtnSkip" Text="Skip" OnClick="btnPriorLevel_Click" OnClientClick="return multiClickCheck(this);" />
                         </div>
                     </div>
                </div>
@@ -5296,8 +5377,8 @@
 
 
 
-                                                <asp:Button ID="BtnSaveMeasure" runat="server" CssClass="NFButton" Text="Save" OnClick="BtnSaveMeasure_Click" OnClientClick=" return ValidateMeasure()" />
-                                                <asp:Button ID="BtnUpdateMeasure" runat="server" CssClass="NFButton" Text="Update" Visible="false" OnClick="BtnUpdateMeasure_Click" OnClientClick=" return ValidateMeasure()" />
+                                                <asp:Button ID="BtnSaveMeasure" runat="server" CssClass="NFButton" Text="Save" OnClick="BtnSaveMeasure_Click" OnClientClick=" return ValidateMeasure(this)" />
+                                                <asp:Button ID="BtnUpdateMeasure" runat="server" CssClass="NFButton" Text="Update" Visible="false" OnClick="BtnUpdateMeasure_Click" OnClientClick=" return ValidateMeasure(this)" />
                                                 <asp:HiddenField ID="Hdfsavemeasure" runat="server" Value="" />
 
 
@@ -5494,7 +5575,7 @@
                     <tr>
                         <td width="20%"></td>
                         <td width="80%">
-                            <asp:Button ID="btnAddApLp" runat="server" Text="Add" CssClass="NFButton" OnClick="btnAddApLp_Click" OnClientClick="return checkNull()" />
+                            <asp:Button ID="btnAddApLp" runat="server" Text="Add" CssClass="NFButton" OnClick="btnAddApLp_Click" OnClientClick="return checkNull(this)" />
                             <asp:Button ID="btnRjctApLp" runat="server" Text="Cancel" CssClass="NFButton" OnClick="btnRjctApLp_Click" />
                         </td>
                     </tr>
@@ -5555,7 +5636,7 @@
                     <tr>
                         <td width="20%"></td>
                         <td width="80%">
-                            <asp:Button ID="btnRejectConfirm" runat="server" Text="Reject" CssClass="NFButton" OnClick="BtnReject_Click" />
+                            <asp:Button ID="btnRejectConfirm" runat="server" Text="Reject" CssClass="NFButton" OnClick="BtnReject_Click" OnClientClick="return multiClickCheckReject(this);"/>
                             <asp:Button ID="btnCancel" runat="server" Text="Cancel" CssClass="NFButton" OnClientClick="closeReject();" />
 
                         </td>
@@ -5653,7 +5734,7 @@
 
                             <asp:TemplateField HeaderText="Delete" ItemStyle-HorizontalAlign="center" HeaderStyle-Width="15px">
                                 <ItemTemplate>
-                                    <asp:ImageButton OnClientClick="javascript:return deleteDoc();" ID="lb_edit" runat="server" class="btn btn-red" CommandArgument='<%# Eval("LPDoc") %>' CommandName="Edit" ImageUrl="~/Administration/images/trash.png" Width="18px" />
+                                    <asp:ImageButton OnClientClick="javascript:return deleteDoc(this);" ID="lb_edit" runat="server" class="btn btn-red" CommandArgument='<%# Eval("LPDoc") %>' CommandName="Edit" ImageUrl="~/Administration/images/trash.png" Width="18px" />
                                 </ItemTemplate>
                             </asp:TemplateField>
                         </Columns>
@@ -5735,7 +5816,7 @@
                 </asp:DataList>
             </div>
             <div style="text-align: center; margin: 10px 0 10px 0">
-                <asp:Button runat="server" class="NFButton" ID="btnSaveOrder" Text="Save Order" OnClick="btnSaveOrder_Click" />
+                <asp:Button runat="server" class="NFButton" ID="btnSaveOrder" Text="Save Order" OnClick="btnSaveOrder_Click" OnClientClick="return multiClickCheck(this);" />
             </div>
             <div style="text-align: right;margin-right:5px;margin-bottom:5px;font-weight:bold;">*Maintenance Lesson</div>
         </div>
@@ -5942,7 +6023,7 @@
                                    
 
                                     <%--<asp:Button ID="btnPriorLevel" Width="75px" runat="server" Text="Save" CssClass="NFButton" OnClick="btnPriorLevel_Click" OnClientClick="return ValidateRadio();" />--%>
-                                    <asp:Button ID="btnPriorLevel" Width="75px" runat="server" Text="Save" CssClass="NFButton" OnClick="btnEmailClick" OnClientClick="return ValidateRadio();" />
+                                    <asp:Button ID="btnPriorLevel" Width="75px" runat="server" Text="Save" CssClass="NFButton" OnClick="btnEmailClick" OnClientClick="return ValidateRadio(this);" />
                                     <asp:Button ID="btnResetLevel" Width="150px" runat="server" Text="Start from beginning" CssClass="NFButton" OnClick="btnResetLevel_Click" style="display: none;"  />
 
                                 </td>
@@ -6316,131 +6397,161 @@
 
     // function to validate Measure Data.
 
-    function ValidateMeasure() {
-        if (document.getElementById("<%=txtColumnName.ClientID%>").value == "") {
-            document.getElementById("<%=tdMsgMeasure.ClientID%>").innerHTML = "<div class='warning_box'>Column Name Field can not be blank</div> ";
-            document.getElementById("<%=txtColumnName.ClientID%>").focus();
-            return false;
-        }
-        return true;
-
-    }
-
-
-    function ValidateSet() {
-        var stName = document.getElementById("<%=txtBoxAddSet.ClientID%>").value;
-        if (stName.trim() == "") {
-            document.getElementById("<%=tdMsgSet.ClientID%>").innerHTML = "<div class='warning_box'>Set Name Field can not be blank</div> ";
-            document.getElementById("<%=txtBoxAddSet.ClientID%>").focus();
-            return false;
-        }
-        return true;
-
-    }
-
-    function ValidateStep() {
-        var stpName = document.getElementById("<%=txtStepName.ClientID%>").value;
-        if (stpName.trim() == "") {
-            document.getElementById("<%=tdMsgStep.ClientID%>").innerHTML = "<div class='warning_box'>Step Name Field can not be blank</div> ";
-            document.getElementById("<%=txtStepName.ClientID%>").focus();
-            return false;
-        }
-        return true;
-
-    }
-
-
-    function ValidateCriteria() {
-
-        if (document.getElementById("<%=ddlCriteriaType.ClientID%>").value == "MODIFICATION");
-        {
-            return true;
-        }
-
-        if (document.getElementById("<%=ddlCriteriaType.ClientID%>").value == "") {
-            document.getElementById("<%=tdMsgCriteria.ClientID%>").innerHTML = "<div class='warning_box'>Select any Criteria Type</div> ";
-            document.getElementById("<%=ddlCriteriaType.ClientID%>").focus();
-            return false;
-        }
-        if (document.getElementById("<%=ddlTempColumn.ClientID%>").value == "") {
-            document.getElementById("<%=tdMsgCriteria.ClientID%>").innerHTML = "<div class='warning_box'>Select any Column  Type</div> ";
-            document.getElementById("<%=ddlTempColumn.ClientID%>").focus();
-            return false;
-        }
-
-        if (document.getElementById("<%=txtRequiredScore.ClientID%>").value == "") {
-            document.getElementById("<%=tdMsgCriteria.ClientID%>").innerHTML = "<div class='warning_box'>Required Score Field can not be blank</div> ";
-            document.getElementById("<%=txtRequiredScore.ClientID%>").focus();
-            return false;
-        }
-        else {
-            var value = parseInt(document.getElementById("<%=txtRequiredScore.ClientID%>").value);
-            if (value < 0 || value > 100) {
-                document.getElementById("<%=tdMsg.ClientID%>").innerHTML = "<div class='warning_box'>Please Enter Score Between 0 and 100</div> ";
-
+    function ValidateMeasure(btn) {
+        if (!multiClickCriteria) {
+            if (document.getElementById("<%=txtColumnName.ClientID%>").value == "") {
+                document.getElementById("<%=tdMsgMeasure.ClientID%>").innerHTML = "<div class='warning_box'>Column Name Field can not be blank</div> ";
+                document.getElementById("<%=txtColumnName.ClientID%>").focus();
                 return false;
             }
+            multiClickCriteria = true;
+            btn.style.opacity = '0.5';
+            return true;
         }
-        return true;
-
+        return false;
     }
 
-    function checkEmailSelection() {
-        var isChecked = false;
-        var emails = "";
-        var emailMissing = "";
-        var lbMsg = "";
-        var RB1 = document.getElementById("<%=dlEmailforSorting.ClientID%>");
-        var radio = RB1.getElementsByTagName("input");
-        var persons = RB1.getElementsByTagName("label");
-        for (var li=0;li< radio.length;li++)
-        {
-            var email = radio[li+1];//.valueOf("hdn_EmailValue");
-            //alert(email.defaultValue);
-            if (radio[li].checked && email.defaultValue != "") {
-                //alert(email);
-                isChecked = true;
-                //break;
+
+    function ValidateSet(btn) {
+        if (!multiClickSet) {
+            var stName = document.getElementById("<%=txtBoxAddSet.ClientID%>").value;
+            if (stName.trim() == "") {
+                document.getElementById("<%=tdMsgSet.ClientID%>").innerHTML = "<div class='warning_box'>Set Name Field can not be blank</div> ";
+                document.getElementById("<%=txtBoxAddSet.ClientID%>").focus();
+                return false;
             }
-            if (radio[li].checked && radio[li-1].defaultValue === "") {
-                emailMissing = emailMissing + persons[li-1].textContent + ",";;
+            multiClickSet = true;
+            btn.style.opacity = '0.5';
+            return true;
+        }
+        document.getElementById("<%=tdMsgSet.ClientID%>").innerHTML = "<div class='warning_box'>Please wait...</div> ";
+        return false;
+    }
+
+    function ValidateStep(btn) {
+        if (!multiClickStep) {
+            var stpName = document.getElementById("<%=txtStepName.ClientID%>").value;
+            if (stpName.trim() == "") {
+                document.getElementById("<%=tdMsgStep.ClientID%>").innerHTML = "<div class='warning_box'>Step Name Field can not be blank</div> ";
+                document.getElementById("<%=txtStepName.ClientID%>").focus();
+                return false;
             }
+            multiClickStep = true;
+            btn.style.opacity = '0.5';
+            return true;
         }
-        if (emailMissing != null && emailMissing.length > 1) {
-            emailMissing = emailMissing.substring(0,emailMissing.length - 1);
-        }
+        document.getElementById("<%=tdMsgStep.ClientID%>").innerHTML = "<div class='warning_box'>Please wait...</div> ";
+        return false;
+    }
 
-        var listb1 = document.getElementById("<%= lstSelectdEmails.ClientID %>");
-        var len1 = listb1.options.length;
 
-        var listb2 = document.getElementById("<%= lstSelecteUserNames.ClientID %>");
-        var len2 = listb2.options.length;
-
-        if (len1 > 0 && len2 > 0) {
-            isChecked = true;
-        }
-        else {
-            if (isChecked) {
-                lbMsg = "Please confirm the selected emails";
-                isChecked = false;
+    function ValidateCriteria(btn) {
+        if (!multiClickCriteria) {
+            if (document.getElementById("<%=ddlCriteriaType.ClientID%>").value == "MODIFICATION");
+            {
+                multiClickCriteria = true;
+                btn.style.opacity = '0.5';
+                return true;
             }
-        }
 
-        if (!isChecked) {
-            $('#msgAlert').css("display", "block");
-            if (lbMsg == "") {
-                $('#msgAlert').html('Please select a person with email to send');
+            if (document.getElementById("<%=ddlCriteriaType.ClientID%>").value == "") {
+                document.getElementById("<%=tdMsgCriteria.ClientID%>").innerHTML = "<div class='warning_box'>Select any Criteria Type</div> ";
+                document.getElementById("<%=ddlCriteriaType.ClientID%>").focus();
+                return false;
+            }
+            if (document.getElementById("<%=ddlTempColumn.ClientID%>").value == "") {
+                document.getElementById("<%=tdMsgCriteria.ClientID%>").innerHTML = "<div class='warning_box'>Select any Column  Type</div> ";
+                document.getElementById("<%=ddlTempColumn.ClientID%>").focus();
+                return false;
+            }
+
+            if (document.getElementById("<%=txtRequiredScore.ClientID%>").value == "") {
+                document.getElementById("<%=tdMsgCriteria.ClientID%>").innerHTML = "<div class='warning_box'>Required Score Field can not be blank</div> ";
+                document.getElementById("<%=txtRequiredScore.ClientID%>").focus();
+                return false;
             }
             else {
-                $('#msgAlert').html(lbMsg);
+                var value = parseInt(document.getElementById("<%=txtRequiredScore.ClientID%>").value);
+                if (value < 0 || value > 100) {
+                    document.getElementById("<%=tdMsg.ClientID%>").innerHTML = "<div class='warning_box'>Please Enter Score Between 0 and 100</div> ";
+
+                    return false;
+                }
             }
-            setTimeout(function () {
-                $("#msgAlert").css("display", "none");
-            }, 4000);
-        } else if (emailMissing != "") {
-            return confirm('Following persons (' + emailMissing + ') emails are missing.do you want to continue?');
+            multiClickCriteria = true;
+            return true;
         }
-        return isChecked;
+        document.getElementById("<%=tdMsgCriteria.ClientID%>").innerHTML = "<div class='warning_box'>Please wait...</div> ";
+        return false;
+    }
+
+    function checkEmailSelection(btn) {
+        if (!multiClickSubmit) {
+            var isChecked = false;
+            var emails = "";
+            var emailMissing = "";
+            var lbMsg = "";
+            var RB1 = document.getElementById("<%=dlEmailforSorting.ClientID%>");
+            var radio = RB1.getElementsByTagName("input");
+            var persons = RB1.getElementsByTagName("label");
+            for (var li = 0; li < radio.length; li++) {
+                var email = radio[li + 1];//.valueOf("hdn_EmailValue");
+                //alert(email.defaultValue);
+                if (radio[li].checked && email.defaultValue != "") {
+                    //alert(email);
+                    isChecked = true;
+                    //break;
+                }
+                if (radio[li].checked && radio[li - 1].defaultValue === "") {
+                    emailMissing = emailMissing + persons[li - 1].textContent + ",";;
+                }
+            }
+            if (emailMissing != null && emailMissing.length > 1) {
+                emailMissing = emailMissing.substring(0, emailMissing.length - 1);
+            }
+
+            var listb1 = document.getElementById("<%= lstSelectdEmails.ClientID %>");
+            var len1 = listb1.options.length;
+
+            var listb2 = document.getElementById("<%= lstSelecteUserNames.ClientID %>");
+            var len2 = listb2.options.length;
+
+            if (len1 > 0 && len2 > 0) {
+                isChecked = true;
+            }
+            else {
+                if (isChecked) {
+                    lbMsg = "Please confirm the selected emails";
+                    isChecked = false;
+                }
+            }
+
+            if (!isChecked) {
+                $('#msgAlert').css("display", "block");
+                if (lbMsg == "") {
+                    $('#msgAlert').html('Please select a person with email to send');
+                }
+                else {
+                    $('#msgAlert').html(lbMsg);
+                }
+                setTimeout(function () {
+                    $("#msgAlert").css("display", "none");
+                }, 4000);
+            } else if (emailMissing != "") {
+                var confirmVal = confirm('Following persons (' + emailMissing + ') emails are missing.do you want to continue?');
+                if (confirmVal) {
+                    multiClickSubmit = true;
+                    btn.style.opacity = '0.5';
+                }
+                return confirmVal;
+            }
+            if (isChecked) {
+                multiClickSubmit = true;
+                btn.style.opacity = '0.5';
+            }
+            return isChecked;
+        }
+        return false;
     }
 
     function getValueBtn(attrbte) {
@@ -6528,86 +6639,97 @@
         $("#divOverride").hide();
     }
 
-    function autoSave() {
-        var window_width = $(window).width();
-        var box_width = (window_width / 2) - 100;
-
-        if ($('#btnAddSet').is(":visible")) {
-            $("#btnAddSet").trigger("click");
-        }
-        
-
-        if ($('#BtnUpdate').is(":visible")) {
-
-            $("#BtnUpdate").trigger("click");
-            //$('body').append("<div class='topMessageBox' style='margin-left:" + box_width + "px'>Types of Instruction Saved</div>");
-            //setTimeout(function () {
-            //    $(".topMessageBox").remove()
-            //}, 2000);
-        }
-        if ($('#btUpdateLessonProc').is(":visible")) {
-            $("#btUpdateLessonProc").trigger("click");
-            //$('body').append("<div class='topMessageBox' style='margin-left:" + box_width + "px'>Lesson Procedure Saved</div>");
-            //setTimeout(function () {
-            //    $(".topMessageBox").remove()
-            //}, 2000);
-        }
-		if ($('#btUpdateMeasurement').is(":visible")) {
-            $("#btUpdateMeasurement").trigger("click");
-        }
-        if ($('#btnUpdateset').is(":visible")) {
-            $("#btnUpdateset").trigger("click");
-        }
-        if ($('#btnUpdatesteps').is(":visible")) {
-            $("#btnUpdatesteps").trigger("click");
-        }
-        if ($('#btnupdateprompts').is(":visible")) {
-            $("#btnupdateprompts").trigger("click");
+    function autoSave(status) {
+        //status will be false only for BtnSubmit click
+        if (status) {
+            multiClickCriteria = false;
+            document.getElementById("<%=BtnSubmit.ClientID%>").style.opacity = 1;
         }
 
-        if ($('#BtnUpdateLessonPlan').is(":visible")) {
-            $("#BtnUpdateLessonPlan").trigger("click");
+        if (!multiClickSubmit) {
+            var window_width = $(window).width();
+            var box_width = (window_width / 2) - 100;
 
+            if ($('#btnAddSet').is(":visible")) {
+                $("#btnAddSet").trigger("click");
+            }
+
+
+            if ($('#BtnUpdate').is(":visible")) {
+
+                $("#BtnUpdate").trigger("click");
+                //$('body').append("<div class='topMessageBox' style='margin-left:" + box_width + "px'>Types of Instruction Saved</div>");
+                //setTimeout(function () {
+                //    $(".topMessageBox").remove()
+                //}, 2000);
+            }
+            if ($('#btUpdateLessonProc').is(":visible")) {
+                $("#btUpdateLessonProc").trigger("click");
+                //$('body').append("<div class='topMessageBox' style='margin-left:" + box_width + "px'>Lesson Procedure Saved</div>");
+                //setTimeout(function () {
+                //    $(".topMessageBox").remove()
+                //}, 2000);
+            }
+            if ($('#btUpdateMeasurement').is(":visible")) {
+                $("#btUpdateMeasurement").trigger("click");
+            }
+            if ($('#btnUpdateset').is(":visible")) {
+                $("#btnUpdateset").trigger("click");
+            }
+            if ($('#btnUpdatesteps').is(":visible")) {
+                $("#btnUpdatesteps").trigger("click");
+            }
+            if ($('#btnupdateprompts').is(":visible")) {
+                $("#btnupdateprompts").trigger("click");
+            }
+
+            if ($('#BtnUpdateLessonPlan').is(":visible")) {
+                $("#BtnUpdateLessonPlan").trigger("click");
+
+            }
+
+            if ($('#btnCommentLessonInfo').is(":visible")) {
+                $("#btnCommentLessonInfo").trigger("click");
+
+            }
+
+            if ($('#btnMeasurementSystems').is(":visible")) {
+                $("#btnCommentLessonInfo").trigger("click");
+
+            }
+            if ($('#btnCommentTypeofInstr').is(":visible")) {
+                $("#btnCommentLessonInfo").trigger("click");
+
+            }
+            if ($('#btncommentLessonProcedure').is(":visible")) {
+                $("#btnCommentLessonInfo").trigger("click");
+
+            }
+            if ($('#btncommentPrompt').is(":visible")) {
+                $("#btnCommentLessonInfo").trigger("click");
+
+            }
+            if ($('#btncommentStep').is(":visible")) {
+                $("#btnCommentLessonInfo").trigger("click");
+
+            }
+            if ($('#btncommentset').is(":visible")) {
+                $("#btnCommentLessonInfo").trigger("click");
+
+            }
+
+            if ($('#btnsubmit').is(":visible")) {
+                $("#HiddenAppr").trigger("click");
+            }
+            if ($('#<%=txtBoxAddSet.ClientID%>').length > 0) {
+                document.getElementById("<%=txtBoxAddSet.ClientID%>").focus();
+            }
+            multiClickSubmit = true;
+            if(!status)
+            document.getElementById("<%=BtnSubmit.ClientID%>").style.opacity = '0.5';
+            return true;
         }
-
-        if ($('#btnCommentLessonInfo').is(":visible")) {
-            $("#btnCommentLessonInfo").trigger("click");
-
-        }
-
-        if ($('#btnMeasurementSystems').is(":visible")) {
-            $("#btnCommentLessonInfo").trigger("click");
-
-        }
-        if ($('#btnCommentTypeofInstr').is(":visible")) {
-            $("#btnCommentLessonInfo").trigger("click");
-
-        }
-        if ($('#btncommentLessonProcedure').is(":visible")) {
-            $("#btnCommentLessonInfo").trigger("click");
-
-        }
-        if ($('#btncommentPrompt').is(":visible")) {
-            $("#btnCommentLessonInfo").trigger("click");
-
-        }
-        if ($('#btncommentStep').is(":visible")) {
-            $("#btnCommentLessonInfo").trigger("click");
-
-        }
-        if ($('#btncommentset').is(":visible")) {
-            $("#btnCommentLessonInfo").trigger("click");
-
-        }
-
-		if($('#btnsubmit').is(":visible"))
-		{
-			$("#HiddenAppr").trigger("click");
-		}
-        if ($('#<%=txtBoxAddSet.ClientID%>').length > 0) {
-            document.getElementById("<%=txtBoxAddSet.ClientID%>").focus();
-        }
-
+        return false;
     }
     function showload() {
         document.getElementById('formatchngloader').style.display = 'block';
