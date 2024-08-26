@@ -34,9 +34,24 @@
             document.getElementById('<%= printPrev.ClientID%>').value = '1';
         }
 
+        var multiClickSubmit = false;
+        var multiCLickPrint = false;
+        var multiCLickDiscard = false;
+        var multiCLickViewPrior = false;
+        function enableButton() {
+            multiClickSubmit = false;
+            multiCLickPrint = false;
+            multiCLickDiscard = false;
+            multiCLickViewPrior = false;
+        }
         function closecheck() {
             sessionStorage.setItem('DataCl', 'true');
             Checkclose.value = 'true';
+        }
+        function closecheckSubmit() {
+                $('#div_overlay').show();
+                sessionStorage.setItem('DataCl', 'true');
+                Checkclose.value = 'true';
         }
         function printpage1() {
             document.getElementById('<%= sessDate.ClientID%>').style.visibility = "visible";
@@ -324,6 +339,9 @@
                 $('#btnTSAndR').show();
             }
             $('#dashMain').fadeIn();
+            $('#div_overlay').hide();
+            sessionStorage.setItem('DataCl', 'false');
+            Checkclose.value = 'false';
         }
 
         function hideConfirmPopUp() {
@@ -1208,45 +1226,83 @@
         //    }
         //}
         //}
-        function loadBeforeSave(type) {
-            var grid = document.getElementById('<%=grdDataSht.ClientID%>');
-            var rowcount = parseInt(grid.rows.length - 1);
-            for (var i = 1; i <= rowcount; i++) {
-                var txtdur = $(grid.rows[i]).find(".clsDuratn");
-                for (var j = 0; j < txtdur.length; j++) {
-                    var btn = $(txtdur[j]).next()[0];
-                    var hidden = $(btn).next()[0];
-
-                    window.clearInterval(btn.id);
-                    txtdur = $(grid.rows[i]).find(".clsDuratn")[j];
-                    hidden.value = txtdur.value;
-                    btn.value = 'Start';
-                    var index = id_array.indexOf(btn.id);
-                    id_array.splice((i - 1), 1);
-                }
+        function multiClickCheckDiscard(btn) {
+            if (!multiCLickDiscard) {
+                multiCLickDiscard = true;
+                btn.style.opacity = '0.5';
+                return true;
             }
+            return false;
+        }
+        function multiClickCheckPrint(btn) {
+            if (!multiCLickPrint) {
+                multiCLickPrint = true;
+                btn.style.opacity = '0.5';
+                return true;
+            }
+            return false;
+        }
+        function multiClickCheckViewPrior(btn) {
+            if (!multiCLickViewPrior) {
+                multiCLickViewPrior = true;
+                btn.style.opacity = '0.5';
+                return true;
+            }
+            return false;
+        }
+        function loadBeforeSave(type) {
+            if (!multiClickSubmit) {
+                var grid = document.getElementById('<%=grdDataSht.ClientID%>');
+                var rowcount = parseInt(grid.rows.length - 1);
+                for (var i = 1; i <= rowcount; i++) {
+                    var txtdur = $(grid.rows[i]).find(".clsDuratn");
+                    for (var j = 0; j < txtdur.length; j++) {
+                        var btn = $(txtdur[j]).next()[0];
+                        var hidden = $(btn).next()[0];
 
-            temp();
-            if (type == 'Submit') {
-                //return confirm('Are you sure you want to submit ?');                
-                var temp1 = confirm('Are you sure you want to submit ?');
-                if (temp1.toString() == "true") {
-                    $("#btnSubmit2").attr({ "disabled": true, "value": "Submitting" }).removeClass("NFButtonNew").addClass("NFButtonNew1");
-                    $("#btnSubmit").attr({ "disabled": true, "value": "Submitting" }).removeClass("NFButtonNew").addClass("NFButtonNew1");
-                    if (IOAtype != "Y")
-                         {           //check the IOA user Or Normal User
-                           $('#div_overlay').show();
-                         }
-                    $("body").css("cursor", "progress");
+                        window.clearInterval(btn.id);
+                        txtdur = $(grid.rows[i]).find(".clsDuratn")[j];
+                        hidden.value = txtdur.value;
+                        btn.value = 'Start';
+                        var index = id_array.indexOf(btn.id);
+                        id_array.splice((i - 1), 1);
+                    }
+                }
+
+                temp();
+                if (type == 'Submit') {
+                    //return confirm('Are you sure you want to submit ?');                
+                    var temp1 = confirm('Are you sure you want to submit ?');
+                    if (temp1.toString() == "true") {
+                        $("#btnSubmit2").attr({ "disabled": true, "value": "Submitting" }).removeClass("NFButtonNew").addClass("NFButtonNew1");
+                        $("#btnSubmit").attr({ "disabled": true, "value": "Submitting" }).removeClass("NFButtonNew").addClass("NFButtonNew1");
+                        if (IOAtype != "Y") {           //check the IOA user Or Normal User
+                            $('#div_overlay').show();
+                        }
+                        $("body").css("cursor", "progress");
+                        multiClickSubmit = true;
+                        return true;
+                    }
+                    else {
+                        $('#div_overlay').hide();
+                        sessionStorage.setItem('DataCl', 'false');
+                        Checkclose.value = 'false';
+                        return false;
+                    }
+                }
+                else if (type == 'Save') {
+                    multiClickSubmit = true;
+                    document.getElementById('btnSave').style.opacity = '0.5';
+                    document.getElementById('btnSave1').style.opacity = '0.5';
                     return true;
                 }
                 else {
-                    return false;
+                    multiClickSubmit = true;
+                    document.getElementById('btnAddTrial').style.opacity = '0.5';
+                    return true;
                 }
             }
-            else {
-                return true;
-            }
+            return false;
         }
 
 
@@ -3148,18 +3204,24 @@
          }
 
         //Check whether the normal user and IOA user are same
-         function CheckIOAUser() {
-             if (checkUser() == "1") {
-                 $("#tdMsg2").show();
-                 return false;
-             }
-             else if (checkUser() == "2") {     // There is no normal session associated with this IOA
-                 $("#tdMsg3").show();
-                 return false;
-             }
-             else {
-                 return true;
-             }
+        function CheckIOAUser(btn) {
+            if (!multiClickSubmit) {
+                if (checkUser() == "1") {
+                    $("#tdMsg2").show();
+                    return false;
+                }
+                else if (checkUser() == "2") {     // There is no normal session associated with this IOA
+                    $("#tdMsg3").show();
+                    return false;
+                }
+                else {
+                    multiClickSubmit = true;
+                    btn.style.opacity = '0.5';
+                    return true;
+                }
+
+            }
+            return false
          }
          function CheckFirstClick() {
              $("#btnIOASelect").hide();
@@ -3379,15 +3441,15 @@
 
 
                                             <asp:Button ID="btnSubmit1" runat="server" Text="Submit Scores" CssClass="NFButtonNew" Style="font-size: 12px; display: none;" OnClientClick="return loadBeforeSave('Submit');" OnClick=" btnSubmit_Click" />
-                                            <asp:Button ID="btnSubmit2" runat="server" Text="Submit Scores" CssClass="NFButtonNew" Style="font-size: 10px" OnClientClick="closecheck(); " OnClick="ConfirmSubmissionCheck" />
+                                            <asp:Button ID="btnSubmit2" runat="server" Text="Submit Scores" CssClass="NFButtonNew" Style="font-size: 10px" OnClientClick="closecheckSubmit();" OnClick="ConfirmSubmissionCheck" />
                                             <asp:Button ID="btnFinalSubmit" runat="server" OnClick="ConfirmSubmission" Style="display:none;" />
                                             <asp:Button ID="btnSubmitAndRepeat1" runat="server" Text="Submit & Repeat" CssClass="NFButtonNew" Style="font-size: 10px; display: none;" OnClientClick="return submitMe(this);" OnClick="btnSubmitAndRepeat_Click" />
 <%--                                            <asp:Button ID="btnDiscard" runat="server" Text="Discard" CssClass="NFButtonNew" Style="font-size: 12px; display: none;" OnClientClick="return submitDisable(this);" OnClick="btnDiscard_ok_Click" />--%>
                                             <asp:Button ID="btnSubmitAndRepeat3" runat="server" Text="Submit & Repeat" CssClass="NFButtonNew" Style="font-size: 10px" OnClientClick="closecheck(); " OnClick="ConfirmSubmissionCheck" />
-                                           <asp:Button ID="Print1" runat="server" Text="Print Blank" CssClass="NFButtonNew" Style="font-size: 12px" onclick ="btnSave2_Click" /> <!--OnClientClick="printpage1();SaveData();"-->
+                                           <asp:Button ID="Print1" runat="server" Text="Print Blank" CssClass="NFButtonNew" Style="font-size: 12px" OnClientClick ="return multiClickCheckPrint(this);" onclick ="btnSave2_Click" /> <!--OnClientClick="printpage1();SaveData();"-->
                                             <asp:Button ID="print2" runat="server" Text="Print" CssClass="NFButtonNew" Style="font-size: 12px" Visible="false" OnClientClick="printpage1(); printpage(); " OnClick="btnNotSave_Click"   />
 <%--                                        <asp:Button ID="btnDiscardDatasheet" Text="Discard Datasheet" runat="server" CssClass="NFButtonNew" Style="font-size: 12px" onclick="btnDiscardDatasheet_Click"/>--%>
-											<asp:Button ID="btnDiscardDatasheet" Text="Discard Datasheet" runat="server" CssClass="NFButtonNew" Style="font-size: 12px" OnClick="btnDiscardDatasheet_Click"/>
+											<asp:Button ID="btnDiscardDatasheet" Text="Discard Datasheet" runat="server" CssClass="NFButtonNew" Style="font-size: 12px" OnClientClick="return multiClickCheckDiscard(this);" OnClick="btnDiscardDatasheet_Click"/>
 
                                             
                                             <%--<asp:Button ID="btnProbe1" runat="server" Text="Probe Mode" CssClass="NFButtonNew" OnClientClick="probe();" OnClick="btnProbe_Click" Style="height: 30px !important; font-size: 10px;" />--%>
@@ -3982,12 +4044,12 @@
                         <ContentTemplate>
 
                             <asp:Button ID="ImgBtn_Inactive" CssClass="NFButtonNew" Text="Inactivate" runat="server" OnClientClick="javascript: return confirm('Are you sure you want to Inactivate?')" OnClick="ImgBtn_Inactive_Click" Style="background-color: red; color: white; font-size: 12px" />
-                            <asp:Button ID="btnPriorSessn" CssClass="NFButtonNew" Style="font-size: 12px" runat="server" Text="View Prior Sessions" OnClick="btnPriorSessn_Click" OnClientClick="scrollToTop()" />
+                            <asp:Button ID="btnPriorSessn" CssClass="NFButtonNew" Style="font-size: 12px" runat="server" Text="View Prior Sessions" OnClick="btnPriorSessn_Click" OnClientClick="return multiClickCheckViewPrior(this); scrollToTop()" />
                             <asp:Button ID="btnSave" runat="server" Text="Save Draft" Style="font-size: 12px" CssClass="NFButtonNew" OnClientClick="loadBeforeSave('Save'); scrollToTop();" OnClick="btnSave_ClickCheck" />
                             <asp:Button ID="btnProbe" runat="server" Text="Probe Mode" Style="font-size: 12px" CssClass="NFButtonNew" OnClientClick="probe();" OnClick="btnProbe_Click" />
                             <asp:Button ID="ImgBtn_Override" runat="server" Style="font-size: 12px" BackColor="#03507d" CssClass="NFButtonNew" Text="Override" OnClientClick="scrollToTop(); return popOverride(); " />
-                            <asp:Button ID="btnSubmit" runat="server" Text="Submit Scores" Style="font-size: 12px" CssClass="NFButtonNew" OnClick="ConfirmSubmissionCheck" OnClientClick="scrollToTop();" />
-                            <asp:Button ID="btnSubmitAndRepeat2" runat="server" Style="font-size: 12px" Text="Submit & Repeat" CssClass="NFButtonNew" OnClick="ConfirmSubmissionCheck" OnClientClick="scrollToTop();" />
+                            <asp:Button ID="btnSubmit" runat="server" Text="Submit Scores" Style="font-size: 12px" CssClass="NFButtonNew" OnClick="ConfirmSubmissionCheck" OnClientClick="closecheckSubmit(); scrollToTop();" />
+                            <asp:Button ID="btnSubmitAndRepeat2" runat="server" Style="font-size: 12px" Text="Submit & Repeat" CssClass="NFButtonNew" OnClick="ConfirmSubmissionCheck" OnClientClick="closecheck(); scrollToTop();" />
                             <asp:Button ID="btnAddTrial" runat="server" Text="Add Trials" CssClass="NFButtonNew" OnClick="btnAddTrial_Click" Style="float: right; font-size: 12px" OnClientClick="loadBeforeSave('Save'); scrollToTop();" />
                             <asp:Label ID="LabelvisualToolEdit" runat="server" Text="Label" Visible="false" Style="color: red; font-size: 17px; padding: 5px;"></asp:Label>
 
@@ -4168,7 +4230,7 @@
                                 <td>
                                     <%--<input type="button" id="btnDisContinue" class="NFButtonWithNoImage" style="width: 100px; position: relative; left: 125px;" value="Yes" onclick="triggerSubmitClick();" />--%>
 									<%--<asp:Button id="btnDiscardYes" runat="server" CssClass="NFButtonWithNoImage" style="width: 100px; position: relative;" Text="Yes" OnClientClick="triggerDiscardClick();" OnClick="btnPriorSessn_Click" />--%>
-									<asp:Button ID="btnDiscardYes" runat="server" Text="Yes" style="width: 100px; position: relative;" CssClass="NFButtonWithNoImage"  OnClick="btnDiscard_ok_Click "/>
+									<asp:Button ID="btnDiscardYes" runat="server" Text="Yes" style="width: 100px; position: relative;" CssClass="NFButtonWithNoImage" OnClientClick="return multiClickCheckDiscard(this);"  OnClick="btnDiscard_ok_Click "/>
                                     </td>
                                 <td>
                                     <input type="button" class="NFButtonWithNoImage" style="width: 100px; position: relative;  " value="No" onclick="hideDiscardPopUp();"  />
@@ -4412,7 +4474,7 @@
 
                                             </td>
                                             <td style="text-align: left;" colspan="2">
-                                                <asp:Button ID="btnIOASelect" CssClass="NFButtonWithNoImage" Width="50px" runat="server" Text="Go" OnClientClick="var a = CheckIOAUser();CheckFirstClick(); return a" OnClick="btnIOASelect_Click" />
+                                                <asp:Button ID="btnIOASelect" CssClass="NFButtonWithNoImage" Width="50px" runat="server" Text="Go" OnClientClick="var a = CheckIOAUser(this);CheckFirstClick(); return a" OnClick="btnIOASelect_Click" />
                                                 <asp:HiddenField ID="Hiddenfield3" runat="server" />
                                             </td>
 

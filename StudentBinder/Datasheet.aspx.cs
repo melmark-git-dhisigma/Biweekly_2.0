@@ -4689,6 +4689,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         }
         catch (Exception ex)
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             if (trans != null && trans.Connection != null && trans.Connection.State == ConnectionState.Open)
             {
                 oData.RollBackTransation(trans, con);
@@ -4701,6 +4702,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             clError.WriteToLog(ex.ToString());
             throw ex;
         }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
     protected void btnNoIOA_Click(object sender, EventArgs e)
     {
@@ -4844,6 +4846,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         {
             btnSave_Click(sender,e);
         }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
 
     protected void btnSave_Click(object sender, EventArgs e)
@@ -4873,9 +4876,8 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         {
             tdMsg.InnerHtml = clsGeneral.failedMsg("Submit not possible: This session was discarded by another user. Please Close[X] this datasheet.");
             ScriptManager.RegisterStartupScript(this, this.GetType(), "closedatasheet", "closedatasheet();", true);
-
-    }
-
+        }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
 
     private void SaveDraft()
@@ -5214,6 +5216,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         }
         catch (Exception ex)
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             if (trans != null && trans.Connection != null && trans.Connection.State == ConnectionState.Open)
                 oData.RollBackTransation(trans, con);
 
@@ -5245,6 +5248,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             LessonBanner.Visible = true;
         }
         Checkclose.Value = "false";
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
     [System.Web.Services.WebMethod]
     #region comment
@@ -28629,6 +28633,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         if (oDS != null)
             lpId = oTemp.TemplateId.ToString();
         clearOverrideSession(lpId);
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
         Response.Redirect("DSTempHistory.aspx?LPid=" + oDS.LessonPlanID);
     }
     //protected void grdDataSht_RowDataBound(object sender, GridViewRowEventArgs e)
@@ -30362,8 +30367,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             repeatNo = Convert.ToInt32(lblSubmitAndRepeatCount.Text);
         }
         repeatNo++;
-        if(updateCheck)
+        if (updateCheck)
             Response.Redirect("Datasheet.aspx?pageid=" + oTemp.TemplateId + "&studid=" + oSession.StudentId + "&SRMode=true&repeatNo=" + repeatNo + "&isMaint=" + isMaintStatus + "&currSetIdTemp=" + currSetIdTemp + "&exc=false");
+        else
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
+
         Checkclose.Value = "false";
     }
     //protected void btnDiscard_ok_Click(object sender, EventArgs e)
@@ -31027,8 +31035,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         }
         catch (Exception ex)
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             throw ex;
         }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
 
     private string[] Shuffle(string[] Objects)
@@ -31299,6 +31309,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         if ((InstantHdrModifiedDate != HdrModifiedDate))
         {
             ScriptManager.RegisterStartupScript(this, this.GetType(), "popupTrigger2", "popUpTriggerAnotherClick();", true);
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
         }
         else
         {
@@ -31553,6 +31564,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 {
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "", "showConfirmPopUp('" + NACols2 + "','" + bText + "');", true);
                 }
+                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             }
             else
             {
@@ -31570,6 +31582,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
     }
         else
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             tdMsg.InnerHtml = clsGeneral.failedMsg("Submit not possible: This session was discarded by another user. Please Close[X] this datasheet.");
             ScriptManager.RegisterStartupScript(this, this.GetType(), "closedatasheet1", "closedatasheet();", true);
 
@@ -31895,7 +31908,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             oDS.VTLessonId = 0;
         }
         promptPrintBefore(printSave);
-
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
     protected void btnNotSave_Click(object sender, EventArgs e)
     {
@@ -32349,6 +32362,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             ScriptManager.RegisterStartupScript(this, this.GetType(), "scriptdisc", "alert('Discard failed');", true);
 
         }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
 
     }
 
