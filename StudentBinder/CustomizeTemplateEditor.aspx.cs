@@ -5522,11 +5522,13 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 {
                     string error = Ex.Message;
                     tdMsgSet.InnerHtml = clsGeneral.failedMsg("Insertion Failed! <br> '" + error + "' ");
+                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                 }
             }
         }
         catch (Exception Ex)
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             throw Ex;
         }
 
@@ -5993,6 +5995,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             + "Values(" + headerId + "," + sess.SchoolId + "," + columnValue + "," + measureValue + ",'PROMPT','" + criteriaType + "'  ," + requiredScore + ",'" + totalInstance + "','" + totalcorrectInstance + "', " + consctveSess + "," + ioaReq + "," + multiTeach + ", " + sess.LoginId + ",getdate()," + sess.LoginId + ",getdate(),'A'," + IsComments.Value + ",'" + txtModComments.Text + "','" + txtModNo.Text + "'," + isNAChk + "," + consctveAvg + ")  ;"; //--- [New Criteria] May 2020 ---//
                         objData.Execute(insertQuerry);
                     }
+                    //To restrict multiple clicks
+                    txtRequiredScore.Text = String.Empty;
 
                     ScriptManager.RegisterClientScriptBlock(UpdatePanel11, UpdatePanel11.GetType(), "", "CloseCriteriaPopup();", true);
                     GetSetCriteriaData(headerId);
@@ -6003,11 +6007,13 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             }
             catch (Exception Ex)
             {
+                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                 string error = Ex.Message;
                 tdMsgCriteria.InnerHtml = clsGeneral.failedMsg("Insertion Failed! <br> '" + error + "' ");
                 throw Ex;
             }
         }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
 
 
@@ -6186,6 +6192,9 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         objData.Execute(insertQuerry);
                     }
 
+                    //To restrict multiple clicks
+                    txtRequiredScore.Text = String.Empty;
+
                     ScriptManager.RegisterClientScriptBlock(UpdatePanel11, UpdatePanel11.GetType(), "", "CloseCriteriaPopup();", true);                    
                     GetStepCriteriaData(headerId);
                     GetSetCriteriaData(headerId);
@@ -6196,11 +6205,13 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             }
             catch (Exception Ex)
             {
+                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                 string error = Ex.Message;
                 tdMsgCriteria.InnerHtml = clsGeneral.failedMsg("Insertion Failed! <br> '" + error + "' ");
                 throw Ex;
             }
         }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
 
     protected void BtnAddPromptDCriteria_Click(object sender, EventArgs e)
@@ -6308,6 +6319,9 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             + "Values(" + headerId + "," + sess.SchoolId + "," + columnValue + "," + measureValue + ",'STEP','" + criteriaType + "'  ," + requiredScore + ",'" + totalInstance + "','" + totalcorrectInstance + "', " + consctveSess + "," + ioaReq + "," + multiTeach + ", " + sess.LoginId + ",getdate()," + sess.LoginId + ",getdate(),'A'," + IsComments.Value + ",'" + txtModComments.Text + "','" + txtModNo.Text + "'," + isNAChk + "," + consctveAvg + ") ;"; //--- [New Criteria] May 2020 ---//
                         objData.Execute(insertQuerry);
                     }
+                    
+                    //To restrict multiple clicks
+                    txtRequiredScore.Text = String.Empty;
 
                     ScriptManager.RegisterClientScriptBlock(UpdatePanel11, UpdatePanel11.GetType(), "", "CloseCriteriaPopup();", true);
                     GetPromptCriteriaData(headerId);
@@ -6318,12 +6332,13 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             }
             catch (Exception Ex)
             {
+                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                 string error = Ex.Message;
                 tdMsgCriteria.InnerHtml = clsGeneral.failedMsg("Insertion Failed! <br> '" + error + "' ");
                 throw Ex;
             }
         }
-
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
 
     protected void btnEditSet_Click(object sender, EventArgs e)
@@ -6443,6 +6458,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             
             FillDropMeasure();
             EditSetCriteria(criteriaId);
+
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AddCriteriaPopup();", true);
         }
         catch (Exception Ex)
@@ -6503,6 +6520,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             
             FillDropMeasure();
             EditSetCriteria(criteriaId);
+
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AddCriteriaPopup();", true);
         }
         catch (Exception Ex)
@@ -6545,6 +6564,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             
             FillDropMeasure();
             EditSetCriteria(criteriaId);
+
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AddCriteriaPopup();", true);
         }
         catch (Exception Ex)
@@ -7256,6 +7277,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             chkNACriteria.Visible = false;
             ApplyAllDisableVisual();            
 
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AddCriteriaPopup();", true);
         }
         catch (Exception Ex)
@@ -7521,6 +7543,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             trModification1.Style.Add("visibility", "hidden");
             chkNACriteria.Checked = false;            
 
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AddCriteriaPopup();", true);
         }
         catch (Exception Ex)
@@ -7551,7 +7574,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             trModification1.Style.Add("visibility", "hidden");
             chkNACriteria.Checked = false;            
 
-
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AddCriteriaPopup();", true);
         }
         catch (Exception Ex)
@@ -7799,6 +7822,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             }
             catch (Exception Ex)
             {
+                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                 string error = Ex.Message;
                 tdMsgSet.InnerHtml = clsGeneral.failedMsg("Insertion Failed! <br> '" + error + "' ");
                 throw Ex;
@@ -8082,6 +8106,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             string error = Ex.Message;
             tdMsg.InnerHtml = clsGeneral.failedMsg("Updation Failed! <br> '" + error + "' ");
             throw Ex;
@@ -8236,6 +8261,10 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         updateQuerry = "UPDATE DSTempRule SET CriteriaType = '" + ddlCriteriaType.SelectedValue.ToString() + "', IOAReqInd = '" + rbtnIoaReq.SelectedValue.ToString() + "', MultiTeacherReqInd = '" + rbtnMultitchr.SelectedValue.ToString() + "',DSTempSetColId = '" + ddlTempColumn.SelectedValue.ToString() + "',DSTempSetColCalcId = '" + ddlTempMeasure.SelectedValue.ToString() + "',ScoreReq = '" + clsGeneral.convertQuotes(txtRequiredScore.Text.Trim()) + "',ConsequetiveInd = '" + rbtnConsectiveSes.SelectedValue.ToString() + "',ConsequetiveAvgInd = '" + rbtnConsectiveAvg.SelectedValue.ToString() + "',TotCorrInstance = '" + totalResp + "',TotalInstance = '" + totCorrectResp + "',ModifiedBy = " + sess.LoginId + ", ModifiedOn = GETDATE(),IsComment=" + IsComments.Value + ",ModificationComment='" + txtModComments.Text + "',ModificationRule='" + txtModNo.Text + "',IsNA=" + isNAChk + " WHERE DSTempRuleId = " + setCriteriaId; //--- [New Criteria] May 2020 ---//
 
                         int index = objData.Execute(updateQuerry);
+                        
+                        //To restrict multiple clicks
+                        txtRequiredScore.Text = String.Empty;
+
                         ScriptManager.RegisterClientScriptBlock(UpdatePanel11, UpdatePanel11.GetType(), "", "CloseCriteriaPopup();", true);
                         GetSetCriteriaData(headerId);
 
@@ -8251,6 +8280,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             throw Ex;
         }
 
@@ -8320,6 +8350,10 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         }                                                 
                         updateQuerry = "UPDATE DSTempRule SET CriteriaType = '" + ddlCriteriaType.SelectedValue.ToString() + "', IOAReqInd = '" + rbtnIoaReq.SelectedValue.ToString() + "', MultiTeacherReqInd = '" + rbtnMultitchr.SelectedValue.ToString() + "',DSTempSetColId = '" + ddlTempColumn.SelectedValue.ToString() + "',DSTempSetColCalcId = '" + ddlTempMeasure.SelectedValue.ToString() + "',ScoreReq = '" + clsGeneral.convertQuotes(txtRequiredScore.Text.Trim()) + "',ConsequetiveInd = '" + rbtnConsectiveSes.SelectedValue.ToString() + "',ConsequetiveAvgInd = '" + rbtnConsectiveAvg.SelectedValue.ToString() + "',TotCorrInstance = '" + totalResp + "',TotalInstance = '" + totCorrectResp + "',ModifiedBy = " + sess.LoginId + ", ModifiedOn = GETDATE(),IsComment=" + IsComments.Value + ",ModificationComment='" + txtModComments.Text + "',ModificationRule='" + txtModNo.Text + "',IsNA=" + isNAChk + " WHERE DSTempRuleId = " + setCriteriaId; //--- [New Criteria] May 2020 ---//
                         int index = objData.Execute(updateQuerry);
+
+                        //To restrict multiple clicks
+                        txtRequiredScore.Text = String.Empty;
+
                         ScriptManager.RegisterClientScriptBlock(UpdatePanel11, UpdatePanel11.GetType(), "", "CloseCriteriaPopup();", true);
                         GetStepCriteriaData(headerId);
                                           
@@ -8335,6 +8369,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             throw Ex;
         }
     }
@@ -8402,6 +8437,10 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         }                   
                         updateQuerry = "UPDATE DSTempRule SET CriteriaType = '" + ddlCriteriaType.SelectedValue.ToString() + "', IOAReqInd = '" + rbtnIoaReq.SelectedValue.ToString() + "', MultiTeacherReqInd = '" + rbtnMultitchr.SelectedValue.ToString() + "',DSTempSetColId = '" + ddlTempColumn.SelectedValue.ToString() + "',DSTempSetColCalcId = '" + ddlTempMeasure.SelectedValue.ToString() + "',ScoreReq = '" + clsGeneral.convertQuotes(txtRequiredScore.Text.Trim()) + "',ConsequetiveInd = '" + rbtnConsectiveSes.SelectedValue.ToString() + "',ConsequetiveAvgInd = '" + rbtnConsectiveAvg.SelectedValue.ToString() + "',TotCorrInstance = '" + totalResp + "',TotalInstance = '" + totCorrectResp + "',ModifiedBy = " + sess.LoginId + ", ModifiedOn = GETDATE(),IsComment=" + IsComments.Value + ",ModificationComment='" + txtModComments.Text + "',ModificationRule='" + txtModNo.Text + "',IsNA=" + isNAChk + " WHERE DSTempRuleId = " + setCriteriaId; //--- [New Criteria] May 2020 ---//
                         int index = objData.Execute(updateQuerry);
+                        
+                        //To restrict multiple clicks
+                        txtRequiredScore.Text = String.Empty;
+
                         ScriptManager.RegisterClientScriptBlock(UpdatePanel11, UpdatePanel11.GetType(), "", "CloseCriteriaPopup();", true);
                         GetPromptCriteriaData(headerId);
 
@@ -8417,6 +8456,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             throw Ex;
         }
     }
@@ -8802,6 +8842,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         ViewState["New"] = true;
         FillAllPrompts();             // Fill all prompts when selecting prompt column type
         ClearData();
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
         ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "EditMeasurePopup();", true);
 
     }
@@ -8989,6 +9030,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         chk_distractor.Checked = false;
         chk_distractor.Enabled = true;
         Disitem.Enabled = true;
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
 
     protected void ClearStepData()
@@ -9004,7 +9046,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         ddchkCountry.Enabled = true;
         txtStepName.ReadOnly = false;
         txtStepDesc.ReadOnly = false;
-
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
 
     protected void ClearCriteriaData()
@@ -9224,6 +9266,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         }
                         catch (Exception Ex)
                         {
+                            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                             objData.RollBackTransation(Transs, con);
                             string error = Ex.Message;
                             tdMsgMeasure.InnerHtml = clsGeneral.failedMsg("Insertion Failed! <br> '" + error + "' ");
@@ -9335,6 +9378,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         }
                         catch (Exception Ex)
                         {
+                            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                             objData.RollBackTransation(Transs, con);
                             string error = Ex.Message;
                             tdMsgMeasure.InnerHtml = clsGeneral.failedMsg("Insertion Failed! <br> '" + error + "' ");
@@ -9388,6 +9432,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         }
                         catch (Exception Ex)
                         {
+                            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                             objData.RollBackTransation(Transs, con);
                             string error = Ex.Message;
                             tdMsgMeasure.InnerHtml = clsGeneral.failedMsg("Insertion Failed! <br> '" + error + "' ");
@@ -9440,6 +9485,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         }
                         catch (Exception Ex)
                         {
+                            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                             objData.RollBackTransation(Transs, con);
                             string error = Ex.Message;
                             tdMsgMeasure.InnerHtml = clsGeneral.failedMsg("Insertion Failed! <br> '" + error + "' ");
@@ -9481,6 +9527,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         }
                         catch (Exception Ex)
                         {
+                            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                             objData.RollBackTransation(Transs, con);
                             string error = Ex.Message;
                             tdMsgMeasure.InnerHtml = clsGeneral.failedMsg("Insertion Failed! <br> '" + error + "' ");
@@ -9495,11 +9542,14 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 }
 
             }
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
         }
         catch (Exception Ex)
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             throw Ex;
         }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
 
     protected void BtnUpdateMeasure_Click(object sender, EventArgs e)
@@ -9794,6 +9844,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             }
                             catch (Exception Ex)
                             {
+                                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                                 objData.RollBackTransation(Transs, con);
                                 string error = Ex.Message;
                                 tdMsgMeasure.InnerHtml = clsGeneral.failedMsg("Updation Failed! <br> '" + error + "' ");
@@ -9972,6 +10023,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             }
                             catch (Exception Ex)
                             {
+                                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                                 objData.RollBackTransation(Transs, con);
                                 string error = Ex.Message;
                                 tdMsgMeasure.InnerHtml = clsGeneral.failedMsg("Updation Failed! <br> '" + error + "' ");
@@ -10046,6 +10098,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             }
                             catch (Exception Ex)
                             {
+                                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                                 objData.RollBackTransation(Transs, con);
                                 string error = Ex.Message;
                                 tdMsgMeasure.InnerHtml = clsGeneral.failedMsg("Updation Failed! <br> '" + error + "' ");
@@ -10118,6 +10171,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             }
                             catch (Exception Ex)
                             {
+                                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                                 objData.RollBackTransation(Transs, con);
                                 string error = Ex.Message;
                                 tdMsgMeasure.InnerHtml = clsGeneral.failedMsg("Updation Failed! <br> '" + error + "' ");
@@ -10166,6 +10220,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             }
                             catch (Exception Ex)
                             {
+                                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                                 objData.RollBackTransation(Transs, con);
                                 string error = Ex.Message;
                                 tdMsgMeasure.InnerHtml = clsGeneral.failedMsg("Updation Failed! <br> '" + error + "' ");
@@ -10290,6 +10345,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             }
                             catch (Exception Ex)
                             {
+                                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                                 objData.RollBackTransation(Transs, con);
                                 string error = Ex.Message;
                                 tdMsgMeasure.InnerHtml = clsGeneral.failedMsg("Updation Failed! <br> '" + error + "' ");
@@ -10396,6 +10452,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             }
                             catch (Exception Ex)
                             {
+                                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                                 objData.RollBackTransation(Transs, con);
                                 string error = Ex.Message;
                                 tdMsgMeasure.InnerHtml = clsGeneral.failedMsg("Updation Failed! <br> '" + error + "' ");
@@ -10447,6 +10504,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             }
                             catch (Exception Ex)
                             {
+                                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                                 objData.RollBackTransation(Transs, con);
                                 string error = Ex.Message;
                                 tdMsgMeasure.InnerHtml = clsGeneral.failedMsg("Updation Failed! <br> '" + error + "' ");
@@ -10496,6 +10554,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             }
                             catch (Exception Ex)
                             {
+                                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                                 objData.RollBackTransation(Transs, con);
                                 string error = Ex.Message;
                                 tdMsgMeasure.InnerHtml = clsGeneral.failedMsg("Updation Failed! <br> '" + error + "' ");
@@ -10534,6 +10593,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             }
                             catch (Exception Ex)
                             {
+                                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                                 objData.RollBackTransation(Transs, con);
                                 string error = Ex.Message;
                                 tdMsgMeasure.InnerHtml = clsGeneral.failedMsg("Updation Failed! <br> '" + error + "' ");
@@ -10552,6 +10612,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             throw Ex;
         }
         showMatchToSampleDrop();
@@ -11709,10 +11770,12 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     }
                 }
             }
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AlertSuccessMsg();", true);
         }
         catch (Exception Ex)
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             throw Ex;
         }
 
@@ -12648,7 +12711,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             }
 
         }
-
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
 
     protected void BtnCopyTemplate_Click(object sender, EventArgs e)             // Submit Template
@@ -13024,6 +13087,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                 }
                                 catch (Exception ex)
                                 {
+                                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                                     throw ex;
                                 }
                             }
@@ -13538,6 +13602,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 }
                 catch (Exception Ex)
                 {
+                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                     throw Ex;
                 }
             }
@@ -13566,8 +13631,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         else
         {
             ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
-}
-
+        }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
 
 
@@ -14239,7 +14304,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         //}
         //if (countSet == 0)
         //{
-            ClientScript.RegisterStartupScript(this.GetType(), "", "loadEmailOrder(this.id);", true);
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
+        ClientScript.RegisterStartupScript(this.GetType(), "", "loadEmailOrder(this.id);", true);
         //}
         //else
         //{
@@ -14632,15 +14698,18 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 }
                 catch (Exception Ex)
                 {
+                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                     throw Ex;
                 }
             }
         }
         catch (Exception Ex)
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             throw Ex;
         }
         drpTasklist_SelectedIndexChanged1(sender, e);
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
         // Delete the Active session 
         if (TemplateId > 0)
         {
@@ -14854,14 +14923,17 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 }
                 catch (Exception Ex)
                 {
+                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                     throw Ex;
                 }
             }
         }
         catch (Exception Ex)
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             throw Ex;
         }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
         drpTasklist_SelectedIndexChanged1(sender, e);
 
     }
@@ -14960,12 +15032,14 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 }
                 catch (Exception Ex)
                 {
+                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                     throw Ex;
                 }
             }
         }
         catch (Exception Ex)
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             throw Ex;
         }
         drpTasklist_SelectedIndexChanged1(sender, e);
@@ -15921,7 +15995,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 }
                 catch
                 {
-
+                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                 }
 
             }
@@ -15947,14 +16021,16 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 }
                 catch (Exception ex)
                 {
+                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                 }
                 // DownloadFile(file);
             }
-
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             ScriptManager.RegisterClientScriptBlock(this, typeof(System.Web.UI.Page), Guid.NewGuid().ToString(), "$(document).ready(function(){popPrompts();});", true);
         }
         catch (Exception Ex)
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             throw Ex;
         }
     }
@@ -16600,6 +16676,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             LoadData();
             LoadTemplateData(0);
         }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
         drpTasklist_SelectedIndexChanged1(sender, e);
     }
 
@@ -16820,6 +16897,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 rdoRandomMoveover.Visible = false;
             }
         }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
 
     protected void showMatchToSampleDrop()
@@ -16860,6 +16938,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
 
         }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
 
 
@@ -17564,9 +17643,11 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
                 }
             }
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
         }
         catch (Exception Ex)
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             throw Ex;
         }
 
@@ -18461,6 +18542,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         btnDeleteLPAdmin.Visible = false;
         BtnAddNewLessonPlan_Click(sender, e);
         FillApprovedLessonDataAdmin();
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
 
 
@@ -18774,7 +18856,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 ScriptManager.RegisterClientScriptBlock(this, typeof(System.Web.UI.Page), Guid.NewGuid().ToString(), "$(document).ready(function(){$('#overlay').fadeIn('slow', function () { $('#DivAlertAPPLP').animate({ top: '5%' },{duration: 'slow',easing: 'linear'}) }); });", true);                
             }
         }
-        
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
 
 
 
@@ -18977,7 +19059,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 queryorder = "update DSTempHdr set LessonOrder=" + lporon + " where LessonPlanId=" +lpid + " and StudentId=" + sess.StudentId;
                 objData.Execute(queryorder); 
             }
-        }        
+        }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
         LoadLPforSorting();
         LoadEmailforSorting();
         LoadData();
@@ -19033,7 +19116,6 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             string UpdateQuery = "UPDATE DSTempHdr SET Bannerstatus=0 WHERE  StudentId= " + sess.StudentId + " and StatusId=(SELECT  LookupId FROM LookUp WHERE LookupType='TemplateStatus' And LookupName='Approved') AND LessonPlanId = (SELECT  lessonplanid FROM DSTemphdr WHERE DSTemphdrid=" + TemplateId + ")";
             objData.Execute(UpdateQuery);
         }
-
         BtnApproval_Click(sender, e);
 
     }
@@ -19268,10 +19350,12 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     btnPriorLevel_Click(sender, e);
                 }
             }
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             //tdReadMsg.InnerHtml = clsGeneral.sucessMsg("Mail Send Successfully");
         }
         catch (Exception exe)
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "alertMessage('Mail Send Failed','red');", true);
             //tdReadMsg.InnerHtml = clsGeneral.sucessMsg("Mail Send Failed");
             emailFullReset(sender,e);
@@ -19956,6 +20040,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             {
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
             }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
 
     protected void BtnAdminPreview_Click(object sender, EventArgs e)             // Submit Template
