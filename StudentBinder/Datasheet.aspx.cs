@@ -30049,6 +30049,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 oData.ExecuteWithTrans("Update StdtSessionDtl set StdtSessionStepId=" + (Convert.ToInt32(dr["StdtSessionStepId"]) * (-1)) + ",DSTempSetColId=" + (Convert.ToInt32(dr["DSTempSetColId"]) * (-1)) + "WHERE StdtSessionStepId=" + Convert.ToInt32(ds.Tables[0].Rows[i]["stepId"]), con, trans);
                             }
                         }
+                        else
+                        {
+                            if (trans != null && trans.Connection.State == ConnectionState.Open)
+                            {
+                                oData.RollBackTransation(trans, con);
+
+                            }
+                            if (con != null)
+                                con.Close();
+                            ScriptManager.RegisterStartupScript(this, this.GetType(), "scriptdisc", "alert('Discard failed');", true);
+                            return;
+                        }
                     }
                 }
             }
@@ -30067,6 +30079,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         oData.ExecuteWithTrans("Update   StdtSessColScore set StudentId=" + (Convert.ToInt32(dr["StudentId"]) * (-1)) + ",DSTempSetColId=" + (Convert.ToInt32(dr["DSTempSetColId"]) * (-1)) + ", DSTempSetColCalcId=" + (Convert.ToInt32(dr["DSTempSetColCalcId"]) * (-1)) + ",StdtSessionHdrId=" + (Convert.ToInt32(dr["StdtSessionHdrId"]) * (-1)) + " WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"], con, trans);
                     }
                 }
+                else
+                {
+                    if (trans != null && trans.Connection.State == ConnectionState.Open)
+                    {
+                        oData.RollBackTransation(trans, con);
+
+                    }
+                    if (con != null)
+                        con.Close();
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "scriptdisc", "alert('Discard failed');", true);
+                    return;
+                }
             }
 
             string disupdate = "select DSTempHdrId,LessonPlanId,StudentId from StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
@@ -30081,6 +30105,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                         queryStat = oData.ExecuteWithTrans("Update   StdtSessionHdr set DSTempHdrId=" + (Convert.ToInt32(dr["DSTempHdrId"]) * (-1)) + ",LessonPlanId=" + (Convert.ToInt32(dr["LessonPlanId"]) * (-1)) + ",StudentId=" + (Convert.ToInt32(dr["StudentId"]) * (-1)) + "WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"], con, trans);
                     }
+                }
+                else
+                {
+                    if (trans != null && trans.Connection.State == ConnectionState.Open)
+                    {
+                        oData.RollBackTransation(trans, con);
+
+                    }
+                    if (con != null)
+                        con.Close();
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "scriptdisc", "alert('Discard failed');", true);
+                    return;
                 }
             }
             SaveBeforePrint.Visible = false;
