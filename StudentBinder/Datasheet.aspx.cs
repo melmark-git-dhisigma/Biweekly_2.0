@@ -135,16 +135,41 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                 }
 
-                string strModqry = "SELECT ModifiedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + Request.QueryString["SessHdrID"];
-                object objModDate = oData.FetchValue(strModqry);
-                if (objModDate != null)
+                Dictionary<int, string> loadtime = null;
+                if (Session["HdrModifiedDate"] != null)
                 {
-                    Session["HdrModifiedDate"] = objModDate.ToString();
+                    loadtime = Session["HdrModifiedDate"] as Dictionary<int, string>;
                 }
-                else { 
-                    string strcrqry = "SELECT CreatedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + Request.QueryString["SessHdrID"];
-                    object creatobj=oData.FetchValue(strcrqry);
-                    Session["HdrModifiedDate"] = creatobj.ToString();
+             
+                string strModqry = "SELECT ModifiedOn,CreatedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + Request.QueryString["SessHdrID"];
+                DataTable objModDate = oData.ReturnDataTable(strModqry, false);
+                if (objModDate != null && objModDate.Rows.Count>0)
+                {
+                    string modifieddate = "";
+                    if (objModDate.Rows[0]["ModifiedOn"] == null)
+                    {
+                        modifieddate = objModDate.Rows[0]["CreatedOn"].ToString();
+                }
+                    else {
+                        modifieddate = objModDate.Rows[0]["ModifiedOn"].ToString();
+                    }
+                    if (loadtime != null)
+                    {
+                        if (loadtime.ContainsKey((Convert.ToInt32(ViewState["StdtSessHdr"]))))
+                        {
+                            loadtime[(Convert.ToInt32(ViewState["StdtSessHdr"]))] = modifieddate;
+                        }
+                        else {
+                            loadtime.Add((Convert.ToInt32(ViewState["StdtSessHdr"])), modifieddate);
+                        }
+                    }
+                    else
+                    {
+                        loadtime = new Dictionary<int, string>();
+                        loadtime.Add((Convert.ToInt32(ViewState["StdtSessHdr"])), modifieddate);
+
+                    }
+                    Session["HdrModifiedDate"] = loadtime;
                 }
 
                 hdnTemplateId.Value = oTemp.TemplateId.ToString();
@@ -3292,26 +3317,44 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
 
                                     //Save draft/submit time check start
-                                    string strModqry = "SELECT ModifiedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
-                                    object objModDate = null;
-                                    using (SqlCommand cm1 = new SqlCommand(strModqry, con, trans))
+                                        Dictionary<int, string> loadtime = null;
+                                        if (Session["HdrModifiedDate"] != null)
                                     {
-                                        objModDate = cm1.ExecuteScalar();
+                                            loadtime = Session["HdrModifiedDate"] as Dictionary<int, string>;
                                     }
-                                    if (objModDate != null && objModDate.ToString() != "")
+
+                                        string strModqry = "SELECT ModifiedOn,CreatedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+                                        DataTable objModDate = oData.ReturnDataTableWithTransaction(strModqry, con, trans, false); 
+                                        if (objModDate != null && objModDate.Rows.Count > 0)
                                     {
-                                        Session["HdrModifiedDate"] = objModDate.ToString();
+                                            string modifieddate = "";
+                                            if (objModDate.Rows[0]["ModifiedOn"] == null)
+                                            {
+                                                modifieddate = objModDate.Rows[0]["CreatedOn"].ToString();
                                     }
                                     else
                                     {
-                                        string strcrqry = "SELECT CreatedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
-                                        object creatobj = null;
-                                        using (SqlCommand cm1 = new SqlCommand(strcrqry, con, trans))
+                                                modifieddate = objModDate.Rows[0]["ModifiedOn"].ToString();
+                                            }
+                                                if (loadtime != null)
                                         {
-                                            creatobj = cm1.ExecuteScalar();
+                                                    if (loadtime.ContainsKey((Convert.ToInt32(ViewState["StdtSessHdr"]))))
+                                                    {
+                                                        loadtime[(Convert.ToInt32(ViewState["StdtSessHdr"]))] = modifieddate;
                                         }
-                                        Session["HdrModifiedDate"] = creatobj.ToString();
+                                                    else
+                                                    {
+                                                        loadtime.Add((Convert.ToInt32(ViewState["StdtSessHdr"])), modifieddate);
                                     }
+                                                }
+                                                else
+                                                {
+                                                    loadtime = new Dictionary<int, string>();
+                                                    loadtime.Add((Convert.ToInt32(ViewState["StdtSessHdr"])), modifieddate);
+
+                                                }
+                                            Session["HdrModifiedDate"] = loadtime;
+                                        }                                     
                                     //Save draft/submit time check end
                                     if (dtsteps != null)
                                     {
@@ -3426,34 +3469,34 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         return rtrn;
     }
 
-    protected void btnTriggerProcess_Click(object sender, EventArgs e)
-    {
-        string modon = "";
-        string modby = "";
-        string mod = "select modifiedon,(SELECT CONCAT(UserFName, ' ', UserLName)  FROM dbo.[User] where UserId=StdtSessionHdr.ModifiedBy)AS fullname from StdtSessionHdr where StdtSessionHdrId=" + ViewState["StdtSessHdr"];
-        DataTable dtmod = oData.ReturnDataTable(mod, false);
-        if (dtmod != null && dtmod.Rows.Count>0)
-        {
-            modon = dtmod.Rows[0]["modifiedon"].ToString();
-            modby = dtmod.Rows[0]["fullname"].ToString();
-        }
-        // Register a script to open the popup
-        ScriptManager.RegisterStartupScript(this, this.GetType(), "Popup", "openPopup('The lesson has been updated by "+modby+ " at "+modon+ ", are you sure you want to overwrite their changes?', 'Operation1');", true);
-    }
-    protected void btnAnotherOperation_Click(object sender, EventArgs e)
-    {
-        string modon = "";
-        string modby = "";
-        string mod = "select modifiedon,(SELECT CONCAT(UserFName, ' ', UserLName)  FROM dbo.[User] where UserId=StdtSessionHdr.ModifiedBy)AS fullname from StdtSessionHdr where StdtSessionHdrId=" + ViewState["StdtSessHdr"];
-        DataTable dtmod = oData.ReturnDataTable(mod, false);
-        if (dtmod != null && dtmod.Rows.Count > 0)
-        {
-            modon = dtmod.Rows[0]["modifiedon"].ToString();
-            modby = dtmod.Rows[0]["fullname"].ToString();
-        }
-        // Register a script to open the popup with a custom message for the second operation
-        ScriptManager.RegisterStartupScript(this, this.GetType(), "Popup2", "openPopup('The lesson has been updated by " + modby + " at " + modon + ", are you sure you want to overwrite their changes?', 'Operation2');", true);
-    }
+    //protected void btnTriggerProcess_Click(object sender, EventArgs e)
+    //{
+    //    string modon = "";
+    //    string modby = "";
+    //    string mod = "select modifiedon,(SELECT CONCAT(UserFName, ' ', UserLName)  FROM dbo.[User] where UserId=StdtSessionHdr.ModifiedBy)AS fullname from StdtSessionHdr where StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+    //    DataTable dtmod = oData.ReturnDataTable(mod, false);
+    //    if (dtmod != null && dtmod.Rows.Count>0)
+    //    {
+    //        modon = dtmod.Rows[0]["modifiedon"].ToString();
+    //        modby = dtmod.Rows[0]["fullname"].ToString();
+    //    }
+    //    // Register a script to open the popup
+    //    ScriptManager.RegisterStartupScript(this, this.GetType(), "Popup", "openPopup('The lesson has been updated by "+modby+ " at "+modon+ ", are you sure you want to overwrite their changes?', 'Operation1');", true);
+    //}
+    //protected void btnAnotherOperation_Click(object sender, EventArgs e)
+    //{
+    //    string modon = "";
+    //    string modby = "";
+    //    string mod = "select modifiedon,(SELECT CONCAT(UserFName, ' ', UserLName)  FROM dbo.[User] where UserId=StdtSessionHdr.ModifiedBy)AS fullname from StdtSessionHdr where StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+    //    DataTable dtmod = oData.ReturnDataTable(mod, false);
+    //    if (dtmod != null && dtmod.Rows.Count > 0)
+    //    {
+    //        modon = dtmod.Rows[0]["modifiedon"].ToString();
+    //        modby = dtmod.Rows[0]["fullname"].ToString();
+    //    }
+    //    // Register a script to open the popup with a custom message for the second operation
+    //    ScriptManager.RegisterStartupScript(this, this.GetType(), "Popup2", "openPopup('The lesson has been updated by " + modby + " at " + modon + ", are you sure you want to overwrite their changes?', 'Operation2');", true);
+    //}
 
     [WebMethod]
     public static bool SetDecisionOperation(bool decision, string operation)
@@ -3752,6 +3795,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             valid_Ind = false;
                     }
                 }
+                Dictionary<int, string> loadtime = Session["HdrModifiedDate"] as Dictionary<int, string>;
                 string strModqry = "SELECT ModifiedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + sessHdrId + "";
                 object objModDate = null;
                 using (SqlCommand cm1 = new SqlCommand(strModqry, con, trans))
@@ -3761,9 +3805,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 //object objModDate = oData.FetchValue(strModqry);
                 if (objModDate != null)
                 {
-                    Session["HdrModifiedDate"] = objModDate.ToString();
+                    if (loadtime != null)
+                    {
+                        if (loadtime.ContainsKey(sessHdrId))
+                        {
+                            loadtime[sessHdrId] = objModDate.ToString();
+                            Session["HdrModifiedDate"] = loadtime;
+                }
+
+            }
                 }
             }
+      
             if (updateMode == "Submit")
             {
                 oDS = (clsDataSheet)Session[DatasheetKey];
@@ -4405,17 +4458,43 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             //con = oData.Open();
             //trans = con.BeginTransaction();
             //Save draft/submit time check start
-            string strModqry = "SELECT ModifiedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
-            object objModDate = oData.FetchValue(strModqry);
-            if (objModDate != null && objModDate.ToString() != "")
+            Dictionary<int, string> loadtime = null;           
+            if (Session["HdrModifiedDate"] != null)
             {
-                Session["HdrModifiedDate"] = objModDate.ToString();
+                loadtime = Session["HdrModifiedDate"] as  Dictionary<int, string> ;
             }
+
+            string strModqry = "SELECT ModifiedOn,CreatedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+            DataTable objModDate = oData.ReturnDataTable(strModqry, false);
+            if (objModDate != null && objModDate.Rows.Count > 0)
+            {
+                string modifieddate = "";
+                if (objModDate.Rows[0]["ModifiedOn"] == null)
+                {
+                    modifieddate = objModDate.Rows[0]["CreatedOn"].ToString();
+                }
             else
             {
-                string strcrqry = "SELECT CreatedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
-                object creatobj = oData.FetchValue(strcrqry);
-                Session["HdrModifiedDate"] = creatobj.ToString();
+                    modifieddate = objModDate.Rows[0]["ModifiedOn"].ToString();
+            }
+                if (loadtime != null)
+                {
+                    if (loadtime.ContainsKey((Convert.ToInt32(ViewState["StdtSessHdr"]))))
+                    {
+                        loadtime[(Convert.ToInt32(ViewState["StdtSessHdr"]))] = modifieddate;
+                    }
+                    else
+                    {
+                        loadtime.Add((Convert.ToInt32(ViewState["StdtSessHdr"])), modifieddate);
+                    }
+                }
+                else
+                {
+                    loadtime = new Dictionary<int, string>();
+                    loadtime.Add((Convert.ToInt32(ViewState["StdtSessHdr"])), modifieddate);
+
+                }
+                Session["HdrModifiedDate"] = loadtime;
             }
             //Save draft/submit time check end
             string strqry = "SELECT DSTempHdrId FROM StdtSessionHdr WHERE StdtSessionHdrId=" + SessHdrID;
@@ -4827,24 +4906,40 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         oSession = (clsSession)Session["UserSession"];
         string InstantHdrModifiedDate = "";
         object exist_object = null;
+         string HdrModifiedDate="";
+         string modifieddate = "";
+         string modifiedby = "";
         string existquery = "SELECT StdtSessionHdrID FROM StdtSessionHdr WHERE DSTempHdrId = " + oTemp.TemplateId + " AND StudentId = " + oSession.StudentId + "";
         exist_object = oData.FetchValue(existquery);
 
-        string updateTime = "SELECT ModifiedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
-        object objSessHdrUpdateTime = oData.FetchValue(updateTime);
-        string HdrModifiedDate = Session["HdrModifiedDate"].ToString();
-        if ((objSessHdrUpdateTime != null) && (objSessHdrUpdateTime.ToString())!="")
+        string updateTime = "SELECT ModifiedOn,CreatedOn,(SELECT CONCAT(UserFName, ' ', UserLName)  FROM dbo.[User] where UserId=StdtSessionHdr.ModifiedBy)AS Modfullname,(SELECT CONCAT(UserFName, ' ', UserLName)  FROM dbo.[User] where UserId=StdtSessionHdr.CreatedBy)AS Createdfullname FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+        DataTable objSessHdrUpdateTime = oData.ReturnDataTable(updateTime, false);
+        if (objSessHdrUpdateTime != null && objSessHdrUpdateTime.Rows.Count > 0)
         {
-            InstantHdrModifiedDate = objSessHdrUpdateTime.ToString();
+            if (objSessHdrUpdateTime.Rows[0]["ModifiedOn"] == null)
+            {
+                modifieddate = objSessHdrUpdateTime.Rows[0]["CreatedOn"].ToString();
+                modifiedby = objSessHdrUpdateTime.Rows[0]["Createdfullname"].ToString();
         }
-        else {
-            string strcrqry = "SELECT CreatedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
-            object creatobj = oData.FetchValue(strcrqry);
-            InstantHdrModifiedDate = creatobj.ToString();
+            else
+            {
+                modifieddate = objSessHdrUpdateTime.Rows[0]["ModifiedOn"].ToString();
+                modifiedby = objSessHdrUpdateTime.Rows[0]["Modfullname"].ToString();
+        }
+        }
+        InstantHdrModifiedDate = modifieddate;
+        if (Session["HdrModifiedDate"]!=null)
+        {
+            Dictionary<int, string> loadtime = Session["HdrModifiedDate"] as Dictionary<int, string>;
+            if (loadtime.ContainsKey((Convert.ToInt32(ViewState["StdtSessHdr"]))))
+            {
+                HdrModifiedDate = loadtime[(Convert.ToInt32(ViewState["StdtSessHdr"]))];
+            }
         }
         if ((InstantHdrModifiedDate != HdrModifiedDate))
         {
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "popupTrigger", "popUpTriggerClick();", true);
+            //ScriptManager.RegisterStartupScript(this, this.GetType(), "popupTrigger", "popUpTriggerClick();", true);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "Popup", "openPopup('The lesson has been updated by " + modifiedby + " at " + modifieddate + ", are you sure you want to overwrite their changes?', 'Operation1');", true);
         }
         else
         {
@@ -31293,26 +31388,42 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         Session["SubmissionAction"] = b1.Text;
         string InstantHdrModifiedDate = "";
         object exist_object = null;
+        string HdrModifiedDate = "";
+        string modifieddate = "";
+        string modifiedby = "";
         string existquery = "SELECT StdtSessionHdrID FROM StdtSessionHdr WHERE DSTempHdrId = " + oTemp.TemplateId + " AND StudentId = " + oSession.StudentId + "";
         exist_object = oData.FetchValue(existquery);
 
-        string updateTime = "SELECT ModifiedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
-        object objSessHdrUpdateTime = oData.FetchValue(updateTime);
-        string HdrModifiedDate = Session["HdrModifiedDate"].ToString();
-        string SubmissionAction = Session["SubmissionAction"].ToString();
-        if ((objSessHdrUpdateTime != null) && (objSessHdrUpdateTime.ToString()) != "")
+        string updateTime = "SELECT ModifiedOn,CreatedOn,(SELECT CONCAT(UserFName, ' ', UserLName)  FROM dbo.[User] where UserId=StdtSessionHdr.ModifiedBy)AS Modfullname,(SELECT CONCAT(UserFName, ' ', UserLName)  FROM dbo.[User] where UserId=StdtSessionHdr.CreatedBy)AS Createdfullname FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+        DataTable objSessHdrUpdateTime = oData.ReturnDataTable(updateTime, false);
+        if (objSessHdrUpdateTime != null && objSessHdrUpdateTime.Rows.Count > 0)
         {
-            InstantHdrModifiedDate = objSessHdrUpdateTime.ToString();
+            if (objSessHdrUpdateTime.Rows[0]["ModifiedOn"] == null)
+            {
+                modifieddate = objSessHdrUpdateTime.Rows[0]["CreatedOn"].ToString();
+                modifiedby = objSessHdrUpdateTime.Rows[0]["Createdfullname"].ToString();
         }
         else
         {
-            string strcrqry = "SELECT CreatedOn FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
-            object creatobj = oData.FetchValue(strcrqry);
-            InstantHdrModifiedDate = creatobj.ToString();
+                modifieddate = objSessHdrUpdateTime.Rows[0]["ModifiedOn"].ToString();
+                modifiedby = objSessHdrUpdateTime.Rows[0]["Modfullname"].ToString();
         }
+        }
+        InstantHdrModifiedDate = modifieddate;
+        if (Session["HdrModifiedDate"] != null)
+        {
+            Dictionary<int, string> loadtime = Session["HdrModifiedDate"] as Dictionary<int, string>;
+            if (loadtime.ContainsKey((Convert.ToInt32(ViewState["StdtSessHdr"]))))
+            {
+                HdrModifiedDate = loadtime[(Convert.ToInt32(ViewState["StdtSessHdr"]))];
+            }
+        }
+        string SubmissionAction = Session["SubmissionAction"].ToString();
         if ((InstantHdrModifiedDate != HdrModifiedDate))
         {
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "popupTrigger2", "popUpTriggerAnotherClick();", true);
+            //ScriptManager.RegisterStartupScript(this, this.GetType(), "popupTrigger2", "popUpTriggerAnotherClick();", true);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "closedatasheet1", "hideOverlay();", true);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "Popup2", "openPopup('The lesson has been updated by " + modifiedby + " at " + modifieddate + ", are you sure you want to overwrite their changes?', 'Operation2');", true);
             ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
         }
         else

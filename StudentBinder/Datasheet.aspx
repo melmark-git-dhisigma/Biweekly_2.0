@@ -3345,19 +3345,19 @@
                  }
              });
          }
-         function popUpTriggerClick() {
-             $('#btnTriggerProcess').trigger("click");
-         }
-         function popUpTriggerAnotherClick() {
-             $('#btnAnotherOperation').trigger("click");
-         }
+         //function popUpTriggerClick() {
+         //    $('#btnTriggerProcess').trigger("click");
+         //}
+         //function popUpTriggerAnotherClick() {
+         //    $('#btnAnotherOperation').trigger("click");
+         //}
     </script>
 </head>
 <body>
     <form id="form1" runat="server">
         <div class="container mt-5" style="display:none">
-            <asp:Button ID="btnTriggerProcess" runat="server" Text="Start Process" OnClick="btnTriggerProcess_Click" CssClass="btn btn-primary" />
-            <asp:Button ID="btnAnotherOperation" runat="server" Text="Another Operation" OnClick="btnAnotherOperation_Click" CssClass="btn btn-primary" />
+           <%-- <asp:Button ID="btnTriggerProcess" runat="server" Text="Start Process" OnClick="btnTriggerProcess_Click" CssClass="btn btn-primary" />
+            <asp:Button ID="btnAnotherOperation" runat="server" Text="Another Operation" OnClick="btnAnotherOperation_Click" CssClass="btn btn-primary" />--%>
             <asp:Button ID="btnContinueProcess" runat="server" Text="Continue Process" OnClick="btnContinueProcess_Click" style="display:none;" />
         </div>
 
