@@ -3354,6 +3354,16 @@
     </script>
 </head>
 <body>
+    <script>
+        // Event listeners to reset the idle timer on user activity without closing the popup or resetting the countdown timer
+        window.onload = parent.resetIdleTimer;
+        window.onmousemove =  parent.resetIdleTimer;
+        window.onmousedown = parent.resetIdleTimer; // Catches touchscreen presses as well
+        window.ontouchstart = parent.resetIdleTimer;
+        window.onclick = parent.resetIdleTimer;     // Catches touchpad clicks as well
+        window.onkeydown = parent.resetIdleTimer;
+        window.addEventListener('scroll', parent.resetIdleTimer, true); // Catches scrolling
+        </script>
     <form id="form1" runat="server">
         <div class="container mt-5" style="display:none">
            <%-- <asp:Button ID="btnTriggerProcess" runat="server" Text="Start Process" OnClick="btnTriggerProcess_Click" CssClass="btn btn-primary" />

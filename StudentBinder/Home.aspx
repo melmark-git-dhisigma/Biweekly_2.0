@@ -184,7 +184,54 @@
         .stdAct {
             background-color: #00CCFF;
         }
+        /* Basic styling for the popup */
+        .popup {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid #ccc;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            z-index: 1003;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
 
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1003;
+        }
+
+        .popup-button {
+            padding: 5px 10px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .button-logout {
+            background-color: #d9534f;
+        }
+
+        .button-stay {
+            background-color: #5cb85c;
+        }
+
+        .popup-button:hover {
+            opacity: 0.8;
+        }
     </style>
 
     <script type="text/javascript">
@@ -324,7 +371,7 @@
 
             var currHref_splitted = currHref.split('/');
 
-            var redirectUrl = currHref_splitted[0] + '/';
+            var redirectUrl = "http://" + currHref_splitted[0] + '/';
 
             for (var i = 0; i < currHref_splitted.length; i++) {
                 if (currHref_splitted[i].substring(0, 2) == '(S') {
@@ -1347,8 +1394,8 @@
 
             selStdId = div.id;
             document.getElementById('hidCureentStudent').value = selStdId
-
-
+            
+            
             PageMethods.SetStudentID(div.id, OnSuccessStdAssign, OnFailure);
             PageMethods.setTemplateSess(div.id);
 
@@ -1708,6 +1755,12 @@
 
                     }
 
+                    if (response[i].Url == "Lesson Plans"||response[i].Url == "ExportLessons.aspx") {
+                        $('#LPTypeFormat').css('display','block');
+                    }
+                    else {
+                        $('#LPTypeFormat').css('display','none');
+                    }
 
                     if (response[i].Url == "Lesson Plans") {
 
@@ -4206,6 +4259,143 @@
     </style>
 </head>
 <body onkeydown="keyDownEvents();">
+    <!-- Popup overlay -->
+    <div id="popupOverlay" class="popup-overlay"></div>
+
+    <!-- Popup window -->
+    <div id="popup" class="popup">
+        <p id="popupMessage"></p>
+        <button class="popup-button button-logout" onclick="logout()">Logout</button>
+        <button class="popup-button button-stay" onclick="closeIdlePopup()">Stay Signed In</button>
+    </div>
+
+    <script>
+        // Define a variable for idle time in milliseconds
+        var idleTimeInMilliseconds = 180000; // 3 minutes in milliseconds
+        var idleStartTime; // Timestamp when the user became idle
+        var countdownTimerInterval;
+        var idleTimer;
+        var popupVisible = false;
+
+        // Start the idle timer
+        function startIdleTimer() {
+            idleStartTime = new Date().getTime();
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(showPopup, idleTimeInMilliseconds);
+        }
+
+        // Reset the idle timer without closing the popup
+        function resetIdleTimer() {
+            if (!popupVisible) {
+                idleStartTime = new Date().getTime();
+                clearTimeout(idleTimer);
+                idleTimer = setTimeout(showPopup, idleTimeInMilliseconds);
+            }
+        }
+
+        // Show the popup and start the countdown timer
+        function showPopup() {
+            if (document.hidden) {
+                showNotification();
+                flashTitle();
+            }
+            openPopup();
+            if (!popupVisible) {
+                startCountdownTimer();
+                popupVisible = true;
+            }
+        }
+
+        // Start the countdown timer
+        function startCountdownTimer() {
+            updateCountdownTimerMessage();
+            countdownTimerInterval = setInterval(updateCountdownTimerMessage, 1000); // Update every second
+        }
+
+        // Update the countdown timer message
+        function updateCountdownTimerMessage() {
+            var currentTime = new Date().getTime();
+            var elapsedMilliseconds = currentTime - idleStartTime;
+
+            var hours = Math.floor(elapsedMilliseconds / 3600000);
+            var minutes = Math.floor((elapsedMilliseconds % 3600000) / 60000);
+            var seconds = Math.floor((elapsedMilliseconds % 60000) / 1000);
+
+            document.getElementById('popupMessage').textContent = 'You have been idle for ' + hours + ' hour(s) ' + minutes + ' minute(s) ';// + seconds + ' second(s).';
+        }
+
+        // Flash the title
+        function flashTitle() {
+            var originalTitle = document.title;
+            var flash = true;
+            var flashInterval = setInterval(function() {
+                document.title = flash ? 'New Message' : originalTitle;
+                flash = !flash;
+            }, 1000);
+
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden) {
+                    clearInterval(flashInterval);
+                    document.title = originalTitle;
+                }
+            });
+        }
+
+        function stopFlashingTitle() {
+            clearInterval(flashInterval);
+            document.title = originalTitle;
+        }
+
+        // Show a notification
+        function showNotification() {
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification('You have been idle for 5 minutes. Do you want to stay signed in?');
+            }
+        }
+
+        // Open the popup
+        function openPopup() {
+            document.getElementById('popup').style.display = 'block';
+            document.getElementById('popupOverlay').style.display = 'block';
+        }
+
+        // Close the popup
+        function closeIdlePopup() {
+            document.getElementById('popup').style.display = 'none';
+            document.getElementById('popupOverlay').style.display = 'none';
+            clearInterval(countdownTimerInterval);
+            popupVisible = false;
+            resetIdleTimer();
+        }
+
+        // Logout the user
+        function logout() {
+            window.location.href = "javascript:__doPostBack('lnk_logout','')"; // Change the URL to your actual logout URL
+        }
+
+        // Event listeners to reset the idle timer on user activity without closing the popup or resetting the countdown timer
+        window.onload = startIdleTimer;
+        window.onmousemove = resetIdleTimer;
+        window.onmousedown = resetIdleTimer; // Catches touchscreen presses as well
+        window.ontouchstart = resetIdleTimer;
+        window.onclick = resetIdleTimer;     // Catches touchpad clicks as well
+        window.onkeydown = resetIdleTimer;
+        window.addEventListener('scroll', resetIdleTimer, true); // Catches scrolling
+
+        // Handle visibility change
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible' && new Date().getTime() - idleStartTime >= idleTimeInMilliseconds) {
+                showPopup();
+            }
+        });
+
+        // Request notification permission
+        document.addEventListener('DOMContentLoaded', (event) => {
+            if ("Notification" in window && Notification.permission !== "granted") {
+                Notification.requestPermission();
+        }
+        });
+    </script>
 <button id="unmute" style="display:none">Unmute</button>
 
 
@@ -4860,7 +5050,7 @@
                             <div class="lessonSearchOptions">
                                 <table style="width: 100%">
                                     <tr>
-                                        <td style="width: 20%;padding-left:12%;">Name</td>
+                                        <td style="width: 20%">Name</td>
                                         <td style="width: 25%">
                                             <input type="text" id="txtLessonName" /></td>
                                         <td style="width: 5%"></td>
@@ -4897,7 +5087,7 @@
                                                         }
                                                     </script>
                                                 </div>
-                                                <div style="float: left;padding-left:15px;">
+                                                <div ID="LPTypeFormat" style="float: left;padding-left:15px;display: none;">
                                                     <span>Format</span>
                                                     <asp:DropDownList ID="ddlFormat" runat="server" CssClass="drpClassFormat">
                                                         <asp:ListItem Value="0">......Select Format......</asp:ListItem>
