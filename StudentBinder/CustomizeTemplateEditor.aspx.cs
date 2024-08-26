@@ -2600,11 +2600,18 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
                     if (criteriaType != "MODIFICATION")
                     {
-                        string measure1 = measureType.Substring(0, 1);
-                        string measure2 = measureType.Substring(1, measureType.Length - 1);
-                        if (measure1 == "%")
+                        if (measureType == "")
                         {
-                            measureType = "% " + measure2;
+                            ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('The lesson plan step criteria measure is missing. Please remove or update the criteria.');", true);
+                        }
+                        else
+                        {
+                            string measure1 = measureType.Substring(0, 1);
+                            string measure2 = measureType.Substring(1, measureType.Length - 1);
+                            if (measure1 == "%")
+                            {
+                                measureType = "% " + measure2;
+                            }
                         }
                     }
                     if (criteriaType == "MOVE UP")
@@ -2887,11 +2894,18 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
                     if (criteriaType != "MODIFICATION")
                     {
-                        string measure1 = measureType.Substring(0, 1);
-                        string measure2 = measureType.Substring(1, measureType.Length - 1);
-                        if (measure1 == "%")
+                        if (measureType == "")
                         {
-                            measureType = "% " + measure2;
+                            ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('The lesson plan set criteria measure is missing. Please remove or update the criteria.');", true);
+                        }
+                        else
+                        {
+                            string measure1 = measureType.Substring(0, 1);
+                            string measure2 = measureType.Substring(1, measureType.Length - 1);
+                            if (measure1 == "%")
+                            {
+                                measureType = "% " + measure2;
+                            }
                         }
                     }
                     if (criteriaType == "MOVE UP")
@@ -3178,11 +3192,18 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
                     if (criteriaType != "MODIFICATION")
                     {
-                        string measure1 = measureType.Substring(0, 1);
-                        string measure2 = measureType.Substring(1, measureType.Length - 1);
-                        if (measure1 == "%")
+                        if (measureType == "")
                         {
-                            measureType = "% " + measure2;
+                            ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('The lesson plan prompt criteria measure is missing. Please remove or update the criteria.');", true);
+                        }
+                        else
+                        {
+                            string measure1 = measureType.Substring(0, 1);
+                            string measure2 = measureType.Substring(1, measureType.Length - 1);
+                            if (measure1 == "%")
+                            {
+                                measureType = "% " + measure2;
+                            }
                         }
                     }
                     if (criteriaType == "MOVE UP")
@@ -4583,6 +4604,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 stepPanel.Style.Add("display", "None");
                 lblStepStart.Visible = false;
                 btnAddStepCriteria.Visible = false;
+
             }
             else
             {
@@ -12946,6 +12968,24 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
         tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting. " + message + " are missing");
         alertmsg = "Please complete template details before submitting. " + message + " are missing";
+
+        //Check criteria measure missing
+        string wrngMesuSlct = "SELECT RuleType FROM   dstemprule DsRule LEFT JOIN dstempsetcol DsCol ON DsRule.dstempsetcolid = DsCol.dstempsetcolid LEFT JOIN dstempsetcolcalc DsColCalc ON DsRule.dstempsetcolcalcid = DsColCalc.dstempsetcolcalcid WHERE CalcType is null and ColName is not null and DsRule.ActiveInd ='A' and DsRule.DSTempHdrId=" + TemplateId;
+        DataTable dtCheckMeasure = objData.ReturnDataTable(wrngMesuSlct, false);
+		if (dtCheckMeasure != null)
+        {
+            if (dtCheckMeasure.Rows.Count > 0)
+            {
+                string measureTyp = dtCheckMeasure.Rows[0]["RuleType"].ToString();
+                if (dtCheckMeasure != null && dtCheckMeasure.Rows.Count != 0)
+                {
+                    message += measureTyp.Substring(0, 1).ToString() + measureTyp.Substring(1, measureTyp.Length - 1).ToLower() + " criteria measure is";
+                    tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting. " + message + " missing");
+                    alertmsg = "Please complete template details before submitting. " + message + " missing";
+                }
+            }
+        }
+
         // FUnction to asign sets and steps If the lesson plan is a visual lesson 
         if (message == "")
         {
