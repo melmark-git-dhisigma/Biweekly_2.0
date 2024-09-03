@@ -7950,7 +7950,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 /// UPDATE PARENTSTEP TABLE WITH THE STEP DETAILS AND SORTORDER
                 /// 
                 updateQuerry = "Update DSTempParentStep Set SetIds='" + setIds + "',SetNames='" + clsGeneral.convertQuotes(setNames) + "',StepCd='" + clsGeneral.convertQuotes(txtStepName.Text.Trim()) + "',StepName='" + clsGeneral.convertQuotes(txtStepDesc.Text.Trim()) + "' where DSTempParentStepId=" + editStepId;
-                 int indexs = objData.Execute(updateQuerry);
+                int indexs = objData.Execute(updateQuerry);
 
 
                 int countitem = 0;
@@ -8012,7 +8012,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         }
                     }
                     // UpdateCompleteSteponSet(Convert.ToInt32(items.Value), headerId);
-                }
+                 }
                string strQurryNosetchk = "SELECT DSTempStepId FROM DSTempStep WHERE DSTempSetId = " +0+ " AND DSTempParentStepId=" + editStepId + " AND DSTempHdrId=" + headerId +" AND IsDynamic=0 AND ActiveInd = 'A'";
                object objNosetStep = objData.FetchValue(strQurryNosetchk);
                if (objNosetStep == null)
@@ -9476,39 +9476,45 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             {
                                 inclMistrial = 1;
                             }
-
-                            insertQuerry = "Insert Into dbo.DSTempSetCol (SchoolId,DSTempHdrId,ColName,ColTypeCd,CorrResp,CorrRespDesc,InCorrRespDesc,IncMisTrialInd,MisTrialDesc " +
-                                   ",CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,ActiveInd,MoveUpstat) " +
-                                   "Values(" + sess.SchoolId + "," + headerId + ",'" + clsGeneral.convertQuotes(txtColumnName.Text.Trim()) + "','" + Convert.ToString(ddlColumnType.SelectedValue) + "' ,'" + clsGeneral.convertQuotes(txtDurCorrectResponse.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtDurCorrectResponse.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtDurIncrctResp.Text.Trim()) + "'," + inclMistrial + ",'" + clsGeneral.convertQuotes(txtDurInclMisTrial.Text.Trim()) + "'," + sess.LoginId + ",getdate()," + sess.LoginId + ",getdate(),'A',"+Convert.ToInt16(MoveupOpt1.SelectedValue)+") ";
-                            returnId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(insertQuerry, con, Transs));
-
-                            if (chkDurAverage.Checked == true)
+                            if (MoveupOpt1.SelectedValue == null)
                             {
-                                iiGraph = 0;
-                                if (chkDurAverageIIG.Checked == true)
-                                {
-                                    iiGraph = 1;
-                                }
-                                insertQuerry = "Insert Into DSTempSetColCalc (SchoolId,DSTempSetColId,CalcType,CalcRptLabel,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,ActiveInd,IncludeInGraph) " +
-                                                "Values(" + sess.SchoolId + "," + returnId + ",'" + Convert.ToString(chkDurAverage.Text) + "','" + clsGeneral.convertQuotes(txtDurAverage.Text.Trim()) + "'," + sess.LoginId + ",getdate()," + sess.LoginId + ",getdate(),'A'," + iiGraph + ") ";
-                                index = Convert.ToInt32(objData.ExecuteWithScopeandConnection(insertQuerry, con, Transs));
+                                tdMsgMeasure.InnerHtml = clsGeneral.warningMsg("Please select \"more than\" or \"less than\" under Advanced Options in the measurement pop-up.");
+                                objData.CommitTransation(Transs, con);
                             }
-                            if (chkDurTotalDur.Checked == true)
+                            else
                             {
-                                iiGraph = 0;
-                                if (chkDurTotalDurIIG.Checked == true)
-                                {
-                                    iiGraph = 1;
-                                }
-                                insertQuerry = "Insert Into DSTempSetColCalc (SchoolId,DSTempSetColId,CalcType,CalcRptLabel,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,ActiveInd,IncludeInGraph) " +
-                                              "Values(" + sess.SchoolId + "," + returnId + ",'" + Convert.ToString(chkDurTotalDur.Text) + "','" + clsGeneral.convertQuotes(txtDurTotalDuration.Text.Trim()) + "'," + sess.LoginId + ",getdate()," + sess.LoginId + ",getdate(),'A'," + iiGraph + ") ";
-                                index = Convert.ToInt32(objData.ExecuteWithScopeandConnection(insertQuerry, con, Transs));
-                            }
+                                insertQuerry = "Insert Into dbo.DSTempSetCol (SchoolId,DSTempHdrId,ColName,ColTypeCd,CorrResp,CorrRespDesc,InCorrRespDesc,IncMisTrialInd,MisTrialDesc " +
+                                       ",CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,ActiveInd,MoveUpstat) " +
+                                       "Values(" + sess.SchoolId + "," + headerId + ",'" + clsGeneral.convertQuotes(txtColumnName.Text.Trim()) + "','" + Convert.ToString(ddlColumnType.SelectedValue) + "' ,'" + clsGeneral.convertQuotes(txtDurCorrectResponse.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtDurCorrectResponse.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtDurIncrctResp.Text.Trim()) + "'," + inclMistrial + ",'" + clsGeneral.convertQuotes(txtDurInclMisTrial.Text.Trim()) + "'," + sess.LoginId + ",getdate()," + sess.LoginId + ",getdate(),'A'," + Convert.ToInt16(MoveupOpt1.SelectedValue) + ") ";
+                                returnId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(insertQuerry, con, Transs));
 
-                            objData.CommitTransation(Transs, con);
-                            ScriptManager.RegisterClientScriptBlock(UpdatePanel1, UpdatePanel1.GetType(), "", "CloseMeasure();", true);
-                            GetMeasureData(headerId);
-                            // SetLessonProcedure(headerId);
+                                if (chkDurAverage.Checked == true)
+                                {
+                                    iiGraph = 0;
+                                    if (chkDurAverageIIG.Checked == true)
+                                    {
+                                        iiGraph = 1;
+                                    }
+                                    insertQuerry = "Insert Into DSTempSetColCalc (SchoolId,DSTempSetColId,CalcType,CalcRptLabel,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,ActiveInd,IncludeInGraph) " +
+                                                    "Values(" + sess.SchoolId + "," + returnId + ",'" + Convert.ToString(chkDurAverage.Text) + "','" + clsGeneral.convertQuotes(txtDurAverage.Text.Trim()) + "'," + sess.LoginId + ",getdate()," + sess.LoginId + ",getdate(),'A'," + iiGraph + ") ";
+                                    index = Convert.ToInt32(objData.ExecuteWithScopeandConnection(insertQuerry, con, Transs));
+                                }
+                                if (chkDurTotalDur.Checked == true)
+                                {
+                                    iiGraph = 0;
+                                    if (chkDurTotalDurIIG.Checked == true)
+                                    {
+                                        iiGraph = 1;
+                                    }
+                                    insertQuerry = "Insert Into DSTempSetColCalc (SchoolId,DSTempSetColId,CalcType,CalcRptLabel,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,ActiveInd,IncludeInGraph) " +
+                                                  "Values(" + sess.SchoolId + "," + returnId + ",'" + Convert.ToString(chkDurTotalDur.Text) + "','" + clsGeneral.convertQuotes(txtDurTotalDuration.Text.Trim()) + "'," + sess.LoginId + ",getdate()," + sess.LoginId + ",getdate(),'A'," + iiGraph + ") ";
+                                    index = Convert.ToInt32(objData.ExecuteWithScopeandConnection(insertQuerry, con, Transs));
+                                }
+                                objData.CommitTransation(Transs, con);
+                                ScriptManager.RegisterClientScriptBlock(UpdatePanel1, UpdatePanel1.GetType(), "", "CloseMeasure();", true);
+                                GetMeasureData(headerId);
+                                // SetLessonProcedure(headerId);
+                            }
                         }
                         catch (Exception Ex)
                         {
@@ -9529,28 +9535,34 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             {
                                 inclMistrial = 1;
                             }
-
-                            insertQuerry = "Insert Into dbo.DSTempSetCol (SchoolId,DSTempHdrId,ColName,ColTypeCd,CorrResp,CorrRespDesc,InCorrRespDesc,IncMisTrialInd,MisTrialDesc " +
-                                   ",CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,ActiveInd,MoveUpstat) " +
-                                   "Values(" + sess.SchoolId + "," + headerId + ",'" + clsGeneral.convertQuotes(txtColumnName.Text.Trim()) + "','" + Convert.ToString(ddlColumnType.SelectedValue) + "' ,'" + clsGeneral.convertQuotes(txtFreqCorrectResponse.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtFreqCorrectResponse.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtfreqIncrctResp.Text.Trim()) + "'," + inclMistrial + ",'" + clsGeneral.convertQuotes(txtFreqIncludeMistrial.Text.Trim()) + "'," + sess.LoginId + ",getdate()," + sess.LoginId + ",getdate(),'A',"+Convert.ToInt16(MoveupOpt.SelectedValue)+") ";
-                            returnId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(insertQuerry, con, Transs));
-
-                            if (chkFrequency.Checked == true)
+                            if (MoveupOpt.SelectedValue == null)
                             {
-                                iiGraph = 0;
-                                if (chkFrequencyIIG.Checked == true)
-                                {
-                                    iiGraph = 1;
-                                }
-                                insertQuerry = "Insert Into DSTempSetColCalc (SchoolId,DSTempSetColId,CalcType,CalcRptLabel,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,ActiveInd,IncludeInGraph) " +
-                                                "Values(" + sess.SchoolId + "," + returnId + ",'" + Convert.ToString(chkFrequency.Text) + "','" + clsGeneral.convertQuotes(txtFrequency.Text.Trim()) + "'," + sess.LoginId + ",getdate()," + sess.LoginId + ",getdate(),'A'," + iiGraph + ") ";
-                                index = Convert.ToInt32(objData.ExecuteWithScopeandConnection(insertQuerry, con, Transs));
+                                tdMsgMeasure.InnerHtml = clsGeneral.warningMsg("Please select \"more than\" or \"less than\" under Advanced Options in the measurement pop-up.");
+                                objData.CommitTransation(Transs, con);
                             }
+                            else
+                            {
+                                insertQuerry = "Insert Into dbo.DSTempSetCol (SchoolId,DSTempHdrId,ColName,ColTypeCd,CorrResp,CorrRespDesc,InCorrRespDesc,IncMisTrialInd,MisTrialDesc " +
+                                   ",CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,ActiveInd,MoveUpstat) " +
+                                   "Values(" + sess.SchoolId + "," + headerId + ",'" + clsGeneral.convertQuotes(txtColumnName.Text.Trim()) + "','" + Convert.ToString(ddlColumnType.SelectedValue) + "' ,'" + clsGeneral.convertQuotes(txtFreqCorrectResponse.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtFreqCorrectResponse.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtfreqIncrctResp.Text.Trim()) + "'," + inclMistrial + ",'" + clsGeneral.convertQuotes(txtFreqIncludeMistrial.Text.Trim()) + "'," + sess.LoginId + ",getdate()," + sess.LoginId + ",getdate(),'A'," + Convert.ToInt16(MoveupOpt.SelectedValue) + ") ";
+                                returnId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(insertQuerry, con, Transs));
 
-                            objData.CommitTransation(Transs, con);
-                            ScriptManager.RegisterClientScriptBlock(UpdatePanel1, UpdatePanel1.GetType(), "", "CloseMeasure();", true);
-                            GetMeasureData(headerId);
-                            //  SetLessonProcedure(headerId);
+                                if (chkFrequency.Checked == true)
+                                {
+                                    iiGraph = 0;
+                                    if (chkFrequencyIIG.Checked == true)
+                                    {
+                                        iiGraph = 1;
+                                    }
+                                    insertQuerry = "Insert Into DSTempSetColCalc (SchoolId,DSTempSetColId,CalcType,CalcRptLabel,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,ActiveInd,IncludeInGraph) " +
+                                                    "Values(" + sess.SchoolId + "," + returnId + ",'" + Convert.ToString(chkFrequency.Text) + "','" + clsGeneral.convertQuotes(txtFrequency.Text.Trim()) + "'," + sess.LoginId + ",getdate()," + sess.LoginId + ",getdate(),'A'," + iiGraph + ") ";
+                                    index = Convert.ToInt32(objData.ExecuteWithScopeandConnection(insertQuerry, con, Transs));
+                                }
+                                objData.CommitTransation(Transs, con);
+                                ScriptManager.RegisterClientScriptBlock(UpdatePanel1, UpdatePanel1.GetType(), "", "CloseMeasure();", true);
+                                GetMeasureData(headerId);
+                                //  SetLessonProcedure(headerId);
+                            }
                         }
                         catch (Exception Ex)
                         {
@@ -13075,7 +13087,22 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 }
             }
         }
-
+        //To check for null moveupstat
+        string qry1 = "SELECT  DSTempSetColId, ColTypeCd, MoveUpstat FROM DSTempSetCol WHERE ActiveInd = 'A' AND DSTempHdrId = " + TemplateId;
+        DataTable dtMoveupstat = objData.ReturnDataTable(qry1, false);
+        foreach (DataRow dr in dtMoveupstat.Rows)
+        {
+            if (dr["ColTypeCd"].ToString() == "Duration" || dr["ColTypeCd"].ToString() == "Frequency")
+            {
+                if (dr["MoveUpstat"] == null || dr["MoveUpstat"] == DBNull.Value)
+                {
+                    message += "Please select \"more than\" or \"less than\" under Advanced Options in the measurement pop-up.";
+                    tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please select \"more than\" or \"less than\" under Advanced Options in the measurement pop-up.");
+                    alertmsg = message; 
+                    break;
+                }
+            }
+        }
         // FUnction to asign sets and steps If the lesson plan is a visual lesson 
         if (message == "")
         {
@@ -13859,6 +13886,21 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
                 if (hdrid != "")
                 {
+                    string qry1 = "SELECT  DSTempSetColId, ColTypeCd, MoveUpstat FROM DSTempSetCol WHERE ActiveInd = 'A' AND DSTempHdrId = " + hdrid;
+                    DataTable dtMoveupstat = objData.ReturnDataTable(qry1, false);
+                    foreach (DataRow dr in dtMoveupstat.Rows)
+                    {
+                        if (dr["ColTypeCd"].ToString() == "Duration" || dr["ColTypeCd"].ToString() == "Frequency")
+                        {
+                            if (dr["MoveUpstat"] == null || dr["MoveUpstat"] == DBNull.Value)
+                            {
+                                message += "Please select \"more than\" or \"less than\" under Advanced Options in the measurement pop-up.";
+                                tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please select \"more than\" or \"less than\" under Advanced Options in the measurement pop-up.");
+                                ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + message + "');", true);
+                                return;
+                            }
+                        }
+                    }
                     if (dt != null)
                     {
 
@@ -19157,8 +19199,6 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         if (promptDDL.SelectedValue != "")
                         {
                             Session["sCurrentPrompt"] = objData.FetchValue("SELECT PromptId FROM DSTempPrompt WHERE DSTempPromptId=" + promptDDL.SelectedValue);
-                            string prmptUpdQry = "UPDATE DSTempStep SET StepByStepPrompt = " + promptDDL.SelectedValue + " WHERE DSTempStepId = " + stepId.Value;
-                            objData.Execute(prmptUpdQry);
                         }
                     }
 
@@ -19694,7 +19734,23 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
                         if (hdrid != "")
                         {
-                            if (dt != null)
+                        string qry1 = "SELECT  DSTempSetColId, ColTypeCd, MoveUpstat FROM DSTempSetCol WHERE ActiveInd = 'A' AND DSTempHdrId = " + hdrid;
+                        DataTable dtMoveupstat = objData.ReturnDataTable(qry1, false);
+                        foreach (DataRow dr in dtMoveupstat.Rows)
+                        {
+                            if (dr["ColTypeCd"].ToString() == "Duration" || dr["ColTypeCd"].ToString() == "Frequency")
+                            {
+                                if (dr["MoveUpstat"] == null || dr["MoveUpstat"] == DBNull.Value)
+                                {
+                                    message += "Please select \"more than\" or \"less than\" under Advanced Options in the measurement pop-up.";
+                                    tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please select \"more than\" or \"less than\" under Advanced Options in the measurement pop-up.");
+                                    alertmsg = message;
+                                    ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
+                                    return;
+                                }
+                            }
+                        }
+                        if (dt != null)
                             {
 
                                 int colcnt = dt.Columns.Count;  // colcnt=2 for Discrete and colcnt=3 for chained
