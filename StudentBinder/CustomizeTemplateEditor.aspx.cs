@@ -13162,6 +13162,29 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         return;
                     }
 
+                     string strdupsort = "SELECT SortOrder as sortorder, COUNT(*) as count FROM DSTempSet where ActiveInd='A' and DSTempHdrId=" + TemplateId + " GROUP BY SortOrder HAVING COUNT(*) > 1";
+                     DataTable dtdupsort = objData.ReturnDataTable(strdupsort, false);
+                     string setname = "";
+                     if (dtdupsort != null)
+                     {
+                         if (dtdupsort.Rows.Count > 0)
+                         {
+                             foreach (DataRow dr in dtdupsort.Rows)
+                             {
+                                 int sortno = Convert.ToInt32(dr["sortorder"]);
+                                 string strsetnames = "select STUFF((SELECT ' - ' + setcd FROM DSTempSet where SortOrder=" + sortno + " and ActiveInd='A' and DSTempHdrId=" + TemplateId + " FOR XML PATH('')), 1, 2, '') AS setname";
+                                 setname = setname + " (" + Convert.ToString(objData.FetchValue(strsetnames)) + " ) ";
+                             }
+                             tdReadMsg.InnerHtml = clsGeneral.warningMsg("The following sets" + setname + " contain duplicate sortorder please remove and add them again to avoid data submission failure");
+                             alertmsg = "The following sets" + setname + " contain duplicate sortorder please remove and add them again to avoid data submission failure";
+                             FillTypeOfInstruction(TemplateId);
+                             ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
+                             return;
+
+                         }
+                     }
+
+
                     if (skilltype == "Chained")
                     {
 
@@ -13794,7 +13817,29 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     return;
                 }
 
-                 if (skilltype == "Chained")
+                string strdupsort = "SELECT SortOrder as sortorder, COUNT(*) as count FROM DSTempSet where ActiveInd='A' and DSTempHdrId=" + TemplateId + " GROUP BY SortOrder HAVING COUNT(*) > 1";
+                DataTable dtdupsort = objData.ReturnDataTable(strdupsort, false);
+                string setname = "";
+                if (dtdupsort != null)
+                {
+                    if (dtdupsort.Rows.Count > 0)
+                    {
+                        foreach (DataRow dr in dtdupsort.Rows)
+                        {
+                            int sortno = Convert.ToInt32(dr["sortorder"]);
+                            string strsetnames = "select STUFF((SELECT ' - ' + setcd FROM DSTempSet where SortOrder=" + sortno + " and ActiveInd='A' and DSTempHdrId=" + TemplateId + " FOR XML PATH('')), 1, 2, '') AS setname";
+                            setname = setname + " (" + Convert.ToString(objData.FetchValue(strsetnames)) + " ) ";
+                        }
+
+                        previewSuccess = false;
+                        tdReadMsg.InnerHtml = clsGeneral.warningMsg("The following sets" + setname + " contain duplicate sortorder please remove and add them again to avoid data submission failure");
+                        FillTypeOfInstruction(TemplateId);
+                        return;  
+                    }
+                }
+
+
+                if (skilltype == "Chained")
                     {
                         string strQrystepTot = "SELECT Count(DSTempParentStepId) from DSTempParentStep where DSTempHdrId=" + TemplateId + "  and ActiveInd='A'";
                         int dtCheckstepTot = Convert.ToInt32(objData.FetchValue(strQrystepTot));
@@ -19602,6 +19647,29 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             FillTypeOfInstruction(TemplateId);
                             ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
                             return;
+                        }
+
+
+                        string strdupsort = "SELECT SortOrder as sortorder, COUNT(*) as count FROM DSTempSet where ActiveInd='A' and DSTempHdrId=" + TemplateId + " GROUP BY SortOrder HAVING COUNT(*) > 1";
+                        DataTable dtdupsort = objData.ReturnDataTable(strdupsort, false);
+                        string setname = "";
+                        if (dtdupsort != null)
+                        {
+                            if (dtdupsort.Rows.Count > 0)
+                            {
+                                foreach (DataRow dr in dtdupsort.Rows)
+                                {
+                                    int sortno = Convert.ToInt32(dr["sortorder"]);
+                                    string strsetnames = "select STUFF((SELECT ' - ' + setcd FROM DSTempSet where SortOrder=" + sortno + " and ActiveInd='A' and DSTempHdrId=" + TemplateId + " FOR XML PATH('')), 1, 2, '') AS setname";
+                                    setname = setname + " (" + Convert.ToString(objData.FetchValue(strsetnames)) + " ) ";
+                                }
+
+                                tdReadMsg.InnerHtml = clsGeneral.warningMsg("The following sets" + setname + " contain duplicate sortorder please remove and add them again to avoid data submission failure");
+                                alertmsg = "The following sets" + setname + " contain duplicate sortorder please remove and add them again to avoid data submission failure";
+                                FillTypeOfInstruction(TemplateId);
+                                ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
+                                return;
+                            }
                         }
 
                    if (skilltype == "Chained")
