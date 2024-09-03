@@ -6374,7 +6374,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         int getColId = Convert.ToInt32(dr["DSTempSetColId"]);
                         string getFreDurMoveStat = "SELECT Moveupstat FROM DSTempSetCol DsCol INNER JOIN DSTempHdr Hdr on Hdr.DSTempHdrId = DsCol.DSTempHdrId WHERE DsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + getColId;
                         object FreDurStat = oData.FetchValue(getFreDurMoveStat);
-                        if (FreDurStat != null)
+                        if (FreDurStat != null && FreDurStat != DBNull.Value)
                         {
                             chainedInptData.FreDurMoveStat = Convert.ToInt16(FreDurStat);
                         }
@@ -6546,7 +6546,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                                 string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
                                 object stat = oData.FetchValue(selqry1);
-                                if (stat != null)
+                                if (stat != null && stat != DBNull.Value)
                                     MoveUpstat = Convert.ToInt16(stat);
                                 #region MoveUp in Less than critera-Default
                                 if (MoveUpstat == 1)
@@ -7648,7 +7648,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                                 string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
                                 object stat = oData.FetchValue(selqry1);
-                                if (stat != null)
+                                if (stat != null && stat != DBNull.Value)
                                     MoveUpstat = Convert.ToInt16(stat);
                                 #region MoveUp on Less than-default
                                 if (MoveUpstat == 1)
@@ -8472,7 +8472,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                                 string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
                                 object stat = oData.FetchValue(selqry1);
-                                if (stat != null)
+                                if (stat != null && stat != DBNull.Value)
                                     MoveUpstat = Convert.ToInt16(stat);
                                 #region MoveUp on Less Than- Default
                                 if (MoveUpstat == 1)
@@ -9428,7 +9428,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                                 string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
                                 object stat = oData.FetchValue(selqry1);
-                                if (stat != null)
+                                if (stat != null && stat != DBNull.Value)
                                     MoveUpstat = Convert.ToInt16(stat);
                                 #region MoveUp on Less than-default
                                 if (MoveUpstat == 1)
@@ -12337,7 +12337,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                             string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
                             object stat = oData.FetchValue(selqry1);
-                            if (stat != null)
+                            if (stat != null && stat != DBNull.Value)
                                 MoveUpstat = Convert.ToInt16(stat);
                             #region MoveUp in Less Than criteria- default
                             if (MoveUpstat == 1)
@@ -13370,7 +13370,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                             string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
                             object stat = oData.FetchValue(selqry1);
-                            if (stat != null)
+                            if (stat != null && stat != DBNull.Value)
                                 MoveUpstat = Convert.ToInt16(stat);
                             #region MoveUp in Less Than criteria - Default
                             if (MoveUpstat == 1)
@@ -16142,7 +16142,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             int getColId = Convert.ToInt32(dr["DSTempSetColId"]);
                             string getFreDurMoveStat = "SELECT Moveupstat FROM DSTempSetCol DsCol INNER JOIN DSTempHdr Hdr on Hdr.DSTempHdrId = DsCol.DSTempHdrId WHERE DsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + getColId;
                             object FreDurStat = oData.FetchValue(getFreDurMoveStat);
-                            if (FreDurStat != null)
+                            if (FreDurStat != null && FreDurStat != DBNull.Value)
                             {
                                 chainedInptData.FreDurMoveStat = Convert.ToInt16(FreDurStat);
                             }
@@ -16316,7 +16316,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                                     string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
                                     object stat = oData.FetchValue(selqry1);
-                                    if (stat != null)
+                                    if (stat != null && stat != DBNull.Value)
                                         MoveUpstat = Convert.ToInt16(stat);
                                     #region MoveUp in Less than critera-Default
                                     if (MoveUpstat == 1)
@@ -17546,7 +17546,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                                     string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
                                     object stat = oData.FetchValue(selqry1);
-                                    if (stat != null)
+                                    if (stat != null && stat != DBNull.Value)
                                         MoveUpstat = Convert.ToInt16(stat);
                                     #region MoveUp on Less than-default
                                     if (MoveUpstat == 1)
@@ -18470,7 +18470,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                                     string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
                                     object stat = oData.FetchValue(selqry1);
-                                    if (stat != null)
+                                    if (stat != null && stat != DBNull.Value)
                                         MoveUpstat = Convert.ToInt16(stat);
                                     #region MoveUp on Less Than- Default
                                     if (MoveUpstat == 1)
@@ -19499,7 +19499,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                                     string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
                                     object stat = oData.FetchValue(selqry1);
-                                    if (stat != null)
+                                    if (stat != null && stat != DBNull.Value)
                                         MoveUpstat = Convert.ToInt16(stat);
                                     #region MoveUp on Less than-default
                                     if (MoveUpstat == 1)
@@ -22115,7 +22115,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                                 string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
                                 object stat = oData.FetchValue(selqry1);
-                                if (stat != null)
+                                if (stat != null && stat != DBNull.Value)
                                     MoveUpstat = Convert.ToInt16(stat);
                                 #region MoveUp in Less Than criteria- default
                                 if (MoveUpstat == 1)
@@ -23111,7 +23111,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                                 string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
                                 object stat = oData.FetchValue(selqry1);
-                                if (stat != null)
+                                if (stat != null && stat != DBNull.Value)
                                     MoveUpstat = Convert.ToInt16(stat);
                                 #region MoveUp in Less Than criteria - Default
                                 if (MoveUpstat == 1)
