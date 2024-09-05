@@ -16162,6 +16162,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         if (dr["ColTypeCd"].ToString() == "Prompt")
                         {
                             bpromptColumn = true;
+                            if (sCurrentPrompt == "+")
+                            {
+                                string promptqry = "SELECT NextPromptId FROM StdtDSStat WHERE DSTempHdrId = " + oTemp.TemplateId;
+                                sCurrentPrompt = oData.FetchValue(promptqry).ToString();
+                            }
+
                         }
                         DiscreteTrials TrialLists = new DiscreteTrials();
                         reader.Close();
