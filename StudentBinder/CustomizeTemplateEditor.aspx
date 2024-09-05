@@ -6642,7 +6642,7 @@
     function autoSave(status) {
         //status will be false only for BtnSubmit click
         if (status) {
-            multiClickCriteria = false;
+            multiClickSubmit = false;
             document.getElementById("<%=BtnSubmit.ClientID%>").style.opacity = 1;
         }
 
@@ -6724,9 +6724,10 @@
             if ($('#<%=txtBoxAddSet.ClientID%>').length > 0) {
                 document.getElementById("<%=txtBoxAddSet.ClientID%>").focus();
             }
-            multiClickSubmit = true;
-            if(!status)
-            document.getElementById("<%=BtnSubmit.ClientID%>").style.opacity = '0.5';
+            if (!status) {
+                multiClickSubmit = true;
+                document.getElementById("<%=BtnSubmit.ClientID%>").style.opacity = '0.5';
+            }
             return true;
         }
         return false;
