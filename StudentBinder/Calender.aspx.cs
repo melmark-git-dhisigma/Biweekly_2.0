@@ -1230,6 +1230,7 @@ public partial class StudentBinder_Calender : System.Web.UI.Page
     {
         ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "CallJS", "view1(this);", true);
         weekview(oSession.days_4weeks);
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
     protected void btnCopyWeek_Click(object sender, EventArgs e)
     {
@@ -1319,7 +1320,7 @@ public partial class StudentBinder_Calender : System.Web.UI.Page
                 }
             }
         }
-
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
     protected void ShowMessage()
     {

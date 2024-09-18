@@ -223,6 +223,32 @@
         }
     </script>
     <script type="text/javascript">
+
+        var multiClickCopy = false;
+        var multiClickReplicate = false;
+
+        function enableButton() {
+            multiClickCopy = false;
+            multiClickCopy = false;
+        }
+        function multiClickCheckCopy(btn) {
+            if (!multiClickCopy) {
+                multiClickCopy = true;
+                btn.style.opacity = '0.5';
+                return true;
+            }
+            return false;
+        }
+
+        function multiClickCheckReplicate(btn) {
+            if (!multiClickReplicate) {
+                multiClickReplicate = true;
+                btn.style.opacity = '0.5';
+                return true;
+            }
+            return false;
+        }
+
         function view(viewDiv) {
             hideSel();
             HideDialog();
@@ -1019,7 +1045,7 @@
                 <table width="100%">
                     <tr>
                         <td style="width: 25%;" align="left">
-                            <asp:Button ID="btnReplicate" runat="server" Text="Copy Selected Week" CssClass="NFButtonWithNoImage" Width="235px" onclick="btnReplicate_Click" class ="divMenu"/></td>
+                            <asp:Button ID="btnReplicate" runat="server" Text="Copy Selected Week" CssClass="NFButtonWithNoImage" Width="235px" onclick="btnReplicate_Click" OnClientClick="return multiClickCheckReplicate(this);" class ="divMenu"/></td>
                         <td style="width: 25%;" align="right">
                             <asp:Label ID="lblDate" runat="server" Font-Bold="True"></asp:Label>
                             <asp:HiddenField ID="hfMode" runat="server" />
@@ -1199,7 +1225,7 @@
                                                             HorizontalAlign="Center" BorderColor="Black" BorderWidth="1 px" Font-Bold="True" Font-Size="10pt" />
                                                     </asp:Calendar>
                                                     <hr />
-                                                    <asp:Button ID="btnCopyWeek" runat="server" Text="Copy To Current Week" CssClass="NFButtonWithNoImage" Width="235px" onclick ="btnCopyWeek_Click" class ="divMenu"/>
+                                                    <asp:Button ID="btnCopyWeek" runat="server" Text="Copy To Current Week" CssClass="NFButtonWithNoImage" Width="235px" onclick ="btnCopyWeek_Click" OnClientClick="return multiClickCheckCopy(this);" class ="divMenu"/>
                                                 </div>
                                                     </td>
                                             <td align="center" style="vertical-align: top;"></td>
