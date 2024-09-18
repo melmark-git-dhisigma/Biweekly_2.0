@@ -34,7 +34,7 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
         try
         {
             rbtnClassType.Visible = false;
-            chk_min_sec.Visible = false;
+            tableDurFormat.Visible = false;
             if (Validation() == true)
             {
                 GenerateReport();
@@ -353,8 +353,8 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
     protected void btnRefresh_Click(object sender, ImageClickEventArgs e)
     {
         rbtnClassType.Visible = false;
-        chk_min_sec.Visible = false;
-        chk_min_sec.Checked = false;
+        tableDurFormat.Visible = false;
+        radBtnDurationFormat.SelectedValue = "0";
         rbtnClassType.SelectedIndex = 2; 
         txtRepStart.Text = string.Empty;
         txtrepEdate.Text = string.Empty;
@@ -384,7 +384,7 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
                 btnExport.Visible = true;
                 tdMsg.Visible = false;
                 td1.Visible = false;
-                chk_min_sec.Visible = true;
+                tableDurFormat.Visible = true;
             }
             else
             {
@@ -495,14 +495,7 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
             SqlDataAdapter DAdap = null;
             SqlCommand cmd = null;
             DataTable Dt = new DataTable();
-            if (chk_min_sec.Checked == true)
-            {
-                timestatus = 1;
-            }
-            else
-            {
-                timestatus = 0;                
-            }
+            timestatus = Convert.ToInt32(radBtnDurationFormat.SelectedValue);
             SqlConnection con = ObjData.Open();
             try
             {
@@ -581,14 +574,7 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
             SqlDataAdapter DAdap = null;
             SqlCommand cmd = null;
             DataTable Dt = new DataTable();
-            if (chk_min_sec.Checked == true)
-            {
-                timestatus = 1;
-            }
-            else
-            {
-                timestatus = 0;                
-            }
+            timestatus = Convert.ToInt32(radBtnDurationFormat.SelectedValue);
             SqlConnection con = ObjData.Open();
          
             try
