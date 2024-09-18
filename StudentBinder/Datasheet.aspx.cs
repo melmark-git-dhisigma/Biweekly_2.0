@@ -3512,18 +3512,27 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         if (Session["UserDecision"] != null && (bool)Session["UserDecision"])
         {
              string operation = Session["Operation"] as string;
-
-             if (operation == "Operation1")
-             {
-                 // Continue with the process
-                 btnSave_Click(sender, e);
-             }
-             else if (operation == "Operation2")
-             {
-                 // Continue with the second operation
-                 ConfirmSubmission(sender, e);
-                 //Response.Write("Operation 2 continued...");
-             }
+             generateMeasurmntTable();
+            if (operation == "Operation1")
+            {
+                // Continue with the process
+                //ScriptManager.RegisterStartupScript(this, this.GetType(), "", "console.log('btnContinueProcess_Click Inside');", true);
+                //generateMeasurmntTable();
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "btnContinueProcess_triggerSaveConfirmClick", "triggerSaveConfirmClick();", true);
+            }
+            else if (operation == "Operation2")
+            {
+                if (Session["SubmissionAction"] == "Submit Scores")
+                {
+                    // Continue with the second operation
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "btnContinueProcessTriggerSubmitAndRepeatClick", "triggerSubmitConfirmClick();", true);
+                    //Response.Write("Operation 2 continued...");
+                }
+                else
+                {
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "btnContinueProcessTriggerSubmitAndRepeatConfirmClick", "triggerSubmitAndRepeatConfirmClick();", true);
+                }
+            }
         }
         else
         {
@@ -4927,7 +4936,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             {
                 modifieddate = objSessHdrUpdateTime.Rows[0]["ModifiedOn"].ToString();
                 modifiedby = objSessHdrUpdateTime.Rows[0]["Modfullname"].ToString();
-        }
+            }
         }
         InstantHdrModifiedDate = modifieddate;
         if (Session["HdrModifiedDate"]!=null)
@@ -4941,11 +4950,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         if ((InstantHdrModifiedDate != HdrModifiedDate))
         {
             //ScriptManager.RegisterStartupScript(this, this.GetType(), "popupTrigger", "popUpTriggerClick();", true);
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "Popup", "openPopup('The lesson has been updated by " + modifiedby + " at " + modifieddate + ", are you sure you want to overwrite their changes?', 'Operation1');", true);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "btnSave_ClickCheckPopup", "openPopup('The lesson has been updated by " + modifiedby + " at " + modifieddate + ", are you sure you want to overwrite their changes?', 'Operation1');", true);
         }
         else
         {
-            btnSave_Click(sender,e);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "btnSave_ClickChecktriggerSaveConfirmClick", "triggerSaveConfirmClick();", true);
         }
         ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
@@ -4966,12 +4975,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         }
         if (!alreadydisc)
         {
-        SaveDraft();
-        if (Convert.ToBoolean(ViewState["IsHistory"]) == true)
-        {
-            oDS.VTLessonId = 0;
-            //ScriptManager.RegisterStartupScript(this, this.GetType(), "closewindow", "closeIframe1(" + oSession.StudentId + ");", true);
-        }
+            SaveDraft();
+            if (Convert.ToBoolean(ViewState["IsHistory"]) == true)
+            {
+                oDS.VTLessonId = 0;
+                //ScriptManager.RegisterStartupScript(this, this.GetType(), "closewindow", "closeIframe1(" + oSession.StudentId + ");", true);
+            }
         }
         else
         {
@@ -4996,7 +5005,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             con = oData.Open();
             trans = con.BeginTransaction();
             if (updateDraft(Convert.ToInt32(ViewState["StdtSessHdr"]), "Save", con, trans))
-            {               
+            {
                 bool reslt2 = SaveMeasuremnts(Convert.ToInt32(ViewState["StdtSessHdr"].ToString()), con, trans);
                 if (reslt2)
                 {
@@ -5155,10 +5164,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         updateCheck = true;
                         //if (!IsMaintanace)
                         //{
-                           // SaveIOAPercentage();
-                            string strQry = "SELECT DSTempSetColId,ColName,ColTypeCd from DSTempSetCol WHERE DSTempHdrId=" + oTemp.TemplateId + " And  SchoolId = " + oSession.SchoolId + "  And ActiveInd='A'";
-                            DataTable dt = oData.ReturnDataTable(strQry, false);
-                            int count = dt.Rows.Count;
+                        // SaveIOAPercentage();
+                        string strQry = "SELECT DSTempSetColId,ColName,ColTypeCd from DSTempSetCol WHERE DSTempHdrId=" + oTemp.TemplateId + " And  SchoolId = " + oSession.SchoolId + "  And ActiveInd='A'";
+                        DataTable dt = oData.ReturnDataTable(strQry, false);
+                        int count = dt.Rows.Count;
 
                             int measureCount = 0;
                             string sql = " SELECT  Count(Distinct(dc.DSTempSetColId)) FROM DSTempHdr DT " +
@@ -6523,11 +6532,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     // else
                     //    bIOA = false;
                     //Trials = trails.GetTrialLists(8, 1, ht[key].RequiredSession(), key);
-                    string stepValue = TrialLists.value;                    
+                    string stepValue = TrialLists.value;
                     int reqSess = chainedCols[sColName].RequiredSession();
                     chainedCols[sColName].SessionCount = TrialLists.sessionCount;
                     chainedCols[sColName].StepCount = TrialLists.trialsCount;
-                    chainedCols[sColName].PromptsUsed = promptUsed;                    
+                    chainedCols[sColName].PromptsUsed = promptUsed;
                     chainedCols[sColName].TotalSets = TrialLists.totalSet;
                     chainedCols[sColName].NoPromptsUsed = LessonpromptUsed;
                     chainedCols[sColName].sCurrentLessonPrompt = sCurrentLessonPrompt;
@@ -31411,12 +31420,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             {
                 modifieddate = objSessHdrUpdateTime.Rows[0]["CreatedOn"].ToString();
                 modifiedby = objSessHdrUpdateTime.Rows[0]["Createdfullname"].ToString();
-        }
-        else
-        {
+            }
+            else
+            {
                 modifieddate = objSessHdrUpdateTime.Rows[0]["ModifiedOn"].ToString();
                 modifiedby = objSessHdrUpdateTime.Rows[0]["Modfullname"].ToString();
-        }
+            }
         }
         InstantHdrModifiedDate = modifieddate;
         if (Session["HdrModifiedDate"] != null)
@@ -31437,7 +31446,14 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         }
         else
         {
-            ConfirmSubmission(sender, e);
+            if (SubmissionAction == "Submit Scores")
+            {
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ConfirmSubmissionCheckSubmitConfirmClick", "triggerSubmitConfirmClick();", true);
+            }
+            else
+            {
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ConfirmSubmissionCheckRepeatConfirmClick", "triggerSubmitAndRepeatConfirmClick();", true);
+            }
         }
     }
 
@@ -31695,11 +31711,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             {
                 if (bText == "Submit Scores")
                 {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "triggerSubmitClick();", true);
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "", "triggerSubmitClick();", true);
                 }
                 else
                 {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "triggerSubmitAndRepeatClick();", true);
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "", "triggerSubmitAndRepeatClick();", true);
                 }
             }
         }
@@ -32068,6 +32084,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
     protected void continue_btn_Click(object sender, EventArgs e)
     {
+        generateMeasurmntTable();
         hdnMissTrialRsn.Value = hdnChkdRsn.Value;
         mistrialRsn.Text = hdnMissTrialRsn.Value;
         ScriptManager.RegisterStartupScript(this, this.GetType(), "UncheckAll", "UncheckAll();", true);
