@@ -40,6 +40,7 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
     {
 
         oSession = (clsSession)Session["UserSession"];
+        Prevsess = (clsSession)Session["PreSession"];
 
         if (oSession == null)
         {
@@ -1704,10 +1705,14 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
             if (txtLPname.Text.Trim().Length == 0)
             {
                 ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "alert('LessonPlan name cannot be null');", true);
+                ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "showAddLp();", true);
+
             }
             else if (ddlGoals.SelectedIndex == 0)
             {
                 ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "alert('Select any Goal');", true);
+                ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "showAddLp();", true);
+
             }
         }
         else
@@ -1738,9 +1743,12 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
             if (StudentLp > 0)
             {
                 ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "alert('Lesson plan name already exist. Please enter another name...');", true);
+                ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "showAddLp();", true);
+
             }
             else
             {
+                ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "Hideloading();", true);
                 AddLessonPlan();
                 lbLPBank_Click(sender, e);  //call the all lessonplan in bank button click to refill the choose goal and LP section.....
                 clearAddNewLesson();

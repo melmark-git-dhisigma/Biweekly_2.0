@@ -87,7 +87,19 @@
     </style>
 
     <script type="text/javascript">
-       
+        function HideButton() {
+            $('.fullOverlay').fadeIn('slow', function () {
+                $('#AddLPDiv').fadeOut();
+                $('.innerLoading').fadeIn();
+            });
+
+        }
+        function showAddLp() {
+            $('#AddLPDiv').fadeIn();
+        }
+        function Hideloading() {
+            $('.innerLoading').fadeOut();
+        }
         function adjustStyle(width) {
             width = parseInt(width);
             if (width >= 988) {
@@ -675,7 +687,7 @@
             z-index: 9999;
         }
 
-        }
+        
 
         #closeLP {
             display: block;
@@ -712,9 +724,25 @@
         .auto-style1 {
             height: 30px;
         }
+        .innerLoading {
+             display: none;
+            margin: auto;
+            height: 50px;
+            width: 250px;
+            text-align: center;
+            font-weight: bold;
+            font-size: large;
+        }
+
+            .innerLoading img {
+                margin-top: 200px;
+                height: 10px;
+                width: 100px;
+            }
     </style>
     <script type="text/javascript">
         function closePOP(goalId, LessonId) {
+            $('.innerLoading').fadeOut();
             $('#AddLPDiv').fadeOut('slow', function () {
                 $('.fullOverlay').fadeOut('fast', function () {
                     if (parseInt(goalId, 10) > 0) {
@@ -789,7 +817,11 @@
     <form id="form1" runat="server">
        
         <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePageMethods="true"></asp:ScriptManager>
-
+         <div class="loading">
+            <div class="innerLoading">
+                <img src="../Administration/images/load.gif" alt="loading" />
+                Please Wait...
+            </div>
         <div>
             <div class="boxContainerContainer">
                 <!-------------------------Top Container Start----------------------->
@@ -1147,7 +1179,7 @@
                                         <tr>
                                             <td class="auto-style1"></td>
                                             <td class="auto-style1">
-                                                <asp:Button ID="btnAddLP" runat="server" CssClass="NFButtonWithNoImage" Width="100px" Text="Submit"  OnClick="btnAddLP_Click" /></td> 
+                                                <asp:Button ID="btnAddLP" runat="server" CssClass="NFButtonWithNoImage" Width="100px" Text="Submit"  OnClick="btnAddLP_Click" onClientClick="HideButton();"/></td> 
                                            <%-- OnClientClick="disableButton();"--%>
                                         </tr>
                                         <tr>
