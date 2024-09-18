@@ -387,23 +387,19 @@
             UpperMenuButtonPanel.style.visibility = "visible";
         }
         function triggerSubmitClick() {
-            //$('#btnSubmit1').trigger("click");
-            var submitButton = document.getElementById('<%= btnSubmit1.ClientID %>');
-            if (submitButton) {
-                submitButton.click();
-            } else {
-                console.error('Submit button not found');
-            }
+            $('#btnSubmit1').trigger("click");
         }
-
+        function triggerSaveConfirmClick() {
+            $('#btnSaveConfirm').trigger("click");
+        }
+        function triggerSubmitConfirmClick() {
+            $('#btnSubmitConfirm').trigger("click");
+        }
+        function triggerSubmitAndRepeatConfirmClick() {
+            $('#btnSubmitAndRepeatConfirm').trigger("click");
+        }
         function triggerSubmitAndRepeatClick() {
-            //$('#btnSubmitAndRepeat1').trigger("click");
-            var submitRptButton = document.getElementById('<%= btnSubmitAndRepeat1.ClientID %>');
-            if (submitRptButton) {
-                submitRptButton.click();
-            } else {
-                console.error('Submit and Repeat button not found');
-            }
+            $('#btnSubmitAndRepeat1').trigger("click");
         }
         function checkclN() {
             sessionStorage.setItem('DataCl', 'false');
@@ -3316,6 +3312,7 @@
              }
          }
          function closedatasheet() {
+            hideOverlay();
              sessionStorage.setItem('DataCl', 'false');
          }
 
@@ -3335,7 +3332,13 @@
                          // Continue with the process
                          //__doPostBack('btnContinueProcess', '');
                          //$('#btnContinueProcess').trigger("click");
-                         document.getElementById('btnContinueProcess').click();
+                         //document.getElementById('btnContinueProcess').click();
+                         var btnContinue = document.getElementById('btnContinueProcess');
+                         if (btnContinue) {
+                             $('#btnContinueProcess').trigger('click');
+                         } else {
+                             //console.log("btnContinueProcess not found.");
+                         }
                      } else {
                          // Exit the process
                      }
@@ -3376,7 +3379,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <span class="close" onclick="closePopup(false)">&times;</span>
-                    <span class="popup-headder" style="font-size:x-large;">Data Update Warning</span>
+                    <span class="popup-headder" style="font-size:x-large;">Notice</span>
                 </div>
                 <div class="modal-body">
                     <p id="customMessage">A new data update has occurred since your last fetch. Please reload the datasheet to avoid overwriting the latest update with your data.</p>
@@ -3441,7 +3444,8 @@
 
                                         <ContentTemplate>
                                             <%--<asp:Button ID="btnPriorSessn1" CssClass="NFButtonNew" runat="server" Text="Prior Sessions" OnClick="btnPriorSessn_Click" Style="height: 30px !important; font-size: 10px;" />--%>
-                                            <asp:Button ID="btnSave1" runat="server" Text="Save Draft" CssClass="NFButtonNew" Style="font-size: 12px" OnClientClick="loadBeforeSave('Save');" OnClick="btnSave_ClickCheck" />
+                                            <asp:Button ID="btnSave1" runat="server" Text="Save Draft" CssClass="NFButtonNew" Style="font-size: 12px" OnClick="btnSave_ClickCheck" />
+                                            <asp:Button ID="btnSaveConfirm" runat="server" Text="Save Draft" CssClass="NFButtonNew" Style="font-size: 12px;display: none;" OnClientClick="loadBeforeSave('Save');" OnClick="btnSave_Click"/>
                                             <asp:HiddenField ID="printPrev" runat="server" Value="0" />
                                             <%--<asp:Button ID="btnSubmit1" runat="server" Text="Submit Scores" CssClass="NFButtonNew" style="font-size:12px; display:none;" OnClientClick="return loadBeforeSave('Submit');" OnClick="btnSubmit_Click" />                                     
                                             <asp:Button ID="btnSubmit2" runat="server" Text="Submit Scores" CssClass="NFButtonNew" style="font-size:12px" OnClientClick="return submitMe(this);" OnClick="ConfirmSubmission" />
@@ -3451,15 +3455,16 @@
 
 
                                             <asp:Button ID="btnSubmit1" runat="server" Text="Submit Scores" CssClass="NFButtonNew" Style="font-size: 12px; display: none;" OnClientClick="return loadBeforeSave('Submit');" OnClick=" btnSubmit_Click" />
-                                            <asp:Button ID="btnSubmit2" runat="server" Text="Submit Scores" CssClass="NFButtonNew" Style="font-size: 10px" OnClientClick="closecheckSubmit();" OnClick="ConfirmSubmissionCheck" />
-                                            <asp:Button ID="btnFinalSubmit" runat="server" OnClick="ConfirmSubmission" Style="display:none;" />
+                                            <asp:Button ID="btnSubmit2" runat="server" Text="Submit Scores" CssClass="NFButtonNew" Style="font-size: 10px" OnClick="ConfirmSubmissionCheck" />
+                                            <asp:Button ID="btnSubmitConfirm" runat="server" Text="Submit Scores" CssClass="NFButtonNew" Style="font-size: 10px;display: none;" OnClientClick="closecheck(); " OnClick="ConfirmSubmission" />
                                             <asp:Button ID="btnSubmitAndRepeat1" runat="server" Text="Submit & Repeat" CssClass="NFButtonNew" Style="font-size: 10px; display: none;" OnClientClick="return submitMe(this);" OnClick="btnSubmitAndRepeat_Click" />
 <%--                                            <asp:Button ID="btnDiscard" runat="server" Text="Discard" CssClass="NFButtonNew" Style="font-size: 12px; display: none;" OnClientClick="return submitDisable(this);" OnClick="btnDiscard_ok_Click" />--%>
-                                            <asp:Button ID="btnSubmitAndRepeat3" runat="server" Text="Submit & Repeat" CssClass="NFButtonNew" Style="font-size: 10px" OnClientClick="closecheck(); " OnClick="ConfirmSubmissionCheck" />
-                                           <asp:Button ID="Print1" runat="server" Text="Print Blank" CssClass="NFButtonNew" Style="font-size: 12px" OnClientClick ="return multiClickCheckPrint(this);" onclick ="btnSave2_Click" /> <!--OnClientClick="printpage1();SaveData();"-->
+                                            <asp:Button ID="btnSubmitAndRepeat3" runat="server" Text="Submit & Repeat" CssClass="NFButtonNew" Style="font-size: 10px" OnClick="ConfirmSubmissionCheck" />
+                                            <asp:Button ID="btnSubmitAndRepeatConfirm" runat="server" Text="Submit & Repeat" CssClass="NFButtonNew" Style="font-size: 10px;display: none;" OnClientClick="closecheck(); " OnClick="ConfirmSubmission"/>
+                                           <asp:Button ID="Print1" runat="server" Text="Print Blank" CssClass="NFButtonNew" Style="font-size: 12px" onclick ="btnSave2_Click" /> <!--OnClientClick="printpage1();SaveData();"-->
                                             <asp:Button ID="print2" runat="server" Text="Print" CssClass="NFButtonNew" Style="font-size: 12px" Visible="false" OnClientClick="printpage1(); printpage(); " OnClick="btnNotSave_Click"   />
 <%--                                        <asp:Button ID="btnDiscardDatasheet" Text="Discard Datasheet" runat="server" CssClass="NFButtonNew" Style="font-size: 12px" onclick="btnDiscardDatasheet_Click"/>--%>
-											<asp:Button ID="btnDiscardDatasheet" Text="Discard Datasheet" runat="server" CssClass="NFButtonNew" Style="font-size: 12px" OnClientClick="return multiClickCheckDiscard(this);" OnClick="btnDiscardDatasheet_Click"/>
+											<asp:Button ID="btnDiscardDatasheet" Text="Discard Datasheet" runat="server" CssClass="NFButtonNew" Style="font-size: 12px" OnClick="btnDiscardDatasheet_Click"/>
 
                                             
                                             <%--<asp:Button ID="btnProbe1" runat="server" Text="Probe Mode" CssClass="NFButtonNew" OnClientClick="probe();" OnClick="btnProbe_Click" Style="height: 30px !important; font-size: 10px;" />--%>
@@ -4054,12 +4059,15 @@
                         <ContentTemplate>
 
                             <asp:Button ID="ImgBtn_Inactive" CssClass="NFButtonNew" Text="Inactivate" runat="server" OnClientClick="javascript: return confirm('Are you sure you want to Inactivate?')" OnClick="ImgBtn_Inactive_Click" Style="background-color: red; color: white; font-size: 12px" />
-                            <asp:Button ID="btnPriorSessn" CssClass="NFButtonNew" Style="font-size: 12px" runat="server" Text="View Prior Sessions" OnClick="btnPriorSessn_Click" OnClientClick="return multiClickCheckViewPrior(this); scrollToTop()" />
-                            <asp:Button ID="btnSave" runat="server" Text="Save Draft" Style="font-size: 12px" CssClass="NFButtonNew" OnClientClick="loadBeforeSave('Save'); scrollToTop();" OnClick="btnSave_ClickCheck" />
+                            <asp:Button ID="btnPriorSessn" CssClass="NFButtonNew" Style="font-size: 12px" runat="server" Text="View Prior Sessions" OnClick="btnPriorSessn_Click" OnClientClick="scrollToTop()" />
+                            <asp:Button ID="btnSave" runat="server" Text="Save Draft" Style="font-size: 12px" CssClass="NFButtonNew" OnClick="btnSave_ClickCheck" OnClientClick="scrollToTop();" />
+                            <asp:Button ID="btnSaveBottomConfirm" runat="server" Text="Save Draft" Style="font-size: 12px;display: none;" CssClass="NFButtonNew" OnClientClick="loadBeforeSave('Save'); scrollToTop();" OnClick="btnSave_Click" />
                             <asp:Button ID="btnProbe" runat="server" Text="Probe Mode" Style="font-size: 12px" CssClass="NFButtonNew" OnClientClick="probe();" OnClick="btnProbe_Click" />
                             <asp:Button ID="ImgBtn_Override" runat="server" Style="font-size: 12px" BackColor="#03507d" CssClass="NFButtonNew" Text="Override" OnClientClick="scrollToTop(); return popOverride(); " />
-                            <asp:Button ID="btnSubmit" runat="server" Text="Submit Scores" Style="font-size: 12px" CssClass="NFButtonNew" OnClick="ConfirmSubmissionCheck" OnClientClick="closecheckSubmit(); scrollToTop();" />
-                            <asp:Button ID="btnSubmitAndRepeat2" runat="server" Style="font-size: 12px" Text="Submit & Repeat" CssClass="NFButtonNew" OnClick="ConfirmSubmissionCheck" OnClientClick="closecheck(); scrollToTop();" />
+                            <asp:Button ID="btnSubmit" runat="server" Text="Submit Scores" Style="font-size: 12px" CssClass="NFButtonNew" OnClick="ConfirmSubmissionCheck" OnClientClick="scrollToTop();" />
+                            <asp:Button ID="btnSubmitBottomConfirm" runat="server" Text="Submit Scores" Style="font-size: 12px;display: none;" CssClass="NFButtonNew" OnClick="ConfirmSubmission" OnClientClick="scrollToTop();" />
+                            <asp:Button ID="btnSubmitAndRepeat2" runat="server" Style="font-size: 12px" Text="Submit & Repeat" CssClass="NFButtonNew" OnClick="ConfirmSubmissionCheck" OnClientClick="scrollToTop();" />
+                            <asp:Button ID="btnSubmitAndRepeatBottomConfirm" runat="server" Style="font-size: 12px;display: none;" Text="Submit & Repeat" CssClass="NFButtonNew" OnClick="ConfirmSubmission" OnClientClick="scrollToTop();"/>
                             <asp:Button ID="btnAddTrial" runat="server" Text="Add Trials" CssClass="NFButtonNew" OnClick="btnAddTrial_Click" Style="float: right; font-size: 12px" OnClientClick="loadBeforeSave('Save'); scrollToTop();" />
                             <asp:Label ID="LabelvisualToolEdit" runat="server" Text="Label" Visible="false" Style="color: red; font-size: 17px; padding: 5px;"></asp:Label>
 

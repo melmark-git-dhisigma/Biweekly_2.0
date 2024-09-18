@@ -1393,6 +1393,8 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     {
                         if (totalTaskType == "Randomized")
                         {
+                            sqlStr = "SELECT [DSTempStepId],[StepCd]+' - '+[StepName] as StepCd,[StepName],SortOrder as StepId  FROM [dbo].[DSTempStep] " +
+                                " WHERE DSTempHdrId=" + oTemp.TemplateId + " AND  DsTempSetId=" + SetId + " AND ActiveInd='A' AND IsDynamic=0 ORDER BY [SortOrder]";
                             Session["totalRandom"] = "Randomized";
                             if (ViewState["StdtSessHdr"] != null)
                             {
@@ -1541,22 +1543,103 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
     }
     protected void SortstepTable(DataTable sorttable, int[] sortOrder)
     {
-        DataTable sortedTable = sorttable.Clone();
+            //DataTable sortedTable = sorttable.Clone();
 
-        foreach (int id in sortOrder)
-        {
+            //foreach (int id in sortOrder)
+            //{
+            //    foreach (DataRow row in sorttable.Rows)
+            //    {
+            //        if (Convert.ToInt32(row["StepId"]) == id)
+            //        {
+            //            sortedTable.ImportRow(row);
+            //            break;
+            //        }
+            //    }
+            //}
+
+            //sorttable.Rows.Clear();
+            //sorttable.Merge(sortedTable
+
+
+            // Check if sorttable is null
+            if (sorttable == null)
+            {
+                throw new ArgumentNullException("sorttable");
+            }
+            if (!sorttable.Columns.Contains("StepId"))
+            {
+                throw new ArgumentException("The DataTable must contain a 'StepId' column.");
+            }
+
+            // Create a HashSet for quick lookup of StepId values in the DataTable
+            HashSet<int> stepIdsInTable = new HashSet<int>();
             foreach (DataRow row in sorttable.Rows)
             {
-                if (Convert.ToInt32(row["StepId"]) == id)
+                stepIdsInTable.Add(Convert.ToInt32(row["StepId"]));
+            }
+
+            // Check if sortOrder contains matching StepIds
+            bool allMatch = true;
+            foreach (int id in sortOrder)
+            {
+                if (!stepIdsInTable.Contains(id))
                 {
-                    sortedTable.ImportRow(row);
+                    allMatch = false;
                     break;
                 }
             }
-        }
 
-        sorttable.Rows.Clear();
-        sorttable.Merge(sortedTable);
+            // If not all StepIds in sortOrder match those in the DataTable, run the query function
+            if (!allMatch)
+            {
+                sortOrder = createSortOrder();
+            }
+
+            // Create a dictionary to map StepId to DataRow for faster lookup
+            Dictionary<int, DataRow> rowMap = new Dictionary<int, DataRow>();
+            foreach (DataRow row in sorttable.Rows)
+            {
+                int stepId = Convert.ToInt32(row["StepId"]);
+                if (!rowMap.ContainsKey(stepId))
+                {
+                    rowMap[stepId] = row;
+                }
+            }
+
+            // Create a new DataTable with the same structure
+            DataTable sortedTable = sorttable.Clone();
+
+            // Add rows to sortedTable in the order specified by sortOrder
+            foreach (int id in sortOrder)
+            {
+                DataRow matchedRow;
+                if (rowMap.TryGetValue(id, out matchedRow))
+                {
+                    sortedTable.ImportRow(matchedRow);
+                }
+            }
+
+            // Clear the original table and merge sorted rows back
+            sorttable.Rows.Clear();
+            sorttable.Merge(sortedTable);
+    }
+
+    private int[] createSortOrder()
+    {
+        // Initialize a list to store the sort order values
+        List<int> orderValues = new List<int>();
+
+        // Safely construct the SQL query to prevent SQL injection
+        string sqlStr = "SELECT Step.StdtSessionStepId as SessStepID, TempStep.[DSTempStepId],TempStep.[StepName] as StepCd,TempStep.[StepName],TempStep.SortOrder as StepId  FROM [dbo].[DSTempStep] TempStep  INNER JOIN StdtSessionStep Step " +
+                                         " ON TempStep.DSTempStepId=Step.DSTempStepId  WHERE TempStep.DSTempHdrId=" + oTemp.TemplateId + " AND TempStep.DsTempSetId=" + oDS.CrntSet + " AND TempStep.ActiveInd='A' AND IsDynamic=0 AND TempStep.SortOrder IS NOT NULL AND  Step.StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString() + " ORDER BY NEWID()";
+
+        DataTable dt = oData.ReturnDataTable(sqlStr,false);
+
+        foreach (DataRow row in dt.Rows)
+        {
+            orderValues.Add(Convert.ToInt32(row["StepId"]));
+        }
+        return orderValues.ToArray();
     }
     
     private string getTeachingMethod(string templateId)
@@ -2000,10 +2083,20 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         {
             if (Session["random"].ToString() == "total task random")
             {
-                string qry = "Update StdtSessionHdr set StepOrder='" + Session["steporder"].ToString() + "' where StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
-                oData.Execute(qry);
-                Session["random"] = null;
-                Session["steporder"] = null;
+                string idqry = "SELECT  StepOrder FROM StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
+                DataTable idqryTable = oData.ReturnDataTable(idqry, false);
+                string ordervalue = idqryTable.Rows[0]["stepOrder"].ToString();
+
+                if (idqryTable.Rows.Count > 0)
+                {
+                    if (idqryTable.Rows[0]["StepOrder"].ToString() == "")
+                    {
+                        string qry = "Update StdtSessionHdr set StepOrder='" + Session["steporder"].ToString() + "' where StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
+                        oData.Execute(qry);
+                        Session["random"] = null;
+                        Session["steporder"] = null;
+                    }
+                }
             }
         }
         
@@ -2084,6 +2177,22 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         string selSteps = "SELECT DSS.StepCd,Step.DSTempStepId FROM StdtSessionStep Step INNER JOIN DSTempStep DSS ON DSS.DSTempStepId=Step.DSTempStepId WHERE StdtSessionHdrId=" + Convert.ToInt32(ViewState["StdtSessHdr"].ToString()) + "  AND IsDynamic=0 order by SortOrder";
         DataTable dtSteps = new DataTable();
         dtSteps = oData.ReturnDataTable(selSteps, false);
+        string selSessNbrQry = "SELECT SessionNbr FROM StdtSessionHdr WHERE StdtSessionHdrId = " + Convert.ToInt32(ViewState["StdtSessHdr"].ToString());
+        int sessNum = Convert.ToInt32(oData.FetchValue(selSessNbrQry));
+        if(sessNum == 1)
+        {
+            for (int i = 0; i < dtSteps.Rows.Count; i++)
+            {
+                string selqry = "SELECT ISNULL (StepByStepPrompt,-1) FROM DSTempStep WHERE DSTempStepId = " + dtSteps.Rows[i]["DSTempStepId"].ToString() + "";
+                int stepPtompId = Convert.ToInt32(oData.FetchValue(selqry));
+                if(stepPtompId>0)
+                {
+                    string updQry = "UPDATE StdtDSStepStat SET PromptId = (SELECT StepByStepPrompt FROM DSTempStep WHERE DSTempStepId = " + dtSteps.Rows[i]["DSTempStepId"].ToString() + ") WHERE DSTempStepId = " + dtSteps.Rows[i]["DSTempStepId"].ToString();
+                    oData.Execute(updQry);
+                }
+                
+            }
+        }
         string table = "<table>";
         for (int i = 0; i < dtSteps.Rows.Count + 1; i++)
         {
@@ -3403,18 +3512,27 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         if (Session["UserDecision"] != null && (bool)Session["UserDecision"])
         {
              string operation = Session["Operation"] as string;
-
-             if (operation == "Operation1")
-             {
-                 // Continue with the process
-                 btnSave_Click(sender, e);
-             }
-             else if (operation == "Operation2")
-             {
-                 // Continue with the second operation
-                 ConfirmSubmission(sender, e);
-                 //Response.Write("Operation 2 continued...");
-             }
+             generateMeasurmntTable();
+            if (operation == "Operation1")
+            {
+                // Continue with the process
+                //ScriptManager.RegisterStartupScript(this, this.GetType(), "", "console.log('btnContinueProcess_Click Inside');", true);
+                //generateMeasurmntTable();
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "btnContinueProcess_triggerSaveConfirmClick", "triggerSaveConfirmClick();", true);
+            }
+            else if (operation == "Operation2")
+            {
+                if (Session["SubmissionAction"] == "Submit Scores")
+                {
+                    // Continue with the second operation
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "btnContinueProcessTriggerSubmitAndRepeatClick", "triggerSubmitConfirmClick();", true);
+                    //Response.Write("Operation 2 continued...");
+                }
+                else
+                {
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "btnContinueProcessTriggerSubmitAndRepeatConfirmClick", "triggerSubmitAndRepeatConfirmClick();", true);
+                }
+            }
         }
         else
         {
@@ -3693,7 +3811,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 using (SqlCommand cm1 = new SqlCommand(strModqry, con, trans))
                 {
                  objModDate = cm1.ExecuteScalar();
-            }
+                }
                 //object objModDate = oData.FetchValue(strModqry);
                 if (objModDate != null)
                 {
@@ -4818,7 +4936,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             {
                 modifieddate = objSessHdrUpdateTime.Rows[0]["ModifiedOn"].ToString();
                 modifiedby = objSessHdrUpdateTime.Rows[0]["Modfullname"].ToString();
-        }
+            }
         }
         InstantHdrModifiedDate = modifieddate;
         if (Session["HdrModifiedDate"]!=null)
@@ -4832,11 +4950,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         if ((InstantHdrModifiedDate != HdrModifiedDate))
         {
             //ScriptManager.RegisterStartupScript(this, this.GetType(), "popupTrigger", "popUpTriggerClick();", true);
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "Popup", "openPopup('The lesson has been updated by " + modifiedby + " at " + modifieddate + ", are you sure you want to overwrite their changes?', 'Operation1');", true);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "btnSave_ClickCheckPopup", "openPopup('The lesson has been updated by " + modifiedby + " at " + modifieddate + ", are you sure you want to overwrite their changes?', 'Operation1');", true);
         }
         else
         {
-            btnSave_Click(sender,e);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "btnSave_ClickChecktriggerSaveConfirmClick", "triggerSaveConfirmClick();", true);
         }
         ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
@@ -4857,12 +4975,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         }
         if (!alreadydisc)
         {
-        SaveDraft();
-        if (Convert.ToBoolean(ViewState["IsHistory"]) == true)
-        {
-            oDS.VTLessonId = 0;
-            //ScriptManager.RegisterStartupScript(this, this.GetType(), "closewindow", "closeIframe1(" + oSession.StudentId + ");", true);
-        }
+            SaveDraft();
+            if (Convert.ToBoolean(ViewState["IsHistory"]) == true)
+            {
+                oDS.VTLessonId = 0;
+                //ScriptManager.RegisterStartupScript(this, this.GetType(), "closewindow", "closeIframe1(" + oSession.StudentId + ");", true);
+            }
         }
         else
         {
@@ -4887,7 +5005,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             con = oData.Open();
             trans = con.BeginTransaction();
             if (updateDraft(Convert.ToInt32(ViewState["StdtSessHdr"]), "Save", con, trans))
-            {               
+            {
                 bool reslt2 = SaveMeasuremnts(Convert.ToInt32(ViewState["StdtSessHdr"].ToString()), con, trans);
                 if (reslt2)
                 {
@@ -5046,10 +5164,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         updateCheck = true;
                         //if (!IsMaintanace)
                         //{
-                           // SaveIOAPercentage();
-                            string strQry = "SELECT DSTempSetColId,ColName,ColTypeCd from DSTempSetCol WHERE DSTempHdrId=" + oTemp.TemplateId + " And  SchoolId = " + oSession.SchoolId + "  And ActiveInd='A'";
-                            DataTable dt = oData.ReturnDataTable(strQry, false);
-                            int count = dt.Rows.Count;
+                        // SaveIOAPercentage();
+                        string strQry = "SELECT DSTempSetColId,ColName,ColTypeCd from DSTempSetCol WHERE DSTempHdrId=" + oTemp.TemplateId + " And  SchoolId = " + oSession.SchoolId + "  And ActiveInd='A'";
+                        DataTable dt = oData.ReturnDataTable(strQry, false);
+                        int count = dt.Rows.Count;
 
                             int measureCount = 0;
                             string sql = " SELECT  Count(Distinct(dc.DSTempSetColId)) FROM DSTempHdr DT " +
@@ -6414,11 +6532,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     // else
                     //    bIOA = false;
                     //Trials = trails.GetTrialLists(8, 1, ht[key].RequiredSession(), key);
-                    string stepValue = TrialLists.value;                    
+                    string stepValue = TrialLists.value;
                     int reqSess = chainedCols[sColName].RequiredSession();
                     chainedCols[sColName].SessionCount = TrialLists.sessionCount;
                     chainedCols[sColName].StepCount = TrialLists.trialsCount;
-                    chainedCols[sColName].PromptsUsed = promptUsed;                    
+                    chainedCols[sColName].PromptsUsed = promptUsed;
                     chainedCols[sColName].TotalSets = TrialLists.totalSet;
                     chainedCols[sColName].NoPromptsUsed = LessonpromptUsed;
                     chainedCols[sColName].sCurrentLessonPrompt = sCurrentLessonPrompt;
@@ -30655,6 +30773,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         con.Close();
                     }
                     ClientScript.RegisterStartupScript(this.GetType(), "", "probe();", true);
+                    NewSessionStep();
                 }
             }
             if (dtHdrs.Rows.Count == 1)
@@ -30677,6 +30796,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         Response.Redirect("Datasheet.aspx?SessHdrID=" + dtHdrs.Rows[0]["StdtSessionHdrId"].ToString() + "&isMaint=true&exc=true");
                     }
                     ClientScript.RegisterStartupScript(this.GetType(), "", "probe();", true);
+                    NewSessionStep();
                 }
                 else
                 {
@@ -31300,12 +31420,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             {
                 modifieddate = objSessHdrUpdateTime.Rows[0]["CreatedOn"].ToString();
                 modifiedby = objSessHdrUpdateTime.Rows[0]["Createdfullname"].ToString();
-        }
-        else
-        {
+            }
+            else
+            {
                 modifieddate = objSessHdrUpdateTime.Rows[0]["ModifiedOn"].ToString();
                 modifiedby = objSessHdrUpdateTime.Rows[0]["Modfullname"].ToString();
-        }
+            }
         }
         InstantHdrModifiedDate = modifieddate;
         if (Session["HdrModifiedDate"] != null)
@@ -31326,7 +31446,14 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         }
         else
         {
-            ConfirmSubmission(sender, e);
+            if (SubmissionAction == "Submit Scores")
+            {
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ConfirmSubmissionCheckSubmitConfirmClick", "triggerSubmitConfirmClick();", true);
+            }
+            else
+            {
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ConfirmSubmissionCheckRepeatConfirmClick", "triggerSubmitAndRepeatConfirmClick();", true);
+            }
         }
     }
 
@@ -31584,11 +31711,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             {
                 if (bText == "Submit Scores")
                 {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "triggerSubmitClick();", true);
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "", "triggerSubmitClick();", true);
                 }
                 else
                 {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "triggerSubmitAndRepeatClick();", true);
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "", "triggerSubmitAndRepeatClick();", true);
                 }
             }
         }
@@ -31957,6 +32084,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
     protected void continue_btn_Click(object sender, EventArgs e)
     {
+        generateMeasurmntTable();
         hdnMissTrialRsn.Value = hdnChkdRsn.Value;
         mistrialRsn.Text = hdnMissTrialRsn.Value;
         ScriptManager.RegisterStartupScript(this, this.GetType(), "UncheckAll", "UncheckAll();", true);
