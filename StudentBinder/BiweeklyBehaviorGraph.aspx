@@ -3127,10 +3127,24 @@
         setTimeout(callback, 1000);
             }
             function captureAndSend(lessid, callback) {
-                html2canvas($("#HighchartGraph")[0]).then(function (canvas) {
-                    base64 = canvas.toDataURL();
+                //html2canvas($("#HighchartGraph")[0]).then(function (canvas) {
+                //    base64 = canvas.toDataURL();
+                //    var dataToSend = {
+                //        base64: base64, chartId: lessid
+                //    };
+
+                var element = document.getElementById("HighchartGraph");
+
+                var scale = window.devicePixelRatio;
+                html2canvas(element, {
+                    scale: scale,
+                    width: element.offsetWidth * scale,
+                    height: element.offsetHeight * scale
+                }).then(function (canvas) {
+                    var base64 = canvas.toDataURL();
                     var dataToSend = {
-                        base64: base64, chartId: lessid
+                        base64: base64,
+                        chartId: lessid
                     };
                    
                     $.ajax({
