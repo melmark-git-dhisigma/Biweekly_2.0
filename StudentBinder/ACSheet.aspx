@@ -33,7 +33,16 @@
 
     <script src="jsScripts/jq1.js" type="text/javascript" charset="utf-8"></script>     
 <script type="text/javascript">
-
+    var multiClickGenerate = false;
+    var multiClickSave = false;
+    var multiClickExport = false;
+    var multiClickDelete = false;
+    function enableButton() {
+        multiClickGenerate = false;
+        multiClickSave = false;
+        multiClickExport = false;
+        multiClickDelete = false;
+    }
     function updateColor(el) {
         el.parentNode.style.color = el.checked ? "green" : "#808080"
         el.parentNode.style.fontWeight = el.checked ? "bold" : "normal";
@@ -126,10 +135,15 @@
             });
         }
 
-        function showWait() {
-            $('#fullContents').fadeOut('fast');
-            $('.loading').fadeIn('fast');
-
+        function showWait(btn) {
+            if (!multiClickExport) {
+                multiClickExport = true;
+                btn.style.opacity = '0.5';
+                $('#fullContents').fadeOut('fast');
+                $('.loading').fadeIn('fast');
+                return true;
+            }
+            return false;
         }
         function HideWait() {
             $('#fullContents').fadeIn('fast');
@@ -218,23 +232,45 @@
 
          });               
 
-         function scrollToTop() {
-             var result = GetTextBoxValueTwo(); 
-             if (result == true) {
-                 window.scrollTo(0, 0);
-                 window.parent.parent.scrollTo(0, 0);
-             }
-             return result;
-             
+        function scrollToTop(btn) {
+            if (!multiClickSave) {
+                var result = GetTextBoxValueTwo();
+                if (result == true) {
+                    window.scrollTo(0, 0);
+                    window.parent.parent.scrollTo(0, 0);
+                }
+                if (result) {
+                    multiClickSave = true;
+                    btn.style.opacity = '0.5';
+                }
+                return result;
+            }
+            return false;
+        }
+         function multiClickCheckGenerate(btn){
+            if (!multiClickGenerate) {
+                multiClickGenerate = true;
+                btn.style.opacity = '0.5';
+                showMessage();
+                return true;
+            }
+             return false;
          }
          function showMessage() {
              $('.loading').show();
              $('#dialog').hide();
          }
-         function Delete() {
-             var flag;
-             flag = confirm("Are you sure you want to delete this coversheet?");
-             return flag;
+        function Delete(btn) {
+            if (!multiClickDelete) {
+                var flag;
+                flag = confirm("Are you sure you want to delete this coversheet?");
+                if (flag) {
+                    multiClickDelete = true;
+                    btn.style.opacity = '0.5';
+                }
+                return flag;
+            }
+            return false;
          }
 
          function h2click(h2, IEPid) {
@@ -382,19 +418,19 @@
                                
                              </td>
                              <td>
-                                <asp:Button ID="btnUpdateNew" Style="float: right; display: inline; margin:1px;" runat="server" CssClass="NFButtonWithNoImage" OnClick="btnUpdate_Click" Text="Update" ValidationGroup="Group1" OnClientClick="return scrollToTop();"/>                                 
-                                <asp:Button ID="btnSaveNew" Style="float: right; display: inline; margin:1px;" runat="server" CssClass="NFButtonWithNoImage" OnClick="Save_Click" Text="Save" OnClientClick="return scrollToTop();"/>                                
+                                <asp:Button ID="btnUpdateNew" Style="float: right; display: inline; margin:1px;" runat="server" CssClass="NFButtonWithNoImage" OnClick="btnUpdate_Click" Text="Update" ValidationGroup="Group1" OnClientClick="return scrollToTop(this);"/>                                 
+                                <asp:Button ID="btnSaveNew" Style="float: right; display: inline; margin:1px;" runat="server" CssClass="NFButtonWithNoImage" OnClick="Save_Click" Text="Save" OnClientClick="return scrollToTop(this);"/>                                
                             </td>
                              
                                 <td style="width: 30%; text-align: right;">
-                                        <asp:Button ID="btnImport" runat="server" Text="Export" CssClass="NFButton" Style="float: right" OnClick="btnImport_Click" OnClientClick="showWait();" />
+                                        <asp:Button ID="btnImport" runat="server" Text="Export" CssClass="NFButton" Style="float: right" OnClick="btnImport_Click" OnClientClick="return showWait(this);" />
 
                                     </td>
                                     <td>
-                                        <asp:Button ID="btnDelete" runat="server" Text="Delete" CssClass="NFButton" Style="float: right;" OnClick="btnGenDelete_Click" OnClientClick="javascript:return Delete();"/>
+                                        <asp:Button ID="btnDelete" runat="server" Text="Delete" CssClass="NFButton" Style="float: right;" OnClick="btnGenDelete_Click" OnClientClick="javascript:return Delete(this);"/>
 									</td>
                             <td>
-                                <asp:Button ID="btnGenNewSheet0" runat="server" CssClass="NFButton" ToolTip="Create new sheet" alt="Create New Document" OnClick="btnPreAccSheet1_Click" Text="Create New Coversheet" Style="width: auto;" />
+                                <asp:Button ID="btnGenNewSheet0" runat="server" CssClass="NFButton" ToolTip="Create new sheet" alt="Create New Document" OnClick="btnPreAccSheet1_Click" OnClientClick="return multiClickCheckGenerate(this);" Text="Create New Coversheet" Style="width: auto;" />
                                 <%--  <asp:Button ID="btnBack" runat="server" CssClass="Cancel" OnClick="btnBack_Click" ToolTip="Cancel" Text="" Style="float: right;" />--%>
                             </td>
                         </tr>
@@ -1130,7 +1166,7 @@
                                                             </tr>
                                                             <tr>
                                                                 <td colspan="3" style="text-align: center;">
-                                                                    <asp:Button ID="btnSave" runat="server" CssClass="NFButton" OnClick="Save_Click" OnClientClick="return scrollToTop();" Text="Save" Visible="true" />
+                                                                    <asp:Button ID="btnSave" runat="server" CssClass="NFButton" OnClick="Save_Click" OnClientClick="return scrollToTop(this);" Text="Save" Visible="true" />
                                                                 </td>
                                                             </tr>
                                                         </table>
@@ -1709,7 +1745,7 @@
                                                             </tr>
                                                             <tr>
                                                                 <td colspan="3" style="text-align: center;">
-                                                                    <asp:Button ID="btnUpdate" runat="server" CssClass="NFButton" OnClick="btnUpdate_Click" OnClientClick="return scrollToTop();" Text="Update" ValidationGroup="Group1" />
+                                                                    <asp:Button ID="btnUpdate" runat="server" CssClass="NFButton" OnClick="btnUpdate_Click" OnClientClick="return scrollToTop(this);" Text="Update" ValidationGroup="Group1" />
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1803,7 +1839,7 @@
                                     </tr>
                                     <tr>
                                         <td class="tdText" style="text-align: center" colspan="6">
-                                            <asp:Button ID="btnGenACD" runat="server" Text="Generate" OnClick="btnGenACD_Click" CssClass="NFButton"  OnClientClick="showMessage()" />
+                                            <asp:Button ID="btnGenACD" runat="server" Text="Generate" OnClick="btnGenACD_Click" CssClass="NFButton"  OnClientClick="return multiClickCheckGenerate(this);" />
                                             <input type="button" id="CancalGen" class="NFButton" value="Cancel" />
                                         </td>
                                     </tr>
