@@ -49,6 +49,19 @@
 
     </script>
     <script>
+        var multiClickSearch = false;
+
+        function multiClickCheckSearch(btn) {
+            if (!multiClickSearch) {
+                multiClickSearch = true;
+                btn.style.opacity = '0.5';
+                return true;
+            }
+            return false;
+        }
+        function enableButton() {
+            multiClickSearch = false;
+        }
         function allowBackSpace(e, obj) {
             var evt = e || window.event;
             if (evt.keyCode == 8) {
@@ -120,7 +133,7 @@
                        
                     </td>
                     <td style="width: 10%">
-                        <asp:Button ID="btnSearch" runat="server" OnClick="btnSearch_Click" Text="Search" CssClass="NFButton"  /></td>
+                        <asp:Button ID="btnSearch" runat="server" OnClick="btnSearch_Click" Text="Search" OnClientClick="return multiClickCheckSearch(this);" CssClass="NFButton"  /></td>
                     
                     
                 </tr>

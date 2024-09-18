@@ -325,6 +325,7 @@ public partial class StudentBinder_DSTempHistory : System.Web.UI.Page
             LessonPlanSearch();
         }
         }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
 
     protected void gvView_PageIndexChanging(object sender, GridViewPageEventArgs e)
