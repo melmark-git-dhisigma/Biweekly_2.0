@@ -68,6 +68,7 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
         sess = (clsSession)Session["UserSession"];
+        Prevsess = (clsSession)Session["PreSession"];
 
         tdMsgDel.InnerHtml = "";
         if (sess == null)
@@ -803,6 +804,7 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
             }
             catch (Exception ex)
             {
+                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                 ex.ToString();
             }
             //--------------
@@ -819,6 +821,7 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
     public void LoadDataList()
     {
         sess = (clsSession)Session["UserSession"];
+        preuser = Session["Spreuser"].ToString();
         //dt = new System.Data.DataTable();
         curesesid = this.Session.SessionID.ToString();
         HostName = Dns.GetHostName();
@@ -1415,6 +1418,7 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
         {
             SaveOrUpdateData();
         }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
 
     private void SaveOrUpdateData()
@@ -2182,6 +2186,7 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
                 }
                 catch (Exception exp)
                 {
+                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                     exp.ToString();
                 }
             }
@@ -2259,8 +2264,8 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
                                     if (columns[i] != "")
                                     {
                                         columns[i] = Server.HtmlDecode(Regex.Replace(columns[i].ToString().Trim(), "<(.|\n)*?>", ""));
-                                        columns[i]=columns[i]+"<br>";
-										replaceWithTextsSingle(theDoc.MainDocumentPart, placeHolders[i], columns[i]);
+                                       columns[i]=columns[i]+"<br>";
+                                        replaceWithTextsSingle(theDoc.MainDocumentPart, placeHolders[i], columns[i]);
 
                                     }
                                     else
@@ -2331,6 +2336,7 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
         }
         catch (Exception eX)
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             tdMsg.InnerHtml = clsGeneral.failedMsg(eX.Message.ToString() + "....Failed !");
         }
     }
@@ -2551,11 +2557,13 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
                 tdMsg.InnerHtml = "";
                 AllInOne();
             }
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             //tdMsg.InnerHtml = "";
             //AllInOne();
         }
         catch (Exception ex)
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             throw ex;
         }
     }
@@ -3373,6 +3381,7 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
         btnExport.Visible = false;
         btnGenDelete.Visible = false;    
         LoadDataList();
+        ScriptManager.RegisterStartupScript(this, GetType(),"enableButtonScript", "enableButton();", true);
         tdMsgDel.InnerHtml = "<span style='color: green; font-family:times new roman;margin-left:20px;font-size:12px;'>Deleted Successfully...</span>";
 
     }
@@ -3385,6 +3394,7 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
             FillGraphData();
             LoadDataList();
         }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
     private bool validate()
     {
