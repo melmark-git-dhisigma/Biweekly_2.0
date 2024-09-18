@@ -34,36 +34,176 @@ public partial class StudentBinder_DatasheetTimerIpad : System.Web.UI.Page
     public static DataTable behaviorDT = null;
     protected void Page_Load(object sender, EventArgs e)
     {
-        Prevsess = (clsSession)Session["PreSession"];
-        sess = (clsSession)Session["UserSession"];
-
-        preid = Convert.ToInt16(Session["Spreid"]);
-        preuser = Session["Spreuser"].ToString();
-        SessStudentid = Convert.ToInt16(Session["Sprestid"]);
-        PreClassid = Convert.ToInt16(Session["SpreClsid"]);
-        Sessstname = Session["Sprestname"].ToString();
-        curesesid = this.Session.SessionID.ToString();
-        HostName = Dns.GetHostName();
-        userAgent = HttpContext.Current.Request.UserAgent.ToString();
-        ip = clsGeneral.GetIPAddress();
-        ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
-        Pagepath = "DatasheetTimerIpd:Page_Load";
-        if (Prevsess != null)
-        {
-            sesserrlog.WriteToLog(today.ToString("yyyy-MM-dd") + ',' + now.ToString("HH:mm:ss") + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + Prevsess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + Prevsess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ',' + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + Prevsess.Classid + ',' + PreClassid + ',' + sess.StudentId + ',' + Prevsess.StudentId + ',' + SessStudentid + ',' + HostName + ',' + userAgent);
-        }
-        else
-        {
-            sesserrlog.WriteToLog(today.ToString("yyyy-MM-dd") + ',' + now.ToString("HH:mm:ss") + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + "PrevSession Null" + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + "PrevSession Null" + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ',' + "PrevSession Null" + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + "PrevSession Null" + ',' + PreClassid + ',' + sess.StudentId + ',' + "PrevSession Null" + ',' + SessStudentid + ',' + HostName + ',' + userAgent);
-        }
-        sess = clsGeneralSchk.sessioncheck(curesesid, preid, ip, preuser, sess, Prevsess, SessStudentid, PreClassid, Sessstname, Pagepath);
-        
-        if (!IsPostBack)
+        try
         {
             Prevsess = (clsSession)Session["PreSession"];
-            hdnFldUlId.Value = "";
-            loadDataTabs();
+            sess = (clsSession)Session["UserSession"];
+
+            preid = Convert.ToInt16(Session["Spreid"]);
+            preuser = Session["Spreuser"].ToString();
+            SessStudentid = Convert.ToInt16(Session["Sprestid"]);
+            PreClassid = Convert.ToInt16(Session["SpreClsid"]);
+            Sessstname = Session["Sprestname"].ToString();
+            curesesid = this.Session.SessionID.ToString();
+            HostName = Dns.GetHostName();
+            userAgent = HttpContext.Current.Request.UserAgent.ToString();
+            ip = clsGeneral.GetIPAddress();
+            ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
+            Pagepath = "DatasheetTimerIpd:Page_Load";
+            if (Prevsess != null)
+            {
+                sesserrlog.WriteToLog(today.ToString("yyyy-MM-dd") + ',' + now.ToString("HH:mm:ss") + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + Prevsess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + Prevsess.UserName + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ',' + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + Prevsess.Classid + ',' + PreClassid + ',' + sess.StudentId + ',' + Prevsess.StudentId + ',' + SessStudentid + ',' + HostName + ',' + userAgent);
+            }
+            else
+            {
+                sesserrlog.WriteToLog(today.ToString("yyyy-MM-dd") + ',' + now.ToString("HH:mm:ss") + ',' + sess.LoginTime.ToString() + ',' + sess.LoginId.ToString() + ',' + "PrevSession Null" + ',' + preid.ToString() + ',' + ip + ',' + sess.UserName + ',' + "PrevSession Null" + ',' + preuser + ',' + sess.SchoolId + ',' + "Log" + ',' + sess.SessionID + ',' + "PrevSession Null" + ',' + curesesid + ',' + Pagepath + ',' + sess.Classid + ',' + "PrevSession Null" + ',' + PreClassid + ',' + sess.StudentId + ',' + "PrevSession Null" + ',' + SessStudentid + ',' + HostName + ',' + userAgent);
+            }
+            sess = clsGeneralSchk.sessioncheck(curesesid, preid, ip, preuser, sess, Prevsess, SessStudentid, PreClassid, Sessstname, Pagepath);
+        
+            if (!IsPostBack)
+            {
+                hdnFldUlId.Value = "";
+                loadDataTabs();
+            }
         }
+        catch (Exception Ex)
+        {
+            String logStr = "";
+            string key = "";
+            if (Prevsess != null)
+            {
+                string sessionStateString = "";
+                key = "PreSession";
+                //sessionStateString = GetSessionStateAsString(key);
+                logStr += "Prevsess:StdtId-" + Prevsess.StudentId.ToString() + "\n";
+            }
+            else
+            {
+                logStr += "Prevsess:NULL" + "\n";
+            }
+            if (sess != null)
+            {
+                string sessionStateString = "";
+                key = "UserSession";
+                //sessionStateString = GetSessionStateAsString(key);
+                logStr += "sess:StdtId-" + sess.StudentId.ToString() + "\n";
+            }
+            else
+            {
+                logStr += "sess:NULL" + "\n";
+            }
+            if (preid != null)
+            {
+                string sessionStateString = "";
+                key = "Spreid";
+                sessionStateString = GetSessionStateAsString(key);
+                logStr += "preid:" + sessionStateString.ToString() + "\n";
+            }
+            else
+            {
+                logStr += "preid:NULL" + "\n";
+            }
+            if (preuser != null)
+            {
+                string sessionStateString = "";
+                key = "Spreuser";
+                sessionStateString = GetSessionStateAsString(key);
+                logStr += "preuser:" + sessionStateString.ToString() + "\n";
+            }
+            else
+            {
+                logStr += "preuser:NULL" + "\n";
+            }
+            if (SessStudentid != null)
+            {
+                string sessionStateString = "";
+                key = "Sprestid";
+                sessionStateString = GetSessionStateAsString(key);
+                logStr += "SessStudentid:" + sessionStateString.ToString() + "\n";
+            }
+            else
+            {
+                logStr += "SessStudentid:NULL" + "\n";
+            }
+            if (PreClassid != null)
+            {
+                string sessionStateString = "";
+                key = "SpreClsid";
+                sessionStateString = GetSessionStateAsString(key);
+                logStr += "PreClassid:" + sessionStateString.ToString() + "\n";
+            }
+            else
+            {
+                logStr += "PreClassid:NULL" + "\n";
+            }
+            if (Sessstname != null)
+            {
+                if (Sessstname == "")
+                    logStr += "Sessstname:Blank\n";
+                else
+                    logStr += "Sessstname:" + Sessstname.ToString() + "\n";
+            }
+            else
+            {
+                logStr += "Sessstname:NULL" + "\n";
+            }
+            if (curesesid != null)
+            {
+                if (curesesid == "")
+                    logStr += "Sessstname:Blank\n";
+                else
+                    logStr += "curesesid:" + curesesid.ToString() + "\n";
+            }
+            else
+            {
+                logStr += "curesesid:NULL" + "\n";
+            }
+            if (HostName != null )
+            {
+                if (HostName == "")
+                    logStr += "Sessstname:Blank\n";
+                else
+                    logStr += "HostName:" + HostName.ToString() + "\n";
+            }
+            else
+            {
+                logStr += "HostName:NULL" + "\n";
+            }
+            if (userAgent != null)
+            {
+                if (userAgent == "")
+                    logStr += "Sessstname:Blank\n";
+                else
+                    logStr += "userAgent:" + userAgent.ToString() + "\n";
+            }
+            else
+            {
+                logStr += "userAgent:NULL" + "\n";
+            }
+            if (ip != null)
+            {
+                if (ip == "")
+                    logStr += "Sessstname:Blank\n";
+                else
+                    logStr += "ip:" + ip.ToString() + "\n";
+            }
+            else
+            {
+                logStr += "ip:NULL" + "\n";
+            }
+            ClsErrorLog clError = new ClsErrorLog();
+            clError.WriteToLog("" + logStr + "Exception:" + Ex.ToString());
+            //throw Ex;
+        }
+    }
+    private string GetSessionStateAsString(string key)
+    {
+        // Retrieve the value associated with the specified key
+        object value = HttpContext.Current.Session[key];
+        
+        // Return formatted string
+        //return key + ": " + (value != null ? value.ToString() : "null");
+        return (value != null ? value.ToString() : "null");
     }
     public void loadDataTabs()
     {
@@ -468,6 +608,8 @@ public partial class StudentBinder_DatasheetTimerIpad : System.Web.UI.Page
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public static string saveDurationOther(string MeasurementId, string StudentId, string duration, string FrqSave, string toe, string isBehUpdate, bool chkIOA, string ClassId)
     {
+        string condition = "";
+        int updateStat = 0, BehaviorIOAId = 0, NormalBehavId = 0;
         clsSession oSession = (clsSession)HttpContext.Current.Session["UserSession"];
         objData = new clsData();
 
@@ -498,8 +640,15 @@ public partial class StudentBinder_DatasheetTimerIpad : System.Web.UI.Page
                         if (behavId.ToString() != null && behavId.ToString() != "")
                         {
                             string UpdateQuery = "Update Behaviour SET Duration=" + duration + " WHERE BehaviourId=" + behavId.ToString() + "";
-                            insertresult = objData.Execute(UpdateQuery);
+                            int updateresult = objData.Execute(UpdateQuery);
+                            updateStat = Convert.ToInt32(objData.FetchValue("SELECT COUNT (BehaviorIOAId) FROM BehaviorIOADetails WHERE NormalBehaviorId=" + behavId));
+                            if (updateStat == 1)
+                            {
+                                string Status = "Duration";
+                                BehaviorIOAId = Convert.ToInt32(objData.FetchValue("SELECT BehaviorIOAId FROM BehaviorIOADetails WHERE NormalBehaviorId=" + behavId));
+                                objData.ExecuteIOAPercBehaviorCalc(MeasurementId, StudentId, BehaviorIOAId, Convert.ToInt32(behavId), Status);
                         }
+                    }
                     }
                     else
                     {
@@ -507,6 +656,12 @@ public partial class StudentBinder_DatasheetTimerIpad : System.Web.UI.Page
                         insertresult = objData.ExecuteWithScope(InsertQuery);
                     }
                 }
+                if (insertresult > 0)
+                {
+                    condition = "FrequencyCount IS  NULL AND YesOrNo IS  NULL AND Duration IS NOT NULL";
+                    string Status = "Duration";
+                    normalUserForIOACalculation(insertresult, StudentId, MeasurementId, Status, condition);
+            }
             }
             else
             {
@@ -554,7 +709,13 @@ public partial class StudentBinder_DatasheetTimerIpad : System.Web.UI.Page
                         if (behavId.ToString() != null && behavId.ToString() != "")
                         {
                             string UpdateQuery = "Update BehaviorIOADetails SET Duration=" + duration + " WHERE BehaviorIOAId=" + behavId.ToString() + "";
-                            insertresult = objData.Execute(UpdateQuery);
+                          int  updateresult = objData.Execute(UpdateQuery);
+                          NormalBehavId = Convert.ToInt32(objData.FetchValue("SELECT ISNULL(CONVERT(INT,NormalBehaviorId),-1) FROM BehaviorIOADetails WHERE BehaviorIOAId=" + behavId));
+                          if (NormalBehavId != -1)
+                          {
+                              string Status = "Duration";
+                              objData.ExecuteIOAPercBehaviorCalc(MeasurementId, StudentId, Convert.ToInt32(behavId), NormalBehavId, Status);
+                          }
 
                             //object createdon = objData.FetchValue("SELECT CreatedOn FROM BehaviorIOADetails WHERE BehaviorIOAId=" + behavId.ToString());
                             //string Status = "Duration";
@@ -598,7 +759,13 @@ public partial class StudentBinder_DatasheetTimerIpad : System.Web.UI.Page
                         }
                     }
                 }
+                if (insertresult > 0)
+                {
+                    condition = "FrequencyCount IS  NULL AND YesOrNo IS  NULL AND Duration IS NOT NULL";
+                    string Status = "Duration";
+                    int bCount = IOAUserForIOACalculation(insertresult, StudentId, MeasurementId, Status, condition);
             }
+        }
         }
 
         return insertresult.ToString();
