@@ -16,6 +16,10 @@ using System.Text;
 using System.Xml;
 using System.Diagnostics;
 using System.Drawing;
+using System.Web.Services;
+using System.Web.Script.Services;
+
+
 
 public partial class Graph : System.Web.UI.Page
 {
@@ -720,7 +724,11 @@ public partial class Graph : System.Web.UI.Page
 
     private void LoadDashBoardClientAcademicGraph(string CAgraphClassid, string CAgraphStudid, int CAgraphMistrial)
     {
+        if (highcheck.Checked == false)
+        {
         RV_DBReport.Visible = true;
+        graphcontainer.Visible = false;
+        lblNoData.Text = "";
         RV_DBReport.ServerReport.ReportServerCredentials = new CustomReportCredentials(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"], ConfigurationManager.AppSettings["Domain"]);
         RV_DBReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["DashBoardClientAcademic"];        
         //Classids = Convert.ToString(objData.FetchValue("select classid from class where classid = 2011"));
@@ -734,16 +742,27 @@ public partial class Graph : System.Web.UI.Page
         parm[2] = new ReportParameter("ParamMistrial", Mistrial);
         this.RV_DBReport.ServerReport.SetParameters(parm);
         RV_DBReport.ServerReport.Refresh();
-
-        if (R1.Checked == true)
+        }
+        else
         {
-            Btnview_Click();
+            RV_DBReport.Visible = false;
+            graphcontainer.Visible = true;
+            lblNoData.Text = "";
+            string script1 = "loadWait();";
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "show", script1, true);
+            string script = @"setTimeout(function() {loadAcbyClient('" + CAgraphClassid + "', '" + CAgraphStudid + "','" + CAgraphMistrial + "');}, 500);";
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ShowMessageWithParamsScript", script, true);
+
     }
      
     }
 
     private void LoadDashBoardClientAcademicPercentage(string CAgraphClassid, string CAgraphStudid)
     {
+        if (highcheck.Checked == false)
+        {
+         graphcontainer.Visible = false;
+         lblNoData.Text = "";
         RV_DBReport.Visible = true;
         RV_DBReport.ServerReport.ReportServerCredentials = new CustomReportCredentials(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"], ConfigurationManager.AppSettings["Domain"]);
         RV_DBReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["DashBoardClientAcademicPercentage"];
@@ -756,6 +775,17 @@ public partial class Graph : System.Web.UI.Page
         parm[1] = new ReportParameter("ParamStudid", Studids);
         this.RV_DBReport.ServerReport.SetParameters(parm);
         RV_DBReport.ServerReport.Refresh();
+    }
+        else
+        {
+            RV_DBReport.Visible = false;
+            graphcontainer.Visible = true;
+            lblNoData.Text = "";
+            string script1 = "loadWait();";
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "show3", script1, true);
+            string script = @"setTimeout(function() {loadAcbyClientPerc('" + CAgraphClassid + "', '" + CAgraphStudid + "');}, 500);";
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ShowMessageWithParamsScript3", script, true);
+        }
     }
 
     private void LoadDashBoardStaffAcademicGraph(string SAgraphClassid, string SAgraphStudid, int CAgraphMistrial)
@@ -785,7 +815,11 @@ public partial class Graph : System.Web.UI.Page
 
     private void LoadDashBoardClientClinicalGraph(string CCgraphClassid, string CCgraphStudid)
     {
+        if (highcheck.Checked == false)
+        {
         RV_DBReport.Visible = true;
+        graphcontainer.Visible = false;
+        lblNoData.Text = "";
         RV_DBReport.ServerReport.ReportServerCredentials = new CustomReportCredentials(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"], ConfigurationManager.AppSettings["Domain"]);
         RV_DBReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["DashBoardClientClinical"];        
         String Classids = Convert.ToString(CCgraphClassid);
@@ -796,10 +830,17 @@ public partial class Graph : System.Web.UI.Page
         parm[1] = new ReportParameter("ParamStudid", Studids);
         this.RV_DBReport.ServerReport.SetParameters(parm);
         RV_DBReport.ServerReport.Refresh();
-        if (R1.Checked == true)
-        {
-            ClinicalClientBtnview_Click();
     }
+        else {
+            RV_DBReport.Visible = false;
+            graphcontainer.Visible = true;
+            lblNoData.Text = "";
+            string script1 = "loadWait();";
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "show1", script1, true);
+            string script = @"setTimeout(function() {loadClinicbyClient('" + CCgraphClassid + "', '" + CCgraphStudid + "');}, 500);";
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ShowMessageWithParamsScript2", script, true);
+    }
+        
     }
 
     private void LoadDashBoardStaffClinicalGraph(string SCgraphClassid, string SCgraphStudid)
@@ -1119,109 +1160,91 @@ public partial class Graph : System.Web.UI.Page
             //chkbx_leson_deliverd.Enabled = true;
         }
     }
-
-    public void Btnview_Click()
+ 
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public static string getAClient(string classid, string studentid, string mistrial)
     {
-        string mis;
-        string cid = "";
-        string sid = "";
-        if (chkbx_Mistrial.Checked)
-        {
-            mis= "1";
-        }
-        else
-        {
-            mis = "0";
-        }
+        clsData objdata = new clsData();
+        List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+        Dictionary<string, object> row;
+        String proc = "[dbo].[DashboardClientAcademic]";
 
-        if (grphclasid == null)
-        {
+        DataTable dt = objdata.ReturnNewAcademicTable(proc, classid, studentid, mistrial);
 
-            foreach (System.Web.UI.WebControls.ListItem item in ddcb_clas.Items)
+        foreach (DataRow dr in dt.Rows)
             {
-                if (item.Selected == false)
+            row = new Dictionary<string, object>();
+            foreach (DataColumn dc in dt.Columns)
                 {
-                    cid += item.Value + ",";
+                row.Add(dc.ColumnName, dr[dc]);
+            }
+            rows.Add(row);
 
                 }
+
+        JavaScriptSerializer json = new JavaScriptSerializer();
+        string dat = json.Serialize(rows);
+        return json.Serialize(rows);
             }
-        }
-        else
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public static string getAClientPerc(string classid, string studentid)
         {
-            cid = grphclasid;
-        }
+        clsData objdata = new clsData();
+        List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+        Dictionary<string, object> row;
+        String proc = "[dbo].[DashboardClientAcademicPercentage]";
 
-        if (grphstudid == null)
-        {
+        DataTable dt = objdata.ReturnNewAcademicTablePerc(proc, classid, studentid);
 
-            foreach (System.Web.UI.WebControls.ListItem item in ddcb_stud.Items)
+        foreach (DataRow dr in dt.Rows)
             {
-                if (item.Selected == false)
+            row = new Dictionary<string, object>();
+            foreach (DataColumn dc in dt.Columns)
                 {
-                    sid += item.Value + ",";
+                row.Add(dc.ColumnName, dr[dc]);
+            }
+            rows.Add(row);
 
                 }
-            }
-        }
-        else
-        {
-            sid = grphstudid;
-        }
-        
 
-        Session["cid"] = cid;
-        Session["sid"] = sid;
-        Session["mis"] = mis;
-
-
-        Response.Redirect("~/StudentBinder/ViewAcademicByclient.aspx");
-    }
-    protected void ClinicalClientBtnview_Click()
-    {
-        string cid = "";
-        string sid = "";
-        if (grphclasid == null)
-        {
-
-            foreach (System.Web.UI.WebControls.ListItem item in ddcb_clas.Items)
-            {
-                if (item.Selected == false)
-                {
-                    cid += item.Value + ",";
-
-                }
-            }
-        }
-        else
-        {
-            cid = grphclasid;
-        }
-
-        if (grphstudid == null)
-        {
-
-            foreach (System.Web.UI.WebControls.ListItem item in ddcb_stud.Items)
-            {
-                if (item.Selected == false)
-                {
-                    sid += item.Value + ",";
-
-                }
-            }
-        }
-        else
-        {
-            sid = grphstudid;
-        }
-
-
-        Session["cid"] = cid;
-        Session["sid"] = sid;
-        Response.Redirect("~/StudentBinder/ViewClinicalClient.aspx");
-
+        JavaScriptSerializer json = new JavaScriptSerializer();
+        string dat = json.Serialize(rows);
+        return json.Serialize(rows);
     }
 
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public static string getClientClinic(string cid, string sid)
+            {
+        clsData objData = new clsData();
+        string str = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
+        SqlConnection cn = new SqlConnection(str);
+        cn.Open();
 
+        List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+        Dictionary<string, object> row;
+        String proc = "[dbo].[DashboardClientClinical]";
+
+        DataTable dt = objData.ReturnNewTableClinicClient(proc, cid, sid);
+
+        foreach (DataRow dr in dt.Rows)
+            {
+            row = new Dictionary<string, object>();
+            foreach (DataColumn dc in dt.Columns)
+                {
+                row.Add(dc.ColumnName, dr[dc]);
+            }
+            rows.Add(row);
+
+                }
+
+        JavaScriptSerializer json = new JavaScriptSerializer();
+        string dat = json.Serialize(rows);
+        Debug.WriteLine(dat);
+        return json.Serialize(rows);
+    }
 
 
 }
