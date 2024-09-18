@@ -60,6 +60,35 @@
 
         };
 
+        var multiClickGenerate = false;
+        var multiClickExport = false;
+        var multiClickDelete = false;
+
+        function enableButton() {
+            multiClickGenerate = false;
+            multiClickExport = false;
+            multiClickDelete = false;
+        }
+
+        function multiClickCheckGenerate(btn) {
+            scrollToTop();
+            if (!multiClickGenerate) {
+                showWait();
+                multiClickGenerate = true;
+                btn.style.opacity = '0.5';
+                return true;
+            }
+            return false;
+        }
+        function multiClickCheckExport(btn) {
+            if (!multiClickExport) {
+                showWait();
+                multiClickExport = true;
+                btn.style.opacity = '0.5';
+                return true;
+            }
+            return false;
+        }
 
 
         function freeTextPopup(Divcontent) {
@@ -228,12 +257,19 @@
 
 
             }
-            function Delete() {
+        function Delete(btn) {
+            if (!multiClickDelete) {
                 var flag;
                 flag = confirm("Are you sure you want to delete this coversheet?");
+                if (flag) {
+                    multiClickDelete = true;
+                    btn.style.opacity = '0.5';
+                }
                 return flag;
 
             }
+            return false;
+        }
     </script>
 
 
@@ -595,11 +631,11 @@
                                         <h2>2 <span>Clinical Coversheet Report</span></h2>
                                     </td>
                                     <td style="width: 30%; text-align: right;">
-                                        <asp:Button ID="btnExport" runat="server" Text="Export" CssClass="NFButton" Style="float: right" OnClick="btnExport_Click" OnClientClick="showWait();" />
+                                        <asp:Button ID="btnExport" runat="server" Text="Export" CssClass="NFButton" Style="float: right" OnClick="btnExport_Click" OnClientClick="return multiClickCheckExport(this);" />
 
                                     </td>
                                     <td>
-                                        <asp:Button ID="btnGenDelete" runat="server" Text="Delete" CssClass="NFButton" Style="float: right;" OnClick="btnGenDelete_Click" OnClientClick="javascript:return Delete();"/>
+                                        <asp:Button ID="btnGenDelete" runat="server" Text="Delete" CssClass="NFButton" Style="float: right;" OnClick="btnGenDelete_Click" OnClientClick="javascript:return Delete(this);"/>
 									</td>
                                     <td>
                                         <asp:Button ID="btnGenNewSheet" runat="server" CssClass="NFButton" ToolTip="Create new sheet" alt="Create New Document" OnClick="btnGenNewClinicalSheet_Click" OnClientClick="showWait();" Text="Create New Coversheet" Style="width: auto;" />
@@ -1435,7 +1471,7 @@
                                                         </tr>
                                                         <tr>
                                                             <td colspan="3" style="text-align: center">
-                                                                <asp:Button ID="btnSave" runat="server" Text="Save" Width="80px" CssClass="NFButton" OnClick="btnSave_Click" OnClientClick="javascript: scrollToTop(); showWait();"/></td>
+                                                                <asp:Button ID="btnSave" runat="server" Text="Save" Width="80px" CssClass="NFButton" OnClick="btnSave_Click" OnClientClick="return multiClickCheckGenerate(this);"/></td>
                                                         </tr>
                                                     </table>
                                                     <br />
@@ -1476,7 +1512,7 @@
                                             </tr>
                                             <tr>
                                                 <td class="tdText" style="text-align: center" colspan="6">
-                                                    <asp:Button ID="btnGenCLS" runat="server" Text="Generate" OnClick="btnGenCLS_Click" OnClientClick="showWait();" CssClass="NFButton" />
+                                                    <asp:Button ID="btnGenCLS" runat="server" Text="Generate" OnClick="btnGenCLS_Click" OnClientClick="return multiClickCheckGenerate(this);" CssClass="NFButton" />
                                                     <input type="button" id="CancalGen" class="NFButton" value="Cancel" />
                                                 </td>
                                             </tr>
