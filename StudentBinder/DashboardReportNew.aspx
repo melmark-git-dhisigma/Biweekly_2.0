@@ -8,9 +8,35 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head id="Head1" runat="server">
     <title></title>
-
+    <script>
+        Array.prototype.includes = null;
+        Array.prototype.indexOf = null;
+        if (!Array.prototype.includes) {
+            Array.prototype.includes = function (search) {
+                return !!~this.indexOf(search);
+            }
+        }
+        if (!Array.prototype.indexOf) {
+            Array.prototype.indexOf = (function (Object, max, min) {
+                "use strict";
+                return function indexOf(member, fromIndex) {
+                    if (this === null || this === undefined) throw TypeError("Array.prototype.indexOf called on null or undefined");
+                    var that = Object(this), Len = that.length >>> 0, i = min(fromIndex | 0, Len);
+                    if (i < 0) i = max(0, Len + i); else if (i >= Len) return -1;
+                    if (member === void 0) {
+                        for (; i !== Len; ++i) if (that[i] === void 0 && i in that) return i;
+                    } else if (member !== member) {
+                        for (; i !== Len; ++i) if (that[i] !== that[i]) return i;
+                    } else for (; i !== Len; ++i) if (that[i] === member) return i;
+                    return -1;
+                };
+            })(Object, Math.max, Math.min);
+        }
+    </script>
 
     <script src="js/jquery-2.1.0.js"></script>
+     <script src="../Scripts/highcharts/7.1.2/highcharts.js"></script>
+   <script src="../Scripts/highcharts/7.1.2/modules/accessibility.js"></script>
     <script src="js/d3.v3.js"></script>
     <script src="js/nv.d3.js"></script>
     <link href="../Administration/CSS/GraphStyle.css" rel="stylesheet" />
@@ -19,7 +45,7 @@
     <style type="text/css">
 
         .loading {
-            display: block;
+            display: none;
             position: absolute;
             width: 100%;
             height: 800px;
@@ -29,6 +55,20 @@
             background-image: url("../Administration/images/overlay.png");
             /*background: repeat-x scroll center top transparent;*/
         }
+        .innerLoading {
+            margin: auto;
+            height: 50px;
+            width: 250px;
+            text-align: center;
+            font-weight: bold;
+            font-size: large;
+        }
+
+            .innerLoading img {
+                margin-top: 200px;
+                height: 10px;
+                width: 100px;
+            }
 
         .nv-controlsWrap {
             visibility: hidden;
@@ -62,7 +102,6 @@
         .divchkbox label {
           vertical-align: text-bottom;
         }
-     
     </style>
 
 
@@ -83,6 +122,7 @@
         function HideWait() {
             $('.loading').fadeOut('fast');//, function () { });
         }
+        
         $(function () {
 
             //drawGraph();
@@ -137,11 +177,17 @@
             });
             $('#txtValue').val(selectedVals);
         }
-
+       
     </script>
 </head>
 <body>
     <form id="form1" runat="server">
+        <div class="loading">
+            <div class="innerLoading">
+                <img src="../Administration/images/load.gif" alt="loading" />
+                Please Wait...
+            </div>
+        </div>
         <asp:ScriptManager ID="ScriptManager1" runat="server" AsyncPostBackTimeOut="180000"> </asp:ScriptManager>
         <div class="mainDivS">
             <div class="Head" style="float: none; font-size: 35px; text-align:center; font-family:Tahoma; color: #00549f;margin-top:-45px">
@@ -196,7 +242,7 @@
                                 <span style="text-align:right; font-size:12px;color: #00549f;vertical-align: text-bottom;">Count Mistrial</span>
                             </td>
                             <td>
-                                 <asp:radiobutton runat="server" id="R1" text=""  style="text-align:right;font-weight:bolder;font-size:12px;color: #00549f;padding-right:10px"></asp:radiobutton>
+                                        <asp:CheckBox id="highcheck" runat="server"  Text=""></asp:CheckBox>
                             </td>
                         </tr>
                     </table>
@@ -319,7 +365,455 @@
 
             </div>
         </div> 
+        <div>
+             <asp:Label ID="lblNoData" runat="server" Text=""></asp:Label>
+     <div id = "graphcontainer" style = "width: 1116.899603148px; height: 578.268px; margin: 0 auto" runat="server"></div>
+        </div>
         <!--olddashboard-teacher--end-->
+        <script>
+            function loadClinicbyClient(classid, studentid) {
+    var jsonData = JSON.stringify({ cid: classid, sid: studentid });
+    $.ajax({
+        type: "POST",
+        url: "DashboardReportNew.aspx/getClientClinic",
+        data: jsonData,
+        contentType: "application/json; charset=utf-8",
+        async: false,
+        dataType: "json",
+        success: function (response) {
+            var parsed = JSON.parse(response.d);
+            if (parsed.length != 0) {
+                var aData = parsed;
+                var behav = [];
+                var categoriesdata = [];
+                var seriesdata = [];
+                var result = [];
+                $.map(aData, function (item, index) {
+                    categoriesdata.push(item['StudentName']);
+                });
+                $.map(categoriesdata, function (item, index) {
+                    if (!result.includes(item)) {
+                        result.push(item);
+                    }
+
+                });
+                var len = result.length;
+                $.map(aData, function (item, index) {
+                    if (result.includes(item['StudentName'])) {
+                        var index;
+                        result.some(function (elem, inx) {
+                            if (elem === item['StudentName']) {
+                                index = inx;
+                            }
+                        });
+                        var dt = [];
+                        var i = 0;
+                        while (i < len) {
+                            if (i == index) {
+
+                                dt.push({ y: item['BehaviourSession'], name: item['BehaviourName'] });
+                            }
+                            else {
+                                dt.push({ y: 0, name: '' });
+                            }
+
+
+                            i = i + 1;
+
+                        }
+
+                        var daa = JSON.parse(JSON.stringify(dt));
+                        var seriesdict = new Object;
+                        var ser = new Object;
+                        seriesdict['name'] = item['BehaviourName'];
+                        seriesdict['data'] = daa;
+                        seriesdata.push(seriesdict);
+                        behav.push(item['BehaviorNameToolTip']);
+
+                        while (dt.length > 0) {
+                            dt.pop();
+                        }
+                    }
+
+
+                });
+                var cat = JSON.parse(JSON.stringify(result));
+                var dat = JSON.parse(JSON.stringify(seriesdata));
+                var beh = JSON.parse(JSON.stringify(behav));
+                var titletext='Clinical by client';
+                drawChartClinic(cat, dat, beh,titletext);
+                HideWait();
+            }
+            else {
+                HideWait();
+                var nodata = document.getElementById('lblNoData');
+                nodata.innerHTML = "No Data Available";
+            }
+        },
+        error: OnErrorCall_
+    });
+
+    function OnErrorCall_(response) {
+        alert("Whoops something went wrong!");
+
+    }
+}
+            function loadAcbyClient(classid, studentid, mistrial) {
+                var jsonData = JSON.stringify({ classid: classid, studentid: studentid, mistrial: mistrial });
+                $.ajax({
+                    type: "POST",
+                    url: "DashboardReportNew.aspx/getAClient",
+                    data: jsonData,
+                    contentType: "application/json; charset=utf-8",
+                    async: false,
+                    dataType: "json",
+                    success: function (response) {
+                        var parsed = JSON.parse(response.d);
+                        if (parsed.length != 0) {
+                            var aData = parsed;
+                            var categoriesdata = [];
+                            var seriesdata = [];
+                            var result = [];
+                            $.map(aData, function (item, index) {
+                                categoriesdata.push(item['StudentName']);
+                            });
+                            $.map(categoriesdata, function (item, index) {
+                                if (!result.includes(item)) {
+                                    result.push(item);
+                                }
+                            });
+                            var len = result.length;
+                            $.map(aData, function (item, index) {
+                                if (result.includes(item['StudentName'])) {
+                                    var index;
+                                    result.some(function (elem, inx) {
+                                        if (elem === item['StudentName']) {
+                                            index = inx;
+                                        }
+                                    });
+                                    var dt = [];
+                                    var i = 0;
+                                    while (i < len) {
+                                        if (i == index) {
+
+                                            dt.push({ y: item['SessionCount'], name: item['LessonName'] });
+                                        }
+                                        else {
+                                            dt.push({ y: 0, name: '' });
+                                        }
+                                        i = i + 1;
+                                    }
+                                    var daa = JSON.parse(JSON.stringify(dt));
+                                    var seriesdict = new Object;
+                                    seriesdict['name'] = item['LessonName'];
+                                    seriesdict['data'] = daa;
+                                    seriesdata.push(seriesdict);
+                                    while (dt.length > 0) {
+                                        dt.pop();
+                                    }
+                                }
+                            });
+                            var cat = JSON.parse(JSON.stringify(result));
+                            var dat = JSON.parse(JSON.stringify(seriesdata));
+                            drawChartAc(cat, dat);
+                            HideWait();
+                        }
+                        else {
+                            var nodata = document.getElementById('lblNoData');
+                            nodata.innerHTML = "No Data Available";
+                            HideWait();
+                        }
+                        },
+
+                    error: OnErrorCall_
+                });
+                function OnErrorCall_(response) {
+                    alert("Whoops something went wrong!");
+
+                }
+            }
+            function drawChartClinic(cat, da, be, titletext) {
+                var intrvl = 1;
+                var maxy = null;
+                var ytext = '';
+                if (titletext != 'Clinical by client') {
+                    intrvl = 10;
+                    maxy = 100;
+                }
+                else {
+                    ytext = 'Total Behavior Count';
+                }
+                Highcharts.chart('graphcontainer', {
+                    chart: {
+                        type: 'bar'
+                    },
+                    title: {
+                        text: titletext,
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    xAxis: {
+                        categories: cat,
+                        title: {
+                            text: 'Client Name',
+                            useHTML: true,
+                            style: {
+                                fontWeight: 'bold',
+                                color: 'black',
+                                fontSize: '12px',
+                                fontFamily: 'Arial'
+
+                            }
+                        },
+                        labels: {
+                            enabled: true,
+                            useHTML: true,
+                            style: {
+                                color: 'black',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                fontFamily: 'Arial'
+
+                            }
+                        },
+                    },
+                    yAxis: {
+                        min: 0,
+                        max: maxy,
+                        tickInterval: intrvl,
+                        opposite:true,
+                        title: {
+                            text: ytext,
+                            useHTML: true,
+                            style: {
+                                fontWeight: 'bold',
+                                color: 'black',
+                                fontSize: '12px',
+                                fontFamily: 'Arial'
+
+                            }
+                        },
+                        labels: {
+                            enabled: true,
+                            useHTML: true,
+                            style: {
+                                color: 'black',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                fontFamily: 'Arial'
+
+                            }
+                        },
+                    },
+
+                    legend: {
+                        reversed: true,
+                        enabled: false,
+                    },
+                    plotOptions: {
+                        series: {
+                            stacking: 'normal'
+                        },
+                        bar: {
+                            dataLabels: {
+                                enabled: true,
+                                formatter: function () {
+                                    if (titletext != 'Clinical by client') {
+                                        return this.point.y + "%";
+                                    } else {
+                                        return this.point.name;
+                                    }
+                                },
+                                style: {
+                                    fontWeight: 'bold',
+                                    fontSize: '12px',
+                                    fontFamily: 'Arial',
+                                    color: 'black',
+                                }
+                            }
+                        },
+                    },
+                    tooltip: {
+                        formatter: function () {
+                            if (titletext != 'Clinical by client') {
+                                return this.point.ToolTip;
+                            }
+                            else {
+                                var serieI = this.series.index;
+                                return be[serieI];
+                            }
+                        }
+
+                    },
+
+                    series: da
+
+                });
+
+            }
+            function drawChartAc(cat, da) {
+
+                Highcharts.chart('graphcontainer', {
+                    chart: {
+                        type: 'bar'
+                    },
+                    title: {
+                        text: 'Academic by client'
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    xAxis: {
+                        categories: cat,
+                        //   categories:['a','b'],
+                        title: {
+                            text: 'Client Name',
+                            useHTML: true,
+                            style: {
+                                fontWeight: 'bold',
+                                color: 'black',
+                                fontSize: '12px',
+                                fontFamily: 'Arial'
+
+                            }
+                        },
+                        labels: {
+                            enabled: true,
+                            useHTML: true,
+                            style: {
+                                color: 'black',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                fontFamily: 'Arial'
+
+                            }
+                        },
+                    },
+                    yAxis: {
+                        min: 0,
+                        tickInterval: 1,
+                        opposite:true,
+                        title: {
+                            text: 'Total Sessions',
+                            useHTML: true,
+                            style: {
+                                fontWeight: 'bold',
+                                color: 'black',
+                                fontSize: '12px',
+                                fontFamily: 'Arial'
+
+                            }
+                        },
+                        labels: {
+                            enabled: true,
+                            useHTML: true,
+                            style: {
+                                color: 'black',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                fontFamily: 'Arial'
+
+                            }
+                        },
+                    },
+                    legend: {
+                        reversed: true,
+                        enabled: false,
+                    },
+                    plotOptions: {
+                        bar: {
+                            dataLabels: {
+                                enabled: true,
+                                formatter: function () {
+                                    return this.point.name;
+                                },
+                                style: {
+                                    fontWeight: 'bold',
+                                    fontSize: '12px',
+                                    fontFamily: 'Arial',
+                                    color: 'black',
+                                }
+                            }
+                        },
+                        series: {
+                            stacking: 'normal'
+                        }
+
+                    },
+                    series: da
+                });
+
+            }
+            function loadAcbyClientPerc(classid, studentid) {
+                var jsonData = JSON.stringify({ classid: classid, studentid: studentid });
+                $.ajax({
+                    type: "POST",
+                    url: "DashboardReportNew.aspx/getAClientPerc",
+                    data: jsonData,
+                    contentType: "application/json; charset=utf-8",
+                    async: false,
+                    dataType: "json",
+                    success: function (response) {
+                        var parsed = JSON.parse(response.d);
+                        if (parsed.length != 0) {
+                            var aData = parsed;
+                            var categoriesdata = [];
+                            var seriesdata = [];
+                            var result = [];
+                            tooltiparr = [];
+                            $.map(aData, function (item, index) {
+                                categoriesdata.push(item['StudentName']);
+                            });
+                            $.map(categoriesdata, function (item, index) {
+                                if (!result.includes(item)) {
+                                    result.push(item);
+                                }
+                            });
+                            var len = result.length;
+                            var percData = []; var avgscore = [];
+                            result.forEach(function (item) {
+                                var score = 0, count = 0;
+                                var tooltip = '';
+                                aData.forEach(function (it) {
+                                    if (item == it.StudentName) {
+                                        score = score + it.Percentage;
+                                        count = count + 1;
+                                        tooltip=it.LessonNameToolTip;
+                                    }
+                                });
+                                var ydict = new Object;
+                                ydict['y'] = score / count;
+                                ydict['ToolTip'] = tooltip;
+                                avgscore.push(ydict);
+                            });
+                            var seriesdict = new Object;
+                            seriesdict['name'] = "Percentage";
+                            seriesdict['data'] = avgscore;
+                            seriesdict['colorByPoint'] = true;
+                            percData.push(seriesdict);
+                            var cat = JSON.parse(JSON.stringify(result));
+                            var dat = JSON.parse(JSON.stringify(percData));
+                            var titletext='Percentage of Block Scheduled Lessons';
+                            drawChartClinic(cat, dat, tooltiparr,titletext);
+                            HideWait();
+                        }
+                        else {
+                            var nodata = document.getElementById('lblNoData');
+                            nodata.innerHTML = "No Data Available";
+                            HideWait();
+                        }
+                    },
+
+                    error: OnErrorCall_
+                });
+                function OnErrorCall_(response) {
+                    alert("Whoops something went wrong!");
+
+                }
+            
+            }
+        </script>
     </form>
 </body>
 </html>

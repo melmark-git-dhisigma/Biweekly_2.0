@@ -213,22 +213,34 @@ public class clsData
     }
    
 
-    public object ExecuteIOAPercCalculation(int NormalTable, int IOATable)
+    public object ExecuteIOAPercCalculation(int NormalTable, int IOATable, SqlConnection con, SqlTransaction trans)
     {
-        using (cmd = new SqlCommand())
-        {
-            SqlConnection con = Open();
-            // if (blnTrans) cmd.Transaction = Trans;
-            cmd.Connection = con;
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Clear();
-            cmd.Parameters.AddWithValue("@NormalSessHdr", NormalTable);
-            cmd.Parameters.AddWithValue("@IOASessHdr", IOATable);
-            cmd.CommandText = "IOAPercentage_Calculation";
 
-            object content = cmd.ExecuteScalar();
-            Close(con);
-            return content;
+        try
+        {
+            using (cmd = new SqlCommand())
+
+            {
+                //SqlConnection con = Open();
+                // if (blnTrans) cmd.Transaction = Trans;
+                cmd.Connection = con;
+                cmd.Transaction = trans;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Clear();
+                cmd.Parameters.AddWithValue("@NormalSessHdr", NormalTable);
+                cmd.Parameters.AddWithValue("@IOASessHdr", IOATable);
+                cmd.CommandText = "IOAPercentage_Calculation";
+
+                object content = cmd.ExecuteScalar();
+                //Close(con);
+                return content;
+            }
+        }
+        catch (Exception ex)
+        {
+            object content = null;
+            trans.Rollback();
+            return (content);
         }
     }
 
@@ -1787,6 +1799,32 @@ public class clsData
             cmd.Parameters.AddWithValue("@ParamClassid", cid);
             cmd.Parameters.AddWithValue("@ParamStudid", sid);
             cmd.Parameters.AddWithValue("@ParamMistrial", mis);
+            da = new SqlDataAdapter(cmd);
+            da.Fill(Dt);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error: " + e);
+        }
+        finally
+        {
+            Close(con);
+        }
+        return Dt;
+    }
+    public DataTable ReturnNewAcademicTablePerc(string ProcName, string cid, string sid)
+    {
+        DataTable Dt = new DataTable();
+        SqlConnection con = Open();
+        try
+        {
+
+
+            SqlDataAdapter da = new SqlDataAdapter();
+            cmd = new SqlCommand(ProcName, con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@ParamClassid", cid);
+            cmd.Parameters.AddWithValue("@ParamStudid", sid);
             da = new SqlDataAdapter(cmd);
             da.Fill(Dt);
         }
