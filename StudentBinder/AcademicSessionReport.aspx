@@ -463,6 +463,7 @@
                                     <asp:ListItem Value="Incidental">Incidental Teaching Graph</asp:ListItem>
                                     <asp:ListItem Value="Regular" Selected="True">Regular Graph</asp:ListItem>
                                 </asp:RadioButtonList>
+                                        <asp:CheckBox id="Mhighcheck" runat="server"  Text=""></asp:CheckBox>
                             </td>
                         </tr>
 
@@ -1239,6 +1240,7 @@
                                             symb['states'] = { hover: { enabled: true } }
                                             catdata['symbol'] = symb;
                                             catdata['yAxis'] = 0;
+                                            catdata['index'] = 2;
                                             catdata['value'] = (item['Score']);
                                             data.push(catdata);
                                             yAxis[catdata['name']] = catdata['yAxis'];
@@ -1260,6 +1262,7 @@
                                             symb['states'] = { hover: { enabled: true } }
                                             catdata['symbol'] = symb;
                                             catdata['yAxis'] = 1;
+                                            catdata['index'] = 3;
                                             catdata['value'] = (item['DummyScore']);
                                             data.push(catdata);
                                             yAxis[catdata['name']] = catdata['yAxis'];
@@ -1503,6 +1506,13 @@
                                         }
                                     }
                                 }
+                                if (secstatus) {
+                                    plotarr['yAxis'] = 1;
+                                }
+                                else {
+                                    plotarr['yAxis'] = 0;
+                                }
+                                plotarr['index'] = 1;
                                 plotarr['data'] = mergedarr;
                                 if (plotarr['data'].length != 0) {
                                     ser.push(plotarr);
@@ -1688,8 +1698,15 @@
                                                         }
                                                     }
                                                     else if (point.arrowval) {
+                                                            if (this.y > 0) {
+                                                                this.rotation=90;
                                                         return '<span style="transform: rotate(-45deg); display: block; white-space: nowrap;font-size: 12px; font-family:Arial;font-color:black;text-shadow: none;font-weight:normal;">' + point.arrowval;
                                                     }
+                                                            else{
+                                                                return '<span style="transform: rotate(-45deg); display: block; white-space: nowrap;font-size: 12px; font-family:Arial;font-color:black;text-shadow: none;font-weight:normal;">' + point.arrowval;
+                                                           
+                                                            }
+                                                            }
                                                     else {
                                                         return '';
                                                     }
@@ -2589,6 +2606,7 @@ year
                                         symb['states'] = { hover: { enabled: true } }
                                         catdata['symbol'] = symb;
                                         catdata['yAxis'] = 0;
+                                        catdata['index'] = 2;
                                         catdata['value'] = (item['Score']);
                                         data.push(catdata);
                                         yAxis[catdata['name']] = catdata['yAxis'];
@@ -2610,6 +2628,7 @@ year
                                         symb['states'] = { hover: { enabled: true } }
                                         catdata['symbol'] = symb;
                                         catdata['yAxis'] = 1;
+                                        catdata['index'] = 3;
                                         catdata['value'] = (item['DummyScore']);
                                         data.push(catdata);
                                         yAxis[catdata['name']] = catdata['yAxis'];
@@ -2852,6 +2871,13 @@ year
                                         }
                                     }
                                 }
+                                if (secstatus) {
+                                    plotarr['yAxis'] = 1;
+                                }
+                                else {
+                                    plotarr['yAxis'] = 0;
+                                }
+                                plotarr['index'] = 1;
                                 plotarr['data'] = mergedarr;
                                 if (plotarr['data'].length != 0) {
                                     ser.push(plotarr);
@@ -2878,10 +2904,24 @@ year
                     setTimeout(callback, 1000);
                 }
             function captureAndSend(lessid, callback) {
-                html2canvas($("#HighchartGraph")[0]).then(function (canvas) {
-                    base64 = canvas.toDataURL();
+                //html2canvas($("#HighchartGraph")[0]).then(function (canvas) {
+                //    base64 = canvas.toDataURL();
+                //    var dataToSend = {
+                //        base64: base64, chartId: lessid
+                //    };
+
+                var element = document.getElementById("HighchartGraph");
+
+                var scale = window.devicePixelRatio;
+                html2canvas(element, {
+                    scale: scale,
+                    width: element.offsetWidth * scale,
+                    height: element.offsetHeight * scale
+                }).then(function (canvas) {
+                    var base64 = canvas.toDataURL();
                     var dataToSend = {
-                        base64: base64, chartId: lessid
+                        base64: base64,
+                        chartId: lessid
                     };
                     $.ajax({
                         type: "POST",
@@ -2902,6 +2942,583 @@ year
                 setTimeout(callback, 1000);
             
             }
+        </script>
+        <script>
+            //Start maint report
+            function loadMchart(startdate,enddate,studid,lessid,schoolid,events,trend,checkioa,classtype,setid,reporttype,incidtype,callback)
+            {
+                var treatment = '';
+                // set cont size start
+                var myDiv = document.getElementById('cont');
+                if (reporttype == "true" || reporttype == "True") {
+                    myDiv.style.width = '671.976pt';
+                    myDiv.style.height = '510.2364pt';
+                } else {
+                    myDiv.style.width = '935.43307pt';
+                    myDiv.style.height = '688.901215752pt';
+                }
+
+                var jsonData = JSON.stringify({ startdate: startdate, enddate: enddate, studid: studid,lessid:lessid,schoolid:schoolid,events:events,trend:trend,checkioa:checkioa,classtype:classtype,setid:setid });
+                $.ajax({
+                    type: "POST",
+                    url: "AcademicSessionReport.aspx/getMaintreport",
+                    data: jsonData,
+                    contentType: "application/json; charset=utf-8",
+                    async: false,
+                    dataType: "json",
+                    success: function (response) {
+                        var inputsDate = startdate;
+                        inputsDate = inputsDate.replace(/-/g, '/');
+                        var inputeDate = enddate;
+                        inputeDate = inputeDate.replace(/-/g, '/');
+                        var res = JSON.parse(response.d);
+                        if (res.length != 0) {
+                            document.getElementById('sname').innerHTML = res[0].StudentName;
+                            document.getElementById('lnam').innerHTML = res[0].LessonPlanName;
+                            document.getElementById('daterang').innerHTML = convertDateFormat(inputsDate) + "-" + convertDateFormat(inputeDate);
+                            if (schoolid == 1) {
+                                document.getElementById('mel').innerHTML = 'Melmark New England';
+                            }
+                            else {
+                                document.getElementById('mel').innerHTML = 'Melmark Pennsylvania';
+                            }
+                            if (res[0].Deftn != null) {
+                                document.getElementById('deftxt').innerHTML = 'Definition:    ' + res[0].Deftn;
+                            }
+                            else {
+                                document.getElementById('deftxt').innerHTML = 'Definition:    ';
+                            }
+                            treatment = res[0].Treatment + '<br><br>';
+
+                            var leftmax, rightmax;
+                            leftmax = res[0].MaxScore;
+                            rightmax = res[0].MaxDummyScore;
+                            res.sort(sortByDate);
+                            var secstatus = true;
+                            // primary and secondary y axis start.
+                            var leftY = res[0].LeftYaxis;
+                            var rightY = res[0].RightYAxis;
+                            if (rightY == null) {
+                                secstatus = false;
+                            }
+                            var prevRow = minumumSession(res);
+                            $.map(res, function (item, index) {
+                                if (item['NewRow'] != null) {
+                                    item['NewRow'] = item['NewRow'];
+                                    prevRow = item['NewRow'];
+                                }
+                                else {
+                                    $.map(res, function (ite, index) {
+                                        if (ite['NewRow'] != null && ite['NewRow'] >= prevRow + 1) {
+                                            ite['NewRow'] = ite['NewRow'] + 1;
+                                        }
+                                    });
+                                    item['NewRow'] = prevRow + 1;
+                                    prevRow = item['NewRow']
+                                }
+                            });
+                            //same rownum with different date start
+                            res.sort(function (a, b) {
+                                return a.NewRow - b.NewRow || new Date(a.SessionDate) - new Date(b.SessionDate);
+                            });
+
+                            for (var i = 1; i < res.length; i++) {
+                                if (res[i].NewRow === res[i - 1].NewRow && res[i].SessionDate !== res[i - 1].SessionDate) {
+
+                                    for (var j = i; j < res.length; j++) {
+                                        res[j].NewRow = res[j].NewRow + 1;
+
+
+                                    }
+                                }
+
+                            }
+
+                            ////same rownum with different date end
+                            //end newrow correction
+                            //x category start // regular graph category start
+                            var catarr = [];
+                            var processedNames = [];
+                            var xval = 0;
+                            var xvalarr = [];
+
+                            $.map(res, function (item, index) {
+                                var ssdate = extractTimestamp(item['SessionDate']);
+                                var name = formatDate(ssdate);
+
+                                var isDuplicate = false;
+                                for (var i = 0; i < processedNames.length; i++) {
+                                    if (processedNames[i] === name) {
+                                        isDuplicate = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!isDuplicate) {
+                                    var catdata = new Object;
+                                    catdata['name'] = name;
+                                    var carray = [];
+
+                                    $.map(res, function (ite, index) {
+                                        if (ssdate === extractTimestamp(ite['SessionDate'])) {
+                                            if (ite['Rownum'] == null && ite['CalcType'] == 'Event') {
+                                                ite['Rownum'] = "";
+                                                xvalarr.push(xval);
+                                            }
+                                            if (!CheckforRow(carray, ite['Rownum'])) {
+                                                carray.push(ite['Rownum']);
+                                                xval = xval + 1;
+                                            }
+                                        }
+                                    });
+                                    catdata['categories'] = carray;
+                                    catarr.push(catdata);
+                                    processedNames.push(name);
+                                }
+                            });
+                            var rotangle = -90;
+                            var finalsort = catarr.map(function (order, key) {
+                                var oldname = order.name.split('/');
+                                var newname = oldname[0] + '/' + oldname[1] + '/' + oldname[2].substring(oldname[2].length - 2);
+                                var narr = {
+
+                                    "name": newname,
+                                    "categories": order.categories
+
+                                }
+
+                                return narr;
+                            });
+                            if (finalsort.length == 1) {
+                                rotangle = 0;
+                            }
+                            // regular graph category end
+                            var incCat = [];
+                            // incident graph category start
+                            if (incidtype == "True" || incidtype == "true") {
+                                $.map(res, function (item, index) {
+                                    var existsInArray = false;
+                                    for (var i = 0; i < res.length; i++) {
+                                        if (incCat[i] === item['Rownum']) {
+                                            existsInArray = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (!existsInArray) {
+                                        incCat.push(item['Rownum']);
+                                    }
+                                });
+                            }
+                            // incident graph category end
+                            // x category end
+                            // Plot Data Start
+                            var data = [];
+                            var yAxis = [];
+                            var color = [];
+                            var symbol = [];
+                            var yAxisAr = [];
+                            var colorAr = [];
+                            var symbolAr = [];
+                            var arrowArray = [];
+                            var arrowNull = [];
+                            var calc = []; var perc = []; var nonperc = [];
+                            var dummy = [];
+                            var prevtype;
+                            $.map(res, function (item, index) {
+                                if (item['CalcType'] != 'Event') {
+                                    var yax;
+
+                                    if (item['LeftYaxis'] != null && item['RightYAxis'] == null || item['LeftYaxis'] == null && item['RightYAxis'] != null) {
+                                        yax = 0;
+                                    }
+                                    else if (item['CalcType'] != "Total Duration" && item['CalcType'] != "Total Correct" && item['CalcType'] != "Total Incorrect" && item['CalcType'] != "Frequency" && item['CalcType'] != "Avg Duration" && item['CalcType'] != "Customize" && item['CalcType'] != "Event" && item['CalcType'] != item['RightYAxis']) {
+                                        yax = 0;
+                                    }
+                                    else {
+                                        yax = 1;
+                                    }
+
+                                    if (yax == 0 || item['RptLabel'] == item['LeftYaxis']) {
+                                        var catdata = {};
+                                        var symb = {};
+
+                                        catdata['date'] = item['NewRow'] - 1;
+                                        catdata['name'] = item['ColName'] + '-' + item['RptLabel'];
+                                        catdata['Color'] = item['Color'];
+                                        catdata['IOAPerc'] = item['IOAPerc'];
+                                        catdata['dateval'] = extractdate(item['SessionDate']);
+                                        symb['symbol'] = item['Shape'].toLowerCase();
+                                        symb['enabled'] = true;
+                                        symb['states'] = { hover: { enabled: true } }
+                                        catdata['symbol'] = symb;
+                                        catdata['yAxis'] = 0;
+                                        catdata['index'] = 2;
+                                        catdata['value'] = (item['Score']);
+                                        data.push(catdata);
+                                        yAxis[catdata['name']] = catdata['yAxis'];
+                                        color[catdata['name']] = catdata['Color'];
+                                        symbol[catdata['name']] = catdata['symbol'];
+                                        calc[catdata['name']] = catdata['CalcType'];
+                                    }
+                                    else {
+                                        var catdata = {};
+                                        var symb = {};
+
+                                        catdata['date'] = item['NewRow'] - 1;
+                                        catdata['name'] = item['ColName'] + '-' + item['RptLabel'];
+                                        catdata['Color'] = item['Color'];
+                                        catdata['IOAPerc'] = item['IOAPerc'];
+                                        catdata['dateval'] = extractdate(item['SessionDate']);
+                                        symb['symbol'] = item['Shape'].toLowerCase();
+                                        symb['enabled'] = true;
+                                        symb['states'] = { hover: { enabled: true } }
+                                        catdata['symbol'] = symb;
+                                        catdata['yAxis'] = 1;
+                                        catdata['index'] = 3;
+                                        catdata['value'] = (item['DummyScore']);
+                                        data.push(catdata);
+                                        yAxis[catdata['name']] = catdata['yAxis'];
+                                        color[catdata['name']] = catdata['Color'];
+                                        symbol[catdata['name']] = catdata['symbol'];
+                                        calc[catdata['name']] = catdata['CalcType'];
+                                    }
+                                }
+
+                            });
+
+                            // score and dummy score start
+                            var newData = []; var names = [];
+                            data.forEach(function (item) {
+                                if (!names[item.name]) {
+                                    names[item.name] = true;
+                                    newData.push(item.name);
+                                }
+                            });
+                            var ser = newData.map(function (name) {
+                                return {
+                                    name: name,
+                                    yAxis: yAxis[name],
+                                    color: color[name],
+                                    marker: symbol[name],
+                                    dataGrouping: { enabled: true },
+                                    data: data.filter(function (item) {
+                                        return item.name === name;
+                                    }).map(function (item) {
+                                        return {
+                                            x: item.date,
+                                            y: item.value,
+                                            IOAPerc: item.IOAPerc,
+                                            dateval: item.dateval
+                                        };
+                                    })
+                                };
+
+                            });
+                            // score and dummy score start
+
+                            //set duplicate series (case:no series) start
+                            dupdata = [];
+                            if (data.length === 0) {
+                                var samdata = {};
+                                var sd = rownum[0]; var ed = rownum[rownum.length - 1];
+                                samdata['data'] = [{ x: sd, y: null }, { x: ed, y: null }];
+                                samdata['showInLegend'] = false;
+                                dupdata.push(samdata);
+                                ser = dupdata;
+                                leftmax = 1; rightmax = 1;
+                            }
+                            //set duplicate series (case:no series) end
+                            //trend start
+                            var arrData = []; var yAxis1 = []; var color1 = []; var symbol1 = [];
+                            $.map(res, function (item, index) {
+
+                                if (item['CalcType'] != 'Event' && trend == "Quarter") {
+                                    var yax;
+
+                                    if (item['LeftYaxis'] != null && item['RightYAxis'] == null || item['LeftYaxis'] == null && item['RightYAxis'] != null) {
+                                        yax = 0;
+                                    }
+                                    else if (item['CalcType'] != "Total Duration" && item['CalcType'] != "Total Correct" && item['CalcType'] != "Total Incorrect" && item['CalcType'] != "Frequency" && item['CalcType'] != "Avg Duration" && item['CalcType'] != "Customize" && item['CalcType'] != "Event" && item['CalcType'] != item['RightYAxis']) {
+                                        yax = 0;
+                                    }
+                                    else {
+                                        yax = 1;
+                                    }
+                                    if (yax == 0 || item['RptLabel'] == item['LeftYaxis'] || (item['RptLabel'] != item['LeftYaxis'] && secstatus == false)) {
+                                        var trnddata = {};
+                                        var symbarr = {};
+                                        trnddata['date'] = (item['NewRow'] - 1);
+                                        trnddata['name'] = item['ColName'] + '-' + item['CalcType'] + 'trend';
+                                        trnddata['value'] = item['Trend'];
+                                        trnddata['Color'] = "Gray";
+                                        symbarr['enabled'] = false;
+                                        trnddata['symbol'] = symbarr;
+                                        trnddata['yAxis1'] = 0;
+                                        arrData.push(trnddata);
+                                        yAxis1[trnddata['name']] = trnddata['yAxis1'];
+                                        color1[trnddata['name']] = trnddata['Color'];
+                                        symbol1[trnddata['name']] = trnddata['symbol'];
+                                    }
+                                    else {
+                                        var trnddata = {};
+                                        var symbarr = {};
+                                        trnddata['date'] = (item['NewRow'] - 1);
+                                        trnddata['name'] = item['ColName'] + '-' + item['CalcType'] + 'trend';
+                                        trnddata['value'] = item['Trend'];
+                                        trnddata['Color'] = "Gray";
+                                        symbarr['enabled'] = false;
+                                        trnddata['symbol'] = symbarr;
+                                        trnddata['yAxis1'] = 1;
+                                        arrData.push(trnddata);
+                                        yAxis1[trnddata['name']] = trnddata['yAxis1'];
+                                        color1[trnddata['name']] = trnddata['Color'];
+                                        symbol1[trnddata['name']] = trnddata['symbol'];
+
+                                    }
+                                }
+                            });
+                            var newData1 = []; var name1 = [];
+                            // var newdata1 = [...new Set(arrData.map(item => item.name))];
+                            arrData.forEach(function (item) {
+                                if (!name1[item.name]) {
+                                    name1[item.name] = true;
+                                    newData1.push(item.name);
+                                }
+                            });
+                            var ser1 = newData1.map(function (name) {
+                                return {
+                                    name: "",
+                                    yAxis: yAxis1[name],
+                                    color: color1[name],
+                                    marker: symbol1[name],
+                                    dashStyle: "DashDotDot",
+                                    lineWidth: 2,
+                                    showInLegend: false,
+                                    data: arrData.filter(function (item) {
+                                        return item.name === name;
+                                    }).map(function (item) {
+                                        return {
+                                            x: item.date,
+                                            y: item.value
+                                        };
+                                    })
+                                };
+                            });
+                            //trend  end
+                            ser = ser.concat(ser1);
+                            //Event plot Start
+                            var plotdata = [];
+                            var maxYPosition = 300;
+                            var currentYPosition = 0;
+                            $.map(res, function (item, index) {
+                                var style; var wid;
+                                if (item['CalcType'] == "Event" && item['EventType'] != null && item['EventType'] != 'Arrow notes') {
+
+                                    if (item['EventType'] == "Major") {
+                                        style = 'solid';
+                                        wid = 1;
+                                    }
+                                    else {
+                                        style = 'dot';
+                                        wid = 2;
+                                    }
+
+                                    var plotdict = new Object;
+                                    plotdict['color'] = "black";
+                                    plotdict['dashStyle'] = style;
+
+                                    plotdict['value'] = (item['NewRow'] - 1);
+                                    plotdict['width'] = wid;
+                                    if (item['EventName'] == null) {
+                                        item['EventName'] = "";
+                                    }
+                                    var str = item['EventName'];
+                                    var txtal; var xax;
+                                    var valign;
+                                    if (item['EventType'] == "Major") {
+                                        txtal = 'right';
+                                        xax = -2;
+                                        valign = 'middle'
+                                    }
+                                    else {
+                                        txtal = 'left';
+                                        xax = 9;
+                                        valign = 'middle';
+                                    }
+                                    plotdict['label'] = {
+                                        text: str,
+                                        //textAlign: txtal,
+                                        formatter: function () {
+                                            var labelText = this.options.text;
+                                            labelText = labelText.replace(/↑/g, '<span style="font-size: larger;">↑</span>')
+                                                               .replace(/↓/g, '<span style="font-size: larger;">↓</span>');
+                                            return labelText;
+                                        },
+                                        useHTML: true,
+                                        style: {
+                                            fontWeight: 'normal',
+                                            color: 'black',
+                                            fontSize: '12px',
+                                            fontFamily: 'Arial',
+                                            textShadow: 'none',
+                                        },
+                                        // align: 'right',
+                                        x: xax,
+                                        verticalAlign: valign,
+                                        rotation: -90
+                                    };
+                                    plotdict['label']['overflow'] = 'justify';
+                                    plotdict['label']['crop'] = false;
+                                    plotdata.push(plotdict);
+                                }
+                            });
+                            //arrow start( null session)
+                            var arrows = [];
+                            var plotarr = new Object;
+                            var plotNew
+                            plotarr['type'] = 'scatter';
+                            plotarr['name'] = ser[0].name;
+                            plotarr['showInLegend'] = true;
+                            if (incidtype == "True" || incidtype == "true") {
+                                plotarr['color'] = 'black',
+                                plotarr['marker'] = {
+                                    symbol: 'square',
+                                    radius: 4,
+                                }
+                            }
+                            else {
+                                plotarr['marker'] = {
+                                    symbol: 'url(../Scripts/arrownote.png)',
+                                    width: 6,
+                                    height: 8,
+                                }
+                            }
+                            $.map(res, function (item, index) {
+                                if (item['ArrowNote'] != null) {
+
+                                    arrows.push({ x: (item['NewRow'] - 1), y: item['Score'], arrowval: item['ArrowNote'] });
+
+                                }
+                            });
+                            var mergedarr = [];
+                            var mergedKeys = {};
+
+                            for (var i = 0; i < arrows.length; i++) {
+                                var key = arrows[i].x + '-' + arrows[i].y;
+                                if (!mergedKeys[key]) {
+                                    mergedarr.push(arrows[i]);
+                                    mergedKeys[key] = true;
+                                } else {
+                                    for (var j = 0; j < mergedarr.length; j++) {
+                                        if (mergedarr[j].x === arrows[i].x && mergedarr[j].y === arrows[i].y) {
+                                            mergedarr[j].arrowval += ',' + arrows[i].arrowval;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            if (secstatus) {
+                                plotarr['yAxis'] = 1;
+                            }
+                            else {
+                                plotarr['yAxis'] = 0;
+                            }
+                            plotarr['index'] = 1;
+                            plotarr['data'] = mergedarr;
+                            if (plotarr['data'].length != 0) {
+                                ser.push(plotarr);
+                            }
+                            var rownum = JSON.parse(JSON.stringify(finalsort));
+                            var minxvalue = minx(res) - 1;
+                            var maxxvalue = maxx(res) - 1;
+                            if (incidtype == "True" || incidtype == "true") {
+                                drawGraphInc(treatment, secstatus, leftY, rightY, ser, plotdata, incCat, leftmax, rightmax, minxvalue, maxxvalue)
+                            }
+                            else {
+                                drawGraph(treatment, secstatus, leftY, rightY, ser, plotdata, rownum, leftmax, rightmax, minxvalue, maxxvalue, rotangle)
+                            }
+
+
+                        }
+                        else {
+                            $.ajax({
+                                type: "POST",
+                                url: "AcademicSessionReport.aspx/NoMaintReport",
+                                data: JSON.stringify({ studid: studid, lessid: lessid }),
+                                contentType: "application/json; charset=utf-8",
+                                async: false,
+                                dataType: "json",
+                                success: function (resp) {
+                                    var resu = JSON.parse(resp.d);
+                                    var trtmnt = document.getElementById('trtmnt');
+                                    $('#cont').css("display", "none");
+                                    var span = document.getElementById('lbgraphSpan');
+                                    span.innerHTML = "No Data Available";
+                                        trtmnt.style.fontSize = '12px';
+                                        if (resu[0].Treatment != null) {
+                                            document.getElementById('trtmnt').innerHTML = resu[0].Treatment;
+                                        } else {
+                                            document.getElementById('trtmnt').innerHTML = 'Tx: ';
+                                        }
+
+                                        document.getElementById('lnam').innerHTML = resu[0].LessonPlanName;
+                                        var bname = document.getElementById('lnam');
+                                        bname.style.fontSize = '12px';
+
+                                        var deftxt = document.getElementById('deftxt');
+                                        deftxt.style.fontSize = '12px';
+                                        if (resu[0].Deftn != null) {
+                                            document.getElementById('deftxt').innerHTML = 'Definition:    ' + resu[0].Deftn;
+
+                                        }
+                                        else {
+                                            document.getElementById('deftxt').innerHTML = 'Definition:    ';
+                                        }
+                                        document.getElementById('sname').innerHTML = resu[0].StudentName;
+                                        var studname = document.getElementById('sname');
+                                        studname.style.fontSize = '12px';
+
+                                        document.getElementById('daterang').innerHTML = convertDateFormat(inputsDate) + "-" + convertDateFormat(inputeDate);
+                                        var daterang = document.getElementById('daterang');
+                                        daterang.style.fontSize = '12px';
+                                        if (schoolid == 1) {
+                                            document.getElementById('mel').innerHTML = 'Melmark New England';
+                                        }
+                                        else {
+                                            document.getElementById('mel').innerHTML = 'Melmark Pennsylvania';
+                                        }
+
+                                },
+                                error: function (xhr, status, error) {
+
+                                    console.error("AJAX request failed:", error);
+                                }
+                            });
+
+                        }
+                    },
+                    error: OnErrorCall_
+                });
+                function OnErrorCall_(response) {
+
+                    alert("something went wrong!");
+                }
+                setTimeout(callback, 1000);
+
+
+            }
+            function exportMchart(startdate,enddate,studid,lessid,schoolid,events,trend,checkioa,classtype,setid,reporttype,incidtype)
+            {
+                $('#overlay').hide();
+                loadMchart(startdate, enddate, studid, lessid, schoolid, events, trend, checkioa, classtype, setid, reporttype, incidtype, function () {
+                    captureAndSend(lessid, function () {
+                        DownloadPopup();
+                    });
+
+                });
+            }
+            //end maint.report
         </script>
     </form>
 </body>

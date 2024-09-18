@@ -1902,6 +1902,44 @@ public class clsData
 
     }
 
+
+    public DataTable ReturnMainttable(String proc, String startdate, String enddate, int studid, String lessid, int schoolid, String events, String trend, String checkioa, String classtype,string setid)
+    {
+        DataTable Dt = new DataTable();
+        SqlConnection con = Open();
+        try
+        {
+
+
+            SqlDataAdapter da = new SqlDataAdapter();
+            cmd = new SqlCommand(proc, con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@StartDate", startdate);
+            cmd.Parameters.AddWithValue("@EndDate", enddate);
+            cmd.Parameters.AddWithValue("@StudentId", studid);
+            cmd.Parameters.AddWithValue("@LessonHdrId", lessid);
+            cmd.Parameters.AddWithValue("@SchoolId", schoolid);
+            cmd.Parameters.AddWithValue("@Events", events);
+            cmd.Parameters.AddWithValue("@TrendType", trend);
+            cmd.Parameters.AddWithValue("@IncludeIOA", checkioa);
+            cmd.Parameters.AddWithValue("@ClsType", classtype);
+            cmd.Parameters.AddWithValue("@SetId", setid);
+
+            da = new SqlDataAdapter(cmd);
+            da.Fill(Dt);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error: " + e);
+        }
+        finally
+        {
+            Close(con);
+        }
+        return Dt;
+
+    }
+
     public DataTable ReturnSessTableNext(String proc, String lplan, int studid)
     {
         DataTable Dt = new DataTable();
