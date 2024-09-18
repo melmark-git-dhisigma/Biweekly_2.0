@@ -1931,6 +1931,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
         AttendeesText.Text = "";
         Iepyeartxt.Text = "";
         Ieptxt.Text = "";
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
         // FillStudent();
     }
     protected void btnGenACD_Click(object sender, EventArgs e)
@@ -1990,6 +1991,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 setWritePermissions();
             }
         }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
     private bool validate()
     {
@@ -2002,12 +2004,14 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
         {
             result = false;
             tdMessage.InnerHtml = clsGeneral.warningMsg("Please Select Start Date");
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             return result;
         }
         else if (txtEdate.Text == "")
         {
             result = false;
             tdMessage.InnerHtml = clsGeneral.warningMsg("Please Select End Date");
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             return result;
         }
         else if (txtSdate.Text != "" && txtEdate.Text != "")
@@ -2021,6 +2025,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             {
                 result = false;
                 tdMessage.InnerHtml = clsGeneral.warningMsg("Start date is must before the End date");
+                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                 return result;
             }
 
@@ -2474,7 +2479,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             else
             tdMsg.InnerHtml = clsGeneral.warningMsg("Data Not updated");
         }
-
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
     protected void btnImport_Click(object sender, EventArgs e)
     {
@@ -2487,6 +2492,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
         {
             Directory.Delete(path, true);
         }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
 
 
     }
@@ -3572,6 +3578,8 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 btnUpdateNew.Visible = false;
                 FillData(); 
                 tdMsg.InnerHtml = clsGeneral.sucessMsg("Deleted Successfully...");           
+
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
     protected void LessonTypeSelect(object sender, EventArgs e)
     {
