@@ -3,7 +3,18 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <script type="text/javascript">
-
+        var multiClick = false;
+        function enableButton() {
+            multiClick = false;
+        }
+        function multiClickCheck(btn) {
+            if (!multiClick) {
+                multiClick = true;
+                btn.style.opacity = '0.5';
+                return true;
+            }
+            return false;
+        }
         function deleteSystem() {
             var flag;
             flag = confirm("Are you sure you want to delete this User?");
@@ -154,7 +165,7 @@
                             <asp:Button ID="Button_Search" runat="server" CssClass="btn btn-orange" Text="" OnClick="Button_Search_Click" /></td>
                         <td>
 
-                            <asp:Button ID="Button_Add" runat="server" CssClass="NFButton" Text="Add" OnClick="Button_Add_Click" />
+                            <asp:Button ID="Button_Add" runat="server" CssClass="NFButton" Text="Add" OnClientClic="return multiClickCheck(this);" OnClick="Button_Add_Click" />
 
                         </td>
                     </tr>

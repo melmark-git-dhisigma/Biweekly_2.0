@@ -363,6 +363,7 @@ public partial class Admin_UserList : System.Web.UI.Page
     }
     protected void Button_Add_Click(object sender, EventArgs e)
     {
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
         Response.Redirect("UserCreate.aspx");
     }
     protected void Button_Search_Click(object sender, EventArgs e)

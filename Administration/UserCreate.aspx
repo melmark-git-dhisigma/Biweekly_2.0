@@ -53,6 +53,18 @@
         }
     </script>
     <script type="text/javascript">
+        var multiClickUpload = false;
+        function enableButton() {
+            multiClickUpload = false;
+        }
+        function multiClickCheckUpload(btn) {
+            if (!multiClickUpload) {
+                multiClickUpload = true;
+                btn.style.opacity = '0.5';
+                return true;
+            }
+            return false;
+        }
         function changePassword() {
             var usrHdnval = $("#<%=UserIdToUpdate.ClientID %>");
             $.ajax({
@@ -391,7 +403,7 @@
         <br />
         <div style="width: 100%; padding-left: 10px;">
             <asp:FileUpload ID="fileBulk" runat="server" />
-            <asp:Button ID="btUpload" runat="server" Text="Upload" OnClick="btn_bulkUp_Click" CssClass="NFButton" />
+            <asp:Button ID="btUpload" runat="server" Text="Upload" OnClientClick="return multiClickCheckUpload(this);" OnClick="btn_bulkUp_Click" CssClass="NFButton" />
 
             <asp:LinkButton ID="btnDownload" runat="server" Style="padding-left: 42px;" Text="Download Template" OnClick="btnDownload_Click"></asp:LinkButton>
             <br />
@@ -420,7 +432,7 @@
 
         <div style="width: 100%; padding-left: 10px;">
             <asp:FileUpload ID="fileUploadDel" runat="server" />
-            <asp:Button ID="btnUpDel" runat="server" Text="Upload" OnClick="btnDelUser_Click" CssClass="NFButton" />
+            <asp:Button ID="btnUpDel" runat="server" Text="Upload" OnClientClick="return multiClickCheckUpload(this);" OnClick="btnDelUser_Click" CssClass="NFButton" />
             <br />
         </div>
         <div id="divMessageDel" runat="server" style="width: 98%"></div>
@@ -890,7 +902,7 @@
                 <div class="rounded-corners" id="submitdiv" runat="server">
                     <asp:HiddenField runat="server" ID="UserIdToUpdate" />
                     <asp:HiddenField runat="server" ID="SessnIDToUpdate" />
-                    <asp:Button ID="btnAdd" runat="server" CssClass="NFButton" OnClick="btnAdd_Click"
+                    <asp:Button ID="btnAdd" runat="server" CssClass="NFButton" OnClientClick="return multiClickCheckUpload(this);" OnClick="btnAdd_Click"
                         Text="Save" ValidationGroup="a" TabIndex="20" />
                     <asp:Button ID="btnCancel" runat="server" CssClass="NFButton" Text="Cancel" OnClick="btnCancel_Click" />
                 </div>
