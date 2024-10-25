@@ -100,31 +100,53 @@
         });
     </script>
     <script language="javascript" type="text/javascript">
-        function validate() {
-            var btnValue=$('#<%=btnSave.ClientID %>').val();
-            if (btnValue == "Delete") {
-                flag = confirm("Are you sure to Delete?");
-                return flag;
-            }
-            else {
-                if (document.getElementById("<%=txtClassCode.ClientID%>").value == "") {
-                    document.getElementById("<%=tdMsg.ClientID%>").innerHTML = "<div class='warning_box'>Please Enter Class Code</dv> ";
-                    document.getElementById("<%=txtClassCode.ClientID%>").focus();
-                    return false;
-                }
-                if (document.getElementById("<%=txtCode.ClientID%>").value == "") {
-                    document.getElementById("<%=tdMsg.ClientID%>").innerHTML = "<div class='warning_box'>Please Enter Class Name</dv> ";
-                    document.getElementById("<%=txtCode.ClientID%>").focus();
-                    return false;
-                }
-                if (document.getElementById("<%=txtDescription.ClientID%>").value == "") {
-                    document.getElementById("<%=tdMsg.ClientID%>").innerHTML = "<div class='warning_box'>Please Enter Class Description</dv> ";
-                    document.getElementById("<%=txtDescription.ClientID%>").focus();
-                    return false;
-                }
+        var multiClickAdd = false;
+        var multiClick = false;
 
+        function enableButton() {
+            multiClickAdd = false;
+            multiClick = false;
+        }
+        function multiClickCheckAdd(btn) {
+            if (!multiClickAdd) {
+                multiClickAdd = true;
+                btn.style.opacity = '0.5';
                 return true;
             }
+            return false;
+        }
+        
+        function validate() {
+            if (!multiClick) {
+                var btnValue = $('#<%=btnSave.ClientID %>').val();
+                if (btnValue == "Delete") {
+                    flag = confirm("Are you sure to Delete?");
+                    if (flag) {
+                        multiClick = true;
+                    }
+                    return flag;
+                }
+                else {
+                    if (document.getElementById("<%=txtClassCode.ClientID%>").value == "") {
+                        document.getElementById("<%=tdMsg.ClientID%>").innerHTML = "<div class='warning_box'>Please Enter Class Code</dv> ";
+                        document.getElementById("<%=txtClassCode.ClientID%>").focus();
+                        return false;
+                    }
+                    if (document.getElementById("<%=txtCode.ClientID%>").value == "") {
+                        document.getElementById("<%=tdMsg.ClientID%>").innerHTML = "<div class='warning_box'>Please Enter Class Name</dv> ";
+                        document.getElementById("<%=txtCode.ClientID%>").focus();
+                        return false;
+                    }
+                    if (document.getElementById("<%=txtDescription.ClientID%>").value == "") {
+                        document.getElementById("<%=tdMsg.ClientID%>").innerHTML = "<div class='warning_box'>Please Enter Class Description</dv> ";
+                        document.getElementById("<%=txtDescription.ClientID%>").focus();
+                        return false;
+                    }
+                    multiClicklick = true;
+                    return true;
+                }
+            }
+            return false;
         }
 
         function OnTextChanged() {
@@ -286,7 +308,7 @@
                         <td>
                             <input id="lbtnclassforusers" style="width: 120px" type="button" value="Assign Users" class="NFButton" /></td>
                         <td>
-                            <asp:Button ID="btnAdd" runat="server" Width="120px" CssClass="NFButton" OnClick="btnAdd_Click" Text="Add New"  Visible="False" /></td>
+                            <asp:Button ID="btnAdd" runat="server" Width="120px" CssClass="NFButton" OnClick="btnAdd_Click" OnClientClick ="return multiClickCheckAdd(this);" Text="Add New"  Visible="False" /></td>
                     </tr>
                 </table>
             </td>
@@ -397,7 +419,7 @@
 
                             </td>
                             <td>
-                                <asp:Button ID="btnSearchUser" runat="server" Text="Search" OnClick="btnSearchUser_Click" CssClass="NFButton" /></td>
+                                <asp:Button ID="btnSearchUser" runat="server" Text="Search" OnClick="btnSearchUser_Click" OnClientClick="return multiClickCheckAdd(this);" CssClass="NFButton" /></td>
                         </tr>
                     </table>
 
@@ -469,7 +491,7 @@
                                 </asp:AutoCompleteExtender>
                             </td>
                             <td>
-                                <asp:Button ID="btnSearch" runat="server" Text="Search" OnClick="btnSearch_Click" CssClass="NFButton" /></td>
+                                <asp:Button ID="btnSearch" runat="server" Text="Search" OnClick="btnSearch_Click" CssClass="NFButton" onclientclick ="return multiClickCheckAdd(this);"/></td>
                         </tr>
                     </table>
 
