@@ -6717,7 +6717,10 @@
                 $("#btnCommentLessonInfo").trigger("click");
 
             }
+            if ($('#BtnSavePrompt').is(":visible")) {
+                $("#BtnSavePrompt").trigger("click");
 
+            }
             if ($('#btnsubmit').is(":visible")) {
                 $("#HiddenAppr").trigger("click");
             }

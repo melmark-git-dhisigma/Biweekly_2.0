@@ -11211,7 +11211,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 || !bPromtHirchy || (bPromtHirchy && oDS.ChainType == "Total Task" &&
                                 Session["StepLevelPrompt"] != null && Convert.ToBoolean(Session["StepLevelPrompt"]) == true)
                                 || (bPromtHirchy && oDS.ChainType != "Total Task" && LessonpromptUsed != null &&
-                                sLessonPrompt == LessonpromptUsed[LessonpromptUsed.Length - 1]))
+                                sLessonPrompt == sLPused))
                             {
                                 if (sesResultchain != null)
                                 {
@@ -24449,7 +24449,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         || !bPromtHirchy || (bPromtHirchy && oDS.ChainType == "Total Task" &&
                         Session["StepLevelPrompt"] != null && Convert.ToBoolean(Session["StepLevelPrompt"]) == true)
                         || (bPromtHirchy && oDS.ChainType != "Total Task" && LessonpromptUsed != null &&
-                        sLessonPrompt == LessonpromptUsed[LessonpromptUsed.Length - 1]))
+                        sLessonPrompt == sLPused))
                     {
                         if (sesResultchain != null)
                         {
