@@ -217,6 +217,7 @@ public partial class Admin_UserRights1 : System.Web.UI.Page
         {
             tdMsg.InnerHtml = clsGeneral.warningMsg("Please Select Group...Try Again");
             ddlGroup.Focus();
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             return;
         }
         else
@@ -242,9 +243,11 @@ public partial class Admin_UserRights1 : System.Web.UI.Page
                     ClearFields();
                     tdMsg.InnerHtml = clsGeneral.sucessMsg(Message);
                     SetGui("");
+                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                 }
                 catch (SqlException Ex)
                 {
+                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                     tdMsg.InnerHtml = clsGeneral.failedMsg("Error... Please Try Again or Contact Administrator");
                     throw Ex;
                 }
