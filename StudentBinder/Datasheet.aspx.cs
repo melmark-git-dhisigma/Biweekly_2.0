@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Web.Services;
 using System.Net;
+using System.Text;
 
 public partial class StudentBinder_Datasheet : System.Web.UI.Page
 {
@@ -844,6 +845,19 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (ordervalue == "" || Sampleordervalue == "")
                                             {
                                                 steps = clsMathToSamples.FormStepsInOrderWithAns(ansList, Questions.Length, Questions);
+                                                try{
+                                                    int sessTotStepCount = Convert.ToInt32(Session["TotStepCount"]);
+                                                    int dtRowCount = dt.Rows.Count;
+                                                    int CrntSet = oDS.CrntSet;
+                                                    if (sessTotStepCount != dtRowCount)
+                                                    {
+                                                        clError.WriteToLog("StepCountMismatch:\n"+"StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString() + "\nCurrent SetId:" + CrntSet + "\nSession TotStepCount:"+sessTotStepCount+"  DataTable StepCount:"+dtRowCount+"\nQuery:\n" + sqlStr + "\nDataTable:\n" + ConvertDataTableToString(dt));
+                                                    }
+                                                }
+                                                catch (Exception exep)
+                                                {
+                                                    clError.WriteToLog("StepCountMismatch:Error:" + exep.ToString() + "StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString());
+                                                }
                                                 for (int i = 0; i < dt.Rows.Count; i++)
                                                 {
                                                     ordervalue = ordervalue + "," + dt.Rows[i]["StepId"].ToString();
@@ -1000,6 +1014,20 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         }
                         if (updatestatus == true)
                         {
+                            try
+                            {
+                                int sessTotStepCount = Convert.ToInt32(Session["TotStepCount"]);
+                                int dtRowCount = dt.Rows.Count;
+                                int CrntSet = oDS.CrntSet;
+                                if (sessTotStepCount != dtRowCount)
+                                {
+                                    clError.WriteToLog("StepCountMismatch:\n" + "StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString() + "\nCurrent SetId:" + CrntSet + "\nSession TotStepCount:" + sessTotStepCount + "  DataTable StepCount:" + dtRowCount + "\nQuery:\n" + sqlStr + "\nDataTable:\n" + ConvertDataTableToString(dt));
+                                }
+                            }
+                            catch (Exception exep)
+                            {
+                                clError.WriteToLog("StepCountMismatch:Error:" + exep.ToString() + " StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString());
+                            }
                             if (dt != null && dt.Rows.Count > 0)
                             {
                                 for (int i = 0; i < dt.Rows.Count; i++)
@@ -1160,6 +1188,45 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             }
     }
 
+    public string ConvertDataTableToString(DataTable dt)
+    {
+        StringBuilder sb = new StringBuilder();
+        int[] maxLengths = new int[dt.Columns.Count];
+
+        // Calculate max length for each column
+        for (int i = 0; i < dt.Columns.Count; i++)
+        {
+            maxLengths[i] = dt.Columns[i].ColumnName.Length; // Start with the column name length
+
+            foreach (DataRow row in dt.Rows)
+            {
+                int len = row[i].ToString().Length;
+                if (len > maxLengths[i])
+                {
+                    maxLengths[i] = len;
+                }
+            }
+        }
+
+        // Add column headers with proper alignment
+        for (int i = 0; i < dt.Columns.Count; i++)
+        {
+            sb.Append(dt.Columns[i].ColumnName.PadRight(maxLengths[i] + 2)); // Add padding for better readability
+        }
+        sb.AppendLine();
+
+        // Add rows with proper alignment
+        foreach (DataRow row in dt.Rows)
+        {
+            for (int i = 0; i < dt.Columns.Count; i++)
+            {
+                sb.Append(row[i].ToString().PadRight(maxLengths[i] + 2)); // Align based on max length of the column
+            }
+            sb.AppendLine();
+        }
+
+        return sb.ToString();
+    }
    
     //protected void fillSteps(int TempHdrId, int NbrOfTrials, string SkillTyp, int SetId, string TeachingProc, int VTLessonId, string ChainType)
     //{
@@ -2079,6 +2146,8 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         }
     }
     protected void NewSessionStep() {
+        ClsErrorLog clError = new ClsErrorLog();
+        oDS = (clsDataSheet)Session[DatasheetKey];
         if (Session["random"] != null)
         {
             if (Session["random"].ToString() == "total task random")
@@ -2091,6 +2160,20 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 {
                     if (idqryTable.Rows[0]["StepOrder"].ToString() == "")
                     {
+                        try
+                        {
+                            int sessTotStepCount = Convert.ToInt32(Session["TotStepCount"]);
+                            int dtRowCount = Session["steporder"].ToString().Split(',').Length;
+                            int CrntSet = oDS.CrntSet;
+                            if (sessTotStepCount != dtRowCount)
+                            {
+                                clError.WriteToLog("StepCountMismatch:\n"+ "StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString() + "Current SetId:" + CrntSet+"\nSession TotStepCount:" + sessTotStepCount + "  DataTable StepCount:" + dtRowCount + "\nSession Steporder:\n" + Session["steporder"].ToString());
+                            }
+                        }
+                        catch (Exception exep)
+                        {
+                            clError.WriteToLog("StepCountMismatch:Error:" + exep.ToString() + "StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString());
+                        }
                         string qry = "Update StdtSessionHdr set StepOrder='" + Session["steporder"].ToString() + "' where StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
                         oData.Execute(qry);
                         Session["random"] = null;
@@ -2333,6 +2416,9 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             }
                             oDS.LessonPlanID = Convert.ToInt32(dtTmpHdrDtls.Rows[0]["LessonPlanId"].ToString());
                             GetDSStat(oDS.SkillType, oDS.TeachProc, oDS.LessonPlanID);
+                            string sqlStepCount = "SELECT COUNT(DSTempStepId) AS ActiveStepCount FROM DSTempStep WHERE ActiveInd = 'A' and DSTempHdrId=" + hdnTemplateId.Value + " and DSTempSetId=" + oDS.CrntSet + " GROUP BY DSTempHdrId, DSTempSetId;";
+                            int TotStepCount = Convert.ToInt32(oData.FetchValue(sqlStepCount));
+                            Session["TotStepCount"] = TotStepCount;
                             GetColumnDetls();
                             fillSteps(oTemp.TemplateId, oDS.NbrOfTrials, oDS.SkillType, oDS.CrntSet, oDS.TeachProc, oDS.VTLessonId, oDS.ChainType, oDS.TotalTaskFormat, oDS.MatchToSampleType);
 
@@ -4709,7 +4795,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
     protected void btnIOASelect_Click(object sender, EventArgs e)
     {
         oData = new clsData();
-
+        ClsErrorLog clErr = new ClsErrorLog();
         SqlConnection con = null;
         SqlTransaction trans = null;
 
@@ -4770,10 +4856,23 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     con.Close();
                 }
                 if (Session["steporder"] != null)
-                { 
-                string qry = "Update StdtSessionHdr set StepOrder='" + Session["steporder"].ToString() + "' where StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
-                oData.Execute(qry);
-                Session["steporder"] = null;
+                {
+                    try
+                    {
+                        Int32 sessTotStepCount = Convert.ToInt32(Session["TotStepCount"]);
+                        Int32 dtRowCount = Session["steporder"].ToString().Split(',').Length;
+                        if (sessTotStepCount != dtRowCount)
+                        {
+                            clErr.WriteToLog("StepCountMismatch:\nSession TotStepCount:" + sessTotStepCount + "  DataTable StepCount:" + dtRowCount + "\nSession Steporder:\n" + Session["steporder"].ToString() + "StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString() + "Current SetId:" + oDS.CrntSet);
+                        }
+                    }
+                    catch (Exception exep)
+                    {
+                        clErr.WriteToLog("StepCountMismatch:Error:" + exep.ToString() + "StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString());
+                    }
+                    string qry = "Update StdtSessionHdr set StepOrder='" + Session["steporder"].ToString() + "' where StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
+                    oData.Execute(qry);
+                    Session["steporder"] = null;
             	}
             }
             btnSubmitAndRepeat1.Visible = false;
