@@ -1,4 +1,4 @@
-﻿using Microsoft.Reporting.WebForms;
+using Microsoft.Reporting.WebForms;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -18,10 +18,13 @@ public partial class StudentBinder_ProgressSummaryReportClinical : System.Web.UI
     ClsTemplateSession ObjTempSess;
     clsData ObjData = null;
     clsData oData = null;
-
+    DataTable allclsviewdata = new DataTable();
+    DataTable dateandcount = new DataTable();
     protected void Page_Load(object sender, EventArgs e)
     {
         btnExport.Visible = false;
+        clsview.Visible = false;
+        Gvclsbehadate.Visible = false;
     }
    
     [Serializable]
@@ -140,7 +143,128 @@ public partial class StudentBinder_ProgressSummaryReportClinical : System.Web.UI
         this.RV_ExcelReport.ServerReport.SetParameters(parm);
         RV_ExcelReport.ServerReport.Refresh();
     }
+    private void GenerateReportHighchart()
+    {
+        ObjData = new clsData();
+        tdMsg.InnerHtml = "";
+        sess = (clsSession)Session["UserSession"];
+        ObjTempSess = (ClsTemplateSession)Session["BiweeklySession"];
+        DateTime dtst = new DateTime();
+        DateTime dted = new DateTime();
+        dtst = DateTime.ParseExact(txtRepStart.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+        dted = DateTime.ParseExact(txtrepEdate.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+        string StartDate = dtst.ToString("yyyy-MM-dd");
+        string enddate = dted.ToString("yyyy-MM-dd");
+        //CreateDataTable();
+        getAllclassicViewData(StartDate, enddate,sess.StudentId,sess.SchoolId);
+        ClassicLoadBehaviors();
+        clsview.Visible = true;
+        Gvclsbehadate.Visible = true;
+    }
 
+    public void getAllclassicViewData(String Sdate,String Edate,int studid, int schoolid)
+    {
+        SqlCommand cmd = null;
+        SqlConnection con = ObjData.Open();
+        try
+        {
+            SqlDataAdapter da = new SqlDataAdapter();
+            cmd = new SqlCommand("PSR_Data_Clinical", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.CommandTimeout = 600;
+            cmd.Parameters.AddWithValue("@StartDate", Sdate);
+            cmd.Parameters.AddWithValue("@EndDate", Edate);
+            cmd.Parameters.AddWithValue("@StudentId", studid);
+            cmd.Parameters.AddWithValue("@SchoolId", schoolid);
+            da = new SqlDataAdapter(cmd);
+            da.Fill(allclsviewdata);
+            countforrowsize();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error: " + ex);
+           
+            ClsErrorLog errlog = new ClsErrorLog();
+            errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\n StudentId ID = " + studid + "\n" + ex.ToString());
+        }
+        finally
+        {
+            ObjData.Close(con);
+        }
+    }
+
+    private void countforrowsize()
+    {
+        DataTable groupedTable = new DataTable();
+        groupedTable.Columns.Add("date", typeof(String));
+        groupedTable.Columns.Add("id", typeof(int));
+        groupedTable.Columns.Add("count", typeof(int));
+        var groupedData = allclsviewdata.AsEnumerable()
+           .GroupBy(row => new
+           {
+               Date = row.Field<String>("EvntDate"),
+               Id = row.Field<int>("MeasurementId")
+                   
+           })
+           .Select(g => new
+           {
+               Date = g.Key.Date,
+               Id = g.Key.Id,
+               Count = g.Count()
+           });
+        foreach (var group in groupedData)
+        {
+            groupedTable.Rows.Add(group.Date, group.Id, group.Count);
+        }
+
+
+        dateandcount.Columns.Add("Date", typeof(DateTime));
+        dateandcount.Columns.Add("Count", typeof(int));
+
+        var maxCounts = new Dictionary<String, int>();
+
+        foreach (DataRow row in groupedTable.Rows)
+        {
+            string date = row.Field<string>("date");
+            int count = row.Field<int>("count");
+
+            if (maxCounts.ContainsKey(date))
+            {
+                maxCounts[date] = Math.Max(maxCounts[date], count);
+            }
+            else
+            {
+                maxCounts[date] = count;
+            }
+        }
+
+        foreach (var kvp in maxCounts)
+        {
+            dateandcount.Rows.Add(kvp.Key, kvp.Value);
+        }
+
+
+    }
+
+    public void ClassicLoadBehaviors()
+    {
+        DataSet ds = LoadDataHighchart();
+        if (ds != null)
+        {
+
+            clslist.DataSource = ds;
+            clslist.DataBind();
+        }
+        else
+        {
+            td1.Visible = true;
+            td1.InnerHtml = clsGeneral.failedMsg("No Lesson Found.");
+        }
+    }
+
+   
+ 
+   
     protected void btnSessView_Click(object sender, EventArgs e)
     {
         try
@@ -178,8 +302,16 @@ public partial class StudentBinder_ProgressSummaryReportClinical : System.Web.UI
                 tdMsg.Visible = false;
                 td1.Visible = false;
                 btnExport.Visible = false;
+                if (highcheck.Checked == false)
+                {
                 RV_ExcelReport.Visible = true;
                 GenerateReport();
+            }
+            else
+            {
+                RV_ExcelReport.Visible = false;
+                    GenerateReportHighchart();
+                }
             }
             else
             {
@@ -245,6 +377,28 @@ public partial class StudentBinder_ProgressSummaryReportClinical : System.Web.UI
         }
     }
 
+
+    protected DataSet LoadDataHighchart()
+    {
+        sess = (clsSession)Session["UserSession"];
+        oData = new clsData();
+
+        DateTime dtst = new DateTime();
+        DateTime dted = new DateTime();
+        dtst = DateTime.ParseExact(txtRepStart.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+        dted = DateTime.ParseExact(txtrepEdate.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+        string StartDate = dtst.ToString("yyyy-MM-dd");
+        string enddate = dted.ToString("yyyy-MM-dd");
+
+        String sqlStr = "SELECT MeasurementId,Behaviour,IsFrequency,IsDuration,IsYesOrNo FROM ("+
+    "SELECT   B.StudentId,  B.MeasurementId,BD.Behaviour,BD.Frequency AS IsFrequency, BD.Duration AS IsDuration,BD.YesOrNo AS IsYesOrNo FROM "+
+      "  BehaviourDetails BD INNER JOIN Behaviour B ON "+
+       " B.MeasurementId = BD.MeasurementId  WHERE  B.StudentId = " + sess.StudentId + "  AND BD.ActiveInd IN ('A', 'N')  AND BD.SchoolId = " + sess.SchoolId + ") AS StdCalcs " +
+	"WHERE  StdCalcs.StudentId = "+sess.StudentId+" GROUP BY  MeasurementId,  Behaviour, IsFrequency, IsDuration, IsYesOrNo ORDER BY  Behaviour";
+        DataSet ds = oData.ReturnDataSet(sqlStr, false);
+        return ds;
+    }
+
     protected DataSet LoadData()
     {
         sess = (clsSession)Session["UserSession"];
@@ -254,6 +408,213 @@ public partial class StudentBinder_ProgressSummaryReportClinical : System.Web.UI
         "ORDER BY Behaviour,MeasurementId";
         DataSet ds = oData.ReturnDataSet(sqlStr, false);
         return ds;
+    }
+
+ 
+    protected void clslist_ItemDataBound(object sender, DataListItemEventArgs e)
+    {
+
+        Gvclsbehadate.DataSource = GetDataForDate(); // Method to get data for the first GridView
+        Gvclsbehadate.DataBind();
+
+        if (e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem)
+        {
+            ObjData = new clsData();
+            sess = (clsSession)Session["UserSession"];
+            DataSet ds = new DataSet();
+            oData = new clsData();
+            DateTime dtst = new DateTime();
+            DateTime dted = new DateTime();
+            dtst = DateTime.ParseExact(txtRepStart.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+            dted = DateTime.ParseExact(txtrepEdate.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+            string StartDate = dtst.ToString("yyyy-MM-dd");
+            string enddate = dted.ToString("yyyy-MM-dd");
+            //enddate = enddate + " 23:59:59.998";
+
+
+            GridView Gvclsbeha = (e.Item.FindControl("Gvclsbeha") as GridView);
+            string BehaviorId = (e.Item.FindControl("bhid") as Label).Text;
+            int frq = 0, dur = 0, yesNo = 0;
+            string sqlStr = "SELECT ISNULL(Frequency,0) AS IsFrequency, ISNULL(Duration,0) AS IsDuration, ISNULL(YesOrNo,0) AS IsYesOrNo FROM BehaviourDetails WHERE MeasurementId=" + BehaviorId;
+            DataTable DT = oData.ReturnDataTable(sqlStr, false);
+            if (DT != null && DT.Rows.Count == 1)
+            {
+                frq = Convert.ToInt32(DT.Rows[0]["IsFrequency"]);
+                dur = Convert.ToInt32(DT.Rows[0]["IsDuration"]);
+                yesNo = Convert.ToInt32(DT.Rows[0]["IsYesOrNo"]);
+            }
+            if (frq == 0)
+            {
+                ((DataControlField)Gvclsbeha.Columns.Cast<DataControlField>()
+                    .Where(fld => (fld.HeaderText == "Frequency"))
+                    .SingleOrDefault()).Visible = false;
+            }
+            if (dur == 0)
+            {
+                ((DataControlField)Gvclsbeha.Columns.Cast<DataControlField>()
+                    .Where(fld => (fld.HeaderText == "Duration"))
+                    .SingleOrDefault()).Visible = false;
+            }
+            if (yesNo == 0)
+            {
+                ((DataControlField)Gvclsbeha.Columns.Cast<DataControlField>()
+                    .Where(fld => (fld.HeaderText == "Yes/No"))
+                    .SingleOrDefault()).Visible = false;
+            }
+
+                ((DataControlField)Gvclsbeha.Columns.Cast<DataControlField>()
+                    .Where(fld => (fld.HeaderText == "Date"))
+                    .SingleOrDefault()).Visible = false;
+            
+
+            DataTable dt = getClsDataByMeasurementId(BehaviorId,StartDate,enddate);
+
+            Gvclsbeha.DataSource = dt;
+            Gvclsbeha.DataBind();
+
+            foreach (GridViewRow row in Gvclsbeha.Rows)
+            {
+                Label datelabel = (Label)row.FindControl("dateid");
+                foreach (DataRow rows in dateandcount.Rows)
+                 {
+                     DateTime dateTime = DateTime.Parse((rows["date"]).ToString());
+                     string dateOnly = dateTime.ToString("MM/dd/yyyy");
+                     if (datelabel.Text == dateOnly)
+                     {
+                         if (Convert.ToInt32(rows["count"]) > 1)
+                         {
+                             int count = 30 + (Convert.ToInt32(rows["count"]) * 15);
+                             row.Style["height"] = count + "px";
+
+                         }
+                         else
+                         {
+                             
+                                 row.Style["height"] = "40px";
+                             
+                         }
+                     }
+                
+                 }
+            }
+            foreach (GridViewRow row in Gvclsbehadate.Rows)
+            {
+                Label datelabel = (Label)row.FindControl("dateid2");
+                foreach (DataRow rows in dateandcount.Rows)
+                {
+                    DateTime dateTime = DateTime.Parse((rows["date"]).ToString());
+                    string dateOnly = dateTime.ToString("MM/dd/yyyy");
+                    if (datelabel.Text == dateOnly)
+                    {
+                        if (Convert.ToInt32(rows["count"]) > 1)
+                        {
+                            int count = 30 + (Convert.ToInt32(rows["count"]) * 15);
+                            row.Style["height"] = count + "px";
+
+                        }
+                        else
+                        {
+                            row.Style["height"] = "40px";
+                        }
+                    }
+
+                }
+            }
+            
+        }
+    
+    }
+    private DataTable GetDataForDate()
+    {
+        DateTime dtst = new DateTime();
+        DateTime dted = new DateTime();
+        dtst = DateTime.ParseExact(txtRepStart.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+        dted = DateTime.ParseExact(txtrepEdate.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+        string StartDate = dtst.ToString("yyyy-MM-dd");
+        string enddate = dted.ToString("yyyy-MM-dd"); 
+
+        DataTable table = new DataTable();
+        table.Columns.Add("Date", typeof(DateTime));
+
+        DateTime startDate = DateTime.Parse(StartDate);
+        DateTime endDate = DateTime.Parse(enddate);
+
+        for (DateTime date = startDate; date <= endDate; date = date.AddDays(1))
+        {
+            DataRow row = table.NewRow();
+            row["Date"] = date;
+            table.Rows.Add(row);
+        }
+
+        
+
+        return table;
+    }
+    protected DataTable getClsDataByMeasurementId(string BehaviorId, String StartDate,string enddate)
+    {
+        DataTable dt = new DataTable();
+
+        dt.Columns.Add("EvntDate", typeof(DateTime));
+        dt.Columns.Add("Time", typeof(string));
+        dt.Columns.Add("Name", typeof(string));
+        dt.Columns.Add("Frequency", typeof(string));
+        dt.Columns.Add("Duration", typeof(string));
+        dt.Columns.Add("YesOrNo", typeof(string));
+        dt.Columns.Add("EventName", typeof(string));
+        dt.Columns.Add("StdtSessEventType", typeof(string));
+
+        DateTime startDate = DateTime.Parse(StartDate);
+        DateTime endDate = DateTime.Parse(enddate);
+
+        for (DateTime date = startDate; date <= endDate; date = date.AddDays(1))
+        {
+            string totDate = date.ToString("MM/dd/yyyy");
+            string time = "";
+            string user = "";
+            string fre="";
+            string yorn="";
+            string dur="";
+            string evname="";
+            string type="";
+            DataRow row = dt.NewRow();
+            row["EvntDate"] = date;
+            if (allclsviewdata != null && allclsviewdata.Rows.Count > 0)
+            {
+                for (int r = 0; r < allclsviewdata.Rows.Count;r++ )
+                {
+                    if (allclsviewdata.Rows[r]["EvntDate"].ToString() == totDate && Convert.ToInt32(allclsviewdata.Rows[r]["MeasurementId"]) == Convert.ToInt32(BehaviorId))
+                    {
+                        
+                            time = time + "<br/>" + allclsviewdata.Rows[r]["Time"].ToString();
+                        
+                            user = user + "<br/>" + allclsviewdata.Rows[r]["Name"].ToString();
+                       
+                            fre = fre + "<br/>" + allclsviewdata.Rows[r]["Frequency"].ToString();
+                        
+                            dur = dur + "<br/>" + allclsviewdata.Rows[r]["Duration"].ToString();
+                        
+                            yorn = yorn + "<br/>" + allclsviewdata.Rows[r]["YesOrNo"].ToString();
+                        
+                            evname = evname + "<br/>" + allclsviewdata.Rows[r]["EventName"].ToString();
+                        
+                            type = type + "<br/>" + allclsviewdata.Rows[r]["StdtSessEventType"].ToString();
+                        
+
+                    }
+                }
+                row["Time"] = time;
+                row["Name"] = user;
+                row["Frequency"] = fre;
+                row["Duration"] = dur;
+                row["YesOrNo"] = yorn;
+                row["EventName"] = evname;
+                row["StdtSessEventType"] = type;
+            }
+          
+            dt.Rows.Add(row);
+        }
+
+        return dt;
     }
 
     protected void dlBehavior_ItemDataBound(object sender, DataListItemEventArgs e)

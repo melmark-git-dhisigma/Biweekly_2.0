@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="ProgressSummaryReportClinical.aspx.cs" Inherits="StudentBinder_ProgressSummaryReportClinical" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="ProgressSummaryReportClinical.aspx.cs" Inherits="StudentBinder_ProgressSummaryReportClinical" %>
 <%@ Register Assembly="Microsoft.ReportViewer.WebForms, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91" Namespace="Microsoft.Reporting.WebForms" TagPrefix="rsweb" %>
 
 <!DOCTYPE html>
@@ -31,6 +31,9 @@
         border-width:1px;
         border-color:lightgray;
         }        
+               .nowrap {
+        white-space: nowrap;
+    }
     </style>
     <script type="text/javascript">
         window.onload = function () {
@@ -48,6 +51,12 @@
 
         function showMessage() {
             $('#PSRLoadingImage').show();
+        }
+        function showMessage2() {
+            var checkbox = document.getElementById('<%= highcheck.ClientID %>');
+            if (checkbox.checked) {
+                $('#PSRLoadingImage').show();
+            }
         }
     </script>
     <script>
@@ -90,11 +99,11 @@
                 </td>
             
             <td style="width:200px">
-
+                <asp:CheckBox id="highcheck" runat="server"  Text=""></asp:CheckBox>
                 <asp:button id="btnSessView" runat="server" text="Session View" cssclass="NFButton" tooltip="Show Session View" onclick="btnSessView_Click" OnClientClick="showMessage()"   />
 
                 
-                <asp:button id="btnClassicView" runat="server" text="Classic View" cssclass="NFButton" tooltip="Show Classic View" onclick="btnClassicView_Click"   />
+                <asp:button id="btnClassicView" runat="server" text="Classic View" cssclass="NFButton" tooltip="Show Classic View" onclick="btnClassicView_Click" OnClientClick="showMessage2()"  />
                                
                 
             </td>
@@ -145,6 +154,149 @@
             </tr>
         </table>
 
+<%------------------------------------DataList to List the Classic Data------------------------------------%>
+<br />
+                   <div style="display: flex; align-items: flex-start; gap: 0; margin: 0; padding: 0;">
+                       <table>
+                          
+                               <tr>
+                                   <td>
+  <asp:GridView ID="Gvclsbehadate" runat="server" Width="100%" AutoGenerateColumns="false" GridLines="Both" BackColor="White" BorderColor="#336666" 
+                                            BorderStyle="None" BorderWidth="1px" Style="width: 100%" HorizontalAlign="Justify" >
+                                            <RowStyle CssClass="RowStyle RowStyleN" />
+                                            <FooterStyle CssClass="FooterStyle" ForeColor="#333333" />
+                                            <SelectedRowStyle CssClass="SelectedRowStyle" BackColor="#4498c2" Font-Bold="True" />
+                                            <PagerStyle CssClass="PagerStyle" ForeColor="White" HorizontalAlign="Left" />
+                                            <EmptyDataRowStyle CssClass="EmptyDataRowStyle" />
+                                           <Columns>
+  <asp:TemplateField>
+            <HeaderTemplate>
+                <table>
+                    <tr style="height:70px;">
+
+                        <th style="border: none; text-align: center;">Date</th>
+                    </tr>
+                   
+                </table>
+            </HeaderTemplate>
+            <ItemTemplate>
+                <asp:Label ID="dateid2" runat="server" Text='<%# Eval("Date", "{0:MM/dd/yyyy}") %>'></asp:Label>
+            </ItemTemplate>
+            <HeaderStyle BackColor="#4498c2" ForeColor="black" />
+            <ItemStyle BackColor="#4498c2" ForeColor="black" CssClass="nowrap" />
+        </asp:TemplateField>
+    </Columns>
+                                        </asp:GridView>
+                                       </td>
+                               </tr>
+                           </table>
+<div id="clsview" runat="server" style="width: 100%;  overflow: auto" visible="false">
+                <asp:DataList ID="clslist" runat="server" Style="vertical-align: top" CellPadding="0" CellSpacing="0"  RepeatDirection="Horizontal" OnItemDataBound="clslist_ItemDataBound" Width="100%">
+                    
+                    <ItemStyle VerticalAlign="Top" />
+                    <ItemTemplate>
+                         
+
+                        <div id="div2" >
+                            <table id="Table1" style="width: 100%;">
+                                <tr>
+                                    <asp:Label ID="bhid" runat="server" Text='<%# Eval("MeasurementId") %>' Visible="false"></asp:Label>
+                                </tr>
+                                <tr>
+                                    <th id="th1" runat="server" class='bName' style="background-color: #4498c2; color: black; text-align: center; height: 30px; font-size: 14px"><%# Eval("Behaviour")%></th>
+                                    <th id="th2" runat="server" style="background-color: white; border-color:white; height: 30px; width: 1px;"> </th>
+                                </tr>
+                               
+                                <tr>
+                                    <td>
+                                        <asp:GridView ID="Gvclsbeha" runat="server" Width="100%" AutoGenerateColumns="false" GridLines="Both" BackColor="White" BorderColor="#336666"
+                                            BorderStyle="None" BorderWidth="1px" Style="width: 100%" HorizontalAlign="Justify">
+                                            <RowStyle CssClass="RowStyle RowStyleN" />
+                                            <FooterStyle CssClass="FooterStyle" ForeColor="#333333" />
+                                            <SelectedRowStyle CssClass="SelectedRowStyle" BackColor="#339966" Font-Bold="True" />
+                                            <PagerStyle CssClass="PagerStyle" ForeColor="White" HorizontalAlign="Left" />
+                                            <EmptyDataRowStyle CssClass="EmptyDataRowStyle" />
+                                            <Columns>
+                                                <asp:TemplateField ItemStyle-Width="80px" HeaderText="Date" HeaderStyle-HorizontalAlign="Left" >
+                                                    <ItemTemplate>
+                                                        <asp:Label ID="dateid" runat="server" Text='<%# Eval("EvntDate", "{0:MM/dd/yyyy}")%>'></asp:Label>
+                                                    </ItemTemplate>
+                                                     <HeaderStyle BackColor="#0D668E" ForeColor="black"/>
+                                                       <ItemStyle BackColor="#0D668E" ForeColor="black" CssClass="nowrap"/> 
+                                                </asp:TemplateField>
+                                                <asp:TemplateField ItemStyle-Width="200px" HeaderStyle-Width="200px" HeaderText="Time" HeaderStyle-HorizontalAlign="center">
+                                                    <ItemTemplate>
+                                                        <asp:Label ID="Timeid" runat="server" Text='<%# Eval("Time")%>'></asp:Label>
+                                                    </ItemTemplate>
+                                                     <HeaderStyle BackColor="#FFDEAD" ForeColor="black" />
+                                                       <ItemStyle  ForeColor="black" CssClass="nowrap"/> 
+                                                </asp:TemplateField>
+                                                <asp:TemplateField ItemStyle-Width="200px" HeaderStyle-Width="200px" HeaderText="User" HeaderStyle-HorizontalAlign="center">
+                                                    <ItemTemplate>
+                                                        <asp:Label ID="userid" runat="server" Text='<%# Eval("Name")%>'></asp:Label>
+                                                    </ItemTemplate>
+                                                     <HeaderStyle BackColor="#FFDEAD" ForeColor="black" />
+                                                       <ItemStyle  ForeColor="black" CssClass="nowrap"/> 
+                                                </asp:TemplateField>
+                                                 <asp:TemplateField ItemStyle-Width="200px" HeaderStyle-Width="200px" HeaderText="Frequency" HeaderStyle-HorizontalAlign="center">
+                                                    <ItemTemplate>
+                                                        <asp:Label ID="Label7" runat="server" Text='<%# Eval("Frequency")%>'></asp:Label>
+                                                    </ItemTemplate>
+                                                     <HeaderStyle BackColor="#FFDEAD"  ForeColor="black" />
+                                                       <ItemStyle  ForeColor="black" CssClass="nowrap"/> 
+                                                </asp:TemplateField>
+                                                <asp:TemplateField ItemStyle-Width="200px" HeaderStyle-Width="200px" HeaderText="Duration" HeaderStyle-HorizontalAlign="center">
+                                                    <ItemTemplate>
+                                                        <asp:Label ID="Label6" runat="server" Text='<%# Eval("Duration")%>'></asp:Label>
+                                                    </ItemTemplate>
+                                                     <HeaderStyle BackColor="#FFDEAD" ForeColor="black" />
+                                                       <ItemStyle  ForeColor="black" CssClass="nowrap"/> 
+                                                </asp:TemplateField>
+                                                <asp:TemplateField ItemStyle-Width="200px" HeaderStyle-Width="200px" HeaderText="Yes/No" HeaderStyle-HorizontalAlign="center">
+                                                    <ItemTemplate>
+                                                        <asp:Label ID="Label8" runat="server" Text='<%# Eval("YesOrNo")%>'></asp:Label>
+                                                    </ItemTemplate>
+                                                     <HeaderStyle BackColor="#FFDEAD" ForeColor="black" />
+                                                       <ItemStyle  ForeColor="black" CssClass="nowrap"/> 
+                                                </asp:TemplateField>
+                                                 <asp:TemplateField HeaderText="Condition Lines/ Arrow Notes" ItemStyle-Width="400px" HeaderStyle-Width="400px">
+            <HeaderTemplate>
+                <table style="width:100%; border-collapse:collapse;table-layout:fixed;">
+                    <tr  >
+                        <th colspan="2" style="text-align:center; white-space:nowrap;"border: none;">Condition Lines/ Arrow Notes</th>
+                    </tr>
+                    <tr>
+                        <th style="text-align:center;width:180px;">Name</th>
+                        <th style="text-align:center;width:180px;">Type</th>
+                    </tr>
+                </table>
+            </HeaderTemplate>
+           <ItemTemplate>
+        <table style="width:100%; border-collapse:collapse;border-spacing: 0; border: none;table-layout:fixed;">
+            <tr>
+                <td style="text-align:center;color:black; width:180px;background-color:#dbe4c0;border: none;border-right: 1px solid #d3d3d3 ;">
+                    <asp:Label ID="lblFirstName" runat="server" Text='<%# Eval("EventName") %>' CssClass="nowrap"></asp:Label>
+                </td>
+                <td style="text-align:center;color:black;width:180px; background-color:#dbe4c0;border: none;">
+                    <asp:Label ID="lblLastName" runat="server" Text='<%# Eval("StdtSessEventType") %>' CssClass="nowrap"></asp:Label>
+                </td>
+            </tr>
+        </table>
+    </ItemTemplate>
+                       <HeaderStyle BackColor="#dbe4c0" ForeColor="black" />
+                        <ItemStyle BackColor="#dbe4c0" ForeColor="black"/> 
+        </asp:TemplateField>
+ 
+                                            </Columns>
+                                        </asp:GridView>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </ItemTemplate>
+                </asp:DataList>
+            </div>
+               </div>
         <%------------------------------------DataList to List the Session Data------------------------------------%>
             <div id="divBehavior" runat="server" style="width: 100%; height: 600px; overflow: auto">
                 <asp:DataList ID="dlBehavior" runat="server" Style="vertical-align: top" RepeatDirection="Horizontal" OnItemDataBound="dlBehavior_ItemDataBound" Width="100%">
