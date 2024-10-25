@@ -113,7 +113,10 @@
 
             }
         }
-
+        var multiClick = false;
+        function enableButton() {
+            multiClick = false;
+        }
         function disableButton() {
             $("#btnAddLP").prop("disabled", true);
             setTimeout(function () {
@@ -218,16 +221,21 @@
             $('#HdrExportTemplate').fadeOut('slow');
         }
 
-        function ExecuteLPExist() {
-            if (LPExist() == true) {
-                var Name = $("#txtCopyLP").val();
-                $("#hdLessonName").val(Name);
-                return true;
+        function ExecuteLPExist(btn) {
+            if (!multiClick) {
+                if (LPExist() == true) {
+                    var Name = $("#txtCopyLP").val();
+                    $("#hdLessonName").val(Name);
+                    multiClick = true;
+                    btn.style.opacity = '0.5';
+                    return true;
+                }
+                else {
+                    $("#hdLessonName").val("");
+                    return false;
+                }
             }
-            else {
-                $("#hdLessonName").val("");
-                return false;
-            }
+            return false;
         }
 
         function LPExist() {
@@ -1072,7 +1080,7 @@
                                         </tr>
                                         <tr></tr>
                                         <tr><td>
-                                            <asp:Button ID="btnCopyLP" runat="server" CssClass="NFButton" Style="width: 180px" Text="Copy Lesson Plan" OnClick="btnCopyLP_Click" OnClientClick="return ExecuteLPExist(); " />
+                                            <asp:Button ID="btnCopyLP" runat="server" CssClass="NFButton" Style="width: 180px" Text="Copy Lesson Plan" OnClick="btnCopyLP_Click" OnClientClick="return ExecuteLPExist(this); " />
                                         </td></tr>
                                     </tbody>
                                 </table>
