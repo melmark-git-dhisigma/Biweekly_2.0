@@ -740,7 +740,7 @@ public partial class Admin_UserCreate : System.Web.UI.Page
         {
             tdMsg.InnerHtml = "Wrong Choice";
         }
-
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
         //if (intUserId > 0)
         //{
         //    //intAddressId = Convert.ToInt32(txtAddressId.Text);
@@ -1243,6 +1243,7 @@ public partial class Admin_UserCreate : System.Web.UI.Page
                         {
                             flag = true;
                             divMessage.InnerHtml = clsGeneral.warningMsg(FileParseError[0]);
+                            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                             ScriptManager.RegisterClientScriptBlock(this, typeof(System.Web.UI.Page), Guid.NewGuid().ToString(), "$(document).ready(function(){popPrompts();});", true);
 
                         }
@@ -1251,6 +1252,7 @@ public partial class Admin_UserCreate : System.Web.UI.Page
                     {
                         flag = true;
                         divMessage.InnerHtml = clsGeneral.warningMsg("Please select a CSV File");
+                        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                         ScriptManager.RegisterClientScriptBlock(this, typeof(System.Web.UI.Page), Guid.NewGuid().ToString(), "$(document).ready(function(){popPrompts();});", true);
                     }
                 }
@@ -1258,6 +1260,7 @@ public partial class Admin_UserCreate : System.Web.UI.Page
                 {
                     flag = true;
                     divMessage.InnerHtml = clsGeneral.warningMsg("Please select a CSV File");
+                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                     ScriptManager.RegisterClientScriptBlock(this, typeof(System.Web.UI.Page), Guid.NewGuid().ToString(), "$(document).ready(function(){popPrompts();});", true);
 
                 }
@@ -1266,6 +1269,7 @@ public partial class Admin_UserCreate : System.Web.UI.Page
             {
                 flag = true;
                 divMessage.InnerHtml = clsGeneral.warningMsg("Please select Role");
+                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                 ScriptManager.RegisterClientScriptBlock(this, typeof(System.Web.UI.Page), Guid.NewGuid().ToString(), "$(document).ready(function(){popPrompts();});", true);
 
             }
@@ -1275,6 +1279,7 @@ public partial class Admin_UserCreate : System.Web.UI.Page
         {
             flag = true;
             divMessage.InnerHtml = clsGeneral.sucessMsg("Please select Group");
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             ScriptManager.RegisterClientScriptBlock(this, typeof(System.Web.UI.Page), Guid.NewGuid().ToString(), "$(document).ready(function(){popPrompts();});", true);
 
         }
@@ -1293,6 +1298,7 @@ public partial class Admin_UserCreate : System.Web.UI.Page
             {
                 lnkDupDownload.Style.Add("display", "none");
                 divMessage.InnerHtml = clsGeneral.sucessMsg("" + count + " User Inserted Successfully");
+                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                 ScriptManager.RegisterClientScriptBlock(this, typeof(System.Web.UI.Page), Guid.NewGuid().ToString(), "$(document).ready(function(){popPrompts();});", true);
                 
             }
@@ -1302,6 +1308,7 @@ public partial class Admin_UserCreate : System.Web.UI.Page
                 GenerateFile(duplicate);
                 string Message = "User Inserted : " + count + ". <br />Duplicate : " + duplicatecount;
                 divMessage.InnerHtml = clsGeneral.warningMsg(Message);
+                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                 ScriptManager.RegisterClientScriptBlock(this, typeof(System.Web.UI.Page), Guid.NewGuid().ToString(), "$(document).ready(function(){popPrompts();});", true);
                 
             }
@@ -1322,6 +1329,7 @@ public partial class Admin_UserCreate : System.Web.UI.Page
             if (flagCheck)
             {
                 nameCheck.InnerHtml = clsGeneral.warningMsg("" + countRejected + " User Rejected");
+                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                 ScriptManager.RegisterClientScriptBlock(this, typeof(System.Web.UI.Page), Guid.NewGuid().ToString(), "$(document).ready(function(){popPrompts();});", true);
             }
 
@@ -1479,6 +1487,7 @@ public partial class Admin_UserCreate : System.Web.UI.Page
                 {
                     flag = true;
                     divMessageDel.InnerHtml = clsGeneral.warningMsg(FileParseError[0]);
+                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                     ScriptManager.RegisterClientScriptBlock(this, typeof(System.Web.UI.Page), Guid.NewGuid().ToString(), "$(document).ready(function(){popPromptsDel();});", true);
                 }
 
@@ -1487,6 +1496,7 @@ public partial class Admin_UserCreate : System.Web.UI.Page
             {
                 flag = true;
                 divMessageDel.InnerHtml = clsGeneral.warningMsg("Please select CSV File");
+                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                 ScriptManager.RegisterClientScriptBlock(this, typeof(System.Web.UI.Page), Guid.NewGuid().ToString(), "$(document).ready(function(){popPromptsDel();});", true);
             }
         }
@@ -1496,6 +1506,7 @@ public partial class Admin_UserCreate : System.Web.UI.Page
         {
             flag = true;
             divMessageDel.InnerHtml = clsGeneral.warningMsg("Please select a CSV File");
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             ScriptManager.RegisterClientScriptBlock(this, typeof(System.Web.UI.Page), Guid.NewGuid().ToString(), "$(document).ready(function(){popPromptsDel();});", true);
 
         }
@@ -1504,8 +1515,10 @@ public partial class Admin_UserCreate : System.Web.UI.Page
         if (!flag)
         {
             divMessageDel.InnerHtml = clsGeneral.sucessMsg("" + count + " User Deleted Successfully");
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             ScriptManager.RegisterClientScriptBlock(this, typeof(System.Web.UI.Page), Guid.NewGuid().ToString(), "$(document).ready(function(){popPromptsDel();});", true);
         }
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
 
     }
     protected void drpGrp_SelectedIndexChanged(object sender, EventArgs e)
