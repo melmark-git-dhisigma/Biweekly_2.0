@@ -170,7 +170,20 @@
                                 <asp:ListItem Value="RES">Residence</asp:ListItem>
                                 <asp:ListItem Value="DAY,RES" Selected="True">Both</asp:ListItem>
                             </asp:RadioButtonList>
-                       <asp:CheckBox ID="chk_min_sec" runat="server" Text="Show All Duration in Minutes" Visible="False" /> 
+                 <table id="tableDurFormat" runat="server" visible="false">
+                     <tr>
+                         <td>
+                 <asp:Label ID="LblDurationFormat" runat ="server" Text ="Duration Format: " AssociatedControlID="radBtnDurationFormat" style="display:inline-block"></asp:Label>
+                         </td>
+                         <td>
+                     <asp:RadioButtonList ID="radBtnDurationFormat"  runat="server" RepeatDirection="Horizontal" BorderColor="Black" BorderStyle="None" BorderWidth="1px" style="display:inline-block; margin-top: 0px">
+                     <asp:ListItem Value="0" Selected="True">HH:MM:SS </asp:ListItem>
+                     <asp:ListItem Value="1">Minutes</asp:ListItem>
+                     <asp:ListItem Value="2">Seconds</asp:ListItem>
+                 </asp:RadioButtonList>
+                             </td>
+                         </tr>
+                     </table>
              </td>
             
             <td class="tdText" style="text-align: left">Lesson Plan</td>
