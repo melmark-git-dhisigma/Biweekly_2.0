@@ -13163,7 +13163,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         hdrid = Convert.ToString(objData.FetchValue("SELECT  DSTempHdrId FROM [dbo].[DSTempStep] WHERE ActiveInd = 'A' AND IsDynamic=0 INTERSECT SELECT DSTempHdrId FROM  [dbo].[DSTempSetCol] WHERE DSTempHdrId =" + TemplateId + ""));
                         if (hdrid != "")
                         {
-                            dt = objData.ReturnDataTable("SELECT COUNT(rul.DSTempHdrId),(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] WHERE RuleType='STEP' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT DSTempSetColId " +
+                            dt = objData.ReturnDataTable("SELECT COUNT(rul.DSTempHdrId),(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] WHERE RuleType='STEP' AND ActiveInd = 'A' AND CriteriaDetails<>'NA' AND DSTempSetColId IN (SELECT DSTempSetColId " +
                                               "FROM DSTempSetCol WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS STEP,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] WHERE RuleType='SET' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId " +
                                               "FROM DSTempSetCol WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS SET1 FROM [dbo].[DSTempSetCol] col INNER JOIN [dbo].[DSTempRule] rul on " +
                                                 "col.DSTempSetColId=rul.DSTempSetColId WHERE col.DSTempHdrId=" + hdrid + "", false);
@@ -13346,11 +13346,11 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                         {
                                             string msg = "";
                                             bool flag = true;
-                                            string strQry = "SELECT COUNT(rul.DSTempHdrId),(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] WHERE RuleType='STEP' AND CriteriaType='MOVE UP' " +
+                                            string strQry = "SELECT COUNT(rul.DSTempHdrId),(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] WHERE RuleType='STEP' AND CriteriaDetails<>'NA' AND CriteriaType='MOVE UP' " +
                                                             "AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT DSTempSetColId FROM DSTempSetCol " +
                                                             "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS STEPUP,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
                                                             "WHERE RuleType='STEP'  AND CriteriaType='MOVE DOWN' " +
-                                                            "AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT DSTempSetColId FROM DSTempSetCol " +
+                                                            "AND ActiveInd = 'A' AND CriteriaDetails<>'NA' AND DSTempSetColId IN (SELECT DSTempSetColId FROM DSTempSetCol " +
                                                             "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS STEPDOWN,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
                                                             "WHERE RuleType='SET' AND CriteriaType='MOVE UP' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
                                                             "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS SETUP,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
@@ -13469,7 +13469,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                             string msg = "";
                                             bool flag = true;
                                             string strQry = "SELECT COUNT(rul.DSTempHdrId),(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
-                                                            "WHERE RuleType='SET' AND CriteriaType='MOVE UP' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
+                                                            "WHERE RuleType='SET' AND CriteriaType='MOVE UP' AND ActiveInd = 'A'  AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
                                                             "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS SETUP,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
                                                             "WHERE RuleType='SET' AND CriteriaType='MOVE DOWN' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
                                                             "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS SETDOWN,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
@@ -13819,7 +13819,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     hdrid = Convert.ToString(objData.FetchValue("SELECT  DSTempHdrId FROM [dbo].[DSTempStep] WHERE ActiveInd = 'A' AND IsDynamic=0 INTERSECT SELECT DSTempHdrId FROM  [dbo].[DSTempSetCol] WHERE DSTempHdrId =" + TemplateId + ""));
                     if (hdrid != "")
                     {
-                        dt = objData.ReturnDataTable("SELECT COUNT(rul.DSTempHdrId),(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] WHERE RuleType='STEP' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT DSTempSetColId " +
+                        dt = objData.ReturnDataTable("SELECT COUNT(rul.DSTempHdrId),(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] WHERE RuleType='STEP' AND ActiveInd = 'A' AND CriteriaDetails<>'NA' AND DSTempSetColId IN (SELECT DSTempSetColId " +
                                           "FROM DSTempSetCol WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS STEP,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] WHERE RuleType='SET' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId " +
                                           "FROM DSTempSetCol WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS SET1 FROM [dbo].[DSTempSetCol] col INNER JOIN [dbo].[DSTempRule] rul on " +
                                             "col.DSTempSetColId=rul.DSTempSetColId WHERE col.DSTempHdrId=" + hdrid + "", false);
@@ -14011,9 +14011,9 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                         string msg = "";
                                         bool flag = true;
                                         string strQry = "SELECT COUNT(rul.DSTempHdrId),(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] WHERE RuleType='STEP' AND CriteriaType='MOVE UP' " +
-                                                        "AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT DSTempSetColId FROM DSTempSetCol " +
+                                                        "AND ActiveInd = 'A' AND CriteriaDetails<>'NA' AND DSTempSetColId IN (SELECT DSTempSetColId FROM DSTempSetCol " +
                                                         "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS STEPUP,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
-                                                        "WHERE RuleType='STEP'  AND CriteriaType='MOVE DOWN' " +
+                                                        "WHERE RuleType='STEP' AND CriteriaDetails<>'NA' AND CriteriaType='MOVE DOWN' " +
                                                         "AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT DSTempSetColId FROM DSTempSetCol " +
                                                         "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS STEPDOWN,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
                                                         "WHERE RuleType='SET' AND CriteriaType='MOVE UP' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
@@ -14132,7 +14132,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                         string msg = "";
                                         bool flag = true;
                                         string strQry = "SELECT COUNT(rul.DSTempHdrId),(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
-                                                        "WHERE RuleType='SET' AND CriteriaType='MOVE UP' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
+                                                        "WHERE RuleType='SET' AND CriteriaType='MOVE UP'  AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
                                                         "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS SETUP,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
                                                         "WHERE RuleType='SET' AND CriteriaType='MOVE DOWN' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
                                                         "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS SETDOWN,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
@@ -19663,7 +19663,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             hdrid = Convert.ToString(objData.FetchValue("SELECT  DSTempHdrId FROM [dbo].[DSTempStep] WHERE ActiveInd = 'A' AND IsDynamic=0 INTERSECT SELECT DSTempHdrId FROM  [dbo].[DSTempSetCol] WHERE DSTempHdrId =" + TemplateId + ""));
                             if (hdrid != "")
                             {
-                                dt = objData.ReturnDataTable("SELECT COUNT(rul.DSTempHdrId),(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] WHERE RuleType='STEP' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT DSTempSetColId " +
+                                dt = objData.ReturnDataTable("SELECT COUNT(rul.DSTempHdrId),(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] WHERE RuleType='STEP' AND ActiveInd = 'A' AND CriteriaDetails<>'NA' AND DSTempSetColId IN (SELECT DSTempSetColId " +
                                                   "FROM DSTempSetCol WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS STEP,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] WHERE RuleType='SET' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId " +
                                                   "FROM DSTempSetCol WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS SET1 FROM [dbo].[DSTempSetCol] col INNER JOIN [dbo].[DSTempRule] rul on " +
                                                     "col.DSTempSetColId=rul.DSTempSetColId WHERE col.DSTempHdrId=" + hdrid + "", false);
@@ -19765,7 +19765,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                                 string msg = "";
                                                 bool flag = true;
                                                 string strQry = "SELECT COUNT(rul.DSTempHdrId),(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
-                                                                "WHERE RuleType='SET' AND CriteriaType='MOVE UP' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
+                                                                "WHERE RuleType='SET' AND CriteriaType='MOVE UP' AND ActiveInd = 'A'  AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
                                                                 "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS SETUP,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
                                                                 "WHERE RuleType='SET' AND CriteriaType='MOVE DOWN' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
                                                                 "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS SETDOWN,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
@@ -19850,9 +19850,9 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                                 string msg = "";
                                                 bool flag = true;
                                                 string strQry = "SELECT COUNT(rul.DSTempHdrId),(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] WHERE RuleType='STEP' AND CriteriaType='MOVE UP' " +
-                                                                "AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT DSTempSetColId FROM DSTempSetCol " +
+                                                                "AND ActiveInd = 'A' AND CriteriaDetails<>'NA' AND DSTempSetColId IN (SELECT DSTempSetColId FROM DSTempSetCol " +
                                                                 "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS STEPUP,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
-                                                                "WHERE RuleType='STEP'  AND CriteriaType='MOVE DOWN' " +
+                                                                "WHERE RuleType='STEP' AND CriteriaDetails<>'NA' AND CriteriaType='MOVE DOWN' " +
                                                                 "AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT DSTempSetColId FROM DSTempSetCol " +
                                                                 "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS STEPDOWN,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
                                                                 "WHERE RuleType='SET' AND CriteriaType='MOVE UP' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
@@ -20300,7 +20300,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     hdrid = Convert.ToString(objData.FetchValue("SELECT  DSTempHdrId FROM [dbo].[DSTempStep] WHERE ActiveInd = 'A' AND IsDynamic=0 INTERSECT SELECT DSTempHdrId FROM  [dbo].[DSTempSetCol] WHERE DSTempHdrId =" + TemplateId + ""));
                     if (hdrid != "")
                     {
-                        dt = objData.ReturnDataTable("SELECT COUNT(rul.DSTempHdrId),(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] WHERE RuleType='STEP' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT DSTempSetColId " +
+                        dt = objData.ReturnDataTable("SELECT COUNT(rul.DSTempHdrId),(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] WHERE RuleType='STEP' AND ActiveInd = 'A' AND CriteriaDetails<>'NA' AND DSTempSetColId IN (SELECT DSTempSetColId " +
                                           "FROM DSTempSetCol WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS STEP,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] WHERE RuleType='SET' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId " +
                                           "FROM DSTempSetCol WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS SET1 FROM [dbo].[DSTempSetCol] col INNER JOIN [dbo].[DSTempRule] rul on " +
                                             "col.DSTempSetColId=rul.DSTempSetColId WHERE col.DSTempHdrId=" + hdrid + "", false);
@@ -20436,9 +20436,9 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                         string msg = "";
                                         bool flag = true;
                                         string strQry = "SELECT COUNT(rul.DSTempHdrId),(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] WHERE RuleType='STEP' AND CriteriaType='MOVE UP' " +
-                                                        "AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT DSTempSetColId FROM DSTempSetCol " +
+                                                        "AND ActiveInd = 'A' AND CriteriaDetails<>'NA' AND DSTempSetColId IN (SELECT DSTempSetColId FROM DSTempSetCol " +
                                                         "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS STEPUP,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
-                                                        "WHERE RuleType='STEP'  AND CriteriaType='MOVE DOWN' " +
+                                                        "WHERE RuleType='STEP' AND CriteriaDetails<>'NA' AND CriteriaType='MOVE DOWN' " +
                                                         "AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT DSTempSetColId FROM DSTempSetCol " +
                                                         "WHERE DSTempHdrId=" + hdrid + " AND ActiveInd='A')) AS STEPDOWN,(SELECT COUNT(RuleType) FROM [dbo].[DSTempRule] " +
                                                         "WHERE RuleType='SET' AND CriteriaType='MOVE UP' AND ActiveInd = 'A' AND DSTempSetColId IN (SELECT  DSTempSetColId FROM DSTempSetCol " +
