@@ -1932,11 +1932,13 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
             }
             oData.CommitTransation(Trans, Con);
             LoadData();
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             ScriptManager.RegisterClientScriptBlock(this, typeof(System.Web.UI.Page), Guid.NewGuid().ToString(), "$(document).ready(function(){showdivMessage();});", true);
             
         }
         catch (Exception Ex)
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             oData.RollBackTransation(Trans, Con);
             Con.Close();
             throw Ex;
