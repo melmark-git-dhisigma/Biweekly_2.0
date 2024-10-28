@@ -150,6 +150,7 @@ public partial class Admin_ClassForSchool : System.Web.UI.Page
                         {
                             tdMsg.InnerHtml = clsGeneral.warningMsg("Class Name already exit.Please choose another name.");
                             txtCode.Focus();
+                            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                             return;
                         }
                         if (txtMaxStudents.Text == "")
@@ -168,6 +169,7 @@ public partial class Admin_ClassForSchool : System.Web.UI.Page
                             else
                             {
                                 tdMsg.InnerHtml = clsGeneral.warningMsg("This Class is Full");
+                                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                                 return;
                             }
                         }
@@ -200,6 +202,7 @@ public partial class Admin_ClassForSchool : System.Web.UI.Page
                             else
                             {
                                 tdMsg.InnerHtml = clsGeneral.warningMsg("This Class is Full");
+                                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                                 return;
                             }
 
@@ -220,10 +223,12 @@ public partial class Admin_ClassForSchool : System.Web.UI.Page
                 LoadGroup();
             ClassId = 0;
             Master.fillclass();
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
         }
         catch (SqlException Ex)
         {
             tdMsg.InnerHtml = clsGeneral.failedMsg("Please Try Again");
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             throw Ex;
         }
 
@@ -648,6 +653,7 @@ public partial class Admin_ClassForSchool : System.Web.UI.Page
         Clear();
         btnSave.Text = "Save";
         tdMsg.InnerHtml = "";
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
     protected void txtsearch_TextChanged(object sender, EventArgs e)
     {
@@ -703,6 +709,7 @@ public partial class Admin_ClassForSchool : System.Web.UI.Page
             objData.ReturnCheckBoxList(query, chkStudents);
         }
         objClass = new clsClass(); if (txtClassCode.Text != null) if (ClassId != 0) objClass.fillStudentCheckBox(chkStudents, ClassId, sess.SchoolId);
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
 
     //----------------------------------------
@@ -760,6 +767,7 @@ public partial class Admin_ClassForSchool : System.Web.UI.Page
             objData.ReturnCheckBoxList(query, chkUesrs);
         }
         objClass = new clsClass(); if (txtClassCode.Text != null) if (ClassId != 0) objClass.fillUserCheckBox(chkUesrs, ClassId, sess.SchoolId);
+        ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
 
 
