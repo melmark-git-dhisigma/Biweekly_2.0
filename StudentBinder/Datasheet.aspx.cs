@@ -4153,6 +4153,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
     protected bool SaveMeasuremnts(int sessHdrId, SqlConnection con, SqlTransaction tran)
     {
+        ClsErrorLog clErr = new ClsErrorLog();
         bool valid = false;
         string value = "";
         try
@@ -4428,6 +4429,21 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (score == "-")
                                             {
                                                 score = "-1";
+                                            }
+                                            if (score == "0" && tbl_Measure.Rows.Count==0)
+                                            {
+                                                try
+                                                {
+                                                    clErr.WriteToLog("ScoreMismatch:\n" + "StdtSessionHdrId=" + sessHdrId + 
+                                                        "\nQuery:\n" + sqlStr + "\nDataTable:\n" + ConvertDataTableToString(dt) +
+                                                        "\nCalcType:"+dr["CalcType"].ToString() +
+                                                        "\nHF Values:-\n" +
+                                                        "hfTextScore:" + hfTextScore.Value + "\nhfResultStep_Acc:" + hfResultStep_Acc.Value + "\nhfResultStep_Prmpt:" + hfResultStep_Prmpt.Value + "\nhfRslt1_ExcludeCrntStep_Acc:" + hfRslt1_ExcludeCrntStep_Acc.Value + "\nhfRslt2_ExcludeCrntStep_Acc:" + hfRslt2_ExcludeCrntStep_Acc.Value + "\nhfRslt1_Acc:" + hfRslt1_Acc.Value + "\nhfRslt2_Acc:" + hfRslt2_Acc.Value + "\nhfRslt1_Prmt:" + hfRslt1_Prmt.Value + "\nhfRslt2_Prmt:" + hfRslt2_Prmt.Value + "\nhfRslt1_Ind:" + hfRslt1_Ind.Value + "\nhfRslt2_Ind:" + hfRslt2_Ind.Value + "\nhfRslt1_IndAll:" + hfRslt1_IndAll.Value + "\nhfRslt2_IndAll:" + hfRslt2_IndAll.Value + "\nhfAvgDur:" + hfAvgDur.Value + "\nhfTotDur:" + hfTotDur.Value + "\nhf_Freq:" + hf_Freq.Value + "\nhfTotCorct:" + hfTotCorct.Value + "\nhfInTotCorct:" + hfInTotCorct.Value);
+                                                }
+                                                catch (Exception exep)
+                                                {
+                                                    clErr.WriteToLog("ScoreMismatch:Error:" + exep.ToString() + "StdtSessionHdrId=" + sessHdrId);
+                                                }
                                             }
 
 
