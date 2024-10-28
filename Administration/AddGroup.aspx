@@ -3,13 +3,39 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <script type="text/javascript">
-        function Delete() {
-            var flag;
-            var buttons = $('#<%=btnSave.ClientID %>').val();
-            if(buttons=="Delete")
-             {
-                flag = confirm("Are you sure to Delete?");
-                return flag;
+        var multiClick = false;
+        var multiClickNext = false;
+        function enableButton() {
+            multiClick = false;
+            multiClickNext = false;
+        }
+        function multiClickCheck(btn) {
+            if (!multiClickNext) {
+                multiClickNext = true;
+                btn.style.opacity = '0.5';
+                return true;
+            }
+            return false;
+        }
+        function Delete(btn) {
+            if (!multiClick) {
+                var flag;
+                var buttons = $('#<%=btnSave.ClientID %>').val();
+                if (buttons == "Delete") {
+                    flag = confirm("Are you sure to Delete?");
+                    if (flag) {
+                        multiClick = true;
+                        btn.style.opacity = '0.5';
+                    }
+                    return flag;
+                }
+                else {
+                    multiClick = true;
+                    btn.style.opacity = '0.5';
+                }
+            }
+            else {
+                return false;
             }
         }
     </script>
@@ -34,9 +60,9 @@
                     <td>
                         <asp:TextBox ID="txtDescription" runat="server" CssClass="textClass" Width="270px" MaxLength="50"></asp:TextBox></td>
                     <td>
-                        <asp:Button ID="btnSave" runat="server" CssClass="NFButton" OnClick="btnSave_Click" OnClientClick="javascript:return Delete();" Text="Save" /></td>
+                        <asp:Button ID="btnSave" runat="server" CssClass="NFButton" OnClick="btnSave_Click" OnClientClick="javascript:return Delete(this);" Text="Save" /></td>
                     <td>
-                        <asp:Button ID="btnNext" runat="server" CssClass="NFButton" OnClick="btnNext_Click" Text="Next" /></td>
+                        <asp:Button ID="btnNext" runat="server" CssClass="NFButton" OnClientClick ="return multiClickCheck(this);" OnClick="btnNext_Click" Text="Next" /></td>
                    
                 </tr>
                 <tr>

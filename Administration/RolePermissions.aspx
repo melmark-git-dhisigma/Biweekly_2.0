@@ -37,6 +37,18 @@
     <script type="text/javascript">
 
 
+        var multiClick = false;
+        function enableButton() {
+            multiClick = false;
+        }
+        function = multiClickCheck(btn){
+            if (!multiClick) {
+                multiClick = true;
+                btn.style.opacity = '0.5';
+                return true;
+            }
+            return false;
+        }
 
 
         function showsubmenu(id) {
@@ -219,7 +231,7 @@
                 </asp:DropDownList>
             </td>
             <td>
-                <asp:Button ID="btnSave" runat="server" CssClass="NFButton" OnClick="btnSave_Click" Text="Save" />
+                <asp:Button ID="btnSave" runat="server" CssClass="NFButton" OnClick="btnSave_Click" OnClientClick="return multiClickCheck(this);" Text="Save" />
             </td>
         </tr>
         <tr>

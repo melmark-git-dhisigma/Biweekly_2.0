@@ -90,6 +90,7 @@ public partial class Admin_AddGroup : System.Web.UI.Page
                         {
                             tdMsg.InnerHtml = clsGeneral.warningMsg("Group Code already exit.Please choose another code.");
                             txtDescription.Focus();
+                            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                             return;
                         }
 
@@ -105,6 +106,7 @@ public partial class Admin_AddGroup : System.Web.UI.Page
                 }
                 else
                 {
+                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                     return;
                 }
             }
@@ -119,11 +121,13 @@ public partial class Admin_AddGroup : System.Web.UI.Page
             btnSave.Text = "Save";
             LoadGroup();
             hidGroupId.Value = "0";
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
         }
 
 
         catch (SqlException Ex)
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             tdMsg.InnerHtml = clsGeneral.failedMsg("Please Try Again");
             throw Ex;
         }
@@ -313,6 +317,7 @@ public partial class Admin_AddGroup : System.Web.UI.Page
         {
             GroupId = Convert.ToInt32(hidGroupId.Value);
             Session["GROUPID"] = GroupId.ToString();
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             Response.Redirect("AddRole.aspx");
         }
         else
@@ -321,6 +326,7 @@ public partial class Admin_AddGroup : System.Web.UI.Page
             {
                 btnSave_Click(sender, e);
                 Session["GROUPID"] = GroupIds.ToString();
+                ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                 Response.Redirect("AddRole.aspx");
             }
 

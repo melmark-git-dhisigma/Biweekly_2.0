@@ -130,6 +130,7 @@ public partial class Admin_AddRole : System.Web.UI.Page
                         {
                             tdMsg.InnerHtml = clsGeneral.warningMsg("Role Code already exit.Please choose another code.");
                             txtCode.Focus();
+                            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                             return;
                         }
 
@@ -149,6 +150,7 @@ public partial class Admin_AddRole : System.Web.UI.Page
                 }
                 else
                 {
+                    ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                     return;
                 }
             }
@@ -164,10 +166,12 @@ public partial class Admin_AddRole : System.Web.UI.Page
             btnSave.Text = "Save";
             RoleId = 0;
             LoadRole();
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
         }
 
         catch (SqlException Ex)
         {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             tdMsg.InnerHtml = clsGeneral.failedMsg(" Please Try Again");
             throw Ex;
         }
@@ -328,6 +332,7 @@ public partial class Admin_AddRole : System.Web.UI.Page
         {
             tdMsg.InnerHtml = clsGeneral.warningMsg("Please Select Role and Continue....");
             ddlGroup.Focus();
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             return;
         }
         else
