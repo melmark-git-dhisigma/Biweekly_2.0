@@ -1970,6 +1970,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 ViewState["CurrentDate"] = dateOfMtng;
                 LoadMeetingsNew(dateOfMtng);
                 loadExtraData();
+                Datacarryover(dted.ToString("MM/dd/yyyy"));
                 rbtnLsnClassTypeAc.Visible = true;
                 tdMsg1.Visible = true;
                 tdMsg2.Visible = true;
@@ -2034,6 +2035,215 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
         return result;
     }
 
+    protected void Datacarryover(string endDate)
+    {
+        if (btnSave.Visible)
+        {
+            objData = new clsData();
+            sess = (clsSession)Session["UserSession"];
+
+
+            DataTable dtAgItm = new DataTable();
+            dtAgItm.Columns.Add(new DataColumn("AgendaItemId", typeof(Int32)));
+            dtAgItm.Columns.Add(new DataColumn("AgendaItem", typeof(string)));
+            dtAgItm.Columns.Add(new DataColumn("StaffInitials", typeof(string)));
+            dtAgItm.Columns.Add(new DataColumn("DateAdded", typeof(string)));
+            dtAgItm.Columns.Add(new DataColumn("DoneCarryOver", typeof(string)));
+
+            string prevACSheet1 = "SELECT MtngId as AgendaItemId, AgendaItem, AgendaAddedDate as DateAdded, StaffInitials, DoneCarryOver FROM AcdSheetMtng WHERE followstatus = 'A' AND " +
+               " AccSheetId in (select AccSheetId from StdtAcdSheet where StudentId = " + sess.StudentId + " AND EndDate in (select top 1 EndDate from StdtAcdSheet where StudentId = " +
+               sess.StudentId + " AND CONVERT(datetime,EndDate)<CONVERT(datetime,'" + endDate + "') order by EndDate desc) and DateOfMeeting in (select top 1 DateOfMeeting from " +
+               " StdtAcdSheet where StudentId = " + sess.StudentId + " AND CONVERT(datetime,EndDate)<CONVERT(datetime,'" + endDate + "') order by EndDate desc))";
+            DataTable dtAg = objData.ReturnDataTable(prevACSheet1, false);
+            foreach (DataRow row2 in dtAg.Rows)
+                if (row2["AgendaItem"].ToString() != "" || row2["StaffInitials"].ToString() != "")
+                {
+                    if (row2["DateAdded"].ToString() != "")
+                    {
+                        string dateAdded = row2["DateAdded"].ToString().Replace("-", "/");
+                        dtAgItm.Rows.Add(Convert.ToInt32(row2["AgendaItemId"]), row2["AgendaItem"].ToString(), row2["StaffInitials"].ToString(), dateAdded, row2["DoneCarryOver"].ToString());
+                    }
+                    else
+                        dtAgItm.Rows.Add(Convert.ToInt32(row2["AgendaItemId"]), row2["AgendaItem"].ToString(), row2["StaffInitials"].ToString(), row2["DoneCarryOver"].ToString());
+                }
+            if (dtAgItm != null)
+            {
+                if (dtAgItm.Rows.Count > 0)
+                {
+                    gvAgendaItem.DataSource = dtAgItm;
+                    gvAgendaItem.DataBind();
+                    int i = 0;
+                    foreach (GridViewRow row3 in gvAgendaItem.Rows)
+                    {
+                        RadioButtonList radBtnLst1 = row3.FindControl("RBLDoneCarry") as RadioButtonList;
+                        if (dtAgItm.Rows[i]["DoneCarryOver"].ToString() != "" && i < dtAgItm.Rows.Count)
+                        {
+                            radBtnLst1.SelectedValue = dtAgItm.Rows[i++]["DoneCarryOver"].ToString();
+                        }
+                    }
+                }
+            }
+
+
+
+
+
+
+            //string prevACSheet1 = "SELECT MtngId as AgendaItemId, AgendaItem, AgendaAddedDate, StaffInitials, DoneCarryOver FROM AcdSheetMtng WHERE followstatus = 'A' AND " + 
+            //    " AccSheetId in (select AccSheetId from StdtAcdSheet where StudentId = " +sess.StudentId + " AND EndDate in (select top 1 EndDate from StdtAcdSheet where StudentId = " +
+            //    sess.StudentId + " AND CONVERT(datetime,EndDate)<CONVERT(datetime,'" + endDate + "') order by EndDate desc) and DateOfMeeting in (select top 1 DateOfMeeting from " + 
+            //    " StdtAcdSheet where StudentId = " + sess.StudentId + " AND CONVERT(datetime,EndDate)<CONVERT(datetime,'" + endDate + "') order by EndDate desc))";
+            //DataTable DtAg = objData.ReturnDataTable(prevACSheet1, false);
+
+            string prevACSheet2 = "SELECT IEPYear,IEPSigDate,GoalArea,MetObjective,MetGoal,NotMaintaining,Progressing1,Progressing2,Progressing3,Progressing4,Progressing5,Progressing6,Progressing7 FROM StdtAcdSheet" +
+                " WHERE AccSheetId in (select AccSheetId from StdtAcdSheet where StudentId = " + sess.StudentId + " AND EndDate in (select top 1 EndDate from StdtAcdSheet where StudentId = " +
+                sess.StudentId + " AND CONVERT(datetime,EndDate)<CONVERT(datetime,'" + endDate + "') order by EndDate desc) and DateOfMeeting in (select top 1 DateOfMeeting from " +
+                " StdtAcdSheet where StudentId = " + sess.StudentId + " AND CONVERT(datetime,EndDate)<CONVERT(datetime,'" + endDate + "') order by EndDate desc))";
+
+            DataTable Dt = objData.ReturnDataTable(prevACSheet2, false);
+            foreach (DataRow dr1 in Dt.Rows)
+            {
+                if (dr1["IEPYear"] != null && dr1["IEPYear"].ToString() != "")
+                {
+                    Iepyeartxt.Text = dr1["IEPYear"].ToString();
+                }
+                if (dr1["IEPSigDate"] != null && dr1["IEPSigDate"].ToString() != "")
+                {
+                    Ieptxt.Text = dr1["IEPSigDate"].ToString();
+                }
+            }
+
+            foreach (GridViewRow row in GridViewAccSheet.Rows)
+            {
+                Label l1 = row.FindControl("lblGoalArea") as Label;
+                foreach (DataRow dr in Dt.Rows)
+                {
+                    if (l1.Text == dr["GoalArea"].ToString())
+                    {
+                        RadioButtonList radBtnLst1 = row.FindControl("RadioButtonList1") as RadioButtonList;
+                        RadioButtonList radBtnLst2 = row.FindControl("RadioButtonList2") as RadioButtonList;
+                        RadioButtonList radBtnLst3 = row.FindControl("RadioButtonList3") as RadioButtonList;
+                        RadioButtonList radBtnLst4 = row.FindControl("RadioButtonList4") as RadioButtonList;
+                        RadioButtonList radBtnLst5 = row.FindControl("RadioButtonList5") as RadioButtonList;
+                        RadioButtonList radBtnLst6 = row.FindControl("RadioButtonList6") as RadioButtonList;
+                        RadioButtonList radBtnLst7 = row.FindControl("RadioButtonList7") as RadioButtonList;
+                        if (dr["Progressing1"] != null)
+                        {
+                            radBtnLst1.SelectedValue = dr["Progressing1"].ToString();
+                            if (radBtnLst1.SelectedValue == "Yes")
+                                radBtnLst1.Items[0].Attributes["Style"] = "color:lightgreen;";
+                            else if (radBtnLst1.SelectedValue == "No")
+                                radBtnLst1.Items[1].Attributes["Style"] = "color:red;";
+                            else if (radBtnLst1.SelectedValue == "No Change")
+                                radBtnLst1.Items[2].Attributes["Style"] = "color:yellow;";
+                        }
+                        if (dr["Progressing2"] != null)
+                        {
+                            radBtnLst2.SelectedValue = dr["Progressing2"].ToString();
+                            if (radBtnLst2.SelectedValue == "Yes")
+                                radBtnLst2.Items[0].Attributes["Style"] = "color:lightgreen;";
+                            else if (radBtnLst2.SelectedValue == "No")
+                                radBtnLst2.Items[1].Attributes["Style"] = "color:red;";
+                            else if (radBtnLst2.SelectedValue == "No Change")
+                                radBtnLst2.Items[2].Attributes["Style"] = "color:yellow;";
+                        }
+                        if (dr["Progressing3"] != null)
+                        {
+                            radBtnLst3.SelectedValue = dr["Progressing3"].ToString();
+                            if (radBtnLst3.SelectedValue == "Yes")
+                                radBtnLst3.Items[0].Attributes["Style"] = "color:lightgreen;";
+                            else if (radBtnLst3.SelectedValue == "No")
+                                radBtnLst3.Items[1].Attributes["Style"] = "color:red;";
+                            else if (radBtnLst3.SelectedValue == "No Change")
+                                radBtnLst3.Items[2].Attributes["Style"] = "color:yellow;";
+                        }
+                        if (dr["Progressing4"] != null)
+                        {
+                            radBtnLst4.SelectedValue = dr["Progressing4"].ToString();
+                            if (radBtnLst4.SelectedValue == "Yes")
+                                radBtnLst4.Items[0].Attributes["Style"] = "color:lightgreen;";
+                            else if (radBtnLst4.SelectedValue == "No")
+                                radBtnLst4.Items[1].Attributes["Style"] = "color:red;";
+                            else if (radBtnLst4.SelectedValue == "No Change")
+                                radBtnLst4.Items[2].Attributes["Style"] = "color:yellow;";
+                        }
+                        if (dr["Progressing5"] != null)
+                        {
+                            radBtnLst5.SelectedValue = dr["Progressing5"].ToString();
+                            if (radBtnLst5.SelectedValue == "Yes")
+                                radBtnLst5.Items[0].Attributes["Style"] = "color:lightgreen;";
+                            else if (radBtnLst5.SelectedValue == "No")
+                                radBtnLst5.Items[1].Attributes["Style"] = "color:red;";
+                            else if (radBtnLst5.SelectedValue == "No Change")
+                                radBtnLst5.Items[2].Attributes["Style"] = "color:yellow;";
+                        }
+                        if (dr["Progressing6"] != null)
+                        {
+                            radBtnLst6.SelectedValue = dr["Progressing6"].ToString();
+                            if (radBtnLst6.SelectedValue == "Yes")
+                                radBtnLst6.Items[0].Attributes["Style"] = "color:lightgreen;";
+                            else if (radBtnLst6.SelectedValue == "No")
+                                radBtnLst6.Items[1].Attributes["Style"] = "color:red;";
+                            else if (radBtnLst6.SelectedValue == "No Change")
+                                radBtnLst6.Items[2].Attributes["Style"] = "color:yellow;";
+                        }
+                        if (dr["Progressing7"] != null)
+                        {
+                            radBtnLst7.SelectedValue = dr["Progressing7"].ToString();
+                            if (radBtnLst7.SelectedValue == "Yes")
+                                radBtnLst7.Items[0].Attributes["Style"] = "color:lightgreen;";
+                            else if (radBtnLst7.SelectedValue == "No")
+                                radBtnLst7.Items[1].Attributes["Style"] = "color:red;";
+                            else if (radBtnLst7.SelectedValue == "No Change")
+                                radBtnLst7.Items[2].Attributes["Style"] = "color:yellow;";
+                        }
+                        if (dr["MetObjective"] != null && dr["MetGoal"] != null && dr["NotMaintaining"] != null)
+                        {
+
+                            HtmlInputCheckBox checkbox1 = row.FindControl("Checkbox4") as HtmlInputCheckBox;
+                            HtmlInputCheckBox checkbox2 = row.FindControl("Checkbox5") as HtmlInputCheckBox;
+                            HtmlInputCheckBox checkbox3 = row.FindControl("Checkbox6") as HtmlInputCheckBox;
+                            int ch1 = Convert.ToInt32(dr["MetObjective"]);
+                            int ch2 = Convert.ToInt32(dr["MetGoal"]);
+                            int ch3 = Convert.ToInt32(dr["NotMaintaining"]);
+                            if (ch1 == 1)
+                            {
+                                checkbox1.Checked = true;
+                                HtmlGenericControl c1 = row.FindControl("ch4") as HtmlGenericControl;
+                                if (c1 != null)
+                                {
+                                    c1.Style["color"] = "Green";
+                                    c1.Style["font-weight"] = "bold";
+                                }
+                            }
+                            if (ch2 == 1)
+                            {
+                                checkbox2.Checked = true;
+                                HtmlGenericControl c2 = row.FindControl("ch5") as HtmlGenericControl;
+                                if (c2 != null)
+                                {
+                                    c2.Style["color"] = "Green";
+                                    c2.Style["font-weight"] = "bold";
+
+                                }
+                            }
+                            if (ch3 == 1)
+                            {
+                                checkbox3.Checked = true;
+                                HtmlGenericControl c3 = row.FindControl("ch6") as HtmlGenericControl;
+                                if (c3 != null)
+                                {
+                                    c3.Style["color"] = "Red";
+                                    c3.Style["font-weight"] = "bold";
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+    }
     protected void loadExtraData()
     {
         objData = new clsData();
@@ -3187,7 +3397,12 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             HiddenField hfLPId = (HiddenField)row.FindControl("hfLPId");
 
             //string Pquery = "select MtngId as PMtngId,PropAndDisc as PFollowUp,PersonResp as PPersonResponsible,CONVERT(VARCHAR,Deadlines,101) as PDeadlines from AcdSheetMtng where AccSheetId in (select AccSheetId from StdtAcdSheet where studentid=" + sess.StudentId + " and EndDate < '" + endDate + "' and LessonPlanId=" + hfLPId.Value + ")"; //TEST: EndDate<= changed to <
-            string Pquery = "select MtngId as PMtngId,PropAndDisc as PFollowUp,u.UserLName+', '+u.UserFName as PPersonResponsible,CONVERT(VARCHAR,Deadlines,101) as PDeadlines from AcdSheetMtng join [User] u on u.UserId=PersonResp and AccSheetId in (select AccSheetId from StdtAcdSheet where studentid=" + sess.StudentId + " and EndDate < '" + endDate + "' and LessonPlanId=" + hfLPId.Value + ")";
+            //string Pquery = "select MtngId as PMtngId,PropAndDisc as PFollowUp,u.UserLName+', '+u.UserFName as PPersonResponsible,CONVERT(VARCHAR,Deadlines,101) as PDeadlines from AcdSheetMtng join [User] u on u.UserId=PersonResp and AccSheetId in (select AccSheetId from StdtAcdSheet where studentid=" + sess.StudentId + " and EndDate < '" + endDate + "' and LessonPlanId=" + hfLPId.Value + ")";
+            string Pquery = "SELECT MtngId as PMtngId,PropAndDisc as PFollowUp,u.UserLName+', '+u.UserFName as PPersonResponsible,CONVERT(VARCHAR,Deadlines,101) as PDeadlines " +
+                " FROM AcdSheetMtng left join [User] u on u.UserId = PersonResp WHERE (followstatus = 'C' OR followstatus = 'P') AND AccSheetId in (select AccSheetId from " +
+                " StdtAcdSheet where StudentId = " + sess.StudentId + " AND EndDate in (select top 1 EndDate from StdtAcdSheet where StudentId = " + sess.StudentId +
+                " AND CONVERT(datetime,EndDate)<CONVERT(datetime,'" + endDate + "') order by EndDate desc) AND DateOfMeeting in (select top 1 DateOfMeeting from StdtAcdSheet where " +
+                " StudentId = " + sess.StudentId + " AND CONVERT(datetime,EndDate)<CONVERT(datetime,'" + endDate + "') order by EndDate desc) AND LessonPlanId = " + hfLPId.Value + ")";
             DataTable dtPMtng = objData.ReturnDataTable(Pquery, false);
 
             if (dtPMtng != null)
