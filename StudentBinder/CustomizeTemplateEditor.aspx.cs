@@ -13209,8 +13209,23 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                              return;
 
                          }
-                     }
-
+                     }                                   
+                    
+                        string strPromtRule = "select count(DSTempRuleId) from DSTempRule where RuleType='PROMPT' and  DSTempHdrId=" + TemplateId + "  and ActiveInd='A'";
+                        int dtPromtRule = Convert.ToInt32(objData.FetchValue(strPromtRule));
+                        if (dtPromtRule > 0)
+                        {
+                            string strQryPromt = "select count(DSTempPromptId) from DSTempPrompt where  DSTempHdrId=" + TemplateId + " AND ActiveInd = 'A'";
+                            int dtCheckPrompt = Convert.ToInt32(objData.FetchValue(strQryPromt));
+                            if (dtCheckPrompt == 0)
+                            {
+                                tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting.There is no prompt added, yet the prompt criteria are still included.");
+                                alertmsg = "Please complete template details before submitting.There is no prompt added, yet the prompt criteria are still included.";
+                                FillTypeOfInstruction(TemplateId);
+                                ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
+                                return;
+                            }
+                        }
 
                     if (skilltype == "Chained")
                     {
@@ -13862,6 +13877,21 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         tdReadMsg.InnerHtml = clsGeneral.warningMsg("The following sets" + setname + " contain duplicate sortorder please remove and add them again to avoid data submission failure");
                         FillTypeOfInstruction(TemplateId);
                         return;  
+                    }
+                }
+
+                string strPromtRule = "select count(DSTempRuleId) from DSTempRule where RuleType='PROMPT' and  DSTempHdrId=" + TemplateId + "  and ActiveInd='A'";
+                int dtPromtRule = Convert.ToInt32(objData.FetchValue(strPromtRule));
+                if (dtPromtRule > 0)
+                {
+                    string strQryPromt = "select count(DSTempPromptId) from DSTempPrompt where  DSTempHdrId=" + TemplateId + " AND ActiveInd = 'A'";
+                    int dtCheckPrompt = Convert.ToInt32(objData.FetchValue(strQryPromt));
+                    if (dtCheckPrompt == 0)
+                    {
+                        previewSuccess = false;
+                        tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting.There is no prompt added, yet the prompt criteria are still included.");
+                        FillTypeOfInstruction(TemplateId);
+                        return;
                     }
                 }
 
@@ -19706,6 +19736,22 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
                                 tdReadMsg.InnerHtml = clsGeneral.warningMsg("The following sets" + setname + " contain duplicate sortorder please remove and add them again to avoid data submission failure");
                                 alertmsg = "The following sets" + setname + " contain duplicate sortorder please remove and add them again to avoid data submission failure";
+                                FillTypeOfInstruction(TemplateId);
+                                ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
+                                return;
+                            }
+                        }
+
+                        string strPromtRule = "select count(DSTempRuleId) from DSTempRule where RuleType='PROMPT' and  DSTempHdrId=" + TemplateId + "  and ActiveInd='A'";
+                        int dtPromtRule = Convert.ToInt32(objData.FetchValue(strPromtRule));
+                        if (dtPromtRule > 0)
+                        {
+                            string strQryPromt = "select count(DSTempPromptId) from DSTempPrompt where  DSTempHdrId=" + TemplateId + " AND ActiveInd = 'A'";
+                            int dtCheckPrompt = Convert.ToInt32(objData.FetchValue(strQryPromt));
+                            if (dtCheckPrompt == 0)
+                            {
+                                tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting.There is no prompt added, yet the prompt criteria are still included.");
+                                alertmsg = "Please complete template details before submitting.There is no prompt added, yet the prompt criteria are still included.";
                                 FillTypeOfInstruction(TemplateId);
                                 ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
                                 return;
