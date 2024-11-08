@@ -85,7 +85,7 @@
              <td>
                   <asp:checkbox id="chkLP" runat="server" text="Display LessonPlans" autopostback="false" Checked="true"></asp:checkbox>
                                 <br />
-                                <asp:checkbox id="chkBehavior" runat="server" text="Display Behaviors" Checked="true"></asp:checkbox>
+                                <asp:checkbox id="chkBehavior" runat="server" text="Display Behaviors" Checked="false"></asp:checkbox>
                  
              </td>
              <td>
