@@ -90,6 +90,12 @@
         }
         
     </style>
+    <style>
+        .nowrapText {
+            white-space: nowrap; /* Prevent text wrapping */
+        }
+    </style>
+
     <script type="text/javascript">
         window.onload = function () {
             new JsDatePick({
@@ -109,6 +115,12 @@
 
         function closeMessage() {
             $('#PSRLoadingImage').hide();
+        }
+        function showMessage2() {
+            var checkbox = document.getElementById('<%= highcheck.ClientID %>');
+            if (checkbox.checked) {
+                $('#PSRLoadingImage').show();
+            }
         }
     </script>
     <script>
@@ -195,11 +207,11 @@
              </td>
             
             <td>
-
+                <asp:CheckBox id="highcheck" runat="server"  Text=""></asp:CheckBox>
                 <asp:button id="Button2" runat="server" text="Session View" cssclass="NFButton" tooltip="Show Session View" onclick="btnShow_Click" OnClientClick="showMessage()"   />
 
                 
-                <asp:button id="Button1" runat="server" text="Classic View" cssclass="NFButton" tooltip="Show Classic View" onclick="btnsubmit_Click"   />
+                <asp:button id="Button1" runat="server" text="Classic View" cssclass="NFButton" tooltip="Show Classic View" onclick="btnsubmit_Click" OnClientClick="showMessage2()" />
                 
             </td>
 
@@ -247,11 +259,80 @@
                             </div>
             </td>
         </tr>
+        </table>
+          <%------------------------------------DataList to List the Classic  Data--------------------------------------%>
 
-                      
-
+         <div style="display: flex; align-items: flex-start; gap: 0; margin: 0; padding: 0;">
+                       <table>
                         
+                               <tr>
+                                   <td>
+  <asp:GridView ID="Gvclsdate" runat="server" Width="100%" AutoGenerateColumns="false" GridLines="Both" BackColor="White" BorderColor="#336666" 
+                                            BorderStyle="None" BorderWidth="1px" Style="width: 100%" HorizontalAlign="Justify" >
+                                            <RowStyle CssClass="RowStyle RowStyleN" />
+                                            <FooterStyle CssClass="FooterStyle" ForeColor="#333333" />
+                                            <SelectedRowStyle CssClass="SelectedRowStyle" BackColor="#4498c2" Font-Bold="True" />
+                                            <PagerStyle CssClass="PagerStyle" ForeColor="White" HorizontalAlign="Left" />
+                                            <EmptyDataRowStyle CssClass="EmptyDataRowStyle" />
+                                           <Columns>
+                                  <asp:TemplateField>
+                                            <HeaderTemplate>
+                                                <table>
+                                                    <tr style="height:93px;">
+
+                                                        <th style="border: none; text-align: center;">Date</th>
+                                                    </tr>
+                   
                     </table>
+                                            </HeaderTemplate>
+                                            <ItemTemplate>
+                                                <asp:Label ID="dateid2" runat="server" Text='<%# Eval("Date", "{0:MM/dd/yyyy}") %>'></asp:Label>
+                                            </ItemTemplate>
+                                            <HeaderStyle BackColor="#4498c2" ForeColor="black" />
+                                            <ItemStyle BackColor="#4498c2" ForeColor="black" CssClass="nowrap" />
+                                        </asp:TemplateField>
+                                        </Columns>
+                                                                            </asp:GridView>
+                                                                           </td>
+                                                                   </tr>
+                                                               </table>
+
+
+                                     <div id="clsview" runat="server" style="width: 100%;  overflow: auto" visible="false">
+                                        <asp:DataList ID="clslist" runat="server" Style="vertical-align: top" CellPadding="0" CellSpacing="0"  RepeatDirection="Horizontal" OnItemDataBound="clslist_ItemDataBound" Width="100%">
+                    
+                                            <ItemStyle VerticalAlign="Top" />
+                                            <ItemTemplate>
+                         
+
+                        <div id="div2" >
+                            <table id="Table1" style="width: 100%;">
+                                <tr>
+                                    <asp:Label ID="lessid" runat="server" Text='<%# Eval("LessonPlanId") %>' Visible="false"></asp:Label>
+                                </tr>
+                                <tr>
+                                    <th id="th1" runat="server" class='bName' style="background-color: #4498c2; color: black; text-align: center; height: 30px; font-size: 14px"><%# Eval("LessonName")%></th>
+                                    <th id="th2" runat="server" style="background-color: white; border-color:white; height: 30px; width: 1px;"> </th>
+                                </tr>
+                               
+                                <tr>
+                                    <td>
+                                        <asp:GridView ID="Gvclsless" runat="server" Width="100%" AutoGenerateColumns="false" GridLines="Both" BackColor="White" BorderColor="#336666"
+                                            BorderStyle="None" BorderWidth="1px" Style="width: 100%" HorizontalAlign="Justify" >
+                                            <RowStyle CssClass="RowStyle RowStyleN" />
+                                            <FooterStyle CssClass="FooterStyle" ForeColor="#333333" />
+                                            <SelectedRowStyle CssClass="SelectedRowStyle" BackColor="#339966" Font-Bold="True" />
+                                            <PagerStyle CssClass="PagerStyle" ForeColor="White" HorizontalAlign="Left" />
+                                            <EmptyDataRowStyle CssClass="EmptyDataRowStyle" />
+                                        </asp:GridView>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </ItemTemplate>
+                </asp:DataList>
+                 </div>
+             </div>
 
          <%------------------------------------DataList to List the Session Data--------------------------------------%>
             <div id="divLesson" runat="server" style="width: 100%; height: 600px; overflow: auto">
