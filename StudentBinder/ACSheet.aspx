@@ -1033,7 +1033,7 @@
                                                                                                             </asp:TemplateField>
                                                                                                              <asp:TemplateField>
                                                                                                                 <ItemTemplate>
-                                                                                                                    <asp:ImageButton ID="btnDelRowCurMeeting" CssClass="btn btn-blue" ImageUrl="~/Administration/images/trash.png" runat="server" Text="X" CommandName="delete"  OnClientClick="return confirm('Are you sure you want to delete?');" />
+                                                                                                                    <asp:ImageButton ID="btnDelRowCurMeeting" CssClass="btn btn-blue" ImageUrl="~/Administration/images/trash.png" runat="server" Text="X" CommandName="delete" CommandArgument='<%# Eval("PMtngId") %>'  OnClientClick="return confirm('Are you sure you want to delete?');" />
                                                                                                                 </ItemTemplate>
                                                                                                             </asp:TemplateField>
                                                                                                             <asp:TemplateField>
@@ -1613,7 +1613,7 @@
                                                                                                             </asp:TemplateField>
                                                                                                              <asp:TemplateField>
                                                                                                                 <ItemTemplate>
-                                                                                                                    <asp:ImageButton ID="btnDelRowCurMeeting" CssClass="btn btn-blue" ImageUrl="~/Administration/images/trash.png" runat="server" Text="X" CommandName="delete"  OnClientClick="return confirm('Are you sure you want to delete?');" />
+                                                                                                                    <asp:ImageButton ID="btnDelRowCurMeeting" CssClass="btn btn-blue" ImageUrl="~/Administration/images/trash.png" runat="server" Text="X" CommandName="delete" CommandArgument='<%# Eval("PMtngIdEdit") %>'  OnClientClick="return confirm('Are you sure you want to delete?');" />
                                                                                                                 </ItemTemplate>
                                                                                                             </asp:TemplateField>
                                                                                                             <asp:TemplateField>
