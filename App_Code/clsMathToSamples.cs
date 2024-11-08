@@ -639,11 +639,12 @@ public class clsMathToSamples
         //        bNoRule = true;
         //    FindComb(steps, list, AnsList[i], i, false, bNoRule);
         //}
+        string[] distnictAnsList = AnsList.Distinct().ToArray();
         for (int i = 0; i < AnsList.Length; i++)
         {
-            if (i > Objects.Length - 1)
+            if (i > distnictAnsList.Length - 1)
             {
-                steps[i] = steps[i - Objects.Length].MakeCopy();
+                steps[i] = steps[i - distnictAnsList.Length].MakeCopy();
                 //foreach (Step step in steps)
                 //{
                 //    if (step !=null && step.Questions == "Find " + AnsList[i])
@@ -655,7 +656,7 @@ public class clsMathToSamples
                 //}
             }
             else
-                FindComb(steps, list, AnsList[i], i, false, bNoRule);
+                FindComb(steps, list, distnictAnsList[i], i, false, bNoRule);
         }
         return steps;
     }
