@@ -13189,6 +13189,140 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         return;
                     }
 
+                    //Step Mismatch Validation Start
+                    if (skilltype == "Chained")
+                    {
+                        string SetIdCheck = "";
+                        string steptname = "";
+                        DataTable dtParentstepListF = new DataTable();
+                        dtParentstepListF.Columns.Add("SetId", typeof(string));
+
+                        string DSParentStep = "SELECT  DSTempParentStepId,SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames FROM DSTempParentStep " +
+                             " WHERE DSTempHdrId = " + TemplateId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + TemplateId + " AND ActiveInd = 'A') " +
+                             " AND ActiveInd = 'A' ORDER BY SortOrder";
+                        DataTable dtParentstepList = objData.ReturnDataTable(DSParentStep, false);
+
+                        string Activeset = "select DSTempSetId FROM DSTempSet WHERE DSTempHdrId = " + TemplateId + " AND ActiveInd ='A'";
+                        DataTable dtActivesetList = objData.ReturnDataTable(Activeset, false);
+
+                        List<string> ListSetIds = new List<string>();
+
+                        if (dtActivesetList != null)
+                        {
+                            if (dtActivesetList.Rows.Count > 0)
+                            {
+                                foreach (DataRow row in dtActivesetList.Rows)
+                                {
+                                    ListSetIds.Add(row["DSTempSetId"].ToString());
+                                }
+                            }
+                        }
+
+                        if (dtParentstepList != null)
+                        {
+                            if (dtParentstepList.Rows.Count > 0)
+                            {
+                                foreach (DataRow dr in dtParentstepList.Rows)
+                                {
+                                    SetIdCheck = dr["SetIds"].ToString();
+                                    string[] SetIdAr = SetIdCheck.Split(',');
+
+                                    foreach (string value in SetIdAr)
+                                    {
+                                        if (value != "" && ListSetIds.Contains(value))
+                                        {
+                                            dtParentstepListF.Rows.Add(value.Trim());
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        string Dstemstepcount = "SELECT * FROM  DSTempStep WHERE DSTempHdrId = " + TemplateId + " AND ActiveInd = 'A' and DSTempSetId in (select DSTempSetId from DSTempSet where DSTempHdrId =" + TemplateId + " AND ActiveInd = 'A' )";
+                        DataTable dtDstemstepcountList = objData.ReturnDataTable(Dstemstepcount, false);
+
+                        if (dtDstemstepcountList != null && dtParentstepListF != null)
+                        {
+                            if (dtParentstepListF.Rows.Count != dtDstemstepcountList.Rows.Count)
+                            {
+                                string DissetId = "SELECT distinct(DSTempsetId) FROM  DSTempset WHERE DSTempHdrId = " + TemplateId + " AND ActiveInd = 'A'";
+                                DataTable dtDissetIdList = objData.ReturnDataTable(DissetId, false);
+
+
+                                if (dtDissetIdList != null)
+                                {
+                                    if (dtDissetIdList.Rows.Count > 0)
+                                    {
+                                        foreach (DataRow dr in dtDissetIdList.Rows)
+                                        {
+
+                                            int DsSetId = Convert.ToInt32(dr["DSTempsetId"]);
+                                            string Dupsortorder = "SELECT sortOrder, COUNT(*) as Count FROM DStempStep where DSTempHdrId = " + TemplateId + " and DSTempSetId=" + DsSetId + " and ActiveInd='A' GROUP BY sortOrder HAVING COUNT(*) > 1";
+                                            DataTable dtDupsortorderList = objData.ReturnDataTable(Dupsortorder, false);
+                                            if (dtDupsortorderList != null)
+                                            {
+                                                if (dtDupsortorderList.Rows.Count > 0)
+                                                {
+                                                    foreach (DataRow drds in dtDupsortorderList.Rows)
+                                                    {
+                                                        int sortno = Convert.ToInt32(drds["sortOrder"]);
+                                                        string strstepnames = "select STUFF((SELECT ' - ' + StepCd+' '+StepName FROM DSTempStep where SortOrder=" + sortno + " and DSTempSetId=" + DsSetId + " and ActiveInd='A' and DSTempHdrId=" + TemplateId + " FOR XML PATH('')), 1, 2, '') AS setname";
+                                                        steptname = steptname + " (" + Convert.ToString(objData.FetchValue(strstepnames)) + " ) ";
+
+                                                    }
+
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                if (steptname != "")
+                                {
+                                    tdReadMsg.InnerHtml = clsGeneral.warningMsg("The following steps " + steptname + " contain duplicate sort order please edit or Remove and add them again");
+                                    alertmsg = "The following steps " + steptname + " contain duplicate sort order please edit or Remove and add them again";
+                                    FillTypeOfInstruction(TemplateId);
+                                    ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
+                                    return;
+                                }
+                                else
+                                {
+                                    tdReadMsg.InnerHtml = clsGeneral.warningMsg("The lesson contain step count mismatch Please Create a New LessonPlan");
+                                    alertmsg = "The lesson contain step count mismatch Please Create a New LessonPlan";
+                                    FillTypeOfInstruction(TemplateId);
+                                    ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
+                                    return;
+                                }
+
+                            }
+                        }
+
+                    }
+                    else if (skilltype == "Discrete")
+                    {
+                        string DisTrialDsStep = "SELECT * FROM  DSTempStep WHERE DSTempHdrId = " + TemplateId + " AND ActiveInd = 'A' and IsDynamic=0 And DSTempSetId in (select DSTempSetId from DSTempSet where DSTempHdrId =" + TemplateId + " AND ActiveInd = 'A' )";
+                        DataTable dtDisTrialDstempList = objData.ReturnDataTable(DisTrialDsStep, false);
+                        //string strsetnames = "SELECT NbrOfTrials FROM DSTempHdr WHERE DSTempHdrId = " + TemplateId + " ";
+                        string DisTrialDsHdr = "SELECT NbrOfTrials * (select count(distinct DSTempSetId) from DSTempStep where  DSTempHdrId =  " + TemplateId + " and ActiveInd='A' and DSTempSetId in(select  DSTempSetId from DSTempSet where ActiveInd='A' and DSTempHdrId =  " + TemplateId + "))  FROM DSTempHdr WHERE DSTempHdrId =  " + TemplateId;
+                        int DisTrial = Convert.ToInt32(objData.FetchValue(DisTrialDsHdr));
+                        if (dtDisTrialDstempList != null)
+                        {
+                            if (dtDisTrialDstempList.Rows.Count > 0)
+                            {
+                                if (dtDisTrialDstempList.Rows.Count != DisTrial)
+                                {
+                                    tdReadMsg.InnerHtml = clsGeneral.warningMsg("The lesson contain Trial count mismatch Please Reassign trial number or Create a New LessonPlan");
+                                    alertmsg = "The lesson contain Trial count mismatch Please Reassign trial Number or Create a New LessonPlan";
+                                    FillTypeOfInstruction(TemplateId);
+                                    ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
+                                    return;
+                                }
+                            }
+                        }
+
+                    }
+
+                    //Step Mismatch Validation End
+
                      string strdupsort = "SELECT SortOrder as sortorder, COUNT(*) as count FROM DSTempSet where ActiveInd='A' and DSTempHdrId=" + TemplateId + " GROUP BY SortOrder HAVING COUNT(*) > 1";
                      DataTable dtdupsort = objData.ReturnDataTable(strdupsort, false);
                      string setname = "";
@@ -13858,6 +13992,137 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     FillTypeOfInstruction(TemplateId);
                     return;
                 }
+
+                //Step Mismatch Validation Start
+                if (skilltype == "Chained")
+                {
+                    string SetIdCheck = "";
+                    string steptname = "";
+                    DataTable dtParentstepListF = new DataTable();
+                    dtParentstepListF.Columns.Add("SetId", typeof(string));
+
+                    string DSParentStep = "SELECT  DSTempParentStepId,SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames FROM DSTempParentStep " +
+                         " WHERE DSTempHdrId = " + TemplateId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + TemplateId + " AND ActiveInd = 'A') " +
+                         " AND ActiveInd = 'A' ORDER BY SortOrder";
+                    DataTable dtParentstepList = objData.ReturnDataTable(DSParentStep, false);
+
+                    string Activeset = "select DSTempSetId FROM DSTempSet WHERE DSTempHdrId = " + TemplateId + " AND ActiveInd ='A'";
+                    DataTable dtActivesetList = objData.ReturnDataTable(Activeset, false);
+
+                    List<string> ListSetIds = new List<string>();
+
+                    if (dtActivesetList != null)
+                    {
+                        if (dtActivesetList.Rows.Count > 0)
+                        {
+                            foreach (DataRow row in dtActivesetList.Rows)
+                            {
+                                ListSetIds.Add(row["DSTempSetId"].ToString());
+                            }
+                        }
+                    }
+
+                    if (dtParentstepList != null)
+                    {
+                        if (dtParentstepList.Rows.Count > 0)
+                        {
+                            foreach (DataRow dr in dtParentstepList.Rows)
+                            {
+                                SetIdCheck = dr["SetIds"].ToString();
+                                string[] SetIdAr = SetIdCheck.Split(',');
+
+                                foreach (string value in SetIdAr)
+                                {
+                                    if (value != "" && ListSetIds.Contains(value))
+                                    {
+                                        dtParentstepListF.Rows.Add(value.Trim());
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    string Dstemstepcount = "SELECT * FROM  DSTempStep WHERE DSTempHdrId = " + TemplateId + " AND ActiveInd = 'A' and DSTempSetId in (select DSTempSetId from DSTempSet where DSTempHdrId =" + TemplateId + " AND ActiveInd = 'A' )";
+                    DataTable dtDstemstepcountList = objData.ReturnDataTable(Dstemstepcount, false);
+
+                    if (dtDstemstepcountList != null && dtParentstepListF != null)
+                    {
+                        if (dtParentstepListF.Rows.Count != dtDstemstepcountList.Rows.Count)
+                        {
+                            string DissetId = "SELECT distinct(DSTempsetId) FROM  DSTempset WHERE DSTempHdrId = " + TemplateId + " AND ActiveInd = 'A'";
+                            DataTable dtDissetIdList = objData.ReturnDataTable(DissetId, false);
+
+
+                            if (dtDissetIdList != null)
+                            {
+                                if (dtDissetIdList.Rows.Count > 0)
+                                {
+                                    foreach (DataRow dr in dtDissetIdList.Rows)
+                                    {
+
+                                        int DsSetId = Convert.ToInt32(dr["DSTempsetId"]);
+                                        string Dupsortorder = "SELECT sortOrder, COUNT(*) as Count FROM DStempStep where DSTempHdrId = " + TemplateId + " and DSTempSetId=" + DsSetId + " and ActiveInd='A' GROUP BY sortOrder HAVING COUNT(*) > 1";
+                                        DataTable dtDupsortorderList = objData.ReturnDataTable(Dupsortorder, false);
+                                        if (dtDupsortorderList != null)
+                                        {
+                                            if (dtDupsortorderList.Rows.Count > 0)
+                                            {
+                                                foreach (DataRow drds in dtDupsortorderList.Rows)
+                                                {
+                                                    int sortno = Convert.ToInt32(drds["sortOrder"]);
+                                                    string strstepnames = "select STUFF((SELECT ' - ' + StepCd+' '+StepName FROM DSTempStep where SortOrder=" + sortno + " and DSTempSetId=" + DsSetId + " and ActiveInd='A' and DSTempHdrId=" + TemplateId + " FOR XML PATH('')), 1, 2, '') AS setname";
+                                                    steptname = steptname + " (" + Convert.ToString(objData.FetchValue(strstepnames)) + " ) ";
+
+                                                }
+
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if (steptname != "")
+                            {
+                                previewSuccess = false;
+                                tdReadMsg.InnerHtml = clsGeneral.warningMsg("The following steps " + steptname + " contain duplicate sort order please edit or Remove and add them again");
+                                FillTypeOfInstruction(TemplateId);
+                                return;
+                            }
+                            else
+                            {
+                                previewSuccess = false;
+                                tdReadMsg.InnerHtml = clsGeneral.warningMsg("The lesson contain step count mismatch Please Create a New LessonPlan");
+                                FillTypeOfInstruction(TemplateId);
+                                return;
+                            }
+
+                        }
+                    }
+
+                }
+                else if (skilltype == "Discrete")
+                {
+                    string DisTrialDsStep = "SELECT * FROM  DSTempStep WHERE DSTempHdrId = " + TemplateId + " AND ActiveInd = 'A' and IsDynamic=0 And DSTempSetId in (select DSTempSetId from DSTempSet where DSTempHdrId =" + TemplateId + " AND ActiveInd = 'A' )";
+                    DataTable dtDisTrialDstempList = objData.ReturnDataTable(DisTrialDsStep, false);
+                    //string strsetnames = "SELECT NbrOfTrials FROM DSTempHdr WHERE DSTempHdrId = " + TemplateId + " ";
+                    string DisTrialDsHdr = "SELECT NbrOfTrials * (select count(distinct DSTempSetId) from DSTempStep where  DSTempHdrId =  " + TemplateId + " and ActiveInd='A' and DSTempSetId in(select  DSTempSetId from DSTempSet where ActiveInd='A' and DSTempHdrId =  " + TemplateId + "))  FROM DSTempHdr WHERE DSTempHdrId =  " + TemplateId;
+                    int DisTrial = Convert.ToInt32(objData.FetchValue(DisTrialDsHdr));
+                    if (dtDisTrialDstempList != null)
+                    {
+                        if (dtDisTrialDstempList.Rows.Count > 0)
+                        {
+                            if (dtDisTrialDstempList.Rows.Count != DisTrial)
+                            {
+                                previewSuccess = false;
+                                tdReadMsg.InnerHtml = clsGeneral.warningMsg("The lesson contain Trial count mismatch Please Reassign trial number or Create a New LessonPlan");
+                                FillTypeOfInstruction(TemplateId);
+                                return;
+                            }
+                        }
+                    }
+
+                }
+
+                //Step Mismatch Validation End
 
                 string strdupsort = "SELECT SortOrder as sortorder, COUNT(*) as count FROM DSTempSet where ActiveInd='A' and DSTempHdrId=" + TemplateId + " GROUP BY SortOrder HAVING COUNT(*) > 1";
                 DataTable dtdupsort = objData.ReturnDataTable(strdupsort, false);
@@ -18126,7 +18391,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             }
             DataTable dtset = new DataTable();
             Hashtable ht = new Hashtable();
-            dtset = objData.ReturnDataTable("SELECT DSTempSetId FROM DSTempSet WHERE DSTempHdrId=" + templateid + "", Con, Trans, false);
+            dtset = objData.ReturnDataTable("SELECT DSTempSetId FROM DSTempSet WHERE ActiveInd='A' and  DSTempHdrId=" + templateid + "", Con, Trans, false);
             if (dtset != null)
             {
                 if (dtset.Rows.Count > 0)
@@ -18160,7 +18425,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             if (teachingProc == "Match-to-Sample")
             {
                 DataTable dtstep = new DataTable();
-                dtstep = objData.ReturnDataTable("SELECT DSTempStepId,DSTempSetId FROM DSTempStep WHERE DSTempHdrId=" + templateid + " AND IsDynamic=0", Con, Trans, false);
+                dtstep = objData.ReturnDataTable("SELECT DSTempStepId,DSTempSetId FROM DSTempStep WHERE DSTempHdrId=" + templateid + " AND IsDynamic=0 AND ActiveInd='A' ", Con, Trans, false);
                 if (dtstep.Rows.Count > 0)
                 {
                     foreach (DataRow row in dtstep.Rows)
@@ -18183,7 +18448,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 DataTable dtParentStep = new DataTable();
                 // strQuery = "INSERT INTO DSTempParentStep(SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn) ";
                 strQuery = "SELECT  DSTempParentStepId,SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn"
-                    + " FROM DSTempParentStep WHERE DSTempHdrId = " + templateid;
+                    + " FROM DSTempParentStep WHERE ActiveInd='A' and DSTempHdrId = " + templateid;
                 dtParentStep = objData.ReturnDataTable(strQuery, Con, Trans, false);
                 //  int DSTempParentStepId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                 // DataTable dt
@@ -18213,7 +18478,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             DataTable dtstep = new DataTable();
 
                             strQuery = "SELECT  SchoolId,PrevStepId,SortOrder,PreDefinedInd,CustomById,VTStepId,DSTempSetId,StepCd,StepName,ActiveInd,"
-                                    + "DSTempParentStepId FROM DSTempStep WHERE DSTempParentStepId=" + oldParentSetId + " AND IsDynamic=0 AND DSTempHdrId = " + templateid;
+                                    + "DSTempParentStepId FROM DSTempStep WHERE DSTempParentStepId=" + oldParentSetId + " AND ActiveInd='A' and IsDynamic=0 AND DSTempHdrId = " + templateid;
                             dtstep = objData.ReturnDataTable(strQuery, Con, Trans, false);
                             if (dtstep.Rows.Count > 0)
                             {
@@ -19281,21 +19546,63 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
     {
         try
         {
-        int TemplateId = Convert.ToInt32(ViewState["HeaderId"]);
-		int parentLookupId = Convert.ToInt16(drp_teachingFormat.SelectedValue);
-		objData = new clsData();
-		objData.ReturnDropDown("Select LookupId as Id , LookupName as Name from dbo.LookUp where ParentLookupId=" + parentLookupId, drpTeachingProc);
-            string selitem = drp_teachingFormat.SelectedItem.ToString();
-            if (selitem != "Task Analysis" && selitem != "Other")
+            int TemplateId = Convert.ToInt32(ViewState["HeaderId"]);
+            string type = "";
+            string typesel = "";
+
+            int parentLookupId = Convert.ToInt16(drp_teachingFormat.SelectedValue);
+            int FormatLookupId = Convert.ToInt16(drpTeachingProc.SelectedValue);
+            objData = new clsData();
+            objData.ReturnDropDown("Select LookupId as Id , LookupName as Name from dbo.LookUp where ParentLookupId=" + parentLookupId, drpTeachingProc);
+
+            string temptype = "SELECT SkillType  FROM DSTempHdr WHERE DSTempHdrId = " + TemplateId;
+            string skill = Convert.ToString(objData.FetchValue(temptype));
+            string tempformattype = "SELECT LookupName  FROM lookup WHERE LookupId in( SELECT TeachingProcId  FROM DSTempHdr WHERE DSTempHdrId = " + TemplateId + ")";
+            string Formatname = Convert.ToString(objData.FetchValue(tempformattype));
+            string tempformatDectype = "SELECT LookupDesc  FROM lookup WHERE LookupId in( SELECT TeachingProcId  FROM DSTempHdr WHERE DSTempHdrId = " + TemplateId + ")";
+            string Format = Convert.ToString(objData.FetchValue(tempformatDectype));
+
+            if (Formatname == "Incidental- Discrete" || (Format == "Discrete" && Formatname == "Others"))
+            {
+                skill = "Discrete";
+            }
+            else if (Formatname == "Incidental- Total Task")
+            {
+                skill = "Chained";
+            }
+
+            if (skill == "Chained")
+            {
+                type = "step";
+            }
+            else
+            {
+                type = "Trial";
+            }
+            string selTeachformatitem = drp_teachingFormat.SelectedItem.ToString();
+            string selTeachMethoditem = drpTeachingProc.SelectedItem.ToString();
+
+            if (selTeachformatitem == "Task Analysis" || selTeachformatitem == "Other")
+            {
+                typesel = "step";
+            }
+            else if (selTeachformatitem != "Incidental")
+            {
+                typesel = "Trial";
+            }
+
+
+            //if (selitem != "Task Analysis" && selitem != "Other")
+            if (type != typesel || selTeachformatitem == "Incidental")
             {
                 string selectQuerry = "SELECT COUNT(*)  FROM DSTempStep WHERE ActiveInd = 'A' AND DSTempHdrId = " + TemplateId;
-                int stepcount =Convert.ToInt32( objData.FetchValue(selectQuerry));
+                int stepcount = Convert.ToInt32(objData.FetchValue(selectQuerry));
                 if (stepcount > 0)
                 {
-                string scripts = "showPopup();";
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "Showpop", scripts, true);
+                    string scripts = "showPopup();";
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "Showpop", scripts, true);
+                }
             }
-        }
         }
         catch (Exception Ex)
         {
@@ -19321,10 +19628,10 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 		int parentLookupId = Convert.ToInt16(drp_teachingFormat.SelectedValue);
 		drpTeachingProc.Items.Clear();
 		objData = new clsData();
-		objData.ReturnDropDown("Select LookupId as Id , LookupName as Name from dbo.LookUp where ParentLookupId=" + parentLookupId, drpTeachingProc);
-            string selitem = drp_teachingFormat.SelectedItem.ToString();
-            if (selitem != "Task Analysis" && selitem != "Other")
-            {
+        objData.ReturnDropDown("Select LookupId as Id , LookupName as Name from dbo.LookUp where ParentLookupId=" + parentLookupId, drpTeachingProc);
+        //    string selitem = drp_teachingFormat.SelectedItem.ToString();
+            //if (selitem != "Task Analysis" && selitem != "Other")
+            //{
                 clsData.blnTrans = true;
                 Transs = con.BeginTransaction();
 
@@ -19334,7 +19641,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 objData.CommitTransation(Transs, con);
                 if (con != null)
                     con.Close();
-            }
+            //}
 		hideAllOptions();
     }
         catch (Exception Ex)
@@ -19719,6 +20026,139 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             return;
                         }
 
+                        //Step Mismatch Validation Start
+                        if (skilltype == "Chained")
+                        {
+                            string SetIdCheck = "";
+                            string steptname = "";
+                            DataTable dtParentstepListF = new DataTable();
+                            dtParentstepListF.Columns.Add("SetId", typeof(string));
+
+                            string DSParentStep = "SELECT  DSTempParentStepId,SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames FROM DSTempParentStep " +
+                                 " WHERE DSTempHdrId = " + TemplateId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + TemplateId + " AND ActiveInd = 'A') " +
+                                 " AND ActiveInd = 'A' ORDER BY SortOrder";
+                            DataTable dtParentstepList = objData.ReturnDataTable(DSParentStep, false);
+
+                            string Activeset = "select DSTempSetId FROM DSTempSet WHERE DSTempHdrId = " + TemplateId + " AND ActiveInd ='A'";
+                            DataTable dtActivesetList = objData.ReturnDataTable(Activeset, false);
+
+                            List<string> ListSetIds = new List<string>();
+
+                            if (dtActivesetList != null)
+                            {
+                                if (dtActivesetList.Rows.Count > 0)
+                                {
+                                    foreach (DataRow row in dtActivesetList.Rows)
+                                    {
+                                        ListSetIds.Add(row["DSTempSetId"].ToString());
+                                    }
+                                }
+                            }
+
+                            if (dtParentstepList != null)
+                            {
+                                if (dtParentstepList.Rows.Count > 0)
+                                {
+                                    foreach (DataRow dr in dtParentstepList.Rows)
+                                    {
+                                        SetIdCheck = dr["SetIds"].ToString();
+                                        string[] SetIdAr = SetIdCheck.Split(',');
+
+                                        foreach (string value in SetIdAr)
+                                        {
+                                            if (value != "" && ListSetIds.Contains(value))
+                                            {
+                                                dtParentstepListF.Rows.Add(value.Trim());
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            string Dstemstepcount = "SELECT * FROM  DSTempStep WHERE DSTempHdrId = " + TemplateId + " AND ActiveInd = 'A' and DSTempSetId in (select DSTempSetId from DSTempSet where DSTempHdrId =" + TemplateId + " AND ActiveInd = 'A' )";
+                            DataTable dtDstemstepcountList = objData.ReturnDataTable(Dstemstepcount, false);
+
+                            if (dtDstemstepcountList != null && dtParentstepListF != null)
+                            {
+                                if (dtParentstepListF.Rows.Count != dtDstemstepcountList.Rows.Count)
+                                {
+                                    string DissetId = "SELECT distinct(DSTempsetId) FROM  DSTempset WHERE DSTempHdrId = " + TemplateId + " AND ActiveInd = 'A'";
+                                    DataTable dtDissetIdList = objData.ReturnDataTable(DissetId, false);
+
+
+                                    if (dtDissetIdList != null)
+                                    {
+                                        if (dtDissetIdList.Rows.Count > 0)
+                                        {
+                                            foreach (DataRow dr in dtDissetIdList.Rows)
+                                            {
+
+                                                int DsSetId = Convert.ToInt32(dr["DSTempsetId"]);
+                                                string Dupsortorder = "SELECT sortOrder, COUNT(*) as Count FROM DStempStep where DSTempHdrId = " + TemplateId + " and DSTempSetId=" + DsSetId + " and ActiveInd='A' GROUP BY sortOrder HAVING COUNT(*) > 1";
+                                                DataTable dtDupsortorderList = objData.ReturnDataTable(Dupsortorder, false);
+                                                if (dtDupsortorderList != null)
+                                                {
+                                                    if (dtDupsortorderList.Rows.Count > 0)
+                                                    {
+                                                        foreach (DataRow drds in dtDupsortorderList.Rows)
+                                                        {
+                                                            int sortno = Convert.ToInt32(drds["sortOrder"]);
+                                                            string strstepnames = "select STUFF((SELECT ' - ' + StepCd+' '+StepName FROM DSTempStep where SortOrder=" + sortno + " and DSTempSetId=" + DsSetId + " and ActiveInd='A' and DSTempHdrId=" + TemplateId + " FOR XML PATH('')), 1, 2, '') AS setname";
+                                                            steptname = steptname + " (" + Convert.ToString(objData.FetchValue(strstepnames)) + " ) ";
+
+                                                        }
+
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if (steptname != "")
+                                    {
+                                        tdReadMsg.InnerHtml = clsGeneral.warningMsg("The following steps " + steptname + " contain duplicate sort order please edit or Remove and add them again");
+                                        alertmsg = "The following steps " + steptname + " contain duplicate sort order please edit or Remove and add them again";
+                                        FillTypeOfInstruction(TemplateId);
+                                        ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
+                                        return;
+                                    }
+                                    else
+                                    {
+                                        tdReadMsg.InnerHtml = clsGeneral.warningMsg("The lesson contain step count mismatch Please Create a New LessonPlan");
+                                        alertmsg = "The lesson contain step count mismatch Please Create a New LessonPlan";
+                                        FillTypeOfInstruction(TemplateId);
+                                        ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
+                                        return;
+                                    }
+
+                                }
+                            }
+
+                        }
+                        else if (skilltype == "Discrete")
+                        {
+                            string DisTrialDsStep = "SELECT * FROM  DSTempStep WHERE DSTempHdrId = " + TemplateId + " AND ActiveInd = 'A' and IsDynamic=0 And DSTempSetId in (select DSTempSetId from DSTempSet where DSTempHdrId =" + TemplateId + " AND ActiveInd = 'A' )";
+                            DataTable dtDisTrialDstempList = objData.ReturnDataTable(DisTrialDsStep, false);
+                            //string strsetnames = "SELECT NbrOfTrials FROM DSTempHdr WHERE DSTempHdrId = " + TemplateId + " ";
+                            string DisTrialDsHdr = "SELECT NbrOfTrials * (select count(distinct DSTempSetId) from DSTempStep where  DSTempHdrId =  " + TemplateId + " and ActiveInd='A' and DSTempSetId in(select  DSTempSetId from DSTempSet where ActiveInd='A' and DSTempHdrId =  " + TemplateId + "))  FROM DSTempHdr WHERE DSTempHdrId =  " + TemplateId;
+                            int DisTrial = Convert.ToInt32(objData.FetchValue(DisTrialDsHdr));
+                            if (dtDisTrialDstempList != null)
+                            {
+                                if (dtDisTrialDstempList.Rows.Count > 0)
+                                {
+                                    if (dtDisTrialDstempList.Rows.Count != DisTrial)
+                                    {
+                                        tdReadMsg.InnerHtml = clsGeneral.warningMsg("The lesson contain Trial count mismatch Please Reassign trial number or Create a New LessonPlan");
+                                        alertmsg = "The lesson contain Trial count mismatch Please Reassign trial number or Create a New LessonPlan";
+                                        FillTypeOfInstruction(TemplateId);
+                                        ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
+                                        return;
+                                    }
+                                }
+                            }
+
+                        }
+
+                        //Step Mismatch Validation End
 
                         string strdupsort = "SELECT SortOrder as sortorder, COUNT(*) as count FROM DSTempSet where ActiveInd='A' and DSTempHdrId=" + TemplateId + " GROUP BY SortOrder HAVING COUNT(*) > 1";
                         DataTable dtdupsort = objData.ReturnDataTable(strdupsort, false);

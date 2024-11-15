@@ -2823,7 +2823,7 @@
                                                     Please Wait...
                                                 </div>
                                                     <div class="frmtchngpopup-content" id="frmtchngpopup">
-        <p style="font-size: 15px; text-align:center; color:black">Changing method to discrete trial will delete any steps previously entered.</p>
+        <p style="font-size: 15px; text-align:center; color:black">Changing method will delete any steps/Trials previously entered.</p>
     <br />
        <asp:Button ID="btnContinue" runat="server" Text="Continue" OnClick="btnContinue_Click" OnClientClick="showload();" CssClass="NFButton" style="margin-left:50px;"/>
        <asp:Button ID="cancelbtn" runat="server" Text="Cancel" OnClick="cancelbtn_Click" OnClientClick="showload();"  CssClass="NFButton" style="margin-left:100px;"/>
