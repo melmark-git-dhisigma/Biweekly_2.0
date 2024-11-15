@@ -21,6 +21,7 @@ using System.Net;
 using System.Web.Services;
 using System.Configuration;
 using System.Web.UI.HtmlControls;
+using System.Data.SqlClient;
 
 public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
 {
@@ -327,107 +328,143 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
         String Mesrmntid = "select MeasurementId from BehaviourDetails b where b.StudentId= " + sess.StudentId +" and activeind = 'A' " ;
         System.Data.DataTable dtNew4 = objData.ReturnDataTable(Mesrmntid, false);
         System.Data.DataRow dr4 = dtNew.NewRow();
-        System.Data.DataTable dtNew5 ;
-        System.Data.DataTable dtNew6;
+        //System.Data.DataTable dtNew5;
+        //System.Data.DataTable dtNew6;
 
-        String Beh = "", Evnt = "", concatStrng="";
-        foreach (DataRow row in dtNew4.Rows)
+        String Beh = "", Evnt = "", concatStrng = "";
+        //foreach (DataRow row in dtNew4.Rows)
+        //{
+        //    if (row != null)
+        //    {
+        //        String Behav = "SELECT Behaviour  from BehaviourDetails where MeasurementId =" + row["MeasurementId"];
+        //        dtNew5 = objData.ReturnDataTable(Behav, false);
+        //        Beh = Convert.ToString(dtNew5.Rows[0]["Behaviour"]);
+
+        //        string queryfilter = " SELECT STUFF((select '; ' + CONVERT(VARCHAR(50), outr.EvntTs,101)+','+ outr.eventname from( SELECT * FROM (SELECT * FROM  ((SELECT  SE.MeasurementId, SE.StdtSessEventId,  SE.EventName, " +
+        //      " SE.StdtSessEventType, CONVERT(CHAR(10), SE.EvntTs,101) AS EvntTs, " +
+        //      "  B.Behaviour FROM  [StdtSessEvent] SE LEFT JOIN LessonPlan L ON SE.LessonPlanId = L.LessonPlanId " +
+        //      "LEFT JOIN BehaviourDetails B ON B.MeasurementId=SE.MeasurementId WHERE EventType='EV' AND SE.StudentId=" + sess.StudentId + " AND SE.StdtSessEventType<>'Medication') " +
+        //      //"UNION ALL (SELECT NULL AS MeasurementId, NULL AS StdtSessEventId,  'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" +
+        //      //"+ ( " +
+        //      //"        (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
+        //      //"        FROM   [user] US" +
+        //      //"       WHERE  US.userid = (SELECT" +
+        //      //"             createdby" +
+        //      //"                         FROM" +
+        //      //"           stdtsessionhdr Hdr" +
+        //      //"                       WHERE" +
+        //      //"         Hdr.stdtsessionhdrid = SH.ioasessionhdrid" +
+        //      //"        AND SH.ioaind = 'Y'))" +
+        //      //" + '/'" +
+        //      //" + (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
+        //      //"   FROM   [user] US" +
+        //      //"  WHERE  SH.ioauserid = US.userid) ) AS EventName," +
+        //      //" 'Arrow notes'                         AS" +
+        //      //" StdtSessEventType," +
+        //      //"CONVERT(CHAR(10), SH.endts, 101)      AS EvntTs," +
+        //      //"NULL                                  AS Behaviour" +
+        //      //" FROM   stdtsessionhdr SH" +
+        //      //"       LEFT JOIN lessonplan" +
+        //      //"             ON SH.lessonplanid = lessonplan.lessonplanid" +
+        //      //" WHERE  SH.ioaperc IS NOT NULL" +
+        //      //"      AND SH.ioaind = 'Y'" +
+        //      //"     AND SH.sessionstatuscd = 'S'" +
+        //      //"    AND SH.studentid =" + sess.StudentId + ")" +
+        //      "UNION ALL (SELECT  BIOA.MeasurementId, NULL AS StdtSessEventId,  'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" +
+        //      "+ CASE WHEN BIOA.normalbehaviorid IS NULL THEN ((SELECT" +
+        //      "      TOP 1" +
+        //      "     Rtrim(" +
+        //      "    Ltrim(Upper(" +
+        //      "   US.userinitial))) FROM behaviour BH INNER JOIN [user] US" +
+        //      "  ON" +
+        //      " BH.createdby" +
+        //      " =" +
+        //      " US.userid WHERE BH.createdon BETWEEN" +
+        //        " Dateadd(minute, -5, BIOA.createdon)" +
+        //        " AND" +
+        //        " BIOA.createdon ORDER BY BH.createdon DESC)+'/'+ (SELECT" +
+        //        " TOP 1" +
+        //        " Rtrim(Ltrim(Upper(US.userinitial))) FROM" +
+        //        " behaviorioadetails BI" +
+        //        " INNER" +
+        //        " JOIN [user]" +
+        //        " US ON BI.createdby =" +
+        //        " US.userid WHERE BI.createdon=BIOA.createdon ORDER BY" +
+        //        " BI.createdon DESC)" +
+        //        " )" +
+        //        " ELSE ((" +
+        //        " SELECT" +
+        //        " Rtrim(Ltrim(Upper(US.userinitial))) FROM behaviour BH" +
+        //        " INNER" +
+        //        " JOIN [user]" +
+        //        " US ON" +
+        //        " BH.createdby = US.userid WHERE" +
+        //        " BIOA.normalbehaviorid=BH.behaviourid)+'/'+ (" +
+        //        " SELECT Rtrim(" +
+        //        " Ltrim(Upper(US.userinitial))) FROM behaviorioadetails BI" +
+        //        " INNER" +
+        //        " JOIN" +
+        //        " [user] US ON" +
+        //        " BI.createdby = US.userid INNER JOIN behaviour BH ON" +
+        //        " BH.behaviourid=BI.normalbehaviorid WHERE" +
+        //        " BIOA.normalbehaviorid=BH.behaviourid))" +
+        //        " END " +
+        //      " AS EventName, " +
+        //      "'Arrow notes' AS StdtSessEventType,  CONVERT(CHAR(10), BIOA.CreatedOn,101) AS EvntTs,  " +
+        //      " BHD.Behaviour FROM BehaviorIOADetails BIOA LEFT JOIN BehaviourDetails BHD ON BIOA.MeasurementId=BHD.MeasurementId " +
+        //      "WHERE BIOA.StudentId=" + sess.StudentId + " AND IOAPerc IS NOT NULL AND BIOA.ActiveInd='A') )IOA ) " +
+        //      "  ad " +
+        //      " WHERE  ( ( ad.behaviour IS  NULL " +
+        //      " AND ad.measurementid = 0 )" +
+        //      "OR ad.behaviour = (SELECT TOP 1 behaviour " +
+        //      "FROM   behaviourdetails " +
+        //      "WHERE  measurementid = " + row["MeasurementId"] + ") ) " +
+        //      " AND ad.stdtsesseventtype IN( 'Arrow notes' ) " +
+        //      " AND CONVERT(DATE, ad.evntts) >=  cast('" + dtst.ToString("MM/dd/yyyy") + "' as date)" +
+        //      " AND CONVERT(DATE, ad.evntts) <=  cast('" + dted.ToString("MM/dd/yyyy") + "' as date)" +
+        //      " )outr " +
+        //       " FOR XML PATH('')),1,1,'') eventname ";
+        //        dtNew6 = objData.ReturnDataTable(queryfilter, false);
+        //        if (Convert.ToString(dtNew6.Rows[0]["eventname"]) != "" && Convert.ToString(dtNew6.Rows[0]["eventname"]) != null)
+        //            concatStrng += "<b>" + Beh + " : " + "</b>" + Convert.ToString(dtNew6.Rows[0]["eventname"]) + "<br><br>";
+        //    }
+
+        //}
+        DataTable DtResults = new DataTable();
+        SqlCommand command;
+        SqlDataAdapter adp;
+        try
         {
-            if (row != null)
-            {
-                String Behav = "SELECT Behaviour  from BehaviourDetails where MeasurementId =" + row["MeasurementId"];
-                dtNew5=objData.ReturnDataTable(Behav, false);
-                Beh=Convert.ToString(dtNew5.Rows[0]["Behaviour"]);
-                
-                string queryfilter = " SELECT STUFF((select '; ' + CONVERT(VARCHAR(50), outr.EvntTs,101)+','+ outr.eventname from( SELECT * FROM (SELECT * FROM  ((SELECT  SE.MeasurementId, SE.StdtSessEventId,  SE.EventName, " +
-              " SE.StdtSessEventType, CONVERT(CHAR(10), SE.EvntTs,101) AS EvntTs, " +
-              "  B.Behaviour FROM  [StdtSessEvent] SE LEFT JOIN LessonPlan L ON SE.LessonPlanId = L.LessonPlanId " +
-              "LEFT JOIN BehaviourDetails B ON B.MeasurementId=SE.MeasurementId WHERE EventType='EV' AND SE.StudentId=" + sess.StudentId + " AND SE.StdtSessEventType<>'Medication') " +
-              //"UNION ALL (SELECT NULL AS MeasurementId, NULL AS StdtSessEventId,  'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" +
-              //"+ ( " +
-              //"        (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
-              //"        FROM   [user] US" +
-              //"       WHERE  US.userid = (SELECT" +
-              //"             createdby" +
-              //"                         FROM" +
-              //"           stdtsessionhdr Hdr" +
-              //"                       WHERE" +
-              //"         Hdr.stdtsessionhdrid = SH.ioasessionhdrid" +
-              //"        AND SH.ioaind = 'Y'))" +
-              //" + '/'" +
-              //" + (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
-              //"   FROM   [user] US" +
-              //"  WHERE  SH.ioauserid = US.userid) ) AS EventName," +
-              //" 'Arrow notes'                         AS" +
-              //" StdtSessEventType," +
-              //"CONVERT(CHAR(10), SH.endts, 101)      AS EvntTs," +
-              //"NULL                                  AS Behaviour" +
-              //" FROM   stdtsessionhdr SH" +
-              //"       LEFT JOIN lessonplan" +
-              //"             ON SH.lessonplanid = lessonplan.lessonplanid" +
-              //" WHERE  SH.ioaperc IS NOT NULL" +
-              //"      AND SH.ioaind = 'Y'" +
-              //"     AND SH.sessionstatuscd = 'S'" +
-              //"    AND SH.studentid =" + sess.StudentId + ")" +
-              "UNION ALL (SELECT  BIOA.MeasurementId, NULL AS StdtSessEventId,  'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" +
-              "+ CASE WHEN BIOA.normalbehaviorid IS NULL THEN ((SELECT" +
-              "      TOP 1" +
-              "     Rtrim(" +
-              "    Ltrim(Upper(" +
-              "   US.userinitial))) FROM behaviour BH INNER JOIN [user] US" +
-              "  ON" +
-              " BH.createdby" +
-              " =" +
-              " US.userid WHERE BH.createdon BETWEEN" +
-                " Dateadd(minute, -5, BIOA.createdon)" +
-                " AND" +
-                " BIOA.createdon ORDER BY BH.createdon DESC)+'/'+ (SELECT" +
-                " TOP 1" +
-                " Rtrim(Ltrim(Upper(US.userinitial))) FROM" +
-                " behaviorioadetails BI" +
-                " INNER" +
-                " JOIN [user]" +
-                " US ON BI.createdby =" +
-                " US.userid WHERE BI.createdon=BIOA.createdon ORDER BY" +
-                " BI.createdon DESC)" +
-                " )" +
-                " ELSE ((" +
-                " SELECT" +
-                " Rtrim(Ltrim(Upper(US.userinitial))) FROM behaviour BH" +
-                " INNER" +
-                " JOIN [user]" +
-                " US ON" +
-                " BH.createdby = US.userid WHERE" +
-                " BIOA.normalbehaviorid=BH.behaviourid)+'/'+ (" +
-                " SELECT Rtrim(" +
-                " Ltrim(Upper(US.userinitial))) FROM behaviorioadetails BI" +
-                " INNER" +
-                " JOIN" +
-                " [user] US ON" +
-                " BI.createdby = US.userid INNER JOIN behaviour BH ON" +
-                " BH.behaviourid=BI.normalbehaviorid WHERE" +
-                " BIOA.normalbehaviorid=BH.behaviourid))" +
-                " END " +
-              " AS EventName, " +
-              "'Arrow notes' AS StdtSessEventType,  CONVERT(CHAR(10), BIOA.CreatedOn,101) AS EvntTs,  " +
-              " BHD.Behaviour FROM BehaviorIOADetails BIOA LEFT JOIN BehaviourDetails BHD ON BIOA.MeasurementId=BHD.MeasurementId " +
-              "WHERE BIOA.StudentId=" + sess.StudentId + " AND IOAPerc IS NOT NULL AND BIOA.ActiveInd='A') )IOA ) " +
-              "  ad " +
-              " WHERE  ( ( ad.behaviour IS  NULL " +
-              " AND ad.measurementid = 0 )" +
-              "OR ad.behaviour = (SELECT TOP 1 behaviour " +
-              "FROM   behaviourdetails " +
-              "WHERE  measurementid = " + row["MeasurementId"] + ") ) " +
-              " AND ad.stdtsesseventtype IN( 'Arrow notes' ) " +
-              " AND CONVERT(DATE, ad.evntts) >=  CONVERT(DATE,'" + dtst.ToString("MM/dd/yyyy") + "') " +
-              " AND CONVERT(DATE, ad.evntts) <=  CONVERT(DATE,'" + dted.ToString("MM/dd/yyyy") + "') "+
-              " )outr "+
-               " FOR XML PATH('')),1,1,'') eventname ";
-                dtNew6 = objData.ReturnDataTable(queryfilter, false);
-                if (Convert.ToString(dtNew6.Rows[0]["eventname"]) != "" && Convert.ToString(dtNew6.Rows[0]["eventname"]) != null)
-                concatStrng += "<b>" + Beh + " : " + "</b>" + Convert.ToString(dtNew6.Rows[0]["eventname"]) + "<br><br>";
-            }
 
+            command = new SqlCommand("[GetStudentEvents]", new SqlConnection(objData.ConnectionString));
+            command.CommandTimeout = 60;
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@studentId", sess.StudentId);
+            command.Parameters.AddWithValue("@startDate", dtst.ToString("MM/dd/yyyy"));
+            command.Parameters.AddWithValue("@endDate", dted.ToString("MM/dd/yyyy"));
+            command.Connection.Open();
+            command.ExecuteNonQuery();
+            adp = new SqlDataAdapter(command);
+            adp.Fill(DtResults);
+            adp = null;
+
+            if (DtResults != null && DtResults.Rows.Count > 0)
+            {
+                foreach (DataRow drResults in DtResults.Rows)
+                {
+                    if (Convert.ToString(drResults["EventName"]) != "" && Convert.ToString(drResults["EventName"]) != null)
+                    {
+                        Beh = Convert.ToString(drResults["BehaviourName"]);
+                        concatStrng += "<b>" + Beh + " : " + "</b>" + Convert.ToString(drResults["EventName"]) + "<br></br>";
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
+            ClsErrorLog errlog = new ClsErrorLog();
+            errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\n" + ex.ToString());
         }
         System.Data.DataRow dr5 = dtNew.NewRow();
         dr5["Eventname"] = "Arrow Notes";
@@ -569,107 +606,142 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
          String Mesrmntid = "select MeasurementId from BehaviourDetails b where b.StudentId= " + sess.StudentId +" and activeind = 'A' " ;
         System.Data.DataTable dtNew4 = objData.ReturnDataTable(Mesrmntid, false);
         System.Data.DataRow dr4 = dtNew.NewRow();
-        System.Data.DataTable dtNew5 ;
-        System.Data.DataTable dtNew6;
+        //System.Data.DataTable dtNew5;
+        //System.Data.DataTable dtNew6;
 
-        String Beh = "", Evnt = "", concatStrng="";
-        foreach (DataRow row in dtNew4.Rows)
+        String Beh = "", Evnt = "", concatStrng = "";
+        //foreach (DataRow row in dtNew4.Rows)
+        //{
+        //    if (row != null)
+        //    {
+        //        String Behav = "SELECT Behaviour  from BehaviourDetails where MeasurementId =" + row["MeasurementId"];
+        //        dtNew5=objData.ReturnDataTable(Behav, false);
+        //        Beh=Convert.ToString(dtNew5.Rows[0]["Behaviour"]);
+
+        //        string queryfilter = " SELECT STUFF((select '; ' + CONVERT(VARCHAR(50), outr.EvntTs,101)+','+ outr.eventname from( SELECT * FROM (SELECT * FROM  ((SELECT  SE.MeasurementId, SE.StdtSessEventId,  SE.EventName, " +
+        //      " SE.StdtSessEventType, CONVERT(CHAR(10), SE.EvntTs,101) AS EvntTs, " +
+        //      "  B.Behaviour FROM  [StdtSessEvent] SE LEFT JOIN LessonPlan L ON SE.LessonPlanId = L.LessonPlanId " +
+        //      "LEFT JOIN BehaviourDetails B ON B.MeasurementId=SE.MeasurementId WHERE EventType='EV' AND SE.StudentId=" + sess.StudentId + " AND SE.StdtSessEventType<>'Medication') " +
+        //      //"UNION ALL (SELECT NULL AS MeasurementId, NULL AS StdtSessEventId,  'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" +
+        //      //"+ ( " +
+        //      //"        (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
+        //      //"        FROM   [user] US" +
+        //      //"       WHERE  US.userid = (SELECT" +
+        //      //"             createdby" +
+        //      //"                         FROM" +
+        //      //"           stdtsessionhdr Hdr" +
+        //      //"                       WHERE" +
+        //      //"         Hdr.stdtsessionhdrid = SH.ioasessionhdrid" +
+        //      //"        AND SH.ioaind = 'Y'))" +
+        //      //" + '/'" +
+        //      //" + (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
+        //      //"   FROM   [user] US" +
+        //      //"  WHERE  SH.ioauserid = US.userid) ) AS EventName," +
+        //      //" 'Arrow notes'                         AS" +
+        //      //" StdtSessEventType," +
+        //      //"CONVERT(CHAR(10), SH.endts, 101)      AS EvntTs," +
+        //      //"NULL                                  AS Behaviour" +
+        //      //" FROM   stdtsessionhdr SH" +
+        //      //"       LEFT JOIN lessonplan" +
+        //      //"             ON SH.lessonplanid = lessonplan.lessonplanid" +
+        //      //" WHERE  SH.ioaperc IS NOT NULL" +
+        //      //"      AND SH.ioaind = 'Y'" +
+        //      //"     AND SH.sessionstatuscd = 'S'" +
+        //      //"    AND SH.studentid =" + sess.StudentId + ")" +
+        //      "UNION ALL (SELECT  BIOA.MeasurementId, NULL AS StdtSessEventId,  'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" +
+        //      "+ CASE WHEN BIOA.normalbehaviorid IS NULL THEN ((SELECT" +
+        //      "      TOP 1" +
+        //      "     Rtrim(" +
+        //      "    Ltrim(Upper(" +
+        //      "   US.userinitial))) FROM behaviour BH INNER JOIN [user] US" +
+        //      "  ON" +
+        //      " BH.createdby" +
+        //      " =" +
+        //      " US.userid WHERE BH.createdon BETWEEN" +
+        //        " Dateadd(minute, -5, BIOA.createdon)" +
+        //        " AND" +
+        //        " BIOA.createdon ORDER BY BH.createdon DESC)+'/'+ (SELECT" +
+        //        " TOP 1" +
+        //        " Rtrim(Ltrim(Upper(US.userinitial))) FROM" +
+        //        " behaviorioadetails BI" +
+        //        " INNER" +
+        //        " JOIN [user]" +
+        //        " US ON BI.createdby =" +
+        //        " US.userid WHERE BI.createdon=BIOA.createdon ORDER BY" +
+        //        " BI.createdon DESC)" +
+        //        " )" +
+        //        " ELSE ((" +
+        //        " SELECT" +
+        //        " Rtrim(Ltrim(Upper(US.userinitial))) FROM behaviour BH" +
+        //        " INNER" +
+        //        " JOIN [user]" +
+        //        " US ON" +
+        //        " BH.createdby = US.userid WHERE" +
+        //        " BIOA.normalbehaviorid=BH.behaviourid)+'/'+ (" +
+        //        " SELECT Rtrim(" +
+        //        " Ltrim(Upper(US.userinitial))) FROM behaviorioadetails BI" +
+        //        " INNER" +
+        //        " JOIN" +
+        //        " [user] US ON" +
+        //        " BI.createdby = US.userid INNER JOIN behaviour BH ON" +
+        //        " BH.behaviourid=BI.normalbehaviorid WHERE" +
+        //        " BIOA.normalbehaviorid=BH.behaviourid))" +
+        //        " END " +
+        //      " AS EventName, " +
+        //      "'Arrow notes' AS StdtSessEventType,  CONVERT(CHAR(10), BIOA.CreatedOn,101) AS EvntTs,  " +
+        //      " BHD.Behaviour FROM BehaviorIOADetails BIOA LEFT JOIN BehaviourDetails BHD ON BIOA.MeasurementId=BHD.MeasurementId " +
+        //      "WHERE BIOA.StudentId=" + sess.StudentId + " AND IOAPerc IS NOT NULL AND BIOA.ActiveInd='A') )IOA ) " +
+        //      "  ad " +
+        //      " WHERE  ( ( ad.behaviour IS  NULL " +
+        //      " AND ad.measurementid = 0 )" +
+        //      "OR ad.behaviour = (SELECT TOP 1 behaviour " +
+        //      "FROM   behaviourdetails " +
+        //      "WHERE  measurementid = " + row["MeasurementId"] + ") ) " +
+        //      " AND ad.stdtsesseventtype IN( 'Arrow notes' ) " +
+        //      " AND CONVERT(DATE, ad.evntts) >=  cast('" + stDate + "' as date) " +
+        //      " AND CONVERT(DATE, ad.evntts) <=  cast('" + endDate + "' as date) " +
+        //      " )outr "+
+        //       " FOR XML PATH('')),1,1,'') eventname ";    
+        //        dtNew6 = objData.ReturnDataTable(queryfilter, false);
+        //        if (Convert.ToString(dtNew6.Rows[0]["eventname"]) != "" && Convert.ToString(dtNew6.Rows[0]["eventname"]) != null)
+        //        concatStrng += "<b>" + Beh + " : " + "</b>" + Convert.ToString(dtNew6.Rows[0]["eventname"]) + "<br></br>";
+        //    }
+
+        //}
+        DataTable DtResults = new DataTable();
+        SqlCommand command;
+        SqlDataAdapter adp;
+        try
         {
-            if (row != null)
+            command = new SqlCommand("[GetStudentEvents]", new SqlConnection(objData.ConnectionString));
+            command.CommandTimeout = 60;
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@studentId", sess.StudentId);
+            command.Parameters.AddWithValue("@startDate", stDate);
+            command.Parameters.AddWithValue("@endDate", endDate);
+            command.Connection.Open();
+            command.ExecuteNonQuery();
+            adp = new SqlDataAdapter(command);
+            adp.Fill(DtResults);
+            adp = null;
+
+            if (DtResults != null && DtResults.Rows.Count > 0)
             {
-                String Behav = "SELECT Behaviour  from BehaviourDetails where MeasurementId =" + row["MeasurementId"];
-                dtNew5=objData.ReturnDataTable(Behav, false);
-                Beh=Convert.ToString(dtNew5.Rows[0]["Behaviour"]);
-
-                string queryfilter = " SELECT STUFF((select '; ' + CONVERT(VARCHAR(50), outr.EvntTs,101)+','+ outr.eventname from( SELECT * FROM (SELECT * FROM  ((SELECT  SE.MeasurementId, SE.StdtSessEventId,  SE.EventName, " +
-              " SE.StdtSessEventType, CONVERT(CHAR(10), SE.EvntTs,101) AS EvntTs, " +
-              "  B.Behaviour FROM  [StdtSessEvent] SE LEFT JOIN LessonPlan L ON SE.LessonPlanId = L.LessonPlanId " +
-              "LEFT JOIN BehaviourDetails B ON B.MeasurementId=SE.MeasurementId WHERE EventType='EV' AND SE.StudentId=" + sess.StudentId + " AND SE.StdtSessEventType<>'Medication') " +
-              //"UNION ALL (SELECT NULL AS MeasurementId, NULL AS StdtSessEventId,  'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" +
-              //"+ ( " +
-              //"        (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
-              //"        FROM   [user] US" +
-              //"       WHERE  US.userid = (SELECT" +
-              //"             createdby" +
-              //"                         FROM" +
-              //"           stdtsessionhdr Hdr" +
-              //"                       WHERE" +
-              //"         Hdr.stdtsessionhdrid = SH.ioasessionhdrid" +
-              //"        AND SH.ioaind = 'Y'))" +
-              //" + '/'" +
-              //" + (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
-              //"   FROM   [user] US" +
-              //"  WHERE  SH.ioauserid = US.userid) ) AS EventName," +
-              //" 'Arrow notes'                         AS" +
-              //" StdtSessEventType," +
-              //"CONVERT(CHAR(10), SH.endts, 101)      AS EvntTs," +
-              //"NULL                                  AS Behaviour" +
-              //" FROM   stdtsessionhdr SH" +
-              //"       LEFT JOIN lessonplan" +
-              //"             ON SH.lessonplanid = lessonplan.lessonplanid" +
-              //" WHERE  SH.ioaperc IS NOT NULL" +
-              //"      AND SH.ioaind = 'Y'" +
-              //"     AND SH.sessionstatuscd = 'S'" +
-              //"    AND SH.studentid =" + sess.StudentId + ")" +
-              "UNION ALL (SELECT  BIOA.MeasurementId, NULL AS StdtSessEventId,  'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" +
-              "+ CASE WHEN BIOA.normalbehaviorid IS NULL THEN ((SELECT" +
-              "      TOP 1" +
-              "     Rtrim(" +
-              "    Ltrim(Upper(" +
-              "   US.userinitial))) FROM behaviour BH INNER JOIN [user] US" +
-              "  ON" +
-              " BH.createdby" +
-              " =" +
-              " US.userid WHERE BH.createdon BETWEEN" +
-                " Dateadd(minute, -5, BIOA.createdon)" +
-                " AND" +
-                " BIOA.createdon ORDER BY BH.createdon DESC)+'/'+ (SELECT" +
-                " TOP 1" +
-                " Rtrim(Ltrim(Upper(US.userinitial))) FROM" +
-                " behaviorioadetails BI" +
-                " INNER" +
-                " JOIN [user]" +
-                " US ON BI.createdby =" +
-                " US.userid WHERE BI.createdon=BIOA.createdon ORDER BY" +
-                " BI.createdon DESC)" +
-                " )" +
-                " ELSE ((" +
-                " SELECT" +
-                " Rtrim(Ltrim(Upper(US.userinitial))) FROM behaviour BH" +
-                " INNER" +
-                " JOIN [user]" +
-                " US ON" +
-                " BH.createdby = US.userid WHERE" +
-                " BIOA.normalbehaviorid=BH.behaviourid)+'/'+ (" +
-                " SELECT Rtrim(" +
-                " Ltrim(Upper(US.userinitial))) FROM behaviorioadetails BI" +
-                " INNER" +
-                " JOIN" +
-                " [user] US ON" +
-                " BI.createdby = US.userid INNER JOIN behaviour BH ON" +
-                " BH.behaviourid=BI.normalbehaviorid WHERE" +
-                " BIOA.normalbehaviorid=BH.behaviourid))" +
-                " END " +
-              " AS EventName, " +
-              "'Arrow notes' AS StdtSessEventType,  CONVERT(CHAR(10), BIOA.CreatedOn,101) AS EvntTs,  " +
-              " BHD.Behaviour FROM BehaviorIOADetails BIOA LEFT JOIN BehaviourDetails BHD ON BIOA.MeasurementId=BHD.MeasurementId " +
-              "WHERE BIOA.StudentId=" + sess.StudentId + " AND IOAPerc IS NOT NULL AND BIOA.ActiveInd='A') )IOA ) " +
-              "  ad " +
-              " WHERE  ( ( ad.behaviour IS  NULL " +
-              " AND ad.measurementid = 0 )" +
-              "OR ad.behaviour = (SELECT TOP 1 behaviour " +
-              "FROM   behaviourdetails " +
-              "WHERE  measurementid = " + row["MeasurementId"] + ") ) " +
-              " AND ad.stdtsesseventtype IN( 'Arrow notes' ) " +
-              " AND CONVERT(DATE, ad.evntts) >=  cast('" + stDate + "' as date) " +
-              " AND CONVERT(DATE, ad.evntts) <=  cast('" + endDate + "' as date) " +
-              " )outr "+
-               " FOR XML PATH('')),1,1,'') eventname ";    
-                dtNew6 = objData.ReturnDataTable(queryfilter, false);
-                if (Convert.ToString(dtNew6.Rows[0]["eventname"]) != "" && Convert.ToString(dtNew6.Rows[0]["eventname"]) != null)
-                concatStrng += "<b>" + Beh + " : " + "</b>" + Convert.ToString(dtNew6.Rows[0]["eventname"]) + "<br></br>";
+                foreach (DataRow drResults in DtResults.Rows)
+                {
+                    if (Convert.ToString(drResults["EventName"]) != "" && Convert.ToString(drResults["EventName"]) != null)
+                    {
+                        Beh = Convert.ToString(drResults["BehaviourName"]);
+                        concatStrng += "<b>" + Beh + " : " + "</b>" + Convert.ToString(drResults["EventName"]) + "<br></br>";
+                    }
+                }
             }
-
+        }
+        catch (Exception ex)
+        {
+            ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
+            ClsErrorLog errlog = new ClsErrorLog();
+            errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\n" + ex.ToString());
         }
         System.Data.DataRow dr5 = dtNew.NewRow();
         dr5["Eventname"] = "Arrow Notes";
