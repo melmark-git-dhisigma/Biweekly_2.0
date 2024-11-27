@@ -1869,7 +1869,7 @@
                             }
                             if (resp == corrResp) {
                                 RespAcc++;
-                                //if ($('#lblPromptData').html() == 'Independent')
+                                if ($('#lblPromptData').html() == 'Independent')
                                     RespInd++;
                             }
                             else if (resp != null) {
