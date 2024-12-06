@@ -7,6 +7,7 @@ using System.Data.SqlClient;
 using System.Configuration;
 using System.Data;
 using System.Web;
+using System.Drawing;
 
 
 public class DiscreteTrials
@@ -25,7 +26,7 @@ public class DiscreteSession
     clsSession oSession = null;
 
 
-    public DiscreteTrials GetTrialLists(int studentId, int templateID, int iCrntSet, int iCrntStep, int nmbrOfSession, string colName, bool flag, string correctResponse, string coltypeCode, string chainedtype)
+    public DiscreteTrials GetTrialLists(int studentId, int templateID, int iCrntSet, int iCrntStep, int nmbrOfSession, string colName, bool flag, string correctResponse, string coltypeCode, string chainedtype, SqlTransaction trans, SqlConnection con)
     {
 
 
@@ -68,7 +69,11 @@ public class DiscreteSession
         //string sessnmbr = "SELECT MAX(SessionNbr) AS SessionNbr FROM StdtSessEvent WHERE LessonPlanId =" + lessonplannid + "AND StudentId=" + studentId;
 
         SqlDataReader rdr = null;
-        rdr = objData.ReturnDataReader(sessnmbr, false);
+        SqlCommand cmd = con.CreateCommand();
+        cmd.Transaction = trans;
+        cmd.CommandText = sessnmbr;
+        rdr = cmd.ExecuteReader(CommandBehavior.Default);
+        //rdr = objData.ReturnDataReader(sessnmbr, false);
         int sesnnmbr = 0;
         while (rdr.Read())
         {
@@ -124,6 +129,7 @@ public class DiscreteSession
                                     " AND SH.SessionNbr>ISNULL((SELECT MAX(SessionNbr) FROM StdtSessEvent " +
                                     "WHERE DSTempHdrId=" + templateID + " AND StudentId=" + studentId + "),0)" + cond + " ORDER BY SS.StdtSessionHdrId " + cond2;
         }
+        rdr.Close();
         /*
          SELECT S.StdtSessionStepId,S.StepVal, SS.SessionStatusCd, SS.StdtSessionHdrId, S.DSTempSetColId,DCol.ColName FROM StdtSessionDtl S 
 INNER JOIN StdtSessionStep SS ON S.StdtSessionStepId = SS.StdtSessionStepId 
