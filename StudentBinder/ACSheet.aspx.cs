@@ -1597,8 +1597,8 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 "[Mistrial1],[Mistrial2],[Mistrial3],[Mistrial4],[Mistrial5],[Mistrial6],[Mistrial7],[Step1],[Step2],[Step3],[Step4],[Step5],[Step6],[Step7]," + 
                 "[Attendees],[IEPYear],[IEPSigDate],[Reviewed],[MetObjective],[MetGoal],[NotMaintaining]) " +
                 "VALUES(" + sess.StudentId + ",'" + dtst.ToString("MM/dd/yyyy") + "','" + dted.ToString("MM/dd/yyyy") + "'," +
-                "'" + lblGoalArea.Text + "'," +
-                "'" + lblGoal.Text + "'," +
+                "'" + clsGeneral.convertQuotes(lblGoalArea.Text) + "'," +
+                "'" + clsGeneral.convertQuotes(lblGoal.Text) + "'," +
 
                 "'" + clsGeneral.convertQuotes(txtBenchText) + "'," +
 
@@ -2049,14 +2049,14 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             dtAgItm.Columns.Add(new DataColumn("StaffInitials", typeof(string)));
             dtAgItm.Columns.Add(new DataColumn("DateAdded", typeof(string)));
             dtAgItm.Columns.Add(new DataColumn("DoneCarryOver", typeof(string)));
-
+            
             string prevACSheet1 = "SELECT MtngId as AgendaItemId, AgendaItem, AgendaAddedDate as DateAdded, StaffInitials, DoneCarryOver FROM AcdSheetMtng WHERE followstatus = 'A' AND " +
                " AccSheetId in (select AccSheetId from StdtAcdSheet where StudentId = " + sess.StudentId + " AND EndDate in (select top 1 EndDate from StdtAcdSheet where StudentId = " +
                sess.StudentId + " AND CONVERT(datetime,EndDate)<CONVERT(datetime,'" + endDate + "') order by EndDate desc) and DateOfMeeting in (select top 1 DateOfMeeting from " +
                " StdtAcdSheet where StudentId = " + sess.StudentId + " AND CONVERT(datetime,EndDate)<CONVERT(datetime,'" + endDate + "') order by EndDate desc))";
             DataTable dtAg = objData.ReturnDataTable(prevACSheet1, false);
             foreach (DataRow row2 in dtAg.Rows)
-                if (row2["AgendaItem"].ToString() != "" || row2["StaffInitials"].ToString() != "")
+            if (row2["AgendaItem"].ToString() != "" || row2["StaffInitials"].ToString() != "")
                 {
                     if (row2["DateAdded"].ToString() != "")
                     {
@@ -2099,9 +2099,9 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 " WHERE AccSheetId in (select AccSheetId from StdtAcdSheet where StudentId = " + sess.StudentId + " AND EndDate in (select top 1 EndDate from StdtAcdSheet where StudentId = " +
                 sess.StudentId + " AND CONVERT(datetime,EndDate)<CONVERT(datetime,'" + endDate + "') order by EndDate desc) and DateOfMeeting in (select top 1 DateOfMeeting from " +
                 " StdtAcdSheet where StudentId = " + sess.StudentId + " AND CONVERT(datetime,EndDate)<CONVERT(datetime,'" + endDate + "') order by EndDate desc))";
-
+            
             DataTable Dt = objData.ReturnDataTable(prevACSheet2, false);
-            foreach (DataRow dr1 in Dt.Rows)
+            foreach(DataRow dr1 in Dt.Rows)
             {
                 if (dr1["IEPYear"] != null && dr1["IEPYear"].ToString() != "")
                 {
@@ -2116,9 +2116,9 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             foreach (GridViewRow row in GridViewAccSheet.Rows)
             {
                 Label l1 = row.FindControl("lblGoalArea") as Label;
-                foreach (DataRow dr in Dt.Rows)
+                foreach(DataRow dr in Dt.Rows)
                 {
-                    if (l1.Text == dr["GoalArea"].ToString())
+                    if(l1.Text == dr["GoalArea"].ToString())
                     {
                         RadioButtonList radBtnLst1 = row.FindControl("RadioButtonList1") as RadioButtonList;
                         RadioButtonList radBtnLst2 = row.FindControl("RadioButtonList2") as RadioButtonList;
@@ -3399,8 +3399,8 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             //string Pquery = "select MtngId as PMtngId,PropAndDisc as PFollowUp,PersonResp as PPersonResponsible,CONVERT(VARCHAR,Deadlines,101) as PDeadlines from AcdSheetMtng where AccSheetId in (select AccSheetId from StdtAcdSheet where studentid=" + sess.StudentId + " and EndDate < '" + endDate + "' and LessonPlanId=" + hfLPId.Value + ")"; //TEST: EndDate<= changed to <
             //string Pquery = "select MtngId as PMtngId,PropAndDisc as PFollowUp,u.UserLName+', '+u.UserFName as PPersonResponsible,CONVERT(VARCHAR,Deadlines,101) as PDeadlines from AcdSheetMtng join [User] u on u.UserId=PersonResp and AccSheetId in (select AccSheetId from StdtAcdSheet where studentid=" + sess.StudentId + " and EndDate < '" + endDate + "' and LessonPlanId=" + hfLPId.Value + ")";
             string Pquery = "SELECT MtngId as PMtngId,PropAndDisc as PFollowUp,u.UserLName+', '+u.UserFName as PPersonResponsible,CONVERT(VARCHAR,Deadlines,101) as PDeadlines " +
-                " FROM AcdSheetMtng left join [User] u on u.UserId = PersonResp WHERE (followstatus = 'C' OR followstatus = 'P') AND AccSheetId in (select AccSheetId from " +
-                " StdtAcdSheet where StudentId = " + sess.StudentId + " AND EndDate in (select top 1 EndDate from StdtAcdSheet where StudentId = " + sess.StudentId +
+                " FROM AcdSheetMtng left join [User] u on u.UserId = PersonResp WHERE (followstatus = 'C' OR followstatus = 'P') AND AccSheetId in (select AccSheetId from " + 
+                " StdtAcdSheet where StudentId = " + sess.StudentId + " AND EndDate in (select top 1 EndDate from StdtAcdSheet where StudentId = " + sess.StudentId + 
                 " AND CONVERT(datetime,EndDate)<CONVERT(datetime,'" + endDate + "') order by EndDate desc) AND DateOfMeeting in (select top 1 DateOfMeeting from StdtAcdSheet where " +
                 " StudentId = " + sess.StudentId + " AND CONVERT(datetime,EndDate)<CONVERT(datetime,'" + endDate + "') order by EndDate desc) AND LessonPlanId = " + hfLPId.Value + ")";
             DataTable dtPMtng = objData.ReturnDataTable(Pquery, false);
