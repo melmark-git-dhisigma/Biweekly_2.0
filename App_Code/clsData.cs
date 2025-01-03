@@ -114,6 +114,8 @@ public class clsData
     {
         DataTable Dt = new DataTable();
         SqlConnection con = Open();
+        string SPdura = "";
+        DateTime startTimeSP = DateTime.Now;
         try
         {
             SqlDataAdapter da = new SqlDataAdapter();
@@ -123,13 +125,21 @@ public class clsData
             cmd.Parameters.AddWithValue("@ENDDate", enddate);
             cmd.Parameters.AddWithValue("@Studentid", studentid);
             cmd.Parameters.AddWithValue("@SchoolId", schoolid);
-            
+            cmd.CommandTimeout = 600;
+
             da = new SqlDataAdapter(cmd);
             da.Fill(Dt);
         }
         catch (Exception e)
         {
             Console.WriteLine("Error: " + e);
+
+            DateTime endTimeSP = DateTime.Now;
+            TimeSpan executionTime = endTimeSP - startTimeSP;
+            SPdura = executionTime.ToString();
+
+            ClsErrorLog clError = new ClsErrorLog();
+            clError.WriteToLog(e.ToString() + " , Stored Procedure Duration :" + SPdura);
         }
         finally
         {
