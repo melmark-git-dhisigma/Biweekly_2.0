@@ -154,15 +154,17 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
 
             objTrails.sessionCount = 0;
 
-            reader = objData.ReturnDataReader(strSql, false);
-            dt = objData.ReturnDataTable(strSql, false);
-            foreach (DataRow dr in dt.Rows)
-            {
-                //if (dr["StepCd"].ToString() != "" && dr["StepCd"].ToString() != null)
+            SqlCommand cmd2 = new SqlCommand(strSql, con);
+            cmd2.Transaction = trans;
+            reader = cmd2.ExecuteReader(CommandBehavior.Default);
 
+            //reader = objData.ReturnDataReader(strSql, false);
 
-
-            }
+            //dt = objData.ReturnDataTable(strSql, false);
+            //foreach (DataRow dr in dt.Rows)
+            //{
+            //    //if (dr["StepCd"].ToString() != "" && dr["StepCd"].ToString() != null)
+            //}
 
 
             while (reader.Read())
@@ -227,7 +229,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
         return objTrails;
     }
 
-    public DiscreteTrials GetTrialListsForPreStep(int studentId, int templateID, int iCrntSet, int iCrntStep, int nmbrOfSession, string colName, bool flag, string correctResponse, string coltypeCode, string chainedtype)
+    public DiscreteTrials GetTrialListsForPreStep(int studentId, int templateID, int iCrntSet, int iCrntStep, int nmbrOfSession, string colName, bool flag, string correctResponse, string coltypeCode, string chainedtype, SqlTransaction trans, SqlConnection con)
     {
 
 
@@ -291,7 +293,11 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
         SqlDataReader reader = null;
         try
         {
-            reader = objData.ReturnDataReader(strSql, false);
+            SqlCommand cmd3 = con.CreateCommand();
+            cmd3.Transaction = trans;
+            cmd3.CommandText = strSql;
+            reader = cmd3.ExecuteReader(CommandBehavior.Default);
+            //reader = objData.ReturnDataReader(strSql, false);
 
             int previousHdrId = 0;
 
@@ -397,13 +403,13 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
         else return null;
     }
 
-    public bool MultiTeacherStatus(int studentId, int templateId)
+    public bool MultiTeacherStatus(int studentId, int templateId, SqlTransaction trans, SqlConnection con)
     {
         clsData objData = new clsData();
         bool bMultiTrchr = false;
         string strSql = "select count(distinct ModifiedBy) from StdtSessionHdr where DSTempHdrId=" + templateId + " AND SessionStatusCd='S' AND  EndTs > (SELECT ISNULL(MAX(EvntTs),'1900-01-01') "
         + " FROM StdtSessEvent WHERE DSTempHdrId =" + templateId + " AND StudentId = " + studentId + ") ";
-        int userCount = Convert.ToInt32(objData.FetchValue(strSql));
+        int userCount = Convert.ToInt32(objData.FetchValueTrans(strSql, trans, con));
         if (userCount > 1)
         {
             bMultiTrchr = true;
@@ -411,13 +417,13 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
         return bMultiTrchr;
     }
 
-    public bool IOAStats(int studentId, int templateId)
+    public bool IOAStats(int studentId, int templateId, SqlTransaction trans, SqlConnection con)
     {
         clsData objData = new clsData();
         bool bIOAStatus = false;
         string strSql = "select count(distinct IOAInd) from StdtSessionHdr where DSTempHdrId=" + templateId + " AND SessionStatusCd='S' AND IOAInd='Y' AND EndTs > (SELECT ISNULL(MAX(EvntTs),'1900-01-01') "
         + " FROM StdtSessEvent WHERE DSTempHdrId =" + templateId + " AND StudentId =" + studentId + ")";
-        int IOACount = Convert.ToInt32(objData.FetchValue(strSql));
+        int IOACount = Convert.ToInt32(objData.FetchValueTrans(strSql, trans, con));
         if (IOACount > 0)
         {
             bIOAStatus = true;

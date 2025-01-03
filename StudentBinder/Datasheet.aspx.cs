@@ -5983,8 +5983,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                  " ,ISNULL(MAX(NextStepId),0)NextStepId,ISNULL(MAX(NextPromptId),0)NextPromptId" +
                  " FROM DSTempHdr Hdr LEFT JOIN StdtDSStat Stat  ON Hdr.DSTempHdrId = Stat.DSTempHdrId " +
                   " WHERE Hdr.DSTempHdrId= " + oTemp.TemplateId + " GROUP BY Hdr.SkillType, Hdr.LessonPlanId ";
-
-                reader = oData.ReturnDataReader(strQry, false);
+                SqlCommand cmd = con.CreateCommand();
+                cmd.Transaction = trans;
+                cmd.CommandText = strQry;
+                reader = cmd.ExecuteReader(CommandBehavior.Default);
+                //reader = oData.ReturnDataReader(strQry, false);
                 if (reader.Read())
                 {
                     iCurrentSetId = Convert.ToInt32(reader["NextSetId"]);
@@ -6751,12 +6754,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
 
                     //if (chainedInptData.MultiTeacherRequired)
-                    bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId);
+                    bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId, trans, con);
                     // else
                     //    bMultyTchr = false;
 
                     // if (chainedInptData.IOARequired)
-                    bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId);
+                    bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId, trans, con);
                     // else
                     //    bIOA = false;
                     //Trials = trails.GetTrialLists(8, 1, ht[key].RequiredSession(), key);
@@ -10613,7 +10616,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             //Check for all previous step that it all succeeds to move forward
                             for (int istep = 1; istep < iCurrentStepExecuting; istep++)
                             {
-                                TrialLists = oDisc.GetTrialListsForPreStep(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, istep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
+                                TrialLists = oDisc.GetTrialListsForPreStep(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, istep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                                 chainedCols[sColName].SessionCount = TrialLists.sessionCount;
                                 sesResultchain[index] = null;
                                 chainedCols[sColName].SetInputData(istep.ToString(), TargetPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -12496,12 +12499,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     oDisc = new DiscreteSession();
                     TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, discreteCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                     //if (discreteInptData.MultiTeacherRequired)
-                    bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId);
+                    bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId, trans, con);
                     // else
                     //    bMultyTchr = false;
 
                     // if (discreteInptData.IOARequired)
-                    bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId);
+                    bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId, trans, con);
                     // else
                     //     bIOA = false;
                     //Trials = trails.GetTrialLists(8, 1, ht[key].RequiredSession(), key);
@@ -16525,12 +16528,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
 
                         //if (chainedInptData.MultiTeacherRequired)
-                        bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId);
+                        bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId, trans, con);
                         // else
                         //    bMultyTchr = false;
 
                         // if (chainedInptData.IOARequired)
-                        bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId);
+                        bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId, trans, con);
                         // else
                         //    bIOA = false;
                         //Trials = trails.GetTrialLists(8, 1, ht[key].RequiredSession(), key);
@@ -20784,7 +20787,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 //Check for all previous step that it all succeeds to move forward
                                 for (int istep = 1; istep < iCurrentStepExecuting; istep++)
                                 {
-                                    TrialLists = oDisc.GetTrialListsForPreStep(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, istep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
+                                    TrialLists = oDisc.GetTrialListsForPreStep(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, istep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                                     chainedCols[sColName].SessionCount = TrialLists.sessionCount;
                                     sesResultchain[index] = null;
                                     chainedCols[sColName].SetInputData(istep.ToString(), TargetPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -22272,12 +22275,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         oDisc = new DiscreteSession();
                         TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, discreteCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                         //if (discreteInptData.MultiTeacherRequired)
-                        bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId);
+                        bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId, trans, con);
                         // else
                         //    bMultyTchr = false;
 
                         // if (discreteInptData.IOARequired)
-                        bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId);
+                        bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId, trans, con);
                         // else
                         //     bIOA = false;
                         //Trials = trails.GetTrialLists(8, 1, ht[key].RequiredSession(), key);
