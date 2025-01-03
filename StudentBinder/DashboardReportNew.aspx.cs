@@ -908,25 +908,86 @@ public partial class Graph : System.Web.UI.Page
 
     private void LoadDashBoardStaffClinicalGraph(string SCgraphClassid, string SCgraphStudid)
     {
-        RV_DBReport.Visible = true;
-        RV_DBReport.ServerReport.ReportServerCredentials = new CustomReportCredentials(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"], ConfigurationManager.AppSettings["Domain"]);
-        RV_DBReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["DashBoardStaffClinical"];
-        String Classids = Convert.ToString(SCgraphClassid);
-        String Studids = Convert.ToString(SCgraphStudid);
-        String getUseridsquery = "SELECT STUFF((SELECT Distinct ','+Convert(varchar(200),CreatedBy) from behaviour where Classid IN(" + Classids + ")  and Studentid IN(" + Studids + ") and CONVERT(VARCHAR(10),ModifiedOn, 120) = CONVERT(VARCHAR(10),getdate(), 120)FOR XML PATH('')), 1, 1, '') ";
-        String Userids = Convert.ToString(objData.FetchValue(getUseridsquery));
-        if (Userids == "") 
+        if (highcheck.Checked == false)
         {
-            Userids = null;
+            RV_DBReport.Visible = true;
+            RV_DBReport.ServerReport.ReportServerCredentials = new CustomReportCredentials(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"], ConfigurationManager.AppSettings["Domain"]);
+            RV_DBReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["DashBoardStaffClinical"];
+            String Classids = Convert.ToString(SCgraphClassid);
+            String Studids = Convert.ToString(SCgraphStudid);
+            String getUseridsquery = "SELECT STUFF((SELECT Distinct ','+Convert(varchar(200),CreatedBy) from behaviour where Classid IN(" + Classids + ")  and Studentid IN(" + Studids + ") and CONVERT(VARCHAR(10),ModifiedOn, 120) = CONVERT(VARCHAR(10),getdate(), 120)FOR XML PATH('')), 1, 1, '') ";
+            String Userids = Convert.ToString(objData.FetchValue(getUseridsquery));
+            if (Userids == "")
+            {
+                Userids = null;
+            }
+            Txt_Userid.Text = Userids;
+            RV_DBReport.ShowParameterPrompts = false;
+            ReportParameter[] parm = new ReportParameter[3];
+            parm[0] = new ReportParameter("ParamClassid", Classids);
+            parm[1] = new ReportParameter("ParamStudid", Studids);
+            parm[2] = new ReportParameter("ParamUserid", Userids);
+            this.RV_DBReport.ServerReport.SetParameters(parm);
+            RV_DBReport.ServerReport.Refresh();
         }
-        Txt_Userid.Text = Userids;        
-        RV_DBReport.ShowParameterPrompts = false;
-        ReportParameter[] parm = new ReportParameter[3];
-        parm[0] = new ReportParameter("ParamClassid", Classids);
-        parm[1] = new ReportParameter("ParamStudid", Studids);
-        parm[2] = new ReportParameter("ParamUserid", Userids);
-        this.RV_DBReport.ServerReport.SetParameters(parm);
-        RV_DBReport.ServerReport.Refresh();
+        else
+        {
+            RV_DBReport.Visible = false;
+            graphcontainer.Visible = true;
+            String Classids = Convert.ToString(SCgraphClassid);
+            String Studids = Convert.ToString(SCgraphStudid);
+            String getUseridsquery = "SELECT STUFF((SELECT Distinct ','+Convert(varchar(200),Modifiedby) from stdtsessionhdr where stdtclassid IN(" + Classids + ") and studentid IN(" + Studids + ") and CONVERT(VARCHAR(10),ModifiedOn, 120) = CONVERT(VARCHAR(10),getdate(), 120)FOR XML PATH('')), 1, 1, '')";
+            String Userids = Convert.ToString(objData.FetchValue(getUseridsquery));
+            if (Userids == "")
+            {
+                Userids = null;
+            }
+            List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+            Dictionary<string, object> row;
+            SqlCommand cmd = null;
+            DataTable Dt = new DataTable();
+            clsData ObjData = new clsData();
+            SqlConnection con = ObjData.Open();
+            try
+            {
+                SqlDataAdapter da = new SqlDataAdapter();
+                cmd = new SqlCommand("DashboardStaffClinical", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandTimeout = 600;
+                cmd.Parameters.AddWithValue("@ParamClassid", SCgraphClassid);
+                cmd.Parameters.AddWithValue("@ParamStudid", SCgraphStudid);
+                cmd.Parameters.AddWithValue("@ParamUserid", Userids);
+                da = new SqlDataAdapter(cmd);
+                da.Fill(Dt);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex);
+
+                ClsErrorLog errlog = new ClsErrorLog();
+                errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\n StudentId ID = " + Studids + "\n" + ex.ToString());
+            }
+            finally
+            {
+                ObjData.Close(con);
+            }
+            foreach (DataRow dr in Dt.Rows)
+            {
+                row = new Dictionary<string, object>();
+                foreach (DataColumn dc in Dt.Columns)
+                {
+                    row.Add(dc.ColumnName, dr[dc]);
+                }
+                rows.Add(row);
+
+            }
+
+            JavaScriptSerializer json = new JavaScriptSerializer();
+            string script = @"setTimeout(function() {loadClinicalbyStaff('" + json.Serialize(rows) + "');}, 300);";
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "loadClinicalbyStaff", script, true);
+         
+        }
     }
 
     private void TestLoad()
@@ -1096,6 +1157,7 @@ public partial class Graph : System.Web.UI.Page
     }
     protected void BtnStaffClinical_Click(object sender, EventArgs e)
     {
+        
         tdMsg.InnerHtml = "";
         string studid = Txt_Studid.Text;                
         BtnStaffClinical.BackColor = System.Drawing.Color.FromArgb(88, 163, 163);
