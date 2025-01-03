@@ -166,18 +166,18 @@ public class clsAssignLessonPlan
                 foreach (DataRow row in dtset.Rows)
                 {
                     strQuery = "INSERT INTO DSTempSet(SchoolId,DSTempHdrId,PrevSetId,SetCd,SetName,Samples,SortOrder,ActiveInd,CreatedBy,CreatedOn,DistractorSamples,DistractorSamplesCount) ";
-                    strQuery += "SELECT  SchoolId," + TId + ",PrevSetId,SetCd,SetName,Samples,SortOrder,ActiveInd," + loginid + ",getdate(),DistractorSamples,DistractorSamplesCount FROM DSTempSet WHERE DSTempSetId = " + Convert.ToInt32(row["DSTempSetId"]) + " ";
+                    strQuery += "SELECT  SchoolId," + TId + ",PrevSetId,SetCd,SetName,Samples,SortOrder,ActiveInd," + loginid + ",getdate(),DistractorSamples,DistractorSamplesCount FROM DSTempSet WHERE ActiveInd='A' AND DSTempSetId = " + Convert.ToInt32(row["DSTempSetId"]) + " ";
                     int SetId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                 }
             }
             DataTable dtstep = new DataTable();
-            dtstep = objData.ReturnDataTable("SELECT DSTempStepId FROM DSTempStep WHERE DSTempHdrId=" + templateid + "", Con, Trans, false);
+            dtstep = objData.ReturnDataTable("SELECT DSTempStepId FROM DSTempStep WHERE ActiveInd='A' AND DSTempHdrId=" + templateid + "", Con, Trans, false);
             if (dtstep.Rows.Count > 0)
             {
                 foreach (DataRow row in dtstep.Rows)
                 {
                     strQuery = "INSERT INTO DSTempStep(SchoolId,DSTempHdrId,DSTempSetId,PrevStepId,StepCd,StepName,SortOrder,CreatedBy,ActiveInd,CreatedOn) ";
-                    strQuery += "SELECT SchoolId," + TId + ",DSTempSetId,PrevStepId,StepCd,StepName,SortOrder," + loginid + ",ActiveInd,GETDATE()	FROM DSTempStep WHERE DSTempStepId = " + Convert.ToInt32(row["DSTempStepId"]) + " ";
+                    strQuery += "SELECT SchoolId," + TId + ",DSTempSetId,PrevStepId,StepCd,StepName,SortOrder," + loginid + ",ActiveInd,GETDATE()	FROM DSTempStep WHERE ActiveInd='A' AND DSTempStepId = " + Convert.ToInt32(row["DSTempStepId"]) + " ";
                     int StepId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                 }
             }
@@ -382,7 +382,7 @@ public class clsAssignLessonPlan
                     foreach (DataRow row in dtset.Rows)
                     {
                         strQuery = "INSERT INTO DSTempSet(SchoolId,DSTempHdrId,PrevSetId,SetCd,SetName,Samples,SortOrder,ActiveInd,CreatedBy,CreatedOn,DistractorSamples,DistractorSamplesCount) ";
-                        strQuery += "SELECT  SchoolId," + TId + ",PrevSetId,SetCd,SetName,Samples,SortOrder,ActiveInd," + loginid + ",getdate(),DistractorSamples,DistractorSamplesCount FROM DSTempSet WHERE DSTempSetId = " + Convert.ToInt32(row["DSTempSetId"]) + " ";
+                        strQuery += "SELECT  SchoolId," + TId + ",PrevSetId,SetCd,SetName,Samples,SortOrder,ActiveInd," + loginid + ",getdate(),DistractorSamples,DistractorSamplesCount FROM DSTempSet WHERE ActiveInd='A' AND DSTempSetId = " + Convert.ToInt32(row["DSTempSetId"]) + " ";
                         int SetId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                         if (!ht.ContainsKey(row["DSTempSetId"]))
                         {
@@ -407,7 +407,7 @@ public class clsAssignLessonPlan
             if (teachingProc == "Match-to-Sample")
             {
                 DataTable dtstep = new DataTable();
-                dtstep = objData.ReturnDataTable("SELECT DSTempStepId,DSTempSetId FROM DSTempStep WHERE DSTempHdrId=" + templateid + " AND IsDynamic=0", Con, Trans, false);
+                dtstep = objData.ReturnDataTable("SELECT DSTempStepId,DSTempSetId FROM DSTempStep WHERE DSTempHdrId=" + templateid + " AND ActiveInd='A' AND IsDynamic=0", Con, Trans, false);
                 if (dtstep.Rows.Count > 0)
                 {
                     foreach (DataRow row in dtstep.Rows)
@@ -419,7 +419,7 @@ public class clsAssignLessonPlan
                         }
                         strQuery =
                         strQuery = "INSERT INTO DSTempStep(SchoolId,DSTempHdrId,DSTempSetId,PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder,CreatedBy,ActiveInd,CreatedOn) ";
-                        strQuery += "SELECT SchoolId," + TId + "," + parentSetId + ",PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder," + loginid + ",ActiveInd,GETDATE()	FROM DSTempStep WHERE DSTempStepId = " + Convert.ToInt32(row["DSTempStepId"]) + " ";
+                        strQuery += "SELECT SchoolId," + TId + "," + parentSetId + ",PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder," + loginid + ",ActiveInd,GETDATE()	FROM DSTempStep WHERE ActiveInd='A' AND DSTempStepId = " + Convert.ToInt32(row["DSTempStepId"]) + " ";
                         int StepId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                     }
                 }
@@ -430,7 +430,7 @@ public class clsAssignLessonPlan
                 DataTable dtParentStep = new DataTable();
                 // strQuery = "INSERT INTO DSTempParentStep(SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn) ";
                 strQuery = "SELECT  DSTempParentStepId,SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn"
-                    + " FROM DSTempParentStep WHERE DSTempHdrId = " + templateid;
+                    + " FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempHdrId = " + templateid;
                 dtParentStep = objData.ReturnDataTable(strQuery, Con, Trans, false);
                 //  int DSTempParentStepId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                 // DataTable dt
@@ -454,13 +454,13 @@ public class clsAssignLessonPlan
                             oldParentSetId = Convert.ToInt32(row["DSTempParentStepId"]);
                             strQuery = "INSERT INTO DSTempParentStep(SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn) "
                                         + "SELECT  SchoolId," + TId + ",StepCd,StepName,DSTempSetId,SortOrder,'" + newsetids + "',SetNames,ActiveInd," + loginid + ",getdate()"
-                                        + " FROM DSTempParentStep WHERE DSTempHdrId = " + templateid + " AND DSTempParentStepId=" + oldParentSetId;
+                                        + " FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempHdrId = " + templateid + " AND DSTempParentStepId=" + oldParentSetId;
                             parentSetId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
 
                             DataTable dtstep = new DataTable();
 
                             strQuery = "SELECT  SchoolId,PrevStepId,SortOrder,PreDefinedInd,CustomById,VTStepId,DSTempSetId,StepCd,StepName,ActiveInd,"
-                                    + "DSTempParentStepId FROM DSTempStep WHERE DSTempParentStepId=" + oldParentSetId + " AND DSTempHdrId = " + templateid;
+                                    + "DSTempParentStepId FROM DSTempStep WHERE ActiveInd='A' AND DSTempParentStepId=" + oldParentSetId + " AND DSTempHdrId = " + templateid;
                             dtstep = objData.ReturnDataTable(strQuery, Con, Trans, false);
                             if (dtstep.Rows.Count > 0)
                             {
@@ -470,9 +470,9 @@ public class clsAssignLessonPlan
 
                                     strQuery = "INSERT INTO DSTempStep(SchoolId,DSTempHdrId,DSTempSetId,PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder,CreatedBy,ActiveInd,CreatedOn) ";
                                     strQuery += "SELECT SchoolId," + TId + ",DSTempSetId,PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder," + loginid + ",ActiveInd,GETDATE()"
-                                        + "	FROM DSTempStep WHERE DSTempSetId = " + oldSetId + " AND DSTempParentStepId=" + oldParentSetId;
+                                        + "	FROM DSTempStep WHERE ActiveInd='A' AND DSTempSetId = " + oldSetId + " AND DSTempParentStepId=" + oldParentSetId;
                                     int StepId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
-                                    strQuery = "SELECT DSTempSetId FROM DSTempStep WHERE DSTempStepId=" + StepId;
+                                    strQuery = "SELECT DSTempSetId FROM DSTempStep WHERE ActiveInd='A' AND DSTempStepId=" + StepId;
                                     int NewSetId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                                     if (ht.ContainsKey(Convert.ToInt32(NewSetId)))
                                     {
@@ -655,7 +655,7 @@ public class clsAssignLessonPlan
                             foreach (DataRow row in dtset.Rows)
                             {
                                 strQuery = "INSERT INTO DSTempSet(SchoolId,DSTempHdrId,PrevSetId,SetCd,SetName,Samples,SortOrder,ActiveInd,CreatedBy,CreatedOn,DistractorSamples,DistractorSamplesCount) ";
-                                strQuery += "SELECT  SchoolId," + TId + ",PrevSetId,SetCd,SetName,Samples,SortOrder,ActiveInd," + oSession.LoginId + ",getdate(),DistractorSamples,DistractorSamplesCount FROM DSTempSet WHERE DSTempSetId = " + Convert.ToInt32(row["DSTempSetId"]) + " ";
+                                strQuery += "SELECT  SchoolId," + TId + ",PrevSetId,SetCd,SetName,Samples,SortOrder,ActiveInd," + oSession.LoginId + ",getdate(),DistractorSamples,DistractorSamplesCount FROM DSTempSet WHERE ActiveInd='A' AND DSTempSetId = " + Convert.ToInt32(row["DSTempSetId"]) + " ";
                                 int SetId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                                 if (!ht.ContainsKey(row["DSTempSetId"]))
                                 {
@@ -680,7 +680,7 @@ public class clsAssignLessonPlan
                     if (teachingProc == "Match-to-Sample")
                     {
                         DataTable dtstep = new DataTable();
-                        dtstep = objData.ReturnDataTable("SELECT DSTempStepId,DSTempSetId FROM DSTempStep WHERE DSTempHdrId=" + OldTempId + "", Con, Trans, false);
+                        dtstep = objData.ReturnDataTable("SELECT DSTempStepId,DSTempSetId FROM DSTempStep WHERE ActiveInd='A' AND DSTempHdrId=" + OldTempId + "", Con, Trans, false);
                         if (dtstep.Rows.Count > 0)
                         {
                             foreach (DataRow row in dtstep.Rows)
@@ -692,7 +692,7 @@ public class clsAssignLessonPlan
                                 }
                                 strQuery =
                                 strQuery = "INSERT INTO DSTempStep(SchoolId,DSTempHdrId,DSTempSetId,PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder,CreatedBy,ActiveInd,CreatedOn) ";
-                                strQuery += "SELECT SchoolId," + TId + "," + parentSetId + ",PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder," + oSession.LoginId + ",ActiveInd,GETDATE()	FROM DSTempStep WHERE DSTempStepId = " + Convert.ToInt32(row["DSTempStepId"]) + " ";
+                                strQuery += "SELECT SchoolId," + TId + "," + parentSetId + ",PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder," + oSession.LoginId + ",ActiveInd,GETDATE()	FROM DSTempStep WHERE ActiveInd='A' AND DSTempStepId = " + Convert.ToInt32(row["DSTempStepId"]) + " ";
                                 int StepId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                             }
                         }
@@ -703,7 +703,7 @@ public class clsAssignLessonPlan
                         DataTable dtParentStep = new DataTable();
                         // strQuery = "INSERT INTO DSTempParentStep(SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn) ";
                         strQuery = "SELECT  DSTempParentStepId,SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn"
-                            + " FROM DSTempParentStep WHERE DSTempHdrId = " + OldTempId;
+                            + " FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempHdrId = " + OldTempId;
                         dtParentStep = objData.ReturnDataTable(strQuery, Con, Trans, false);
                         int DSTempParentStepId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                         // DataTable dt
@@ -725,13 +725,13 @@ public class clsAssignLessonPlan
                                 oldParentSetId = Convert.ToInt32(row["DSTempParentStepId"]);
                                 strQuery = "INSERT INTO DSTempParentStep(SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn) "
                                             + "SELECT  SchoolId," + TId + ",StepCd,StepName,DSTempSetId,SortOrder,'" + newsetids + "',SetNames,ActiveInd," + oSession.LoginId + ",getdate()"
-                                            + " FROM DSTempParentStep WHERE DSTempHdrId = " + OldTempId + " AND DSTempParentStepId=" + oldParentSetId;
+                                            + " FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempHdrId = " + OldTempId + " AND DSTempParentStepId=" + oldParentSetId;
                                 parentSetId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
 
                                 DataTable dtstep = new DataTable();
 
                                 strQuery = "SELECT  SchoolId,PrevStepId,SortOrder,PreDefinedInd,CustomById,VTStepId,DSTempSetId,StepCd,StepName,ActiveInd,"
-                                        + "DSTempParentStepId FROM DSTempStep WHERE DSTempParentStepId=" + oldParentSetId + " AND DSTempHdrId = " + OldTempId;
+                                        + "DSTempParentStepId FROM DSTempStep WHERE ActiveInd='A' AND DSTempParentStepId=" + oldParentSetId + " AND DSTempHdrId = " + OldTempId;
                                 dtstep = objData.ReturnDataTableWithTransaction(strQuery, Con, Trans, false);
                                 if (dtstep.Rows.Count > 0)
                                 {
@@ -741,9 +741,9 @@ public class clsAssignLessonPlan
 
                                         strQuery = "INSERT INTO DSTempStep(SchoolId,DSTempHdrId,DSTempSetId,PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder,CreatedBy,ActiveInd,CreatedOn) ";
                                         strQuery += "SELECT SchoolId," + TId + ",DSTempSetId,PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder," + oSession.LoginId + ",ActiveInd,GETDATE()"
-                                            + "	FROM DSTempStep WHERE DSTempSetId = " + oldSetId + " AND DSTempParentStepId=" + oldParentSetId;
+                                            + "	FROM DSTempStep WHERE ActiveInd='A' AND DSTempSetId = " + oldSetId + " AND DSTempParentStepId=" + oldParentSetId;
                                         int StepId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
-                                        strQuery = "SELECT DSTempSetId FROM DSTempStep WHERE DSTempStepId=" + StepId;
+                                        strQuery = "SELECT DSTempSetId FROM DSTempStep WHERE ActiveInd='A' AND DSTempStepId=" + StepId;
                                         int NewSetId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                                         if (ht.ContainsKey(Convert.ToInt32(NewSetId)))
                                         {

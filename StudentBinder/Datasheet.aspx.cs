@@ -264,92 +264,92 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             if (ViewState["hfTextScore"] != null)
             {
                 if (hfTextScore.Value == "")
-                    hfTextScore.Value = ViewState["hfTextScore"].ToString();
+                hfTextScore.Value = ViewState["hfTextScore"].ToString();
             }
             if (ViewState["hfResultStep_Acc"] != null)
             {
                 if (hfResultStep_Acc.Value == "")
-                    hfResultStep_Acc.Value = ViewState["hfResultStep_Acc"].ToString();
+                hfResultStep_Acc.Value = ViewState["hfResultStep_Acc"].ToString();
             }
             if (ViewState["hfResultStep_Prmpt"] != null)
             {
                 if (hfResultStep_Prmpt.Value == "")
-                    hfResultStep_Prmpt.Value = ViewState["hfResultStep_Prmpt"].ToString();
+                hfResultStep_Prmpt.Value = ViewState["hfResultStep_Prmpt"].ToString();
             }
             if (ViewState["hfRslt1_ExcludeCrntStep_Acc"] != null)
             {
                 if (hfRslt1_ExcludeCrntStep_Acc.Value == "")
-                    hfRslt1_ExcludeCrntStep_Acc.Value = ViewState["hfRslt1_ExcludeCrntStep_Acc"].ToString();
+                hfRslt1_ExcludeCrntStep_Acc.Value = ViewState["hfRslt1_ExcludeCrntStep_Acc"].ToString();
             }
             if (ViewState["hfRslt2_ExcludeCrntStep_Acc"] != null)
             {
                 if (hfRslt2_ExcludeCrntStep_Acc.Value == "")
-                    hfRslt2_ExcludeCrntStep_Acc.Value = ViewState["hfRslt2_ExcludeCrntStep_Acc"].ToString();
+                hfRslt2_ExcludeCrntStep_Acc.Value = ViewState["hfRslt2_ExcludeCrntStep_Acc"].ToString();
             }
             if (ViewState["hfRslt1_Acc"] != null)
             {
                 if (hfRslt1_Acc.Value == "")
-                    hfRslt1_Acc.Value = ViewState["hfRslt1_Acc"].ToString();
+                hfRslt1_Acc.Value = ViewState["hfRslt1_Acc"].ToString();
             }
             if (ViewState["hfRslt2_Acc"] != null)
             {
                 if (hfRslt2_Acc.Value == "")
-                    hfRslt2_Acc.Value = ViewState["hfRslt2_Acc"].ToString();
+                hfRslt2_Acc.Value = ViewState["hfRslt2_Acc"].ToString();
             }
             if (ViewState["hfRslt1_Prmt"] != null)
             {
                 if (hfRslt1_Prmt.Value == "")
-                    hfRslt1_Prmt.Value = ViewState["hfRslt1_Prmt"].ToString();
+                hfRslt1_Prmt.Value = ViewState["hfRslt1_Prmt"].ToString();
             }
             if (ViewState["hfRslt2_Prmt"] != null)
             {
                 if (hfRslt2_Prmt.Value == "")
-                    hfRslt2_Prmt.Value = ViewState["hfRslt2_Prmt"].ToString();
+                hfRslt2_Prmt.Value = ViewState["hfRslt2_Prmt"].ToString();
             }
             if (ViewState["hfRslt1_Ind"] != null)
             {
                 if (hfRslt1_Ind.Value == "")
-                    hfRslt1_Ind.Value = ViewState["hfRslt1_Ind"].ToString();
+                hfRslt1_Ind.Value = ViewState["hfRslt1_Ind"].ToString();
             }
             if (ViewState["hfRslt2_Ind"] != null)
             {
                 if (hfRslt2_Ind.Value == "")
-                    hfRslt2_Ind.Value = ViewState["hfRslt2_Ind"].ToString();
+                hfRslt2_Ind.Value = ViewState["hfRslt2_Ind"].ToString();
             }
             if (ViewState["hfRslt1_IndAll"] != null)
             {
                 if (hfRslt1_IndAll.Value == "")
-                    hfRslt1_IndAll.Value = ViewState["hfRslt1_IndAll"].ToString();
+                hfRslt1_IndAll.Value = ViewState["hfRslt1_IndAll"].ToString();
             }
             if (ViewState["hfRslt2_IndAll"] != null)
             {
                 if (hfRslt2_IndAll.Value == "")
-                    hfRslt2_IndAll.Value = ViewState["hfRslt2_IndAll"].ToString();
+                hfRslt2_IndAll.Value = ViewState["hfRslt2_IndAll"].ToString();
             }
             if (ViewState["hfAvgDur"] != null)
             {
                 if (hfAvgDur.Value == "")
-                    hfAvgDur.Value = ViewState["hfAvgDur"].ToString();
+                hfAvgDur.Value = ViewState["hfAvgDur"].ToString();
             }
             if (ViewState["hfTotDur"] != null)
             {
                 if (hfTotDur.Value == "")
-                    hfTotDur.Value = ViewState["hfTotDur"].ToString();
+                hfTotDur.Value = ViewState["hfTotDur"].ToString();
             }
             if (ViewState["hf_Freq"] != null)
             {
                 if (hf_Freq.Value == "")
-                    hf_Freq.Value = ViewState["hf_Freq"].ToString();
+                hf_Freq.Value = ViewState["hf_Freq"].ToString();
             }
             if (ViewState["hfTotCorct"] != null)
             {
                 if (hfTotCorct.Value == "")
-                    hfTotCorct.Value = ViewState["hfTotCorct"].ToString();
+                hfTotCorct.Value = ViewState["hfTotCorct"].ToString();
             }
             if (ViewState["hfInTotCorct"] != null)
             {
                 if (hfInTotCorct.Value == "")
-                    hfInTotCorct.Value = ViewState["hfInTotCorct"].ToString();
+                hfInTotCorct.Value = ViewState["hfInTotCorct"].ToString();
             }
             bool ContrlEnable = true;
             DatasheetKey = "DataSht_Sess-" + hdnTemplateId.Value.ToString();
@@ -538,6 +538,29 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         ViewState["hfTotCorct"] = hfTotCorct.Value;
         ViewState["hfInTotCorct"] = hfInTotCorct.Value;
     }
+
+    //protected void Page_PreRender(object sender, EventArgs e)
+    //{
+    //    // Store the hidden field value into ViewState
+    //    ViewState["hfTextScore"] = hfTextScore.Value;
+    //    ViewState["hfResultStep_Acc"] = hfResultStep_Acc.Value;
+    //    ViewState["hfResultStep_Prmpt"] = hfResultStep_Prmpt.Value;
+    //    ViewState["hfRslt1_ExcludeCrntStep_Acc"] = hfRslt1_ExcludeCrntStep_Acc.Value;
+    //    ViewState["hfRslt2_ExcludeCrntStep_Acc"] = hfRslt2_ExcludeCrntStep_Acc.Value;
+    //    ViewState["hfRslt1_Acc"] = hfRslt1_Acc.Value;
+    //    ViewState["hfRslt2_Acc"] = hfRslt2_Acc.Value;
+    //    ViewState["hfRslt1_Prmt"] = hfRslt1_Prmt.Value;
+    //    ViewState["hfRslt2_Prmt"] = hfRslt2_Prmt.Value;
+    //    ViewState["hfRslt1_Ind"] = hfRslt1_Ind.Value;
+    //    ViewState["hfRslt2_Ind"] = hfRslt2_Ind.Value;
+    //    ViewState["hfRslt1_IndAll"] = hfRslt1_IndAll.Value;
+    //    ViewState["hfRslt2_IndAll"] = hfRslt2_IndAll.Value;
+    //    ViewState["hfAvgDur"] = hfAvgDur.Value;
+    //    ViewState["hfTotDur"] = hfTotDur.Value;
+    //    ViewState["hf_Freq"] = hf_Freq.Value;
+    //    ViewState["hfTotCorct"] = hfTotCorct.Value;
+    //    ViewState["hfInTotCorct"] = hfInTotCorct.Value;
+    //}
 
     public string getFormulae(string calId)
     {
@@ -1088,20 +1111,9 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     string[] samplesCollection = stepname.Split('[');
                                                     string[] samples = samplesCollection[1].Split(',');
                                                     //Keep the same order for qustn and samples
-                                                    if (matchToSampleType == "Randomized")
-                                                    {
-                                                        drst["StepCd"] = stepname;
-                                                        drst["StepName"] = stepname;
-                                                    }
-                                                    else
-                                                    {
-                                                        string dtStepname = drst["StepCd"].ToString();
-                                                        string[] dtSamplesCollection = dtStepname.Split(':');
-                                                        string dtSamplesCollectionNew = dtSamplesCollection[0] + " [" + samplesCollection[1];
-                                                        drst["StepCd"] = dtSamplesCollectionNew;
-                                                        drst["StepName"] = dtSamplesCollectionNew;
-
-                                                    }
+                                                    
+                                                    drst["StepCd"] = stepname;
+                                                    drst["StepName"] = stepname;
 
 
                                                     //need to set value to MyRow column
@@ -1677,6 +1689,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 {
                                     Session["random"] = "total task random";
                                     Session["steporder"] = steporder.Trim(',');
+                                    Session["datatable"] = ConvertDataTableToString(dt);
                                 }
                             }
                         }
@@ -2279,7 +2292,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             int CrntSet = oDS.CrntSet;
                             if (sessTotStepCount != dtRowCount)
                             {
-                                clError.WriteToLog("StepCountMismatch:\n"+ "StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString() + "Current SetId:" + CrntSet+"\nSession TotStepCount:" + sessTotStepCount + "  DataTable StepCount:" + dtRowCount + "\nSession Steporder:\n" + Session["steporder"].ToString());
+                                clError.WriteToLog("StepCountMismatch:\n" + "StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString() + "Current SetId:" + CrntSet + "\nSession TotStepCount:" + sessTotStepCount + "  DataTable StepCount:" + dtRowCount + "\nSession Steporder:\n" + Session["steporder"].ToString() + "\n datatable" + Session["datatable"].ToString());
                             }
                         }
                         catch (Exception exep)
@@ -2290,6 +2303,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         oData.Execute(qry);
                         Session["random"] = null;
                         Session["steporder"] = null;
+                        Session["datatable"] = null;
                     }
                 }
             }
@@ -2528,7 +2542,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             }
                             oDS.LessonPlanID = Convert.ToInt32(dtTmpHdrDtls.Rows[0]["LessonPlanId"].ToString());
                             GetDSStat(oDS.SkillType, oDS.TeachProc, oDS.LessonPlanID);
-                            string sqlStepCount = "SELECT COUNT(DSTempStepId) AS ActiveStepCount FROM DSTempStep WHERE ActiveInd = 'A' and DSTempHdrId=" + hdnTemplateId.Value + " and DSTempSetId=" + oDS.CrntSet + " GROUP BY DSTempHdrId, DSTempSetId;";
+                            string sqlStepCount = "SELECT COUNT(DSTempStepId) AS ActiveStepCount FROM DSTempStep WHERE ActiveInd = 'A' and IsDynamic=0 and DSTempHdrId=" + hdnTemplateId.Value + " and DSTempSetId=" + oDS.CrntSet + " GROUP BY DSTempHdrId, DSTempSetId;";
                             int TotStepCount = Convert.ToInt32(oData.FetchValue(sqlStepCount));
                             Session["TotStepCount"] = TotStepCount;
                             GetColumnDetls();
@@ -4991,7 +5005,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         Int32 dtRowCount = Session["steporder"].ToString().Split(',').Length;
                         if (sessTotStepCount != dtRowCount)
                         {
-                            clErr.WriteToLog("StepCountMismatch:\nSession TotStepCount:" + sessTotStepCount + "  DataTable StepCount:" + dtRowCount + "\nSession Steporder:\n" + Session["steporder"].ToString() + "StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString() + "Current SetId:" + oDS.CrntSet);
+                            clErr.WriteToLog("StepCountMismatch:\nSession TotStepCount:" + sessTotStepCount + "  DataTable StepCount:" + dtRowCount + "\nSession Steporder:\n" + Session["steporder"].ToString() + "StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString() + "Current SetId:" + oDS.CrntSet + "\n datatable=" + Session["datatable"].ToString());
                         }
                     }
                     catch (Exception exep)
@@ -5001,6 +5015,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     string qry = "Update StdtSessionHdr set StepOrder='" + Session["steporder"].ToString() + "' where StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString();
                     oData.Execute(qry);
                     Session["steporder"] = null;
+                    Session["datatable"] = null;
             	}
             }
             btnSubmitAndRepeat1.Visible = false;
@@ -5362,8 +5377,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         string strQuery = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,EventName,StdtSessEventType,SetId,EvntTs,SessionNbr,EventType,LessonPlanId,TimeStampForReport)VALUES" +
      " (" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + DTCurrentDtl.Rows[0]["DSTempHdrId"] + ",'" + EvntName.Replace("'", "''") + "','Major'," + DTCurrentDtl.Rows[0]["CurrentSetId"] + ",GETDATE(),1,'EV', " + DTCurrentDtl.Rows[0]["LessonPlanId"] + ",DATEADD(HH,(SELECT (COUNT(*)+1) FROM StdtSessEvent WHERE CONVERT(DATE,EvntTs)=CONVERT(DATE,GETDATE()) AND " + "SchoolId=" + oSession.SchoolId + " AND StudentId=" + oSession.StudentId + " AND EventType='EV' AND LessonPlanId=" + DTCurrentDtl.Rows[0]["LessonPlanId"] + ")," + "CONVERT(datetime,GETDATE())))";
                         oData.ExecuteWithTrans(strQuery, con, trans);
-
-                        if (Convert.ToString(DTCurrentDtl.Rows[0]["StepName"]) != "")
+                        string stepName = "";
+                        if (Convert.ToString(DTCurrentDtl.Rows[0]["CurrentStepId"]) != "")
+                        {
+                            int stepid = Convert.ToInt32(DTCurrentDtl.Rows[0]["CurrentStepId"]);
+                            int SetId = Convert.ToInt32(DTCurrentDtl.Rows[0]["CurrentSetId"]);  
+                            int templateId =Convert.ToInt32(DTCurrentDtl.Rows[0]["DSTempHdrId"]);
+                            string strQueryMo = "SELECT RNK FROM (SELECT DSTempStepId,SortOrder,RANK() OVER (ORDER BY SortOrder) RNK FROM DSTempStep " +
+                                               " WHERE DSTempHdrId = " + templateId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId=" + templateId + " AND ActiveInd = 'A') AND ActiveInd='A' ) AS Temp WHERE SortOrder = " + stepid;
+                            int Stepindes = Convert.ToInt32(oData.FetchValueTrans(strQueryMo, trans, con));
+                            stepName = "Step " + Stepindes;
+                        }
+                            if (Convert.ToString(DTCurrentDtl.Rows[0]["StepName"]) != "")
                         {
                             strQuery = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,EventName,StdtSessEventType,EvntTs,SessionNbr,EventType,StepId,SetId,LessonPlanId,TimeStampForReport)VALUES" +
     "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + DTCurrentDtl.Rows[0]["DSTempHdrId"] + ",'" + DTCurrentDtl.Rows[0]["StepName"] + "','Minor'," + "GETDATE(),1,'EV'," + DTCurrentDtl.Rows[0]["CurrentStepId"] + "," + DTCurrentDtl.Rows[0]["CurrentSetId"] + "," + DTCurrentDtl.Rows[0]["LessonPlanId"] + ",DATEADD(HH,(SELECT (COUNT(*)+1) FROM StdtSessEvent WHERE CONVERT(DATE,EvntTs)=CONVERT(DATE,getdate()) AND " + "SchoolId=" + oSession.SchoolId + " AND StudentId=" + oSession.StudentId + " AND EventType='EV' AND LessonPlanId=" + DTCurrentDtl.Rows[0]["LessonPlanId"] + ")," + "CONVERT(datetime,getdate())))";
@@ -5983,11 +6008,8 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                  " ,ISNULL(MAX(NextStepId),0)NextStepId,ISNULL(MAX(NextPromptId),0)NextPromptId" +
                  " FROM DSTempHdr Hdr LEFT JOIN StdtDSStat Stat  ON Hdr.DSTempHdrId = Stat.DSTempHdrId " +
                   " WHERE Hdr.DSTempHdrId= " + oTemp.TemplateId + " GROUP BY Hdr.SkillType, Hdr.LessonPlanId ";
-                SqlCommand cmd = con.CreateCommand();
-                cmd.Transaction = trans;
-                cmd.CommandText = strQry;
-                reader = cmd.ExecuteReader(CommandBehavior.Default);
-                //reader = oData.ReturnDataReader(strQry, false);
+
+                reader = oData.ReturnDataReader(strQry, false);
                 if (reader.Read())
                 {
                     iCurrentSetId = Convert.ToInt32(reader["NextSetId"]);
@@ -6751,15 +6773,15 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
 
                     oDisc = new DiscreteSession();
-                    TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                    TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
 
                     //if (chainedInptData.MultiTeacherRequired)
-                    bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId, trans, con);
+                    bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId);
                     // else
                     //    bMultyTchr = false;
 
                     // if (chainedInptData.IOARequired)
-                    bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId, trans, con);
+                    bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId);
                     // else
                     //    bIOA = false;
                     //Trials = trails.GetTrialLists(8, 1, ht[key].RequiredSession(), key);
@@ -10616,7 +10638,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             //Check for all previous step that it all succeeds to move forward
                             for (int istep = 1; istep < iCurrentStepExecuting; istep++)
                             {
-                                TrialLists = oDisc.GetTrialListsForPreStep(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, istep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                                TrialLists = oDisc.GetTrialListsForPreStep(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, istep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
                                 chainedCols[sColName].SessionCount = TrialLists.sessionCount;
                                 sesResultchain[index] = null;
                                 chainedCols[sColName].SetInputData(istep.ToString(), TargetPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -10777,7 +10799,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             {
                                 bStepCountCriteria = false;
                                 sesResultchain[index] = null;
-                                TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                                TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
                                 chainedCols[sColName].SessionCount = TrialLists.sessionCount;
                                 chainedCols[sColName].SetInputData(iCurrentStep.ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
                                 sesResultchain[index] = Chained.Model.Execute(chainedCols[sColName], false, bpromptColumn, oDS.ChainType);
@@ -10816,7 +10838,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         {
                                             bool stepMoveUpflag = sesResultchain[index].MovedForwardStep;
                                             bool stepMoveDownflag = sesResultchain[index].MovedBackStep;
-                                            TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                                            TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
                                             chainedCols[sColName].StepCount = TrialLists.trialsCount;
 
                                             chainedCols[sColName].SetInputData((iCurrentStep - 1).ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -10884,7 +10906,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     else
                                     {
-                                        TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                                        TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
                                         chainedCols[sColName].StepCount = TrialLists.trialsCount;
 
                                         chainedCols[sColName].SetInputData((iCurrentStep - 1).ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -12497,14 +12519,14 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     int counter = discreteCols.Count;
                     int ind = 0;
                     oDisc = new DiscreteSession();
-                    TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, discreteCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                    TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, discreteCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
                     //if (discreteInptData.MultiTeacherRequired)
-                    bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId, trans, con);
+                    bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId);
                     // else
                     //    bMultyTchr = false;
 
                     // if (discreteInptData.IOARequired)
-                    bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId, trans, con);
+                    bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId);
                     // else
                     //     bIOA = false;
                     //Trials = trails.GetTrialLists(8, 1, ht[key].RequiredSession(), key);
@@ -16525,15 +16547,15 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
 
                         oDisc = new DiscreteSession();
-                        TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                        TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
 
                         //if (chainedInptData.MultiTeacherRequired)
-                        bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId, trans, con);
+                        bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId);
                         // else
                         //    bMultyTchr = false;
 
                         // if (chainedInptData.IOARequired)
-                        bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId, trans, con);
+                        bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId);
                         // else
                         //    bIOA = false;
                         //Trials = trails.GetTrialLists(8, 1, ht[key].RequiredSession(), key);
@@ -20787,7 +20809,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 //Check for all previous step that it all succeeds to move forward
                                 for (int istep = 1; istep < iCurrentStepExecuting; istep++)
                                 {
-                                    TrialLists = oDisc.GetTrialListsForPreStep(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, istep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                                    TrialLists = oDisc.GetTrialListsForPreStep(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, istep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
                                     chainedCols[sColName].SessionCount = TrialLists.sessionCount;
                                     sesResultchain[index] = null;
                                     chainedCols[sColName].SetInputData(istep.ToString(), TargetPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -20948,7 +20970,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 {
                                     bStepCountCriteria = false;
                                     sesResultchain[index] = null;
-                                    TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                                    TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
                                     chainedCols[sColName].SessionCount = TrialLists.sessionCount;
                                     chainedCols[sColName].SetInputData(iCurrentStep.ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
                                     sesResultchain[index] = Chained.Model.Execute(chainedCols[sColName], false, bpromptColumn, oDS.ChainType);
@@ -20987,7 +21009,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             {
                                                 bool stepMoveUpflag = sesResultchain[index].MovedForwardStep;
                                                 bool stepMoveDownflag = sesResultchain[index].MovedBackStep;
-                                                TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                                                TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
                                                 chainedCols[sColName].StepCount = TrialLists.trialsCount;
 
                                                 chainedCols[sColName].SetInputData((iCurrentStep - 1).ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -21055,7 +21077,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         else
                                         {
-                                            TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                                            TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
                                             chainedCols[sColName].StepCount = TrialLists.trialsCount;
 
                                             chainedCols[sColName].SetInputData((iCurrentStep - 1).ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -22273,14 +22295,14 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         int counter = discreteCols.Count;
                         int ind = 0;
                         oDisc = new DiscreteSession();
-                        TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, discreteCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                        TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, discreteCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
                         //if (discreteInptData.MultiTeacherRequired)
-                        bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId, trans, con);
+                        bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId);
                         // else
                         //    bMultyTchr = false;
 
                         // if (discreteInptData.IOARequired)
-                        bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId, trans, con);
+                        bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId);
                         // else
                         //     bIOA = false;
                         //Trials = trails.GetTrialLists(8, 1, ht[key].RequiredSession(), key);
@@ -30302,8 +30324,19 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     " WHERE DSTempHdrId = " + oTemp.TemplateId + " AND DSTempSetId=" + SetId + " AND ActiveInd='A' ) AS Temp WHERE RNK = " + StepId;
                     string stepNumber = objData.FetchValue(strQuery).ToString();
 
+                    string strQueryMo = "";
+                    strQueryMo = "SELECT RNK FROM (SELECT DSTempStepId,SortOrder,RANK() OVER (ORDER BY SortOrder) RNK FROM DSTempStep " +
+                    " WHERE DSTempHdrId = " + oTemp.TemplateId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId=" + oTemp.TemplateId + " AND ActiveInd = 'A') AND ActiveInd='A' ) AS Temp WHERE SortOrder = " + stepNumber;
+
+                    object stepNumMo = objData.FetchValue(strQueryMo);
+                    string MasterOrder = "";
+                    if (stepNumMo != null && stepNumMo.ToString() != "")
+                    {
+                        MasterOrder = stepNumMo.ToString();
+                    }
+
                     strQuery = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,EventName,StdtSessEventType,EvntTs,EventType,StepId,SetId,LessonPlanId,SessionNbr,CreatedBy,CreatedOn,TimeStampForReport)VALUES" +
-                        "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",N'" + arrowSymbol + stepNumber + " (OV)','Minor'," + "GETDATE(),'EV'," + iStepId + "," + SetId + "," + sLessonPlanId + ",'" + iSessionNmbr + "'," + oSession.LoginId + ",GETDATE(),DATEADD(HH,(SELECT (COUNT(*)+1) FROM StdtSessEvent WHERE CONVERT(DATE,EvntTs)=CONVERT(DATE,getdate()) AND " + "SchoolId=" + oSession.SchoolId + " AND StudentId=" + oSession.StudentId + " AND EventType='EV' AND LessonPlanId=" + sLessonPlanId + ")," + "CONVERT(datetime,getdate())))";
+                        "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",N'" + arrowSymbol + MasterOrder + "(OV)','Minor'," + "GETDATE(),'EV'," + iStepId + "," + SetId + "," + sLessonPlanId + ",'" + iSessionNmbr + "'," + oSession.LoginId + ",GETDATE(),DATEADD(HH,(SELECT (COUNT(*)+1) FROM StdtSessEvent WHERE CONVERT(DATE,EvntTs)=CONVERT(DATE,getdate()) AND " + "SchoolId=" + oSession.SchoolId + " AND StudentId=" + oSession.StudentId + " AND EventType='EV' AND LessonPlanId=" + sLessonPlanId + ")," + "CONVERT(datetime,getdate())))";
                     objData.ExecuteWithScope(strQuery);
                 }
                 else
@@ -30315,8 +30348,19 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 " WHERE DSTempHdrId = " + oTemp.TemplateId + " AND DSTempSetId=" + SetId + " AND ActiveInd='A' ) AS Temp WHERE RNK = " + StepId;
                     string stepNumber = objData.FetchValue(strQuery).ToString();
 
+                    string strQueryMo = "";
+                    strQueryMo = "SELECT RNK FROM (SELECT DSTempStepId,SortOrder,RANK() OVER (ORDER BY SortOrder) RNK FROM DSTempStep " +
+                    " WHERE DSTempHdrId = " + oTemp.TemplateId + "AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId=" + oTemp.TemplateId + " AND ActiveInd = 'A') AND ActiveInd='A' ) AS Temp WHERE SortOrder = " + stepNumber;
+
+                    object stepNumMo = objData.FetchValue(strQueryMo);
+                    string MasterOrder = "";
+                    if (stepNumMo != null && stepNumMo.ToString() != "")
+                    {
+                        MasterOrder = stepNumMo.ToString();
+                    }
+
                     strQuery = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,EventName,StdtSessEventType,EvntTs,EventType,SetId,StepId,LessonPlanId,SessionNbr,CreatedBy,CreatedOn,TimeStampForReport)VALUES" +
-                        "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",N'" + arrowSymbol + stepNumber + " (OV)','Minor'," + "GETDATE(),'EV'," + SetId + "," + iStepId + "," + sLessonPlanId + ",'" + iSessionNmbr + "'," + oSession.LoginId + ",GETDATE(),DATEADD(HH,(SELECT (COUNT(*)+1) FROM StdtSessEvent WHERE CONVERT(DATE,EvntTs)=CONVERT(DATE,getdate()) AND " + "SchoolId=" + oSession.SchoolId + " AND StudentId=" + oSession.StudentId + " AND EventType='EV' AND LessonPlanId=" + sLessonPlanId + ")," + "CONVERT(datetime,getdate())))";
+                        "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",N'" + arrowSymbol + MasterOrder + "(OV)','Minor'," + "GETDATE(),'EV'," + SetId + "," + iStepId + "," + sLessonPlanId + ",'" + iSessionNmbr + "'," + oSession.LoginId + ",GETDATE(),DATEADD(HH,(SELECT (COUNT(*)+1) FROM StdtSessEvent WHERE CONVERT(DATE,EvntTs)=CONVERT(DATE,getdate()) AND " + "SchoolId=" + oSession.SchoolId + " AND StudentId=" + oSession.StudentId + " AND EventType='EV' AND LessonPlanId=" + sLessonPlanId + ")," + "CONVERT(datetime,getdate())))";
                     objData.ExecuteWithScope(strQuery);
                 }
             }
