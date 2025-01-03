@@ -1,4 +1,4 @@
-using Microsoft.Reporting.WebForms;
+﻿using Microsoft.Reporting.WebForms;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -11,6 +11,7 @@ using System.Web.UI.WebControls;
 using System.Data;
 using System.IO;
 using System.Data.SqlClient;
+using System.Drawing;
 
 public partial class StudentBinder_ProgressSummaryReportClinical : System.Web.UI.Page
 {
@@ -20,6 +21,9 @@ public partial class StudentBinder_ProgressSummaryReportClinical : System.Web.UI
     clsData oData = null;
     DataTable allclsviewdata = new DataTable();
     DataTable dateandcount = new DataTable();
+    DataTable allless = new DataTable();
+    DataTable alldata = new DataTable();
+
     protected void Page_Load(object sender, EventArgs e)
     {
         btnExport.Visible = false;
@@ -262,7 +266,29 @@ public partial class StudentBinder_ProgressSummaryReportClinical : System.Web.UI
         }
     }
 
-   
+    public DataTable ClassicLoadBehaviorsexport()
+    {
+        sess = (clsSession)Session["UserSession"];
+        oData = new clsData();
+
+        DateTime dtst = new DateTime();
+        DateTime dted = new DateTime();
+        dtst = DateTime.ParseExact(txtRepStart.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+        dted = DateTime.ParseExact(txtrepEdate.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+        string StartDate = dtst.ToString("yyyy-MM-dd");
+        string enddate = dted.ToString("yyyy-MM-dd");
+
+        String sqlStr = "SELECT MeasurementId,Behaviour,IsFrequency,IsDuration,IsYesOrNo FROM (" +
+    "SELECT   B.StudentId,  B.MeasurementId,BD.Behaviour,BD.Frequency AS IsFrequency, BD.Duration AS IsDuration,BD.YesOrNo AS IsYesOrNo FROM " +
+      "  BehaviourDetails BD INNER JOIN Behaviour B ON " +
+       " B.MeasurementId = BD.MeasurementId  WHERE  B.StudentId = " + sess.StudentId + "  AND BD.ActiveInd IN ('A', 'N')  AND BD.SchoolId = " + sess.SchoolId + ") AS StdCalcs " +
+    "WHERE  StdCalcs.StudentId = " + sess.StudentId + " GROUP BY  MeasurementId,  Behaviour, IsFrequency, IsDuration, IsYesOrNo ORDER BY  Behaviour";
+        DataTable itemtable = oData.ReturnDataTable(sqlStr, false);
+       
+
+        return itemtable;
+
+    }
  
    
     protected void btnSessView_Click(object sender, EventArgs e)
@@ -301,7 +327,7 @@ public partial class StudentBinder_ProgressSummaryReportClinical : System.Web.UI
             {
                 tdMsg.Visible = false;
                 td1.Visible = false;
-                btnExport.Visible = false;
+                btnExport.Visible = true;
                 if (highcheck.Checked == false)
                 {
                 RV_ExcelReport.Visible = true;
@@ -332,19 +358,53 @@ public partial class StudentBinder_ProgressSummaryReportClinical : System.Web.UI
 
     protected void btnExport_Click(object sender, ImageClickEventArgs e)
     {
-        sess = (clsSession)Session["UserSession"];
-        Response.Clear();
-        string filename = sess.StudentName + "_ClinicalProgressSummaryReport.xls";
-        string enCodeFileName = Server.UrlEncode(filename);  
-        Response.AddHeader("content-disposition", "attachment;filename=" + enCodeFileName);
-        Response.ContentType = "application/ms-excel";
-        Response.ContentEncoding = System.Text.Encoding.Unicode;
-        Response.BinaryWrite(System.Text.Encoding.Unicode.GetPreamble());
-        System.IO.StringWriter sw = new System.IO.StringWriter();
-        System.Web.UI.HtmlTextWriter hw = new HtmlTextWriter(sw);
-        dlBehavior.RenderControl(hw);
-        Response.Write(sw.ToString());
-        Response.End();  
+        if (highcheck.Checked == false)
+        {
+            sess = (clsSession)Session["UserSession"];
+            Response.Clear();
+            string filename = sess.StudentName + "_ClinicalProgressSummaryReport.xls";
+            string enCodeFileName = Server.UrlEncode(filename);
+            Response.AddHeader("content-disposition", "attachment;filename=" + enCodeFileName);
+            Response.ContentType = "application/ms-excel";
+            Response.ContentEncoding = System.Text.Encoding.Unicode;
+            Response.BinaryWrite(System.Text.Encoding.Unicode.GetPreamble());
+            System.IO.StringWriter sw = new System.IO.StringWriter();
+            System.Web.UI.HtmlTextWriter hw = new HtmlTextWriter(sw);
+            dlBehavior.RenderControl(hw);
+            Response.Write(sw.ToString());
+            Response.End();
+        }
+        else
+        {
+            ObjData = new clsData();
+            tdMsg.InnerHtml = "";
+            sess = (clsSession)Session["UserSession"];
+            ObjTempSess = (ClsTemplateSession)Session["BiweeklySession"];
+            DateTime dtst = new DateTime();
+            DateTime dted = new DateTime();
+            dtst = DateTime.ParseExact(txtRepStart.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+            dted = DateTime.ParseExact(txtrepEdate.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+            string StartDate = dtst.ToString("yyyy-MM-dd");
+            string enddate = dted.ToString("yyyy-MM-dd");
+            getAllclassicViewData(StartDate, enddate, sess.StudentId, sess.SchoolId);
+            allless=ClassicLoadBehaviorsexport();
+            if (allless.Rows.Count > 0)
+            {
+                ViewState["allless"] = allless;
+                ViewState["alldata"] = allclsviewdata;
+                tdMsgExport.InnerHtml = clsGeneral.sucessMsg("Export Successfully Created...");
+                hdnExport.Value = "true";
+                string script = "hideOverlay();";
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "show", script, true);
+            }
+            else
+            {
+                ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "alert('No Data Available');", true);
+
+
+            }
+
+        }
     }
 
     protected void btnRefresh_Click(object sender, ImageClickEventArgs e)
@@ -695,5 +755,250 @@ public partial class StudentBinder_ProgressSummaryReportClinical : System.Web.UI
             gVBehvior.DataSource = Dt;
             gVBehvior.DataBind();
         }
+    }
+    public void SummaryBound(object sender, EventArgs e)
+    {
+       
+
+        GridViewRow row = new GridViewRow(0, 0, DataControlRowType.Header, DataControlRowState.Normal);
+
+        TableHeaderCell tec = new TableHeaderCell();
+        tec.ColumnSpan = 1;
+        tec.Text = "";
+        tec.BackColor = ColorTranslator.FromHtml("#0080FF");
+        row.Controls.Add(tec);
+        GridViewRow subRow = new GridViewRow(1, 0, DataControlRowType.Header, DataControlRowState.Normal);
+
+        TableHeaderCell subTec0 = new TableHeaderCell();
+        subTec0.ColumnSpan = 1; 
+        subTec0.Text = "";
+        subTec0.BackColor = ColorTranslator.FromHtml("#0080FF"); 
+        subRow.Controls.Add(subTec0);
+        foreach (DataRow rows in allless.Rows)
+        {
+            string lessid = rows["MeasurementId"].ToString();
+
+            int len = 0;
+            int frq = Convert.ToInt32(rows.Field<bool>("IsFrequency"));
+            int dur = Convert.ToInt32(rows.Field<bool>("IsDuration"));
+            int yesno = Convert.ToInt32(rows.Field<bool>("IsYesOrNo"));
+
+            if (frq == 1) len++;
+            if (dur == 1) len++;
+            if (yesno == 1) len++;
+
+            tec = new TableHeaderCell();
+            tec.ColumnSpan = len + 4; // Account for extra columns
+            tec.Text = rows["Behaviour"].ToString();
+            tec.BackColor = ColorTranslator.FromHtml("#0080FF");
+            row.Controls.Add(tec);
+
+            TableHeaderCell subTec = new TableHeaderCell();
+            subTec.ColumnSpan = len + 2; 
+            subTec.Text = "";
+            subTec.BackColor = ColorTranslator.FromHtml("#FFDEAD"); 
+            subRow.Controls.Add(subTec);
+
+            TableHeaderCell subTec2 = new TableHeaderCell();
+            subTec2.ColumnSpan = 2;
+            subTec2.Text = "Condition Lines/ Arrow Notes";
+            subTec2.BackColor = ColorTranslator.FromHtml("#dbe4c0");
+            subRow.Controls.Add(subTec2);
+        }
+
+        exportgrid.HeaderRow.Parent.Controls.AddAt(0, row);  
+        exportgrid.HeaderRow.Parent.Controls.AddAt(1, subRow); 
+
+
+    }
+    protected void btnDownload_Click(object sender, EventArgs e)
+    {
+        this.BindGrid();
+        sess = (clsSession)Session["UserSession"];
+        string sname = sess.StudentName.ToString().Replace(",", "");
+        string Filename = sname + DateTime.Now + ".xls";
+        Response.ClearContent();
+        Response.Clear();
+        Response.Buffer = true;
+        Response.ClearHeaders();
+        Response.Charset = "";
+        Response.ContentType = "application/vnd.ms-excel";
+        Response.AddHeader("Content-Disposition", "attachment;Filename=" + Filename);
+        StringWriter str = new StringWriter();
+        HtmlTextWriter htw = new HtmlTextWriter(str);
+        Response.Cache.SetCacheability(HttpCacheability.NoCache);
+        exportgrid.AllowPaging = false;
+        exportgrid.GridLines = GridLines.Both;
+        exportgrid.HeaderStyle.Font.Bold = true;
+        //exportgrid.HeaderStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#2E2EFF");
+            exportgrid.Columns[0].HeaderStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#0080FF");
+        foreach (GridViewRow row in exportgrid.Rows)
+        {
+            row.Cells[0].BackColor = System.Drawing.ColorTranslator.FromHtml("#0080FF");  // First column in each row
+        }
+
+        exportgrid.RenderControl(htw);
+        string fileContent = str.ToString();
+        Response.Write(str.ToString());
+        Response.Flush();
+        //Response.Close();
+        Response.End();
+
+
+    }
+    private void BindGrid()
+    {
+        int subcolumn = 0;
+        allless = (DataTable)ViewState["allless"];
+        alldata = (DataTable)ViewState["alldata"];
+        DataTable allcolumn = new DataTable();
+        allcolumn.Columns.Add("lessid", typeof(string));
+        allcolumn.Columns.Add("colname", typeof(string));
+        allcolumn.Columns.Add("subcol", typeof(int));
+        foreach (DataRow rows in allless.Rows)
+        {
+            int frq = 0, dur = 0, yesno = 0; int isLp = 0; int intrvl = 0;
+            
+                frq = Convert.ToInt32(rows.Field<bool>("IsFrequency"));
+                dur = Convert.ToInt32(rows.Field<bool>("IsDuration"));
+                yesno = Convert.ToInt32(rows.Field<bool>("IsYesOrNo"));
+            string lessid = rows["MeasurementId"].ToString();
+            subcolumn = subcolumn + 1;
+            allcolumn.Rows.Add(lessid, "Time", subcolumn);
+            subcolumn = subcolumn + 1;
+            allcolumn.Rows.Add(lessid, "User", subcolumn);
+              if (dur == 1)
+                {
+                    subcolumn = subcolumn + 1;
+                    allcolumn.Rows.Add(lessid, "Duration(In minutes)", subcolumn);
+
+                }
+
+                if (frq == 1)
+                {
+                    subcolumn = subcolumn + 1;
+                    allcolumn.Rows.Add(lessid, "Frequency", subcolumn);
+                }
+                if (yesno == 1)
+                {
+                    subcolumn = subcolumn + 1;
+                    allcolumn.Rows.Add(lessid, "Yes/No", subcolumn);
+                }
+                subcolumn = subcolumn + 1;
+                allcolumn.Rows.Add(lessid, "Name", subcolumn);
+                subcolumn = subcolumn + 1;
+                allcolumn.Rows.Add(lessid, "Type", subcolumn);
+            
+        }
+        DataTable dt = new DataTable();
+        dt.Columns.Add("Date", typeof(string));
+        BoundField boundField1 = new BoundField();
+        boundField1.DataField = "Date";
+        boundField1.HeaderText = "Date";
+        exportgrid.Columns.Add(boundField1);
+        foreach (DataRow rows in allcolumn.Rows)
+        {
+            
+            TemplateField templateField = new TemplateField();
+            templateField.HeaderText = rows["colname"].ToString();
+            templateField.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+            templateField.HeaderStyle.CssClass = "nowrapText";
+            //templateField.HeaderStyle.BorderColor = System.Drawing.Color.Black;
+            templateField.HeaderStyle.VerticalAlign = VerticalAlign.Top;
+            templateField.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            templateField.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
+            templateField.ItemTemplate = new AddGridViewTemplate(ListItemType.Item, "Subcol" + rows["subcol"].ToString());
+            if (templateField.HeaderText == "Time" || templateField.HeaderText == "User" || templateField.HeaderText == "Frequency" || templateField.HeaderText == "Duration(In minutes)" || templateField.HeaderText == "Yes/No")
+            {
+                templateField.HeaderStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#FFDEAD");
+            }
+            else {
+                if (templateField.HeaderText == "Name" || templateField.HeaderText == "Type")
+                {
+                    templateField.HeaderStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#dbe4c0");
+                    templateField.ItemStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#dbe4c0"); 
+                }
+                else {
+                    templateField.HeaderStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#4498c2");
+                }
+            }
+            
+            exportgrid.Columns.Add(templateField);
+            dt.Columns.Add("Subcol" + rows["subcol"].ToString(), typeof(string));
+        }
+       
+      
+         
+        dt = getAllData(allcolumn, dt);
+
+        exportgrid.DataSource = dt;
+        exportgrid.DataBind();
+    }
+    private DataTable getAllData(DataTable dt, DataTable findt)
+    {
+        DateTime dtst = new DateTime();
+        DateTime dted = new DateTime();
+        dtst = DateTime.ParseExact(txtRepStart.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+        dted = DateTime.ParseExact(txtrepEdate.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+        string StartDate = dtst.ToString("yyyy-MM-dd");
+        string enddate = dted.ToString("yyyy-MM-dd");
+        DateTime startDate = DateTime.Parse(StartDate);
+        DateTime endDate = DateTime.Parse(enddate);
+        for (DateTime date = startDate; date <= endDate; date = date.AddDays(1))
+        {
+            DataRow newRow = findt.NewRow();
+            string currdate = date.ToString("MM/dd/yyyy");
+            newRow["Date"] = currdate;
+            string lessid = "";
+            string colname = "";
+            foreach (DataRow rows in dt.Rows)
+            {
+
+               string subcol = "Subcol" + rows["subcol"].ToString();
+               lessid = rows["lessid"].ToString();
+               colname = rows["colname"].ToString();
+                string value = "";
+                foreach (DataRow rows1 in alldata.Rows)
+                {
+                    if (rows1["MeasurementId"].ToString() == lessid && rows1["EvntDate"].ToString() == currdate)
+                    {
+                        if (colname == "Time")
+                        {
+                            value = value + "<br/>" + rows1["Time"].ToString();
+                        }
+                        if (colname == "User")
+                        {
+                            value = value + "<br/>" + rows1["Name"].ToString();
+                        }
+                        if (colname == "Frequency")
+                        {
+                            value = value + "<br/>" + rows1["Frequency"].ToString();
+                        }
+                        if (colname == "Duration(In minutes)")
+                        {
+                            value = value + "<br/>" + rows1["Duration"].ToString();
+                        }
+                        if (colname == "Yes/No")
+                        {
+                            value = value + "<br/>" + rows1["YesOrNo"].ToString();
+                        }
+                        if (colname == "Name")
+                        {
+                            value = value + "<br/>" + rows1["EventName"].ToString();
+                        }
+                        if (colname == "Type")
+                        {
+                            value = value + "<br/>" + rows1["StdtSessEventType"].ToString();
+                        }
+                    }
+                }
+                newRow[subcol] = value;
+
+            }
+            findt.Rows.Add(newRow);
+
+        }
+
+        return findt;
     }
 }
