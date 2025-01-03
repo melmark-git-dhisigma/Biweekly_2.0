@@ -8,6 +8,7 @@ using System.Configuration;
 using System.Data;
 using System.Web;
 using System.Drawing;
+using System.Activities.Statements;
 
 
 public class DiscreteTrials
@@ -59,12 +60,13 @@ public class DiscreteSession
         //string sessnmbr = "SELECT MAX(SessionNbr) AS SessionNbr FROM StdtSessEvent WHERE DSTempHdrId =" + templateID + "AND StudentId=" + studentId;
         string lessonplanid = "SELECT LessonPlanId FROM DSTempHdr WHERE DSTempHdrId=" + templateID;
         SqlDataReader rdr1 = null;
-        rdr1 = objData.ReturnDataReader(lessonplanid, false);
+        rdr1 = objData.ReturnDataReaderWithTrans(lessonplanid, false, trans, con);
         int lessonplannid = 0;
         while (rdr1.Read())
         {
             lessonplannid = Convert.ToInt32(rdr1["LessonPlanId"].ToString());
         }
+        rdr1.Close();
         string sessnmbr = "SELECT ISNULL((SELECT MAX(SessionNbr) AS SessionNbr FROM StdtSessEvent WHERE LessonPlanId =" + lessonplannid + "AND StudentId=" + studentId + "),0) AS SessionNbr";
         //string sessnmbr = "SELECT MAX(SessionNbr) AS SessionNbr FROM StdtSessEvent WHERE LessonPlanId =" + lessonplannid + "AND StudentId=" + studentId;
 
@@ -86,6 +88,7 @@ public class DiscreteSession
                 sesnnmbr = 1;
             }
         }
+        rdr.Close();
         if (sesnnmbr == 1 )
         {
             //strSql = "SELECT DStp.SortOrder,S.StdtSessionStepId,CASE WHEN S.stepval='' THEN '+' ELSE  S.stepval END AS stepval, SS.SessionStatusCd, SS.StdtSessionHdrId, S.DSTempSetColId,DCol.ColName" +
@@ -129,7 +132,6 @@ public class DiscreteSession
                                     " AND SH.SessionNbr>ISNULL((SELECT MAX(SessionNbr) FROM StdtSessEvent " +
                                     "WHERE DSTempHdrId=" + templateID + " AND StudentId=" + studentId + "),0)" + cond + " ORDER BY SS.StdtSessionHdrId " + cond2;
         }
-        rdr.Close();
         /*
          SELECT S.StdtSessionStepId,S.StepVal, SS.SessionStatusCd, SS.StdtSessionHdrId, S.DSTempSetColId,DCol.ColName FROM StdtSessionDtl S 
 INNER JOIN StdtSessionStep SS ON S.StdtSessionStepId = SS.StdtSessionStepId 
@@ -367,7 +369,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
 
 
 
-    public string[] GetStepPrompts(int DSTempColID, int StdtSessHdrId)
+    public string[] GetStepPrompts(int DSTempColID, int StdtSessHdrId, SqlTransaction trans, SqlConnection con)
     {
         clsData objData = new clsData();
         string[] strPrmpts;
@@ -377,7 +379,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
         string sel = "SELECT PromptId FROM StdtDSStepStat StpStat INNER JOIN StdtSessionStep Step ON Step.DSTempStepId=StpStat.DSTempStepId " +
             "WHERE StpStat.DSTempSetColId=" + DSTempColID + " AND Step.StdtSessionHdrId=" + StdtSessHdrId + "";
 
-        DataTable dt = objData.ReturnDataTable(sel, false);
+        DataTable dt = objData.ReturnDataTableWithTransaction(sel, con, trans, false);
         if (dt != null)
         {
             strPrmpts = new string[dt.Rows.Count];
@@ -387,7 +389,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
             }
             if (dt.Rows.Count == 0)
             {
-                object count = objData.FetchValue("SELECT COUNT(*) FROM StdtSessionStep WHERE StdtSessionHdrId=" + StdtSessHdrId + "");
+                object count = objData.FetchValueTrans("SELECT COUNT(*) FROM StdtSessionStep WHERE StdtSessionHdrId=" + StdtSessHdrId + "", trans, con);
                 if (count != null)
                 {
                     strPrmpts = new string[Convert.ToInt32(count)];
@@ -681,7 +683,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
         strQuery = "UPDATE StdtDSStat SET NextStepId='" + nextStep + "',NextPromptId='" + promptId + "',statusMessage='" + resultMessage + "' ,ModifiedBy=" + loginId + " ,ModifiedOn=GETDATE() WHERE DSTempHdrId=" + templateId + "";
         if (objData.ExecuteWithTrans(strQuery, con, trans) > 0) IsSaved = true;
         string sqlStr = "SELECT ChainType FROM DSTempHdr where DSTempHdrId=" + templateId;
-        string chType = objData.FetchValue(sqlStr).ToString();
+        string chType = objData.FetchValueTrans(sqlStr, trans, con).ToString();
         strQuery = "SELECT SortOrder FROM (SELECT DSTempStepId,SortOrder,RANK() OVER (ORDER BY SortOrder) RNK FROM DSTempStep " +
                     " WHERE DSTempHdrId = " + templateId + " AND DSTempSetId=" + SetId + " AND ActiveInd='A' ) AS Temp WHERE RNK = " + nextStep;
         if (chType == "Backward chain")
@@ -757,7 +759,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
             strQuery = "UPDATE StdtDSStat SET NextStepId='" + nextStep + "',statusMessage='" + resultMessage + "' ,ModifiedBy=" + loginId + " ,ModifiedOn=GETDATE() WHERE DSTempHdrId=" + templateId + "";
             if (objData.ExecuteWithTrans(strQuery, con, trans) > 0) IsSaved = true;
             string sqlStr = "SELECT ChainType FROM DSTempHdr where DSTempHdrId=" + templateId;
-            string chType = objData.FetchValue(sqlStr).ToString();
+            string chType = objData.FetchValueTrans(sqlStr, trans, con).ToString();
             strQuery = "SELECT SortOrder FROM (SELECT DSTempStepId,SortOrder,RANK() OVER (ORDER BY SortOrder) RNK FROM DSTempStep " +
                         " WHERE DSTempHdrId = " + templateId + " AND DSTempSetId=" + SetId + " AND ActiveInd='A' ) AS Temp WHERE RNK = " + nextStep;
 
@@ -905,9 +907,9 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
         strQuery = "SELECT  DSTemplateName FROM DSTempHdr WHERE DSTempHdrId=" + templateId;
         string lessonName = objData.FetchValueTrans(strQuery, trans, con).ToString();
         lpQuery = "SELECT COUNT(DISTINCT StdtSessEventId) FROM StdtSessEvent WHERE DSTempHdrId = " + templateId + " AND EventName = 'LP Complete'";
-        lpCount = Convert.ToInt32(objData.FetchValue(lpQuery));
+        lpCount = Convert.ToInt32(objData.FetchValueTrans(lpQuery, trans, con));
         lpQuery = "SELECT DSMode from DSTempHdr ds join StdtLessonPlan slp on slp.StdtLessonPlanId=ds.StdtLessonplanId where ds.LessonPlanId= " + sLessonPlanId;
-        lpComplete = Convert.ToString(objData.FetchValue(lpQuery));
+        lpComplete = Convert.ToString(objData.FetchValueTrans(lpQuery, trans, con));
 
         if (resultMessage == "COMPLETED" && (lpCount>0))
             if (lpComplete == "MAINTENANCE")

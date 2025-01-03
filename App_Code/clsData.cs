@@ -927,6 +927,19 @@ public class clsData
         //   Close(con);
         return dr;
     }
+    public SqlDataReader ReturnDataReaderWithTrans(string Query, bool sql, SqlTransaction trans, SqlConnection con)
+    {
+        SqlDataReader dr = null;
+        if (cmd != null) cmd.Dispose();
+        cmd = new SqlCommand(Query, con);
+        cmd.Transaction = trans;
+
+        if (dr != null) if (dr.Read()) dr.Close();
+        dr = cmd.ExecuteReader(CommandBehavior.Default);
+        cmd = null;
+        return dr;
+
+    }
 
     public DataTable ReturnDataTable(string Query, bool sql)
     {

@@ -14,6 +14,7 @@ using System.Text.RegularExpressions;
 using System.Web.Services;
 using System.Net;
 using System.Text;
+using System.Drawing;
 
 public partial class StudentBinder_Datasheet : System.Web.UI.Page
 {
@@ -2959,8 +2960,31 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 {
                                     int iColId = Convert.ToInt32(dr["DSTempSetColId"].ToString());
                                     Rules TempRules = new Rules();
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                   
+                                    SqlTransaction trans = null;
+                                    SqlConnection con = null;
+                                    try 
+                                    { 
+                                        con = oData.Open();
+                                        trans = con.BeginTransaction();
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
+                                        oData.CommitTransation(trans, con);
+                                        con.Close();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        if (trans != null && trans.Connection != null && trans.Connection.State == ConnectionState.Open)
+                                        {
+                                            oData.RollBackTransation(trans, con);
 
+                                        }
+                                        if (con != null)
+                                            con.Close();
+
+                                        ClsErrorLog clError = new ClsErrorLog();
+                                        clError.WriteToLog(ex.ToString());
+                                        throw ex;
+                                    }
                                     //if (TempRules.pctAccyMoveUp.iScoreRequired == 0 || TempRules.pctAccyMoveUp.iScoreRequired == 100)
                                     //    Session["StepLevelPrompt"] = true;
 
@@ -3424,13 +3448,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             {
                                 //string checkquery = "SELECT StdtSessionHdrID FROM StdtSessionHdr WHERE DSTempHdrId = " + oTemp.TemplateId + " and SessionStatusCd = 'D' AND IsMaintanace ='" + hdn_isMaintainance.Value + "'"; // ORDER BY StdtSessionHdrId DESC";
                                 string checkquery = "SELECT StdtSessionHdrID FROM StdtSessionHdr WHERE DSTempHdrId = " + oTemp.TemplateId + " and SessionStatusCd = 'D' AND IsMaintanace ='" + hdn_isMaintainance.Value + "' AND StudentId = " + oSession.StudentId + "";
-                                checkquery_object = oData.FetchValue(checkquery);
+                                checkquery_object = oData.FetchValueTrans(checkquery, trans, con);
                             }
                             else if (IOAInd == "Y")
                             {
                                 //string checkquery = "SELECT StdtSessionHdrID FROM StdtSessionHdr WHERE DSTempHdrId = " + oTemp.TemplateId + " and SessionStatusCd = 'D' and IOAInd = 'Y' AND IsMaintanace ='" + hdn_isMaintainance.Value + "'"; // ORDER BY StdtSessionHdrId DESC";
                                 string checkquery = "SELECT StdtSessionHdrID FROM StdtSessionHdr WHERE DSTempHdrId = " + oTemp.TemplateId + " and SessionStatusCd = 'D' and IOAInd = 'Y' AND IsMaintanace ='" + hdn_isMaintainance.Value + "' AND StudentId = " + oSession.StudentId + "";
-                                checkquery_object = oData.FetchValue(checkquery);
+                                checkquery_object = oData.FetchValueTrans(checkquery, trans, con);
                             }
                         }
 
@@ -3909,7 +3933,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 {
                                     string selStepStat = "SELECT PromptId FROM StdtDSStepStat WHERE DSTempStepId=" + drStep["DSTempStepId"].ToString() + " AND " +
                                                "DSTempSetColId=" + drColmn["DSTempSetColId"].ToString() + " AND StudentId=" + oSession.StudentId + "";
-                                    crntPrmpt = Convert.ToInt32(oData.FetchValue(selStepStat));
+                                    crntPrmpt = Convert.ToInt32(oData.FetchValueTrans(selStepStat,trans, con));
 
                                     string strqry3 = "select case when'%Independent of All Steps' in(select colcalc.CalcType " +
                                                     "from DSTempSetCol col " +
@@ -3985,7 +4009,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         else
                         {
                             string sqlStr1 = "select SessionStatusCd from StdtSessionHdr where StdtSessionHdrId=" + sessHdrId;
-                            object sesst1 = oData.FetchValue(sqlStr1);
+                            object sesst1 = oData.FetchValueTrans(sqlStr1, trans, con);
                             if (sesst1.ToString() == "S")
                             {
                                 string strDtls = "SELECT UserFName+' '+UserLName AS CreatedBy,StartTs,CASE WHEN S.ModifiedBy IS NULL THEN (SELECT CONCAT(UserFName,' ',UserLName) " +
@@ -4013,7 +4037,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 string where = "";
                                 updQry = "SELECT CASE WHEN Convert(date,StartTs) < Convert(date,GETDATE()) THEN 1 ELSE 0 END AS status " +
                                           "FROM stdtsessionhdr where StdtSessionHdrId=" + sessHdrId;
-                                int idStatus = Convert.ToInt32(oData.FetchValue(updQry));
+                                int idStatus = Convert.ToInt32(oData.FetchValueTrans(updQry,trans, con));
                                 if (idStatus == 1)
                                     where = "IsUpdate=1";
                                 else
@@ -4103,13 +4127,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         int sessid = oDS.IOASessHdr;
 
                         string SelectSessionIOA = "SELECT IOASessionHdrId FROM StdtSessionHdr WHERE StdtSessionHdrId=" + sessHdrId + "";
-                        object objIOAid = oData.FetchValue(SelectSessionIOA);
+                        object objIOAid = oData.FetchValueTrans(SelectSessionIOA, trans, con);
                         if (objIOAid == null) objIOAid = 0;
                         int ioaid = Convert.ToInt32(objIOAid);
                         if (ioaid != 0)
                             sessid = ioaid;
                         string SelectSessionDetail = "SELECT SessionStatusCd AS ISExistSession FROM StdtSessionHdr WHERE StdtSessionHdrId=" + sessid + "";
-                        object objStatus = oData.FetchValue(SelectSessionDetail);
+                        object objStatus = oData.FetchValueTrans(SelectSessionDetail,trans, con);
                         if (objStatus != null)
                         {
                             if (objStatus.ToString() != "S")
@@ -4129,7 +4153,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         else
                         {
                             string deleteQuerry = "DELETE FROM StdtSessionHdr WHERE StdtSessionHdrId=" + sessHdrId;
-                            oData.Execute(deleteQuerry);
+                            oData.ExecuteWithTrans(deleteQuerry, con, trans);
 
                             tdMsg.InnerHtml = clsGeneral.warningMsg("IOA not possible because the partner session to your IOA was closed. Please close (X) this datasheet and try again");
                             valid_Ind = false;
@@ -6148,7 +6172,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     chainedInptData = new Chained.InputData();
                     #region setrules
                     Rules TempRules = new Rules();
-                    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                     if (TempRules != null)
                     {
                         set_moveupCount = TempRules.moveup;
@@ -6377,7 +6401,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     #endregion
                     #region promptrules
                     TempRules = new Rules();
-                    TempRules = GetPromptRules(oTemp.TemplateId, Convert.ToInt32(dr["DSTempSetColId"].ToString()));
+                    TempRules = GetPromptRules(oTemp.TemplateId, Convert.ToInt32(dr["DSTempSetColId"].ToString()), trans, con);
 
                     if (TempRules != null)
                     {
@@ -6576,7 +6600,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     #endregion
                     #region steprules
                     TempRules = new Rules();
-                    TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                    TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                     if (TempRules != null)
                     {
                         step_moveupCount = TempRules.moveup;
@@ -6857,7 +6881,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                         int getColId = Convert.ToInt32(dr["DSTempSetColId"]);
                         string getFreDurMoveStat = "SELECT Moveupstat FROM DSTempSetCol DsCol INNER JOIN DSTempHdr Hdr on Hdr.DSTempHdrId = DsCol.DSTempHdrId WHERE DsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + getColId;
-                        object FreDurStat = oData.FetchValue(getFreDurMoveStat);
+                        object FreDurStat = oData.FetchValueTrans(getFreDurMoveStat, trans, con);
                         if (FreDurStat != null && FreDurStat != DBNull.Value)
                         {
                             chainedInptData.FreDurMoveStat = Convert.ToInt16(FreDurStat);
@@ -6906,7 +6930,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     chainedCols[sColName].TotalSets = TrialLists.totalSet;
                     chainedCols[sColName].NoPromptsUsed = LessonpromptUsed;
                     chainedCols[sColName].sCurrentLessonPrompt = sCurrentLessonPrompt;
-                    chainedCols[sColName].StepPrompts = oDisc.GetStepPrompts(Convert.ToInt32(dr["DSTempSetColId"].ToString()), StdtSessHdrId);
+                    chainedCols[sColName].StepPrompts = oDisc.GetStepPrompts(Convert.ToInt32(dr["DSTempSetColId"].ToString()), StdtSessHdrId, trans, con);
                     chainedCols[sColName].multiMeasure = false;
 
                     string crctResponse = "+";
@@ -6984,13 +7008,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         "INNER JOIN DSTempSetColCalc DC ON DST.DSTempSetColId = DC.DSTempSetColId  INNER JOIN DSTempRule DR ON DR.DSTempSetColCalcId = DC.DSTempSetColCalcId " +
                         "WHERE (DT.DSTempHdrId =" + oTemp.TemplateId + ")AND DR.RuleType='PROMPT' AND DR.CriteriaType='MOVE UP' " +//AND DR.DSTempSetColId=" + iColId +
                         " AND DR.ActiveInd='A' AND DR.IsNA=1";
-                    promptUp = Convert.ToInt32(oData.FetchValue(strPromptCriteria));
+                    promptUp = Convert.ToInt32(oData.FetchValueTrans(strPromptCriteria, trans, con));
                     strPromptCriteria = "SELECT  Count(DR.DSTempRuleId)	FROM DSTempHdr DT  INNER JOIN DSTempSetCol DST ON DT.DSTempHdrId = DST.DSTempHdrId " +
                         "INNER JOIN DSTempSetColCalc DC ON DST.DSTempSetColId = DC.DSTempSetColId  INNER JOIN DSTempRule DR ON DR.DSTempSetColCalcId = DC.DSTempSetColCalcId " +
                         "WHERE (DT.DSTempHdrId =" + oTemp.TemplateId + ")AND DR.RuleType='PROMPT' AND DR.CriteriaType='MOVE DOWN' " +//AND DR.DSTempSetColId=" + iColId +
                         " AND DR.ActiveInd='A' AND DR.IsNA=1";
 
-                    promptDown = Convert.ToInt32(oData.FetchValue(strPromptCriteria));
+                    promptDown = Convert.ToInt32(oData.FetchValueTrans(strPromptCriteria, trans, con));
                     chainedCols[sColName].promptUp = promptUp;
                     chainedCols[sColName].promptDown = promptDown;
 
@@ -6998,7 +7022,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                      " INNER JOIN DSTempSetCol DST ON DT.DSTempHdrId = DST.DSTempHdrId " +
                                      "INNER JOIN DSTempSetColCalc DC ON DST.DSTempSetColId = DC.DSTempSetColId" +
                                      " WHERE DT.DSTempHdrId =" + oTemp.TemplateId + ") then 'true' else 'false' end";
-                    object colt = oData.FetchValue(strqry1);
+                    object colt = oData.FetchValueTrans(strqry1, trans, con);
 
                     if (chainedCols[sColName].StepCount > 0)
                     {
@@ -7010,17 +7034,17 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             if (dr["ColTypeCd"].ToString() == "Text")
                             {
                                 bool status = false;
-                                TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                 colCalId = Convert.ToInt32(ViewState["colCalId"]);
                                 if (TempRules.pctCustomMoveUp.iScoreRequired > 0)
                                 {
                                     bcustMoveUp = ValidateUp(oSession.StudentId, colCalId, TempRules.pctCustomMoveUp.iScoreRequired, reqSess,
-                                        TempRules.pctCustomMoveUp.iTotalCorrectInstance, TempRules.pctCustomMoveUp.bConsequetiveIndex, status);
+                                        TempRules.pctCustomMoveUp.iTotalCorrectInstance, TempRules.pctCustomMoveUp.bConsequetiveIndex, status, trans, con);
                                 }
                                 if (TempRules.pctCustomMoveDown.iScoreRequired > 0)
                                 {
                                     bCustMoveDown = ValidateDown(oSession.StudentId, colCalId, TempRules.pctCustomMoveDown.iScoreRequired, reqSess,
-                                        TempRules.pctCustomMoveDown.iTotalCorrectInstance, TempRules.pctCustomMoveDown.bConsequetiveIndex, status);
+                                        TempRules.pctCustomMoveDown.iTotalCorrectInstance, TempRules.pctCustomMoveDown.bConsequetiveIndex, status, trans, con);
                                 }
                             }
                             #endregion
@@ -7029,7 +7053,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             {
                                 int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                                 string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
-                                object stat = oData.FetchValue(selqry1);
+                                object stat = oData.FetchValueTrans(selqry1, trans, con);
                                 if (stat != null && stat != DBNull.Value)
                                     MoveUpstat = Convert.ToInt16(stat);
                                 #region MoveUp in Less than critera-Default
@@ -7038,10 +7062,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     freqdureloop++;
                                     bool status = true;
                                     CompletionStatusSet = "";
-                                    //TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    //TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                     totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                     //tr 02_07_2019
                                     //avg duration
@@ -7051,7 +7075,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                     {
                                         bPromptAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                         bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -7089,7 +7113,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                         {
                                             bPromptAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -7126,11 +7150,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         //step chained
                                         if (!bPromptAvgDurationMoveUp && !bPromptAvgDurationMoveDown)
                                         {
-                                            TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 bstepAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
 
@@ -7175,7 +7199,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bstepAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
 
@@ -7228,12 +7252,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         //set chained
                                         if (!bstepAvgDurationMoveUp && !bstepAvgDurationMoveDown && !bPromptAvgDurationMoveUp && !bPromptAvgDurationMoveDown)
                                         {
-                                            TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -7269,7 +7293,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 if (reqSess == freqDurMDWNcount)
@@ -7302,7 +7326,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                     }
                                     //avg duration
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     //total duration chained
                                     if (TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance > 0)
                                     {
@@ -7311,7 +7335,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                         {
                                             bPromptTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -7349,7 +7373,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bPromptTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -7386,11 +7410,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         //step chained
                                         if (!bPromptTotDurationMoveUp && !bPromptTotDurationMoveDown)
                                         {
-                                            TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 bstepTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
 
@@ -7435,7 +7459,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bstepTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
 
@@ -7486,13 +7510,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                         if (!bstepTotDurationMoveUp && !bstepTotDurationMoveDown && !bPromptTotDurationMoveUp && !bPromptTotDurationMoveDown)
                                         {
-                                            TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 //CompletionStatusSet = "";
                                                 bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -7527,7 +7551,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 if (reqSess == freqDurMDWNcount)
@@ -7566,10 +7590,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     freqdureloop++;
                                     bool status = true;
                                     CompletionStatusSet = "";
-                                    //TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    //TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                     totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                     //tr 02_07_2019
                                     //avg duration
@@ -7579,7 +7603,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                     {
                                         bPromptAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                         bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -7617,7 +7641,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                         {
                                             bPromptAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -7654,11 +7678,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         //step chained
                                         if (!bPromptAvgDurationMoveUp && !bPromptAvgDurationMoveDown)
                                         {
-                                            TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 bstepAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
 
@@ -7703,7 +7727,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bstepAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
 
@@ -7755,12 +7779,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         //set chained
                                         if (!bstepAvgDurationMoveUp && !bstepAvgDurationMoveDown && !bPromptAvgDurationMoveUp && !bPromptAvgDurationMoveDown)
                                         {
-                                            TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 bAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -7796,7 +7820,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 if (reqSess == freqDurMUPcount)
@@ -7829,7 +7853,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                     }
                                     //avg duration
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     //total duration chained
                                     if (TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance > 0)
                                     {
@@ -7838,7 +7862,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                         {
                                             bPromptTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -7876,7 +7900,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                         {
                                             bPromptTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -7913,11 +7937,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         //step chained
                                         if (!bPromptTotDurationMoveUp && !bPromptTotDurationMoveDown)
                                         {
-                                            TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 bstepTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
 
@@ -7962,7 +7986,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bstepTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
 
@@ -8013,13 +8037,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                         if (!bstepTotDurationMoveUp && !bstepTotDurationMoveDown && !bPromptTotDurationMoveUp && !bPromptTotDurationMoveDown)
                                         {
-                                            TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 //CompletionStatusSet = "";
                                                 bTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -8054,7 +8078,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 if (reqSess == freqDurMUPcount)
@@ -8092,28 +8116,28 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             #endregion
                             #region comment
                             //    bool status = true;
-                            //    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                            //    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                             //    avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                             //    totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                             //    if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                             //    {
                             //        bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                            //            TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                            //            TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                             //    }
                             //    if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                             //    {
                             //        bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                            //            TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                            //            TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                             //    }
                             //    if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                             //    {
                             //        bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                            //            TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                            //            TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                             //    }
                             //    if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                             //    {
                             //        bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                            //            TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                            //            TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                             //    }
                             //    if ((bAvgDurationMoveUp == false) || (bTotDurationMoveUp == false))
                             //    {
@@ -8131,7 +8155,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             {
                                 int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                                 string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
-                                object stat = oData.FetchValue(selqry1);
+                                object stat = oData.FetchValueTrans(selqry1, trans, con);
                                 if (stat != null && stat != DBNull.Value)
                                     MoveUpstat = Convert.ToInt16(stat);
                                 #region MoveUp on Less than-default
@@ -8144,13 +8168,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                     ///for prompt move
                                     ///
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     if (promptUp >= 1)
                                         bPromptFrequencyMoveUp = false;
                                     if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                     {
                                         bPromptFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                         bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -8187,7 +8211,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
                                             bPromptFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -8227,11 +8251,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     //step 
                                     if (!bPromptFrequencyMoveUp && !bPromptFrequencyMoveDown)
                                     {
-                                        TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
                                             bstepFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             int stepcount = TrialLists.trialsCount;
 
@@ -8276,7 +8300,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
                                             bstepFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                             int stepcount = TrialLists.trialsCount;
 
@@ -8329,12 +8353,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     //set 
                                     if (!bstepFrequencyMoveUp && !bstepFrequencyMoveDown && !bPromptFrequencyMoveUp && !bPromptFrequencyMoveDown)
                                     {
-                                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
                                             bFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -8369,7 +8393,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
                                             bFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             if (reqSess == freqDurMDWNcount)
@@ -8410,13 +8434,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                     ///for prompt move
                                     ///
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     if (promptUp >= 1)
                                         bPromptFrequencyMoveUp = false;
                                     if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                     {
                                         bPromptFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                         bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -8453,7 +8477,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
                                             bPromptFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -8493,11 +8517,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     //step 
                                     if (!bPromptFrequencyMoveUp && !bPromptFrequencyMoveDown)
                                     {
-                                        TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
                                             bstepFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             int stepcount = TrialLists.trialsCount;
 
@@ -8542,7 +8566,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
                                             bstepFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                             int stepcount = TrialLists.trialsCount;
 
@@ -8595,12 +8619,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     //set 
                                     if (!bstepFrequencyMoveUp && !bstepFrequencyMoveDown && !bPromptFrequencyMoveUp && !bPromptFrequencyMoveDown)
                                     {
-                                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
                                             bFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -8634,7 +8658,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
                                             bFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             if (reqSess == freqDurMUPcount)
@@ -8672,19 +8696,19 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             #region percent independent of all steps
                             else if (dr["ColTypeCd"].ToString() == "Prompt")
                             {
-                                TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                 freqdureloop++;
                                 bool status = true;
                                 CompletionStatusSet = "";
                                 //for prompt move
                                 IndeallId = Convert.ToInt32(ViewState["IndeallId"]);
-                                TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                 if (promptUp >= 1)
                                     bPromptIndallMoveUp = false;
                                 if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0)
                                 {
                                     bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                        TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                        TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptIndallMoveUpbMultiTchr, bMultyTchr);
@@ -8718,11 +8742,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 //step move up
                                 if (!bPromptIndallMoveUp)
                                 {
-                                    TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                     if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                                     {
                                         bstepIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         int stepcount = TrialLists.trialsCount;
 
@@ -8761,12 +8785,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 //set move up
                                 if (!bstepIndallMoveUp)
                                 {
-                                    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                     if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                                     {
                                         bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -8807,19 +8831,19 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             #region +/-
                             else if (dr["ColTypeCd"].ToString() == "+/-")
                             {
-                                TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                 freqdureloop++;
                                 bool status = true;
                                 CompletionStatusSet = "";
                                 //for prompt move
                                 IndeallId = Convert.ToInt32(ViewState["IndeallId"]);
-                                TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                 if (promptUp >= 1)
                                     bPromptIndallMoveUp = false;
                                 if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0)
                                 {
                                     bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                        TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                        TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptIndallMoveUpbMultiTchr, bMultyTchr);
@@ -8853,11 +8877,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 //step move up
                                 if (!bPromptIndallMoveUp)
                                 {
-                                    TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                     if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                                     {
                                         bstepIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         int stepcount = TrialLists.trialsCount;
 
@@ -8896,12 +8920,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 //set move up
                                 if (!bstepIndallMoveUp)
                                 {
-                                    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                     if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                                     {
                                         bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -8955,26 +8979,26 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             {
                                 int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                                 string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
-                                object stat = oData.FetchValue(selqry1);
+                                object stat = oData.FetchValueTrans(selqry1, trans, con);
                                 if (stat != null && stat != DBNull.Value)
                                     MoveUpstat = Convert.ToInt16(stat);
                                 #region MoveUp on Less Than- Default
                                 if (MoveUpstat == 1)
                                 {
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                     if (TempRules.pctAvgDurationMoveUp.iScoreRequired == 0 || TempRules.pctAvgDurationMoveDown.iScoreRequired == 0)
                                     {
                                         freqdureloop++;
                                         bool status = true;
                                         CompletionStatusSet = "";
-                                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                         avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                         totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                         if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                         {
                                             bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bAvgDurationMoveUpbIOAReqd, bIOA);
@@ -9010,7 +9034,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                         {
                                             bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bAvgDurationMoveDownbIOAReqd, bIOA);
@@ -9039,7 +9063,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         CompletionStatusSet = "";
                                         avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                         totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                         //avg duration
                                         if (TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance > 0)
@@ -9049,7 +9073,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 bPromptAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -9085,7 +9109,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                 {
                                                     bPromptAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -9119,12 +9143,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             if (!bPromptAvgDurationMoveUp && !bPromptAvgDurationMoveDown)
                                             {
-                                                TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                                TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                                 if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                        TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                        TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -9160,7 +9184,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                 {
                                                     bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     if (reqSess == freqDurMDWNcount)
@@ -9192,20 +9216,20 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         FreqDurTextFlag = true;
                                     }
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     if (TempRules.pctTotalDurationMoveUp.iScoreRequired == 0 || TempRules.pctTotalDurationMoveDown.iScoreRequired == 0)
                                     {
                                         freqdureloop++;
                                         bool status = true;
                                         CompletionStatusSet = "";
-                                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                         avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                         totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                         if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                         {
                                             CompletionStatusSet = "";
                                             bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bTotalDurationMoveUpbIOAReqd, bIOA);
@@ -9240,7 +9264,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                         {
                                             bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bTotalDurationMoveDownbIOAReqd, bIOA);
@@ -9273,7 +9297,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         CompletionStatusSet = "";
                                         avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                         totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                         if (TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance > 0)
                                         {
@@ -9282,7 +9306,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 bPromptTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -9318,7 +9342,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
                                                     bPromptTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -9354,13 +9378,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             if (!bPromptTotDurationMoveUp && !bPromptTotDurationMoveDown)
                                             {
-                                                TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                                TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                                 if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     CompletionStatusSet = "";
                                                     bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                        TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                        TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -9395,7 +9419,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
                                                     bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     if (reqSess == freqDurMDWNcount)
@@ -9434,20 +9458,20 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 #region MoveUp on More Than
                                 else if (MoveUpstat == 0)
                                 {
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                     if (TempRules.pctAvgDurationMoveUp.iScoreRequired == 0 || TempRules.pctAvgDurationMoveDown.iScoreRequired == 0)
                                     {
                                         freqdureloop++;
                                         bool status = true;
                                         CompletionStatusSet = "";
-                                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                         avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                         totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                         if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                         {
                                             bAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bAvgDurationMoveUpbIOAReqd, bIOA);
@@ -9483,7 +9507,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                         {
                                             bAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bAvgDurationMoveDownbIOAReqd, bIOA);
@@ -9512,7 +9536,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         CompletionStatusSet = "";
                                         avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                         totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                         //avg duration
                                         if (TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance > 0)
@@ -9522,7 +9546,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 bPromptAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -9558,7 +9582,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                 {
                                                     bPromptAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -9592,12 +9616,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             if (!bPromptAvgDurationMoveUp && !bPromptAvgDurationMoveDown)
                                             {
-                                                TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                                TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                                 if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     bAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                        TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                        TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -9633,7 +9657,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                 {
                                                     bAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     if (reqSess == freqDurMUPcount)
@@ -9665,20 +9689,20 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         FreqDurTextFlag = true;
                                     }
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     if (TempRules.pctTotalDurationMoveUp.iScoreRequired == 0 || TempRules.pctTotalDurationMoveDown.iScoreRequired == 0)
                                     {
                                         freqdureloop++;
                                         bool status = true;
                                         CompletionStatusSet = "";
-                                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                         avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                         totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                         if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                         {
                                             CompletionStatusSet = "";
                                             bTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bTotalDurationMoveUpbIOAReqd, bIOA);
@@ -9713,7 +9737,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                         {
                                             bTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bTotalDurationMoveDownbIOAReqd, bIOA);
@@ -9746,7 +9770,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         CompletionStatusSet = "";
                                         avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                         totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                         if (TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance > 0)
                                         {
@@ -9755,7 +9779,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 bPromptTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -9791,7 +9815,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
                                                     bPromptTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -9827,13 +9851,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             if (!bPromptTotDurationMoveUp && !bPromptTotDurationMoveDown)
                                             {
-                                                TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                                TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                                 if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     CompletionStatusSet = "";
                                                     bTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                        TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                        TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -9868,7 +9892,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
                                                     bTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     if (reqSess == freqDurMUPcount)
@@ -9911,24 +9935,24 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             {
                                 int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                                 string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
-                                object stat = oData.FetchValue(selqry1);
+                                object stat = oData.FetchValueTrans(selqry1, trans, con);
                                 if (stat != null && stat != DBNull.Value)
                                     MoveUpstat = Convert.ToInt16(stat);
                                 #region MoveUp on Less than-default
                                 if (MoveUpstat == 1)
                                 {
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     if (TempRules.pctFrequencyMoveUp.iScoreRequired == 0 || TempRules.pctFrequencyMoveDown.iScoreRequired == 0)
                                     {
                                         freqdureloop++;
                                         bool status = true;
                                         CompletionStatusSet = "";
-                                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                         freqId = Convert.ToInt32(ViewState["freqId"]);
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
                                             bFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveUpbIOAReqd, bIOA);
@@ -9962,7 +9986,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
                                             bFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveDownbIOAReqd, bIOA);
@@ -9993,13 +10017,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         CompletionStatusSet = "";
                                         freqId = Convert.ToInt32(ViewState["freqId"]);
                                         //for prompt move
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                         if (promptUp >= 1)
                                             bPromptFrequencyMoveUp = false;
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
                                             bPromptFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveUpbIOAReqd, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptFrequencyMoveUpbMultiTchr, bMultyTchr);
@@ -10034,7 +10058,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
                                                 bPromptFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveDownbIOAReqd, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptFrequencyMoveDownbMultiTchr, bMultyTchr);
@@ -10068,12 +10092,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                         if (!bPromptFrequencyMoveUp && !bPromptFrequencyMoveDown)
                                         {
-                                            TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
                                                 bFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveUpbIOAReqd, bIOA);
@@ -10107,7 +10131,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
                                                 bFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 if (reqSess == freqDurMDWNcount)
@@ -10143,18 +10167,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 #region MoveUp on More Than
                                 else if (MoveUpstat == 0)
                                 {
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     if (TempRules.pctFrequencyMoveUp.iScoreRequired == 0 || TempRules.pctFrequencyMoveDown.iScoreRequired == 0)
                                     {
                                         freqdureloop++;
                                         bool status = true;
                                         CompletionStatusSet = "";
-                                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                         freqId = Convert.ToInt32(ViewState["freqId"]);
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
                                             bFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveUpbIOAReqd, bIOA);
@@ -10188,7 +10212,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
                                             bFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveDownbIOAReqd, bIOA);
@@ -10219,13 +10243,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         CompletionStatusSet = "";
                                         freqId = Convert.ToInt32(ViewState["freqId"]);
                                         //for prompt move
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                         if (promptUp >= 1)
                                             bPromptFrequencyMoveUp = false;
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
                                             bPromptFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveUpbIOAReqd, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptFrequencyMoveUpbMultiTchr, bMultyTchr);
@@ -10260,7 +10284,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
                                                 bPromptFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveDownbIOAReqd, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptFrequencyMoveDownbMultiTchr, bMultyTchr);
@@ -10294,12 +10318,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                         if (!bPromptFrequencyMoveUp && !bPromptFrequencyMoveDown)
                                         {
-                                            TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
                                                 bFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveUpbIOAReqd, bIOA);
@@ -10333,7 +10357,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
                                                 bFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 if (reqSess == freqDurMUPcount)
@@ -10383,13 +10407,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 //ash: do not perform the below code if the col is used is criteria and score is NA
                                 if (checkIfScoreIsNA(chainedCols[sColName].IsInfluencedBy(MoveType.PromptMoveDown), iColId) != true && checkIfScoreIsNA(chainedCols[sColName].IsInfluencedBy(MoveType.StepMoveDown), iColId) != true && checkIfScoreIsNA(chainedCols[sColName].IsInfluencedBy(MoveType.SetMoveDown), iColId) != true)
                                 {
-                                    DataTable dtstepIDs = oData.ReturnDataTable("SELECT DSTempStepId FROM StdtSessionStep WHERE StdtSessionHdrId=" + StdtSessHdrId, false);
+                                    DataTable dtstepIDs = oData.ReturnDataTableWithTransaction("SELECT DSTempStepId FROM StdtSessionStep WHERE StdtSessionHdrId=" + StdtSessHdrId, con, trans, false);
                                     int indexB = 0;
                                     foreach (DataRow drstepID in dtstepIDs.Rows)
                                     {
                                         string updStepStat = "UPDATE StdtDSStepStat SET PromptId=" + sesResultchain[index].StepPrompts[indexB] + ",ModifiedBy=" + oSession.LoginId + " ,ModifiedOn=GETDATE() WHERE " +
                                             "DSTempSetColId=" + dr["DSTempSetColId"].ToString() + " AND DSTempStepId=" + drstepID["DSTempStepId"].ToString() + "";
-                                        oData.Execute(updStepStat);
+                                        oData.ExecuteWithTrans(updStepStat, con, trans);
                                         indexB++;
                                     }
                                 }
@@ -10399,7 +10423,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             #region %independent of all steps
                             else if (dr["ColTypeCd"].ToString() == "Prompt" && colt.ToString() == "true")
                             {
-                                TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                 freqdureloop++;
                                 bool status = true;
                                 bool check = true;
@@ -10407,13 +10431,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 CompletionStatusSet = "";
                                 //for prompt move
                                 IndeallId = Convert.ToInt32(ViewState["IndeallId"]);
-                                TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                 if (promptUp >= 1)
                                     bPromptIndallMoveUp = false;
                                 if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0)
                                 {
                                     bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                        TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                        TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptIndallMoveUpbMultiTchr, bMultyTchr);
@@ -10457,7 +10481,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0)
                                     {
                                         bPromptIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
-                                            TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status);
+                                            TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveDownbIOAReqd, bIOA);
                                         bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptIndallMoveDownbMultiTchr, bMultyTchr);
@@ -10499,12 +10523,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                 if (!bPromptIndallMoveUp && !bPromptIndallMoveDown)
                                 {
-                                    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                     if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0 && !check)
                                     {
                                         bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bIndallMoveUpbIOAReqd, bIOA);
@@ -10534,7 +10558,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if ((TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && check) || (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && !check1))
                                     {
                                         bIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
-                                            TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status);
+                                            TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bIndallMoveDownbIOAReqd, bIOA);
@@ -10573,7 +10597,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             #region +/- %insependent of all steps
                             else if (dr["ColTypeCd"].ToString() == "+/-" && colt.ToString() == "true")
                             {
-                                TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                 freqdureloop++;
                                 bool status = true;
                                 bool check = true;
@@ -10581,13 +10605,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 CompletionStatusSet = "";
                                 //for prompt move
                                 IndeallId = Convert.ToInt32(ViewState["IndeallId"]);
-                                TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                 if (promptUp >= 1)
                                     bPromptIndallMoveUp = false;
                                 if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0)
                                 {
                                     bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                        TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                        TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptIndallMoveUpbMultiTchr, bMultyTchr);
@@ -10628,7 +10652,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0)
                                     {
                                         bPromptIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
-                                            TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status);
+                                            TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveDownbIOAReqd, bIOA);
                                         bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptIndallMoveDownbMultiTchr, bMultyTchr);
@@ -10669,12 +10693,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 // set move up
                                 if (!bPromptIndallMoveUp && !bPromptIndallMoveDown)
                                 {
-                                    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                     if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0 && !check)
                                     {
                                         bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bIndallMoveUpbIOAReqd, bIOA);
@@ -10703,7 +10727,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if ((TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && check) || (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && !check1))
                                     {
                                         bIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
-                                            TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status);
+                                            TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bIndallMoveDownbIOAReqd, bIOA);
@@ -10809,18 +10833,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     //if (bRuleStatusIOA && bRuleStatusMultiTchr)
                                                     //{
 
-                                                    DataTable dtModificatn = GetModificationDetails("STEP", oTemp.TemplateId);
+                                                    DataTable dtModificatn = GetModificationDetails("STEP", oTemp.TemplateId, trans, con);
                                                     if (dtModificatn != null)
                                                     {
                                                         if (dtModificatn.Rows.Count > 0)
                                                         {
-                                                            bool mod_flag = CheckStepModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId, iCurrentStep);
+                                                            bool mod_flag = CheckStepModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId, iCurrentStep, trans, con);
 
                                                             if (mod_flag)
                                                             {
                                                                 oData = new clsData();
                                                                 string selqry = "SELECT ISNULL(ModificationInd, 0) as ModificationInd FROM DSTempHdr WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                                                object mod = oData.FetchValue(selqry);
+                                                                object mod = oData.FetchValueTrans(selqry, trans, con);
                                                                 if (mod != null)
                                                                 {
                                                                     if (Convert.ToBoolean(mod) != true)
@@ -11193,7 +11217,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         else if (colt.ToString() == "true")
                         {
 
-                            TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                            TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                             if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0)
                             {
                                 if (bstepIndallMoveUp && bStepMoveUp)
@@ -11207,7 +11231,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 nextStep = sesResultchain[0].NextStep;
                             }
 
-                            TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                            TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                             if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0)
                             {
                                 if (bIndallMoveUp && bSetMoveUp)
@@ -11220,7 +11244,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 bSetMoveUp = sesResultchain[0].MovedForwardSet;
                                 nextSet = sesResultchain[0].NextSet;
                             }
-                            TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                            TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                             if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0)
                             {
                                 if (bPromptIndallMoveUp && bPromptMoveUp)
@@ -11260,14 +11284,14 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 }
                                 else
                                 {
-                                    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                     if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance == 0)
                                     {
                                         nextSet = sesResultchain[0].NextSet;
                                     }
 
                                 }
-                                TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                                TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
 
                                 if (bStepMoveBack)
                                 {
@@ -11286,7 +11310,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 }
                                 else
                                 {
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance == 0)
                                     {
                                         sNextLessonPrompt = sesResultchain[0].NextPrompt;
@@ -11295,7 +11319,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             }
                             else
                             {
-                                TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                 if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance == 0)
                                 {
 
@@ -11727,12 +11751,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (nextSet == 0) { nextSet = 1; }
                                         else
                                         {
-                                            DataTable dtModificatn = GetModificationDetails("SET", oTemp.TemplateId);
+                                            DataTable dtModificatn = GetModificationDetails("SET", oTemp.TemplateId, trans, con);
                                             if (dtModificatn != null)
                                             {
                                                 if (dtModificatn.Rows.Count > 0)
                                                 {
-                                                    bool mod_flag = CheckSetModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId);
+                                                    bool mod_flag = CheckSetModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId, trans, con);
 
                                                     //if (mod_flag)
                                                     //{
@@ -11744,7 +11768,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     {
                                                         oData = new clsData();
                                                         string selqry = "SELECT ISNULL(ModificationInd, 0) as ModificationInd FROM DSTempHdr WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                                        object mod = oData.FetchValue(selqry);
+                                                        object mod = oData.FetchValueTrans(selqry, trans, con);
                                                         if (mod != null)
                                                         {
                                                             if (Convert.ToBoolean(mod) != true)
@@ -11950,18 +11974,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (nextStep == 0) { nextStep = 1; }
                                         else
                                         {
-                                            DataTable dtModificatn = GetModificationDetails("STEP", oTemp.TemplateId);
+                                            DataTable dtModificatn = GetModificationDetails("STEP", oTemp.TemplateId, trans, con);
                                             if (dtModificatn != null)
                                             {
                                                 if (dtModificatn.Rows.Count > 0)
                                                 {
-                                                    bool mod_flag = CheckStepModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId, iCurrentStep);
+                                                    bool mod_flag = CheckStepModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId, iCurrentStep, trans, con);
 
                                                     if (mod_flag)
                                                     {
                                                         oData = new clsData();
                                                         string selqry = "SELECT ISNULL(ModificationInd, 0) as ModificationInd FROM DSTempHdr WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                                        object mod = oData.FetchValue(selqry);
+                                                        object mod = oData.FetchValueTrans(selqry, trans, con);
                                                         if (mod != null)
                                                         {
                                                             if (Convert.ToBoolean(mod) != true)
@@ -12112,18 +12136,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 {
                                     if (bRuleStatusIOA && bRuleStatusMultiTchr)
                                     {
-                                        DataTable dtModificatn = GetModificationDetails("PROMPT", oTemp.TemplateId);
+                                        DataTable dtModificatn = GetModificationDetails("PROMPT", oTemp.TemplateId, trans, con);
                                         if (dtModificatn != null)
                                         {
                                             if (dtModificatn.Rows.Count > 0)
                                             {
-                                                bool mod_flag = CheckPromptModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId, iCurrentStep, Convert.ToInt32(sCurrentLessonPrompt));
+                                                bool mod_flag = CheckPromptModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId, iCurrentStep, Convert.ToInt32(sCurrentLessonPrompt), trans, con);
 
                                                 if (mod_flag)
                                                 {
                                                     oData = new clsData();
                                                     string selqry = "SELECT ISNULL(ModificationInd, 0) as ModificationInd FROM DSTempHdr WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                                    object mod = oData.FetchValue(selqry);
+                                                    object mod = oData.FetchValueTrans(selqry, trans, con);
                                                     if (mod != null)
                                                     {
                                                         if (Convert.ToBoolean(mod) != true)
@@ -12213,7 +12237,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     discreteInptData = new DiscreetTrial.InputData();
                     #region setrules
                     Rules TempRules = new Rules();
-                    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                     if (TempRules != null)
                     {
                         set_moveupCount = TempRules.moveup;
@@ -12411,7 +12435,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     #endregion
                     #region promptrules
                     TempRules = new Rules();
-                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                     if (TempRules.count > 0)
                     {
                         bPrompt = true;
@@ -12711,12 +12735,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         "INNER JOIN DSTempSetColCalc DC ON DST.DSTempSetColId = DC.DSTempSetColId  INNER JOIN DSTempRule DR ON DR.DSTempSetColCalcId = DC.DSTempSetColCalcId " +
                         "WHERE (DT.DSTempHdrId =" + oTemp.TemplateId + ")AND DR.RuleType='PROMPT' AND DR.CriteriaType='MOVE UP' " +//AND DR.DSTempSetColId=" + iColId +
                         " AND DR.ActiveInd='A' AND DR.IsNA=1";
-                    promptUp = Convert.ToInt32(oData.FetchValue(strPromptCriteria));
+                    promptUp = Convert.ToInt32(oData.FetchValueTrans(strPromptCriteria, trans, con));
                     strPromptCriteria = "SELECT  Count(DR.DSTempRuleId)	FROM DSTempHdr DT  INNER JOIN DSTempSetCol DST ON DT.DSTempHdrId = DST.DSTempHdrId " +
                         "INNER JOIN DSTempSetColCalc DC ON DST.DSTempSetColId = DC.DSTempSetColId  INNER JOIN DSTempRule DR ON DR.DSTempSetColCalcId = DC.DSTempSetColCalcId " +
                         "WHERE (DT.DSTempHdrId =" + oTemp.TemplateId + ")AND DR.RuleType='PROMPT' AND DR.CriteriaType='MOVE DOWN' " +//AND DR.DSTempSetColId=" + iColId +
                         " AND DR.ActiveInd='A' AND DR.IsNA=1";
-                    promptDown = Convert.ToInt32(oData.FetchValue(strPromptCriteria));
+                    promptDown = Convert.ToInt32(oData.FetchValueTrans(strPromptCriteria, trans, con));
                     discreteCols[sColName].promptUp = promptUp;
                     discreteCols[sColName].promptDown = promptDown;
 
@@ -12724,20 +12748,20 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                      " INNER JOIN DSTempSetCol DST ON DT.DSTempHdrId = DST.DSTempHdrId " +
                                      "INNER JOIN DSTempSetColCalc DC ON DST.DSTempSetColId = DC.DSTempSetColId" +
                                      " WHERE DT.DSTempHdrId =" + oTemp.TemplateId + ") then 'true' else 'false' end";
-                    object colt2 = oData.FetchValue(strqry2);
+                    object colt2 = oData.FetchValueTrans(strqry2, trans, con);
                     //string h2 = colt2.ToString();
                     bool indtest = false;
-                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                     if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                     {
                         indtest = true;
                     }
-                    TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                    TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                     if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                     {
                         indtest = true;
                     }
-                    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                     if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                     {
                         indtest = true;
@@ -12750,7 +12774,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         if (dr["ColTypeCd"].ToString() == "Text")
                         {
 
-                            TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                            TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                             colCalId = Convert.ToInt32(ViewState["colCalId"]);
                             if (TempRules.pctCustomMoveUp.iScoreRequired > 0)
                             {
@@ -12758,7 +12782,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 //int iStudentId, int colCalId, float iScoreRequired, int iSessonNumber,int iTotalCorrectInstance,bool bConsequetiveIndex, bool flag
                                 bool status = false;
                                 bcustMoveUp = ValidateUp(oSession.StudentId, colCalId, TempRules.pctCustomMoveUp.iScoreRequired, reqSess,
-                                    TempRules.pctCustomMoveUp.iTotalCorrectInstance, TempRules.pctCustomMoveUp.bConsequetiveIndex, status);
+                                    TempRules.pctCustomMoveUp.iTotalCorrectInstance, TempRules.pctCustomMoveUp.bConsequetiveIndex, status, trans, con);
                                 int setcount = TrialLists.totalSet;
 
                                 bRuleStatusIOA = oDisc.checkConditionIOA(bCustomMoveupIOA, bIOA);
@@ -12787,7 +12811,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             {
                                 bool status = false;
                                 bCustMoveDown = ValidateDown(oSession.StudentId, colCalId, TempRules.pctCustomMoveDown.iScoreRequired, reqSess,
-                                    TempRules.pctCustomMoveDown.iTotalCorrectInstance, TempRules.pctCustomMoveDown.bConsequetiveIndex, status);
+                                    TempRules.pctCustomMoveDown.iTotalCorrectInstance, TempRules.pctCustomMoveDown.bConsequetiveIndex, status, trans, con);
                                 int setcount = TrialLists.totalSet;
 
                                 bRuleStatusIOA = oDisc.checkConditionIOA(bCustomMovedownIOA, bIOA);
@@ -12820,26 +12844,26 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         {
                             int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                             string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
-                            object stat = oData.FetchValue(selqry1);
+                            object stat = oData.FetchValueTrans(selqry1, trans, con);
                             if (stat != null && stat != DBNull.Value)
                                 MoveUpstat = Convert.ToInt16(stat);
                             #region MoveUp in Less Than criteria- default
                             if (MoveUpstat == 1)
                             {
-                                TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                 if (TempRules.pctAvgDurationMoveUp.iScoreRequired == 0 || TempRules.pctAvgDurationMoveDown.iScoreRequired == 0)
                                 {
                                     freqdureloop++;
                                     bool status = true;
                                     CompletionStatusSet = "";
-                                    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                     avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                     totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                     if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                     {
                                         bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bAvgDurationMoveUpbIOAReqd, bIOA);
@@ -12878,7 +12902,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                     {
                                         bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                            TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                            TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
                                         if (reqSess == freqDurMDWNcount)
@@ -12917,7 +12941,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     CompletionStatusSet = "";
                                     avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                     totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                     //avg duration
                                     if (TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance > 0)
@@ -12927,7 +12951,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                         {
                                             bPromptAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -12963,7 +12987,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bPromptAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -12996,12 +13020,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                         if (!bPromptAvgDurationMoveUp && !bPromptAvgDurationMoveDown)
                                         {
-                                            TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -13040,7 +13064,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 if (reqSess == freqDurMDWNcount)
@@ -13075,20 +13099,20 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     FreqDurTextFlag = true;
                                 }
-                                TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                 if (TempRules.pctTotalDurationMoveUp.iScoreRequired == 0 || TempRules.pctTotalDurationMoveDown.iScoreRequired == 0)
                                 {
                                     freqdureloop++;
                                     bool status = true;
                                     CompletionStatusSet = "";
-                                    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                     avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                     totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                     if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                     {
                                         CompletionStatusSet = "";
                                         bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bTotalDurationMoveUpbIOAReqd, bIOA);
@@ -13126,7 +13150,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                     {
                                         bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                            TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                            TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
                                         if (reqSess == freqDurMDWNcount)
@@ -13170,7 +13194,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     CompletionStatusSet = "";
                                     avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                     totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                     if (TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance > 0)
                                     {
@@ -13179,7 +13203,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                         {
                                             bPromptTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -13215,7 +13239,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bPromptTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -13251,13 +13275,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                         if (!bPromptTotDurationMoveUp && !bPromptTotDurationMoveDown)
                                         {
-                                            TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 CompletionStatusSet = "";
                                                 bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -13295,7 +13319,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 if (reqSess == freqDurMDWNcount)
@@ -13338,20 +13362,20 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             #region MoveUp in More Than Criteria
                             else if (MoveUpstat == 0)
                             {
-                                TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                 if (TempRules.pctAvgDurationMoveUp.iScoreRequired == 0 || TempRules.pctAvgDurationMoveDown.iScoreRequired == 0)
                                 {
                                     freqdureloop++;
                                     bool status = true;
                                     CompletionStatusSet = "";
-                                    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                     avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                     totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                     if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                     {
                                         bAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bAvgDurationMoveUpbIOAReqd, bIOA);
@@ -13390,7 +13414,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                     {
                                         bAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                            TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                            TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
                                         if (reqSess == freqDurMUPcount)
@@ -13429,7 +13453,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     CompletionStatusSet = "";
                                     avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                     totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                     //avg duration
                                     if (TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance > 0)
@@ -13439,7 +13463,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                         {
                                             bPromptAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -13475,7 +13499,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bPromptAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -13508,12 +13532,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                         if (!bPromptAvgDurationMoveUp && !bPromptAvgDurationMoveDown)
                                         {
-                                            TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 bAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -13552,7 +13576,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 if (reqSess == freqDurMUPcount)
@@ -13587,20 +13611,20 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     FreqDurTextFlag = true;
                                 }
-                                TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                 if (TempRules.pctTotalDurationMoveUp.iScoreRequired == 0 || TempRules.pctTotalDurationMoveDown.iScoreRequired == 0)
                                 {
                                     freqdureloop++;
                                     bool status = true;
                                     CompletionStatusSet = "";
-                                    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                     avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                     totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                     if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                     {
                                         CompletionStatusSet = "";
                                         bTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bTotalDurationMoveUpbIOAReqd, bIOA);
@@ -13638,7 +13662,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                     {
                                         bTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                            TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                            TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
                                         if (reqSess == freqDurMUPcount)
@@ -13681,7 +13705,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     CompletionStatusSet = "";
                                     avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                     totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                     if (TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance > 0)
                                     {
@@ -13690,7 +13714,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                         {
                                             bPromptTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -13726,7 +13750,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bPromptTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -13762,13 +13786,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                         if (!bPromptTotDurationMoveUp && !bPromptTotDurationMoveDown)
                                         {
-                                            TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 CompletionStatusSet = "";
                                                 bTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -13806,7 +13830,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 if (reqSess == freqDurMUPcount)
@@ -13853,24 +13877,24 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         {
                             int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                             string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
-                            object stat = oData.FetchValue(selqry1);
+                            object stat = oData.FetchValueTrans(selqry1, trans, con);
                             if (stat != null && stat != DBNull.Value)
                                 MoveUpstat = Convert.ToInt16(stat);
                             #region MoveUp in Less Than criteria - Default
                             if (MoveUpstat == 1)
                             {
-                                TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                 if (TempRules.pctFrequencyMoveUp.iScoreRequired == 0 || TempRules.pctFrequencyMoveDown.iScoreRequired == 0)
                                 {
                                     freqdureloop++;
                                     bool status = true;
                                     CompletionStatusSet = "";
-                                    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                     freqId = Convert.ToInt32(ViewState["freqId"]);
                                     if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                     {
                                         bFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveUpbIOAReqd, bIOA);
@@ -13907,7 +13931,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                     {
                                         bFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                            TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                            TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
                                         if (reqSess == freqDurMDWNcount)
@@ -13948,13 +13972,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     CompletionStatusSet = "";
                                     freqId = Convert.ToInt32(ViewState["freqId"]);
                                     //for prompt move
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     if (promptUp >= 1)
                                         bPromptFrequencyMoveUp = false;
                                     if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                     {
                                         bPromptFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveUpbIOAReqd, bIOA);
                                         bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptFrequencyMoveUpbMultiTchr, bMultyTchr);
@@ -13990,7 +14014,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
                                             bPromptFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveDownbIOAReqd, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptFrequencyMoveDownbMultiTchr, bMultyTchr);
@@ -14023,12 +14047,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     //end prompt section
                                     if (!bPromptFrequencyMoveUp && !bPromptFrequencyMoveDown)
                                     {
-                                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
                                             bFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveUpbIOAReqd, bIOA);
@@ -14065,7 +14089,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
                                             bFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             if (reqSess == freqDurMDWNcount)
@@ -14104,18 +14128,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             #region MoveUp in More Than Criteria
                             else if (MoveUpstat == 0)
                             {
-                                TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                 if (TempRules.pctFrequencyMoveUp.iScoreRequired == 0 || TempRules.pctFrequencyMoveDown.iScoreRequired == 0)
                                 {
                                     freqdureloop++;
                                     bool status = true;
                                     CompletionStatusSet = "";
-                                    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                     freqId = Convert.ToInt32(ViewState["freqId"]);
                                     if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                     {
                                         bFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveUpbIOAReqd, bIOA);
@@ -14152,7 +14176,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                     {
                                         bFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                            TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                            TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
                                         if (reqSess == freqDurMUPcount)
@@ -14194,13 +14218,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     CompletionStatusSet = "";
                                     freqId = Convert.ToInt32(ViewState["freqId"]);
                                     //for prompt move
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     if (promptUp >= 1)
                                         bPromptFrequencyMoveUp = false;
                                     if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                     {
                                         bPromptFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveUpbIOAReqd, bIOA);
                                         bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptFrequencyMoveUpbMultiTchr, bMultyTchr);
@@ -14236,7 +14260,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
                                             bPromptFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveDownbIOAReqd, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptFrequencyMoveDownbMultiTchr, bMultyTchr);
@@ -14269,12 +14293,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     //end prompt section
                                     if (!bPromptFrequencyMoveUp && !bPromptFrequencyMoveDown)
                                     {
-                                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
                                             bFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveUpbIOAReqd, bIOA);
@@ -14311,7 +14335,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
                                             bFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             if (reqSess == freqDurMUPcount)
@@ -14353,7 +14377,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         #region %independent of all steps
                         else if (dr["ColTypeCd"].ToString() == "Prompt" && colt2.ToString() == "true" && indtest)
                         {
-                            TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                            TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                             freqdureloop++;
                             bool status = true;
                             bool check = true;
@@ -14362,13 +14386,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             IndeallId = Convert.ToInt32(ViewState["IndeallId"]);
 
                             //for prompt move
-                            TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                            TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                             if (promptUp >= 1)
                                 bPromptIndallMoveUp = false;
                             if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                             {
                                 bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                    TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                    TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptIndallMoveUpbMultiTchr, bMultyTchr);
@@ -14409,7 +14433,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0)
                                 {
                                     bPromptIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
-                                        TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status);
+                                        TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
 
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveDownbIOAReqd, bIOA);
                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptIndallMoveDownbMultiTchr, bMultyTchr);
@@ -14448,12 +14472,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             // set Move up
                             if (!bPromptIndallMoveUp && !bPromptIndallMoveDown)
                             {
-                                TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                 if (TempRules.pctIndAllMoveUp.iScoreRequired > 0 && !check)
                                 {
                                     bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                        TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                        TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                     int setcount = TrialLists.totalSet;
 
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bIndallMoveUpbIOAReqd, bIOA);
@@ -14486,7 +14510,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if ((TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && check) || (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && !check1))
                                 {
                                     bIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
-                                        TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status);
+                                        TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
                                     int setcount = TrialLists.totalSet;
 
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bIndallMoveDownbIOAReqd, bIOA);
@@ -14523,7 +14547,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                         else if (dr["ColTypeCd"].ToString() == "+/-" && colt2.ToString() == "true" && indtest)
                         {
-                            TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                            TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                             freqdureloop++;
                             bool status = true;
                             bool check = true;
@@ -14532,13 +14556,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             IndeallId = Convert.ToInt32(ViewState["IndeallId"]);
 
                             //for prompt move
-                            TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                            TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                             if (promptUp >= 1)
                                 bPromptIndallMoveUp = false;
                             if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                             {
                                 bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                    TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                    TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptIndallMoveUpbMultiTchr, bMultyTchr);
@@ -14579,7 +14603,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0)
                                 {
                                     bPromptIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
-                                        TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status);
+                                        TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
 
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveDownbIOAReqd, bIOA);
                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptIndallMoveDownbMultiTchr, bMultyTchr);
@@ -14618,12 +14642,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             // set Move up
                             if (!bPromptIndallMoveUp && !bPromptIndallMoveDown)
                             {
-                                TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                 if (TempRules.pctIndAllMoveUp.iScoreRequired > 0 && !check)
                                 {
                                     bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                        TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                        TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                     int setcount = TrialLists.totalSet;
 
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bIndallMoveUpbIOAReqd, bIOA);
@@ -14656,7 +14680,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if ((TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && check) || (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && !check1))
                                 {
                                     bIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
-                                        TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status);
+                                        TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
                                     int setcount = TrialLists.totalSet;
 
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bIndallMoveDownbIOAReqd, bIOA);
@@ -15002,18 +15026,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (nextSet == 0) { nextSet = 1; }
                                 else
                                 {
-                                    DataTable dtModificatn = GetModificationDetails("SET", oTemp.TemplateId);
+                                    DataTable dtModificatn = GetModificationDetails("SET", oTemp.TemplateId, trans, con);
                                     if (dtModificatn != null)
                                     {
                                         if (dtModificatn.Rows.Count > 0)
                                         {
-                                            bool mod_flag = CheckSetModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId);
+                                            bool mod_flag = CheckSetModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId, trans, con);
 
                                             if (mod_flag)
                                             {
                                                 oData = new clsData();
                                                 string selqry = "SELECT ISNULL(ModificationInd, 0) as ModificationInd FROM DSTempHdr WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                                object mod = oData.FetchValue(selqry);
+                                                object mod = oData.FetchValueTrans(selqry, trans, con);
                                                 if (mod != null)
                                                 {
                                                     if (Convert.ToBoolean(mod) != true)
@@ -15154,18 +15178,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             if (bRuleStatusIOA && bRuleStatusMultiTchr)
                             {
                                 iCurrentStep = 0;
-                                DataTable dtModificatn = GetModificationDetails("PROMPT", oTemp.TemplateId);
+                                DataTable dtModificatn = GetModificationDetails("PROMPT", oTemp.TemplateId, trans, con);
                                 if (dtModificatn != null)
                                 {
                                     if (dtModificatn.Rows.Count > 0)
                                     {
-                                        bool mod_flag = CheckPromptModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId, iCurrentStep, Convert.ToInt32(sCurrentLessonPrompt));
+                                        bool mod_flag = CheckPromptModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId, iCurrentStep, Convert.ToInt32(sCurrentLessonPrompt), trans, con);
 
                                         if (mod_flag)
                                         {
                                             oData = new clsData();
                                             string selqry = "SELECT ISNULL(ModificationInd, 0) as ModificationInd FROM DSTempHdr WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                            object mod = oData.FetchValue(selqry);
+                                            object mod = oData.FetchValueTrans(selqry, trans, con);
                                             if (mod != null)
                                             {
                                                 if (Convert.ToBoolean(mod) != true)
@@ -15483,7 +15507,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                  " FROM DSTempHdr Hdr LEFT JOIN StdtDSStat Stat  ON Hdr.DSTempHdrId = Stat.DSTempHdrId " +
                   " WHERE Hdr.DSTempHdrId= " + oTemp.TemplateId + " GROUP BY Hdr.SkillType, Hdr.LessonPlanId ";
 
-            reader = oData.ReturnDataReader(strQry, false);
+            reader = oData.ReturnDataReaderWithTrans(strQry, false, trans, con);
             if (reader.Read())
             {
                 iCurrentSetId = Convert.ToInt32(reader["NextSetId"]);
@@ -15521,7 +15545,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 "INNER JOIN DSTempPrompt DSPRMP ON DSST.DSTempHdrId = DSPRMP.DSTempHdrId " +
                                 "WHERE DSH.DSTempHdrId = " + oTemp.TemplateId + " AND DSST.ActiveInd = 'A' AND DSSTP.ActiveInd = 'A' AND DSPRMP.ActiveInd = 'A'" +
                                 "ORDER BY DSST.DSTempSetId DESC";
-                getMaxSet = Convert.ToInt32(oData.FetchValue(qrygetMaxSet));
+                getMaxSet = Convert.ToInt32(oData.FetchValueTrans(qrygetMaxSet, trans, con));
 
                 string qrygetMaxStp = "";
                 qrygetMaxStp = "SELECT DISTINCT TOP 1 DSSTP.SortOrder AS MaxStepID " +
@@ -15531,7 +15555,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 "INNER JOIN DSTempPrompt DSPRMP ON DSST.DSTempHdrId = DSPRMP.DSTempHdrId " +
                                 "WHERE DSH.DSTempHdrId = " + oTemp.TemplateId + " AND DSST.DSTempSetId = " + iCurrentSetId + " AND DSST.ActiveInd = 'A' AND DSSTP.ActiveInd = 'A' AND DSPRMP.ActiveInd = 'A'" +
                                 "ORDER BY DSSTP.SortOrder DESC";
-                getMaxStp = Convert.ToInt32(oData.FetchValue(qrygetMaxStp));
+                getMaxStp = Convert.ToInt32(oData.FetchValueTrans(qrygetMaxStp, trans, con));
 
                 string qrygetMaxPmt = "";
                 qrygetMaxPmt = "SELECT DISTINCT TOP 1 DSPRMP.PromptId AS MinPromptID, DSPRMP.PromptOrder AS PromptOrder " +
@@ -15541,7 +15565,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 "INNER JOIN DSTempPrompt DSPRMP ON DSST.DSTempHdrId = DSPRMP.DSTempHdrId " +
                                 "WHERE DSH.DSTempHdrId = " + oTemp.TemplateId + " AND DSST.DSTempSetId = " + iCurrentSetId + " AND DSSTP.SortOrder = " + iCurrentStep + " AND DSST.ActiveInd = 'A' AND DSSTP.ActiveInd = 'A' AND DSPRMP.ActiveInd = 'A'" +
                                 "ORDER BY DSPRMP.PromptOrder";
-                getMaxPmt = Convert.ToInt32(oData.FetchValue(qrygetMaxPmt));
+                getMaxPmt = Convert.ToInt32(oData.FetchValueTrans(qrygetMaxPmt, trans, con));
 
                 #endregion GetMaxValues
 
@@ -15554,7 +15578,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 "INNER JOIN DSTempPrompt DSPRMP ON DSST.DSTempHdrId = DSPRMP.DSTempHdrId " +
                                 "WHERE DSH.DSTempHdrId = " + oTemp.TemplateId + " AND DSST.ActiveInd = 'A' AND DSSTP.ActiveInd = 'A' AND DSPRMP.ActiveInd = 'A'" +
                                 "ORDER BY DSST.DSTempSetId";
-                getMinSet = Convert.ToInt32(oData.FetchValue(qrygetMinSet));
+                getMinSet = Convert.ToInt32(oData.FetchValueTrans(qrygetMinSet, trans, con));
 
                 string qrygetMinStp = "";
                 qrygetMinStp = "SELECT DISTINCT TOP 1 DSSTP.SortOrder AS MinStepID " +
@@ -15564,7 +15588,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 "INNER JOIN DSTempPrompt DSPRMP ON DSST.DSTempHdrId = DSPRMP.DSTempHdrId " +
                                 "WHERE DSH.DSTempHdrId = " + oTemp.TemplateId + " AND DSST.DSTempSetId = " + iCurrentSetId + " AND DSST.ActiveInd = 'A' AND DSSTP.ActiveInd = 'A' AND DSPRMP.ActiveInd = 'A'" +
                                 "ORDER BY DSSTP.SortOrder";
-                getMinStp = Convert.ToInt32(oData.FetchValue(qrygetMinStp));
+                getMinStp = Convert.ToInt32(oData.FetchValueTrans(qrygetMinStp, trans, con));
 
                 string qrygetMinPmt = "";
                 qrygetMinPmt = "SELECT DISTINCT TOP 1 DSPRMP.PromptId AS MinPromptID, DSPRMP.PromptOrder AS PromptOrder " +
@@ -15574,7 +15598,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 "INNER JOIN DSTempPrompt DSPRMP ON DSST.DSTempHdrId = DSPRMP.DSTempHdrId " +
                                 "WHERE DSH.DSTempHdrId = " + oTemp.TemplateId + " AND DSST.DSTempSetId = " + iCurrentSetId + " AND DSSTP.SortOrder = " + iCurrentStep + " AND DSST.ActiveInd = 'A' AND DSSTP.ActiveInd = 'A' AND DSPRMP.ActiveInd = 'A'" +
                                 "ORDER BY DSPRMP.PromptOrder DESC";
-                getMinPmt = Convert.ToInt32(oData.FetchValue(qrygetMinPmt));
+                getMinPmt = Convert.ToInt32(oData.FetchValueTrans(qrygetMinPmt, trans, con));
 
                 #endregion GetMinValues
 
@@ -15593,7 +15617,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 "INNER JOIN DSTempPrompt DSPRMP ON DSST.DSTempHdrId = DSPRMP.DSTempHdrId " +
                                 "WHERE DSH.DSTempHdrId = " + oTemp.TemplateId + " AND DSST.ActiveInd = 'A' AND DSPRMP.ActiveInd = 'A'" +
                                 "ORDER BY DSST.DSTempSetId DESC";
-                getMaxSet = Convert.ToInt32(oData.FetchValue(qrygetMaxSet));
+                getMaxSet = Convert.ToInt32(oData.FetchValueTrans(qrygetMaxSet, trans, con));
 
                 string qrygetMaxStp = "";
                 qrygetMaxStp = "0";
@@ -15606,7 +15630,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 "INNER JOIN DSTempPrompt DSPRMP ON DSST.DSTempHdrId = DSPRMP.DSTempHdrId " +
                                 "WHERE DSH.DSTempHdrId = " + oTemp.TemplateId + " AND DSST.DSTempSetId = " + iCurrentSetId + " AND DSST.ActiveInd = 'A' AND DSPRMP.ActiveInd = 'A'" +
                                 "ORDER BY DSPRMP.PromptOrder";
-                getMaxPmt = Convert.ToInt32(oData.FetchValue(qrygetMaxPmt));
+                getMaxPmt = Convert.ToInt32(oData.FetchValueTrans(qrygetMaxPmt, trans, con));
 
                 #endregion GetMaxValues
 
@@ -15618,7 +15642,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 "INNER JOIN DSTempPrompt DSPRMP ON DSST.DSTempHdrId = DSPRMP.DSTempHdrId " +
                                 "WHERE DSH.DSTempHdrId = " + oTemp.TemplateId + " AND DSST.ActiveInd = 'A' AND DSPRMP.ActiveInd = 'A'" +
                                 "ORDER BY DSST.DSTempSetId";
-                getMinSet = Convert.ToInt32(oData.FetchValue(qrygetMinSet));
+                getMinSet = Convert.ToInt32(oData.FetchValueTrans(qrygetMinSet, trans, con));
 
                 string qrygetMinStp = "";
                 qrygetMinStp = "0";
@@ -15631,7 +15655,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 "INNER JOIN DSTempPrompt DSPRMP ON DSST.DSTempHdrId = DSPRMP.DSTempHdrId " +
                                 "WHERE DSH.DSTempHdrId = " + oTemp.TemplateId + " AND DSST.DSTempSetId = " + iCurrentSetId + " AND DSST.ActiveInd = 'A' AND DSPRMP.ActiveInd = 'A'" +
                                 "ORDER BY DSPRMP.PromptOrder DESC";
-                getMinPmt = Convert.ToInt32(oData.FetchValue(qrygetMinPmt));
+                getMinPmt = Convert.ToInt32(oData.FetchValueTrans(qrygetMinPmt, trans, con));
 
                 #endregion GetMinValues
 
@@ -15863,9 +15887,9 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                              "WHERE hdr.DSTempHdrId = " + oTemp.TemplateId + " AND Col.DSTempSetColId = " + iColId + " AND Dtl.StepVal <> ' ' AND hdr.SessionNbr = " + getSessNbr + " " +
                                              "GROUP BY Hdr.StdtSessionHdrId,hdr.SessionNbr,Dtl.StepVal " +
                                              "ORDER BY Hdr.SessionNbr DESC ";
-                if (oData.FetchValue(getInputPlusorMinus) != null)
+                if (oData.FetchValueTrans(getInputPlusorMinus, trans, con) != null)
                 {
-                    strInputPlusorMinus = oData.FetchValue(getInputPlusorMinus).ToString();
+                    strInputPlusorMinus = oData.FetchValueTrans(getInputPlusorMinus, trans, con).ToString();
                 }
 
 
@@ -15912,7 +15936,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         chainedInptData = new Chained.InputData();
                         #region setrules
                         Rules TempRules = new Rules();
-                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                         if (TempRules != null)
                         {
                             set_moveupCount = TempRules.moveup;
@@ -16141,7 +16165,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         #endregion
                         #region promptrules
                         TempRules = new Rules();
-                        TempRules = GetPromptRules(oTemp.TemplateId, Convert.ToInt32(dr["DSTempSetColId"].ToString()));
+                        TempRules = GetPromptRules(oTemp.TemplateId, Convert.ToInt32(dr["DSTempSetColId"].ToString()), trans, con);
 
                         if (TempRules != null)
                         {
@@ -16343,7 +16367,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         #endregion
                         #region steprules
                         TempRules = new Rules();
-                        TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                        TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                         if (TempRules != null)
                         {
                             step_moveupCount = TempRules.moveup;
@@ -16625,7 +16649,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                             int getColId = Convert.ToInt32(dr["DSTempSetColId"]);
                             string getFreDurMoveStat = "SELECT Moveupstat FROM DSTempSetCol DsCol INNER JOIN DSTempHdr Hdr on Hdr.DSTempHdrId = DsCol.DSTempHdrId WHERE DsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + getColId;
-                            object FreDurStat = oData.FetchValue(getFreDurMoveStat);
+                            object FreDurStat = oData.FetchValueTrans(getFreDurMoveStat, trans, con);
                             if (FreDurStat != null && FreDurStat != DBNull.Value)
                             {
                                 chainedInptData.FreDurMoveStat = Convert.ToInt16(FreDurStat);
@@ -16649,7 +16673,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             if (sCurrentPrompt == "+")
                             {
                                 string promptqry = "SELECT NextPromptId FROM StdtDSStat WHERE DSTempHdrId = " + oTemp.TemplateId;
-                                sCurrentPrompt = oData.FetchValue(promptqry).ToString();
+                                sCurrentPrompt = oData.FetchValueTrans(promptqry, trans, con).ToString();
                             }
 
                         }
@@ -16680,7 +16704,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         chainedCols[sColName].TotalSets = TrialLists.totalSet;
                         chainedCols[sColName].NoPromptsUsed = LessonpromptUsed;
                         chainedCols[sColName].sCurrentLessonPrompt = sCurrentLessonPrompt;
-                        chainedCols[sColName].StepPrompts = oDisc.GetStepPrompts(Convert.ToInt32(dr["DSTempSetColId"].ToString()), StdtSessHdrId);
+                        chainedCols[sColName].StepPrompts = oDisc.GetStepPrompts(Convert.ToInt32(dr["DSTempSetColId"].ToString()), StdtSessHdrId, trans, con);
                         chainedCols[sColName].multiMeasure = true;
 
                         string crctResponse = "+";
@@ -16759,13 +16783,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             "INNER JOIN DSTempSetColCalc DC ON DST.DSTempSetColId = DC.DSTempSetColId  INNER JOIN DSTempRule DR ON DR.DSTempSetColCalcId = DC.DSTempSetColCalcId " +
                             "WHERE (DT.DSTempHdrId =" + oTemp.TemplateId + ")AND DR.RuleType='PROMPT' AND DR.CriteriaType='MOVE UP' " +//AND DR.DSTempSetColId=" + iColId +
                             " AND DR.ActiveInd='A' AND DR.IsNA=1";
-                        promptUp = Convert.ToInt32(oData.FetchValue(strPromptCriteria));
+                        promptUp = Convert.ToInt32(oData.FetchValueTrans(strPromptCriteria, trans, con));
                         strPromptCriteria = "SELECT  Count(DR.DSTempRuleId)	FROM DSTempHdr DT  INNER JOIN DSTempSetCol DST ON DT.DSTempHdrId = DST.DSTempHdrId " +
                             "INNER JOIN DSTempSetColCalc DC ON DST.DSTempSetColId = DC.DSTempSetColId  INNER JOIN DSTempRule DR ON DR.DSTempSetColCalcId = DC.DSTempSetColCalcId " +
                             "WHERE (DT.DSTempHdrId =" + oTemp.TemplateId + ")AND DR.RuleType='PROMPT' AND DR.CriteriaType='MOVE DOWN' " +//AND DR.DSTempSetColId=" + iColId +
                             " AND DR.ActiveInd='A' AND DR.IsNA=1";
 
-                        promptDown = Convert.ToInt32(oData.FetchValue(strPromptCriteria));
+                        promptDown = Convert.ToInt32(oData.FetchValueTrans(strPromptCriteria, trans, con));
                         chainedCols[sColName].promptUp = promptUp;
                         chainedCols[sColName].promptDown = promptDown;
 
@@ -16773,7 +16797,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         " INNER JOIN DSTempSetCol DST ON DT.DSTempHdrId = DST.DSTempHdrId " +
                                         "INNER JOIN DSTempSetColCalc DC ON DST.DSTempSetColId = DC.DSTempSetColId" +
                                         " WHERE DT.DSTempHdrId =" + oTemp.TemplateId + ") then 'true' else 'false' end";
-                        object colt = oData.FetchValue(strqry1);
+                        object colt = oData.FetchValueTrans(strqry1, trans, con);
 
                         if (chainedCols[sColName].StepCount > 0)
                         {
@@ -16785,17 +16809,17 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (dr["ColTypeCd"].ToString() == "Text")
                                 {
                                     bool status = false;
-                                    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                     colCalId = Convert.ToInt32(ViewState["colCalId"]);
                                     if (TempRules.pctCustomMoveUp.iScoreRequired > 0)
                                     {
                                         bcustMoveUp = ValidateUp(oSession.StudentId, colCalId, TempRules.pctCustomMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctCustomMoveUp.iTotalCorrectInstance, TempRules.pctCustomMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctCustomMoveUp.iTotalCorrectInstance, TempRules.pctCustomMoveUp.bConsequetiveIndex, status, trans, con);
                                     }
                                     if (TempRules.pctCustomMoveDown.iScoreRequired > 0)
                                     {
                                         bCustMoveDown = ValidateDown(oSession.StudentId, colCalId, TempRules.pctCustomMoveDown.iScoreRequired, reqSess,
-                                            TempRules.pctCustomMoveDown.iTotalCorrectInstance, TempRules.pctCustomMoveDown.bConsequetiveIndex, status);
+                                            TempRules.pctCustomMoveDown.iTotalCorrectInstance, TempRules.pctCustomMoveDown.bConsequetiveIndex, status, trans, con);
 
                                     }
                                 }
@@ -16805,7 +16829,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 {
                                     int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                                     string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
-                                    object stat = oData.FetchValue(selqry1);
+                                    object stat = oData.FetchValueTrans(selqry1, trans, con);
                                     if (stat != null && stat != DBNull.Value)
                                         MoveUpstat = Convert.ToInt16(stat);
                                     #region MoveUp in Less than critera-Default
@@ -16814,10 +16838,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         freqdureloop++;
                                         bool status = true;
                                         CompletionStatusSet = "";
-                                        //TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        //TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                         avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                         totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                         //tr 02_07_2019
                                         //avg duration
@@ -16827,7 +16851,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                         {
                                             bPromptAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -16866,7 +16890,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bPromptAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -16904,11 +16928,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             //step chained
                                             if (!bPromptAvgDurationMoveUp && !bPromptAvgDurationMoveDown)
                                             {
-                                                TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                                                TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                                 if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     bstepAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                        TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                        TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                     int stepcount = TrialLists.trialsCount;
 
@@ -16958,7 +16982,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                 {
                                                     bstepAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     int stepcount = TrialLists.trialsCount;
 
@@ -17017,12 +17041,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             //set chained
                                             if (!bstepAvgDurationMoveUp && !bstepAvgDurationMoveDown && !bPromptAvgDurationMoveUp && !bPromptAvgDurationMoveDown)
                                             {
-                                                TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                                TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                                 if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                        TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                        TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -17070,7 +17094,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                     {
                                                         bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                            TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                            TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                         int setcount = TrialLists.totalSet;
 
                                                         if (reqSess == freqDurMDWNcount)
@@ -17109,7 +17133,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                         }
                                         //avg duration
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                         //total duration chained
                                         if (TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance > 0)
                                         {
@@ -17118,7 +17142,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 bPromptTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -17157,7 +17181,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bPromptTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -17195,11 +17219,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             //step chained
                                             if (!bPromptTotDurationMoveUp && !bPromptTotDurationMoveDown)
                                             {
-                                                TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                                                TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                                 if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     bstepTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                        TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                        TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                     int stepcount = TrialLists.trialsCount;
 
@@ -17249,7 +17273,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
                                                     bstepTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     int stepcount = TrialLists.trialsCount;
 
@@ -17307,13 +17331,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             if (!bstepTotDurationMoveUp && !bstepTotDurationMoveDown && !bPromptTotDurationMoveUp && !bPromptTotDurationMoveDown)
                                             {
-                                                TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                                TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                                 if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     //CompletionStatusSet = "";
                                                     bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                        TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                        TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -17362,7 +17386,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
                                                     bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     if (reqSess == freqDurMDWNcount)
@@ -17406,10 +17430,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         freqdureloop++;
                                         bool status = true;
                                         CompletionStatusSet = "";
-                                        //TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        //TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                         avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                         totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                         //tr 02_07_2019
                                         //avg duration
@@ -17419,7 +17443,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                         {
                                             bPromptAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -17458,7 +17482,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bPromptAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -17496,11 +17520,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             //step chained
                                             if (!bPromptAvgDurationMoveUp && !bPromptAvgDurationMoveDown)
                                             {
-                                                TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                                                TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                                 if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     bstepAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                        TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                        TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                     int stepcount = TrialLists.trialsCount;
 
@@ -17550,7 +17574,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                 {
                                                     bstepAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     int stepcount = TrialLists.trialsCount;
 
@@ -17609,12 +17633,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             //set chained
                                             if (!bstepAvgDurationMoveUp && !bstepAvgDurationMoveDown && !bPromptAvgDurationMoveUp && !bPromptAvgDurationMoveDown)
                                             {
-                                                TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                                TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                                 if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     bAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                        TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                        TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -17663,7 +17687,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                 {
                                                     bAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     if (reqSess == freqDurMUPcount)
@@ -17702,7 +17726,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                         }
                                         //avg duration
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                         //total duration chained
                                         if (TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance > 0)
                                         {
@@ -17711,7 +17735,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 bPromptTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -17750,7 +17774,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bPromptTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -17788,11 +17812,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             //step chained
                                             if (!bPromptTotDurationMoveUp && !bPromptTotDurationMoveDown)
                                             {
-                                                TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                                                TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                                 if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     bstepTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                        TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                        TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                     int stepcount = TrialLists.trialsCount;
 
@@ -17842,7 +17866,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
                                                     bstepTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     int stepcount = TrialLists.trialsCount;
 
@@ -17898,13 +17922,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             if (!bstepTotDurationMoveUp && !bstepTotDurationMoveDown && !bPromptTotDurationMoveUp && !bPromptTotDurationMoveDown)
                                             {
-                                                TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                                TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                                 if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     //CompletionStatusSet = "";
                                                     bTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                        TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                        TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -17952,7 +17976,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
                                                     bTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     if (reqSess == freqDurMUPcount)
@@ -17996,28 +18020,28 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 #endregion
                                 #region comment
                                 //    bool status = true;
-                                //    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                //    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                 //    avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                 //    totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                 //    if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                 //    {
                                 //        bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                //            TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                //            TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                 //    }
                                 //    if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                 //    {
                                 //        bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                //            TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                //            TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                 //    }
                                 //    if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                 //    {
                                 //        bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                //            TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                //            TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                 //    }
                                 //    if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                 //    {
                                 //        bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                //            TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                //            TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                 //    }
                                 //    if ((bAvgDurationMoveUp == false) || (bTotDurationMoveUp == false))
                                 //    {
@@ -18035,7 +18059,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 {
                                     int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                                     string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
-                                    object stat = oData.FetchValue(selqry1);
+                                    object stat = oData.FetchValueTrans(selqry1, trans, con);
                                     if (stat != null && stat != DBNull.Value)
                                         MoveUpstat = Convert.ToInt16(stat);
                                     #region MoveUp on Less than-default
@@ -18048,13 +18072,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                         ///for prompt move
                                         ///
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                         if (promptUp >= 1)
                                             bPromptFrequencyMoveUp = false;
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
                                             bPromptFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -18092,7 +18116,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
                                                 bPromptFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -18133,11 +18157,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         //step 
                                         if (!bPromptFrequencyMoveUp && !bPromptFrequencyMoveDown)
                                         {
-                                            TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
                                                 bstepFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
 
@@ -18189,7 +18213,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
                                                 bstepFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
 
@@ -18251,12 +18275,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         //set 
                                         if (!bstepFrequencyMoveUp && !bstepFrequencyMoveDown && !bPromptFrequencyMoveUp && !bPromptFrequencyMoveDown)
                                         {
-                                            TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
                                                 bFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -18302,7 +18326,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
                                                 bFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 if (reqSess == freqDurMDWNcount)
@@ -18350,13 +18374,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                         ///for prompt move
                                         ///
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                         if (promptUp >= 1)
                                             bPromptFrequencyMoveUp = false;
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
                                             bPromptFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -18394,7 +18418,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
                                                 bPromptFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -18435,11 +18459,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         //step 
                                         if (!bPromptFrequencyMoveUp && !bPromptFrequencyMoveDown)
                                         {
-                                            TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
                                                 bstepFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
 
@@ -18489,7 +18513,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
                                                 bstepFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
 
@@ -18547,12 +18571,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         //set 
                                         if (!bstepFrequencyMoveUp && !bstepFrequencyMoveDown && !bPromptFrequencyMoveUp && !bPromptFrequencyMoveDown)
                                         {
-                                            TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
                                                 bFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -18598,7 +18622,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
                                                 bFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                     if (reqSess == freqDurMUPcount)
@@ -18641,19 +18665,19 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 #region percent independent of all steps
                                 else if (dr["ColTypeCd"].ToString() == "Prompt")
                                 {
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     freqdureloop++;
                                     bool status = true;
                                     CompletionStatusSet = "";
                                     //for prompt move
                                     IndeallId = Convert.ToInt32(ViewState["IndeallId"]);
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     if (promptUp >= 1)
                                         bPromptIndallMoveUp = false;
                                     if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0)
                                     {
                                         bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
                                         bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptIndallMoveUpbMultiTchr, bMultyTchr);
@@ -18691,11 +18715,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     //step move up
                                     if (!bPromptIndallMoveUp)
                                     {
-                                        TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                         if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                                         {
                                             bstepIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             int stepcount = TrialLists.trialsCount;
 
@@ -18740,12 +18764,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     //set move up
                                     if (!bstepIndallMoveUp)
                                     {
-                                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                         if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                                         {
                                             bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -18792,19 +18816,19 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 #region +/-
                                 else if (dr["ColTypeCd"].ToString() == "+/-")
                                 {
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     freqdureloop++;
                                     bool status = true;
                                     CompletionStatusSet = "";
                                     //for prompt move
                                     IndeallId = Convert.ToInt32(ViewState["IndeallId"]);
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     if (promptUp >= 1)
                                         bPromptIndallMoveUp = false;
                                     if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0)
                                     {
                                         bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
                                         bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptIndallMoveUpbMultiTchr, bMultyTchr);
@@ -18842,11 +18866,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     //step move up
                                     if (!bPromptIndallMoveUp)
                                     {
-                                        TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                         if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                                         {
                                             bstepIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             int stepcount = TrialLists.trialsCount;
 
@@ -18891,12 +18915,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     //set move up
                                     if (!bstepIndallMoveUp)
                                     {
-                                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                         if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                                         {
                                             bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -18959,26 +18983,26 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 {
                                     int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                                     string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
-                                    object stat = oData.FetchValue(selqry1);
+                                    object stat = oData.FetchValueTrans(selqry1, trans, con);
                                     if (stat != null && stat != DBNull.Value)
                                         MoveUpstat = Convert.ToInt16(stat);
                                     #region MoveUp on Less Than- Default
                                     if (MoveUpstat == 1)
                                     {
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                         if (TempRules.pctAvgDurationMoveUp.iScoreRequired == 0 || TempRules.pctAvgDurationMoveDown.iScoreRequired == 0)
                                         {
                                             freqdureloop++;
                                             bool status = true;
                                             CompletionStatusSet = "";
-                                            TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                             avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                             totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bAvgDurationMoveUpbIOAReqd, bIOA);
@@ -19021,7 +19045,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 if (reqSess == freqDurMDWNcount)
@@ -19060,7 +19084,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             CompletionStatusSet = "";
                                             avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                             totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
-                                            TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                             //avg duration
                                             if (TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance > 0)
@@ -19070,7 +19094,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     bPromptAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                        TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                        TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -19107,7 +19131,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                     {
                                                         bPromptAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                            TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                            TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                                         bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -19142,12 +19166,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                                 if (!bPromptAvgDurationMoveUp && !bPromptAvgDurationMoveDown)
                                                 {
-                                                    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                                    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                                     if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                     {
                                                         bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                            TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                            TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                         int setcount = TrialLists.totalSet;
 
                                                         bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -19191,7 +19215,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                     {
                                                         bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                            TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                            TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                         int setcount = TrialLists.totalSet;
 
                                                         bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveDownIOA, bIOA);
@@ -19219,20 +19243,20 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             FreqDurTextFlag = true;
                                         }
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                         if (TempRules.pctTotalDurationMoveUp.iScoreRequired == 0 || TempRules.pctTotalDurationMoveDown.iScoreRequired == 0)
                                         {
                                             freqdureloop++;
                                             bool status = true;
                                             CompletionStatusSet = "";
-                                            TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                             avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                             totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 CompletionStatusSet = "";
                                                 bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bTotalDurationMoveUpbIOAReqd, bIOA);
@@ -19274,7 +19298,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bTotalDurationMoveDownbIOAReqd, bIOA);
@@ -19310,7 +19334,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             CompletionStatusSet = "";
                                             avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                             totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
-                                            TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                             if (TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance > 0)
                                             {
@@ -19319,7 +19343,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     bPromptTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                        TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                        TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -19356,7 +19380,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                     {
                                                         bPromptTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                            TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                            TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                                         bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -19393,13 +19417,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                                 if (!bPromptTotDurationMoveUp && !bPromptTotDurationMoveDown)
                                                 {
-                                                    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                                    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                                     if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                     {
                                                         CompletionStatusSet = "";
                                                         bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                            TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                            TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                         int setcount = TrialLists.totalSet;
 
                                                         bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -19441,7 +19465,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                     {
                                                         bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                            TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                            TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                         int setcount = TrialLists.totalSet;
 
                                                         if (reqSess == freqDurMDWNcount)
@@ -19483,20 +19507,20 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     #region MoveUp on More Than
                                     else if (MoveUpstat == 0)
                                     {
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                         if (TempRules.pctAvgDurationMoveUp.iScoreRequired == 0 || TempRules.pctAvgDurationMoveDown.iScoreRequired == 0)
                                         {
                                             freqdureloop++;
                                             bool status = true;
                                             CompletionStatusSet = "";
-                                            TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                             avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                             totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 bAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bAvgDurationMoveUpbIOAReqd, bIOA);
@@ -19539,7 +19563,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bAvgDurationMoveDownbIOAReqd, bIOA);
@@ -19571,7 +19595,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             CompletionStatusSet = "";
                                             avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                             totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
-                                            TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                             //avg duration
                                             if (TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance > 0)
@@ -19581,7 +19605,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     bPromptAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                        TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                        TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -19618,7 +19642,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                     {
                                                         bPromptAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                            TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                            TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                                         bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -19653,12 +19677,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                                 if (!bPromptAvgDurationMoveUp && !bPromptAvgDurationMoveDown)
                                                 {
-                                                    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                                    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                                     if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                     {
                                                         bAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                            TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                            TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                         int setcount = TrialLists.totalSet;
 
                                                         bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -19701,7 +19725,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                     {
                                                         bAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                            TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                            TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                         int setcount = TrialLists.totalSet;
 
                                                         bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveDownIOA, bIOA);
@@ -19729,20 +19753,20 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             FreqDurTextFlag = true;
                                         }
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                         if (TempRules.pctTotalDurationMoveUp.iScoreRequired == 0 || TempRules.pctTotalDurationMoveDown.iScoreRequired == 0)
                                         {
                                             freqdureloop++;
                                             bool status = true;
                                             CompletionStatusSet = "";
-                                            TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                             avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                             totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 CompletionStatusSet = "";
                                                 bTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bTotalDurationMoveUpbIOAReqd, bIOA);
@@ -19782,7 +19806,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
                                                 bTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bTotalDurationMoveDownbIOAReqd, bIOA);
@@ -19818,7 +19842,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             CompletionStatusSet = "";
                                             avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                             totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
-                                            TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                             if (TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance > 0)
                                             {
@@ -19827,7 +19851,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     bPromptTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                        TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                        TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -19864,7 +19888,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                     {
                                                         bPromptTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                            TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                            TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                                         bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -19901,13 +19925,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                                 if (!bPromptTotDurationMoveUp && !bPromptTotDurationMoveDown)
                                                 {
-                                                    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                                    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                                     if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                     {
                                                         CompletionStatusSet = "";
                                                         bTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                            TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                            TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                         int setcount = TrialLists.totalSet;
 
                                                         bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -19949,7 +19973,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                     {
                                                         bTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                            TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                            TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                         int setcount = TrialLists.totalSet;
 
                                                         bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveDownIOA, bIOA);
@@ -19988,24 +20012,24 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 {
                                     int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                                     string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
-                                    object stat = oData.FetchValue(selqry1);
+                                    object stat = oData.FetchValueTrans(selqry1, trans, con);
                                     if (stat != null && stat != DBNull.Value)
                                         MoveUpstat = Convert.ToInt16(stat);
                                     #region MoveUp on Less than-default
                                     if (MoveUpstat == 1)
                                     {
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired == 0 || TempRules.pctFrequencyMoveDown.iScoreRequired == 0)
                                         {
                                             freqdureloop++;
                                             bool status = true;
                                             CompletionStatusSet = "";
-                                            TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                             freqId = Convert.ToInt32(ViewState["freqId"]);
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
                                                 bFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveUpbIOAReqd, bIOA);
@@ -20046,7 +20070,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
                                                 bFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveDownbIOAReqd, bIOA);
@@ -20080,13 +20104,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             CompletionStatusSet = "";
                                             freqId = Convert.ToInt32(ViewState["freqId"]);
                                             //for prompt move
-                                            TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                             if (promptUp >= 1)
                                                 bPromptFrequencyMoveUp = false;
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
                                                 bPromptFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveUpbIOAReqd, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptFrequencyMoveUpbMultiTchr, bMultyTchr);
@@ -20122,7 +20146,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                                 {
                                                     bPromptFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveDownbIOAReqd, bIOA);
                                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptFrequencyMoveDownbMultiTchr, bMultyTchr);
@@ -20157,12 +20181,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             if (!bPromptFrequencyMoveUp && !bPromptFrequencyMoveDown)
                                             {
-                                                TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                                TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                                 if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                                 {
                                                     bFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                        TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                        TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveUpbIOAReqd, bIOA);
@@ -20203,7 +20227,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                                 {
                                                     bFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     if (reqSess == freqDurMDWNcount)
@@ -20242,18 +20266,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     #region MoveUp on More Than
                                     else if (MoveUpstat == 0)
                                     {
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired == 0 || TempRules.pctFrequencyMoveDown.iScoreRequired == 0)
                                         {
                                             freqdureloop++;
                                             bool status = true;
                                             CompletionStatusSet = "";
-                                            TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                             freqId = Convert.ToInt32(ViewState["freqId"]);
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
                                                 bFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveUpbIOAReqd, bIOA);
@@ -20294,7 +20318,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
                                                 bFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveDownbIOAReqd, bIOA);
@@ -20328,13 +20352,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             CompletionStatusSet = "";
                                             freqId = Convert.ToInt32(ViewState["freqId"]);
                                             //for prompt move
-                                            TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                             if (promptUp >= 1)
                                                 bPromptFrequencyMoveUp = false;
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
                                                 bPromptFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveUpbIOAReqd, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptFrequencyMoveUpbMultiTchr, bMultyTchr);
@@ -20370,7 +20394,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                                 {
                                                     bPromptFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveDownbIOAReqd, bIOA);
                                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptFrequencyMoveDownbMultiTchr, bMultyTchr);
@@ -20405,12 +20429,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             if (!bPromptFrequencyMoveUp && !bPromptFrequencyMoveDown)
                                             {
-                                                TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                                TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                                 if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                                 {
                                                     bFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                        TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                        TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveUpbIOAReqd, bIOA);
@@ -20451,7 +20475,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                                 {
                                                     bFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     if (reqSess == freqDurMUPcount)
@@ -20504,7 +20528,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     //ash: do not perform the below code if the col is used is criteria and score is NA
                                     if (checkIfScoreIsNA(chainedCols[sColName].IsInfluencedBy(MoveType.PromptMoveDown), iColId) != true && checkIfScoreIsNA(chainedCols[sColName].IsInfluencedBy(MoveType.StepMoveDown), iColId) != true && checkIfScoreIsNA(chainedCols[sColName].IsInfluencedBy(MoveType.SetMoveDown), iColId) != true)
                                     {
-                                        DataTable dtstepIDs = oData.ReturnDataTable("SELECT DSTempStepId FROM StdtSessionStep WHERE StdtSessionHdrId=" + StdtSessHdrId, false);
+                                        DataTable dtstepIDs = oData.ReturnDataTableWithTransaction("SELECT DSTempStepId FROM StdtSessionStep WHERE StdtSessionHdrId=" + StdtSessHdrId, con, trans, false);
                                         int indexB = 0;
                                         try
                                         {
@@ -20525,7 +20549,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 #region %independent of all steps
                                 else if (dr["ColTypeCd"].ToString() == "Prompt" && colt.ToString() == "true")
                                 {
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     freqdureloop++;
                                     bool status = true;
                                     bool check = true;
@@ -20533,13 +20557,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     CompletionStatusSet = "";
                                     //for prompt move
                                     IndeallId = Convert.ToInt32(ViewState["IndeallId"]);
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     if (promptUp >= 1)
                                         bPromptIndallMoveUp = false;
                                     if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0)
                                     {
                                         bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
                                         bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptIndallMoveUpbMultiTchr, bMultyTchr);
@@ -20584,7 +20608,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0)
                                         {
                                             bPromptIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveDownbIOAReqd, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptIndallMoveDownbMultiTchr, bMultyTchr);
@@ -20627,12 +20651,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                     if (!bPromptIndallMoveUp && !bPromptIndallMoveDown)
                                     {
-                                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                         if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0 && !check)
                                         {
                                             bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bIndallMoveUpbIOAReqd, bIOA);
@@ -20671,7 +20695,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if ((TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && check) || (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && !check1))
                                         {
                                             bIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bIndallMoveDownbIOAReqd, bIOA);
@@ -20721,7 +20745,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 #region +/- %insependent of all steps
                                 else if (dr["ColTypeCd"].ToString() == "+/-" && colt.ToString() == "true")
                                 {
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     freqdureloop++;
                                     bool status = true;
                                     bool check = true;
@@ -20729,13 +20753,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     CompletionStatusSet = "";
                                     //for prompt move
                                     IndeallId = Convert.ToInt32(ViewState["IndeallId"]);
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     if (promptUp >= 1)
                                         bPromptIndallMoveUp = false;
                                     if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0)
                                     {
                                         bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
                                         bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptIndallMoveUpbMultiTchr, bMultyTchr);
@@ -20777,7 +20801,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0)
                                         {
                                             bPromptIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveDownbIOAReqd, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptIndallMoveDownbMultiTchr, bMultyTchr);
@@ -20819,12 +20843,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     // set move up
                                     if (!bPromptIndallMoveUp && !bPromptIndallMoveDown)
                                     {
-                                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                         if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0 && !check)
                                         {
                                             bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bIndallMoveUpbIOAReqd, bIOA);
@@ -20862,7 +20886,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if ((TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && check) || (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && !check1))
                                         {
                                             bIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bIndallMoveDownbIOAReqd, bIOA);
@@ -20980,18 +21004,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                         //if (bRuleStatusIOA && bRuleStatusMultiTchr)
                                                         //{
 
-                                                        DataTable dtModificatn = GetModificationDetails("STEP", oTemp.TemplateId);
+                                                        DataTable dtModificatn = GetModificationDetails("STEP", oTemp.TemplateId, trans, con);
                                                         if (dtModificatn != null)
                                                         {
                                                             if (dtModificatn.Rows.Count > 0)
                                                             {
-                                                                bool mod_flag = CheckStepModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId, iCurrentStep);
+                                                                bool mod_flag = CheckStepModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId, iCurrentStep, trans, con);
 
                                                                 if (mod_flag)
                                                                 {
                                                                     oData = new clsData();
                                                                     string selqry = "SELECT ISNULL(ModificationInd, 0) as ModificationInd FROM DSTempHdr WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                                                    object mod = oData.FetchValue(selqry);
+                                                                    object mod = oData.FetchValueTrans(selqry, trans, con);
                                                                     if (mod != null)
                                                                     {
                                                                         if (Convert.ToBoolean(mod) != true)
@@ -21486,7 +21510,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             else if (colt.ToString() == "true")
                             {
 
-                                TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                                TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                 if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0)
                                 {
                                     if (bstepIndallMoveUp && bStepMoveUp)
@@ -21506,7 +21530,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     nextStep = sesResultchain[0].NextStep;
                                 }
 
-                                TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                 if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0)
                                 {
                                     if (bIndallMoveUp && bSetMoveUp)
@@ -21525,7 +21549,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     bSetMoveUp = sesResultchain[0].MovedForwardSet;
                                     nextSet = sesResultchain[0].NextSet;
                                 }
-                                TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                 if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0)
                                 {
                                     if (bPromptIndallMoveUp && bPromptMoveUp)
@@ -21574,14 +21598,14 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     else
                                     {
-                                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                         if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance == 0)
                                         {
                                             nextSet = sesResultchain[0].NextSet;
                                         }
 
                                     }
-                                    TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
 
                                     if (bStepMoveBack)
                                     {
@@ -21600,7 +21624,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     else
                                     {
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                         if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance == 0)
                                         {
                                             sNextLessonPrompt = sesResultchain[0].NextPrompt;
@@ -21609,7 +21633,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 }
                                 else
                                 {
-                                    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                     if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance == 0)
                                     {
 
@@ -21993,7 +22017,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         discreteInptData = new DiscreetTrial.InputData();
                         #region setrules
                         Rules TempRules = new Rules();
-                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                         if (TempRules != null)
                         {
                             set_moveupCount = TempRules.moveup;
@@ -22191,7 +22215,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         #endregion
                         #region promptrules
                         TempRules = new Rules();
-                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                         if (TempRules.count > 0)
                         {
                             bPrompt = true;
@@ -22487,12 +22511,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             "INNER JOIN DSTempSetColCalc DC ON DST.DSTempSetColId = DC.DSTempSetColId  INNER JOIN DSTempRule DR ON DR.DSTempSetColCalcId = DC.DSTempSetColCalcId " +
                             "WHERE (DT.DSTempHdrId =" + oTemp.TemplateId + ")AND DR.RuleType='PROMPT' AND DR.CriteriaType='MOVE UP' " +//AND DR.DSTempSetColId=" + iColId +
                             " AND DR.ActiveInd='A' AND DR.IsNA=1";
-                        promptUp = Convert.ToInt32(oData.FetchValue(strPromptCriteria));
+                        promptUp = Convert.ToInt32(oData.FetchValueTrans(strPromptCriteria, trans, con));
                         strPromptCriteria = "SELECT  Count(DR.DSTempRuleId)	FROM DSTempHdr DT  INNER JOIN DSTempSetCol DST ON DT.DSTempHdrId = DST.DSTempHdrId " +
                             "INNER JOIN DSTempSetColCalc DC ON DST.DSTempSetColId = DC.DSTempSetColId  INNER JOIN DSTempRule DR ON DR.DSTempSetColCalcId = DC.DSTempSetColCalcId " +
                             "WHERE (DT.DSTempHdrId =" + oTemp.TemplateId + ")AND DR.RuleType='PROMPT' AND DR.CriteriaType='MOVE DOWN' " +//AND DR.DSTempSetColId=" + iColId +
                             " AND DR.ActiveInd='A' AND DR.IsNA=1";
-                        promptDown = Convert.ToInt32(oData.FetchValue(strPromptCriteria));
+                        promptDown = Convert.ToInt32(oData.FetchValueTrans(strPromptCriteria, trans, con));
                         discreteCols[sColName].promptUp = promptUp;
                         discreteCols[sColName].promptDown = promptDown;
 
@@ -22500,20 +22524,20 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         " INNER JOIN DSTempSetCol DST ON DT.DSTempHdrId = DST.DSTempHdrId " +
                                         "INNER JOIN DSTempSetColCalc DC ON DST.DSTempSetColId = DC.DSTempSetColId" +
                                         " WHERE DT.DSTempHdrId =" + oTemp.TemplateId + ") then 'true' else 'false' end";
-                        object colt2 = oData.FetchValue(strqry2);
+                        object colt2 = oData.FetchValueTrans(strqry2, trans, con);
                         //string h2 = colt2.ToString();
                         bool indtest = false;
-                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                         if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                         {
                             indtest = true;
                         }
-                        TempRules = GetStepRules(oTemp.TemplateId, iColId);
+                        TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                         if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                         {
                             indtest = true;
                         }
-                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                         if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                         {
                             indtest = true;
@@ -22526,7 +22550,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             if (dr["ColTypeCd"].ToString() == "Text")
                             {
 
-                                TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                 colCalId = Convert.ToInt32(ViewState["colCalId"]);
                                 if (TempRules.pctCustomMoveUp.iScoreRequired > 0)
                                 {
@@ -22534,7 +22558,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     //int iStudentId, int colCalId, float iScoreRequired, int iSessonNumber,int iTotalCorrectInstance,bool bConsequetiveIndex, bool flag
                                     bool status = false;
                                     bcustMoveUp = ValidateUp(oSession.StudentId, colCalId, TempRules.pctCustomMoveUp.iScoreRequired, reqSess,
-                                        TempRules.pctCustomMoveUp.iTotalCorrectInstance, TempRules.pctCustomMoveUp.bConsequetiveIndex, status);
+                                        TempRules.pctCustomMoveUp.iTotalCorrectInstance, TempRules.pctCustomMoveUp.bConsequetiveIndex, status, trans, con);
                                     int setcount = TrialLists.totalSet;
 
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bCustomMoveupIOA, bIOA);
@@ -22567,7 +22591,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 {
                                     bool status = false;
                                     bCustMoveDown = ValidateDown(oSession.StudentId, colCalId, TempRules.pctCustomMoveDown.iScoreRequired, reqSess,
-                                        TempRules.pctCustomMoveDown.iTotalCorrectInstance, TempRules.pctCustomMoveDown.bConsequetiveIndex, status);
+                                        TempRules.pctCustomMoveDown.iTotalCorrectInstance, TempRules.pctCustomMoveDown.bConsequetiveIndex, status, trans, con);
                                     int setcount = TrialLists.totalSet;
 
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bCustomMovedownIOA, bIOA);
@@ -22604,27 +22628,27 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             {
                                 int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                                 string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
-                                object stat = oData.FetchValue(selqry1);
+                                object stat = oData.FetchValueTrans(selqry1, trans, con);
                                 if (stat != null && stat != DBNull.Value)
                                     MoveUpstat = Convert.ToInt16(stat);
                                 #region MoveUp in Less Than criteria- default
                                 if (MoveUpstat == 1)
                                 {
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                     if (TempRules.pctAvgDurationMoveUp.iScoreRequired == 0 || TempRules.pctAvgDurationMoveDown.iScoreRequired == 0)
                                     {
                                         freqdureloop++;
                                         bool status = true;
                                         //CompletionStatusSet = "";
-                                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                         avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                         totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                         if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                         {
                                             CompletionStatusSet = "";
                                             bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bAvgDurationMoveUpbIOAReqd, bIOA);
@@ -22666,7 +22690,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                         {
                                             bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bAvgDurationMoveDownbIOAReqd, bIOA);
@@ -22698,7 +22722,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         //CompletionStatusSet = "";
                                         avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                         totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                         //avg duration
                                         if (TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance > 0)
@@ -22708,7 +22732,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 bPromptAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -22745,7 +22769,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                 {
                                                     bPromptAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -22779,12 +22803,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             if (!bPromptAvgDurationMoveUp && !bPromptAvgDurationMoveDown)
                                             {
-                                                TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                                TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                                 if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                        TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                        TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -22827,7 +22851,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                 {
                                                     bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveDownIOA, bIOA);
@@ -22855,20 +22879,20 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         DiscreteFreqDurTextFlag = true;
                                     }
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     if (TempRules.pctTotalDurationMoveUp.iScoreRequired == 0 || TempRules.pctTotalDurationMoveDown.iScoreRequired == 0)
                                     {
                                         freqdureloop++;
                                         bool status = true;
                                         //CompletionStatusSet = "";
-                                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                         avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                         totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                         if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                         {
                                             CompletionStatusSet = "";
                                             bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bTotalDurationMoveUpbIOAReqd, bIOA);
@@ -22910,7 +22934,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                         {
                                             bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bTotalDurationMoveDownbIOAReqd, bIOA);
@@ -22946,7 +22970,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         //CompletionStatusSet = "";
                                         avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                         totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                         if (TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance > 0)
                                         {
@@ -22955,7 +22979,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 bPromptTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -22992,7 +23016,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
                                                     bPromptTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -23029,13 +23053,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             if (!bPromptTotDurationMoveUp && !bPromptTotDurationMoveDown)
                                             {
-                                                TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                                TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                                 if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     CompletionStatusSet = "";
                                                     bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                        TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                        TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -23067,7 +23091,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
                                                     bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveDownIOA, bIOA);
@@ -23103,20 +23127,20 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 #region MoveUp in More Than Criteria
                                 else if (MoveUpstat == 0)
                                 {
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                     if (TempRules.pctAvgDurationMoveUp.iScoreRequired == 0 || TempRules.pctAvgDurationMoveDown.iScoreRequired == 0)
                                     {
                                         freqdureloop++;
                                         bool status = true;
                                         CompletionStatusSet = "";
-                                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                         avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                         totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                         if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                         {
                                             bAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bAvgDurationMoveUpbIOAReqd, bIOA);
@@ -23159,7 +23183,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                         {
                                             bAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bAvgDurationMoveDownbIOAReqd, bIOA);
@@ -23191,7 +23215,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         CompletionStatusSet = "";
                                         avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                         totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                         //avg duration
                                         if (TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance > 0)
@@ -23201,7 +23225,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 bPromptAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -23238,7 +23262,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                 {
                                                     bPromptAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -23272,12 +23296,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             if (!bPromptAvgDurationMoveUp && !bPromptAvgDurationMoveDown)
                                             {
-                                                TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                                TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                                 if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     bAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
-                                                        TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status);
+                                                        TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -23320,7 +23344,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                 {
                                                     bAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveDownIOA, bIOA);
@@ -23348,20 +23372,20 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         DiscreteFreqDurTextFlag = true;
                                     }
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     if (TempRules.pctTotalDurationMoveUp.iScoreRequired == 0 || TempRules.pctTotalDurationMoveDown.iScoreRequired == 0)
                                     {
                                         freqdureloop++;
                                         bool status = true;
                                         CompletionStatusSet = "";
-                                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                         avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                         totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                         if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                         {
                                             CompletionStatusSet = "";
                                             bTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bTotalDurationMoveUpbIOAReqd, bIOA);
@@ -23403,7 +23427,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                         {
                                             bTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bTotalDurationMoveDownbIOAReqd, bIOA);
@@ -23439,7 +23463,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         CompletionStatusSet = "";
                                         avgDurationId = Convert.ToInt32(ViewState["avgDurationId"]);
                                         totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
 
                                         if (TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance > 0)
                                         {
@@ -23448,7 +23472,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 bPromptTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveUpMultiTecher, bMultyTchr);
@@ -23485,7 +23509,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
                                                     bPromptTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
                                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptMoveDownMultiTecher, bMultyTchr);
@@ -23522,13 +23546,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             if (!bPromptTotDurationMoveUp && !bPromptTotDurationMoveDown)
                                             {
-                                                TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                                TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                                 if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     CompletionStatusSet = "";
                                                     bTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
-                                                        TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status);
+                                                        TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
@@ -23560,7 +23584,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
                                                     bTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
-                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status);
+                                                        TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveDownIOA, bIOA);
@@ -23600,24 +23624,24 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             {
                                 int colId = Convert.ToInt32(dr["DSTempSetColId"]);
                                 string selqry1 = "select Moveupstat from dstempsetcol DsCol inner join DSTempHdr Hdr on Hdr.DSTempHdrId=DsCol.DSTempHdrId where dsCol.DSTempHdrId=" + oTemp.TemplateId + " And DSTempSetColId= " + colId;
-                                object stat = oData.FetchValue(selqry1);
+                                object stat = oData.FetchValueTrans(selqry1, trans, con);
                                 if (stat != null && stat != DBNull.Value)
                                     MoveUpstat = Convert.ToInt16(stat);
                                 #region MoveUp in Less Than criteria - Default
                                 if (MoveUpstat == 1)
                                 {
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     if (TempRules.pctFrequencyMoveUp.iScoreRequired == 0 || TempRules.pctFrequencyMoveDown.iScoreRequired == 0)
                                     {
                                         freqdureloop++;
                                         bool status = true;
                                         CompletionStatusSet = "";
-                                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                         freqId = Convert.ToInt32(ViewState["freqId"]);
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
                                             bFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveUpbIOAReqd, bIOA);
@@ -23657,7 +23681,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
                                             bFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveDownbIOAReqd, bIOA);
@@ -23691,13 +23715,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         CompletionStatusSet = "";
                                         freqId = Convert.ToInt32(ViewState["freqId"]);
                                         //for prompt move
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                         if (promptUp >= 1)
                                             bPromptFrequencyMoveUp = false;
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
                                             bPromptFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveUpbIOAReqd, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptFrequencyMoveUpbMultiTchr, bMultyTchr);
@@ -23734,7 +23758,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
                                                 bPromptFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveDownbIOAReqd, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptFrequencyMoveDownbMultiTchr, bMultyTchr);
@@ -23768,12 +23792,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         //end prompt section
                                         if (!bPromptFrequencyMoveUp && !bPromptFrequencyMoveDown)
                                         {
-                                            TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
                                                 bFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveUpbIOAReqd, bIOA);
@@ -23814,7 +23838,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
                                                 bFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveDownbIOAReqd, bIOA);
@@ -23846,18 +23870,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 #region MoveUp in More Than Criteria
                                 else if (MoveUpstat == 0)
                                 {
-                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                     if (TempRules.pctFrequencyMoveUp.iScoreRequired == 0 || TempRules.pctFrequencyMoveDown.iScoreRequired == 0)
                                     {
                                         freqdureloop++;
                                         bool status = true;
                                         CompletionStatusSet = "";
-                                        TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
                                         freqId = Convert.ToInt32(ViewState["freqId"]);
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
                                             bFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveUpbIOAReqd, bIOA);
@@ -23898,7 +23922,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
                                             bFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveDownbIOAReqd, bIOA);
@@ -23932,13 +23956,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         CompletionStatusSet = "";
                                         freqId = Convert.ToInt32(ViewState["freqId"]);
                                         //for prompt move
-                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                        TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                         if (promptUp >= 1)
                                             bPromptFrequencyMoveUp = false;
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
                                             bPromptFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveUpbIOAReqd, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptFrequencyMoveUpbMultiTchr, bMultyTchr);
@@ -23975,7 +23999,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
                                                 bPromptFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveDownbIOAReqd, bIOA);
                                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptFrequencyMoveDownbMultiTchr, bMultyTchr);
@@ -24009,12 +24033,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         //end prompt section
                                         if (!bPromptFrequencyMoveUp && !bPromptFrequencyMoveDown)
                                         {
-                                            TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                            TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
                                                 bFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveUpbIOAReqd, bIOA);
@@ -24055,7 +24079,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
                                                 bFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
-                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status);
+                                                    TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bFrequencyMoveDownbIOAReqd, bIOA);
@@ -24089,7 +24113,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             #region %independent of all steps
                             else if (dr["ColTypeCd"].ToString() == "Prompt" && colt2.ToString() == "true" && indtest)
                             {
-                                TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                 freqdureloop++;
                                 bool status = true;
                                 bool check = true;
@@ -24098,13 +24122,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 IndeallId = Convert.ToInt32(ViewState["IndeallId"]);
 
                                 //for prompt move
-                                TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                 if (promptUp >= 1)
                                     bPromptIndallMoveUp = false;
                                 if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                                 {
                                     bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                        TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                        TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptIndallMoveUpbMultiTchr, bMultyTchr);
@@ -24146,7 +24170,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0)
                                     {
                                         bPromptIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
-                                            TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status);
+                                            TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveDownbIOAReqd, bIOA);
                                         bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptIndallMoveDownbMultiTchr, bMultyTchr);
@@ -24186,12 +24210,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 // set Move up
                                 if (!bPromptIndallMoveUp && !bPromptIndallMoveDown)
                                 {
-                                    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                     if (TempRules.pctIndAllMoveUp.iScoreRequired > 0 && !check)
                                     {
                                         bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bIndallMoveUpbIOAReqd, bIOA);
@@ -24230,7 +24254,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if ((TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && check) || (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && !check1))
                                     {
                                         bIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
-                                            TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status);
+                                            TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bIndallMoveDownbIOAReqd, bIOA);
@@ -24274,7 +24298,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                             else if (dr["ColTypeCd"].ToString() == "+/-" && colt2.ToString() == "true" && indtest)
                             {
-                                TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                 freqdureloop++;
                                 bool status = true;
                                 bool check = true;
@@ -24283,13 +24307,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 IndeallId = Convert.ToInt32(ViewState["IndeallId"]);
 
                                 //for prompt move
-                                TempRules = GetPromptRules(oTemp.TemplateId, iColId);
+                                TempRules = GetPromptRules(oTemp.TemplateId, iColId, trans, con);
                                 if (promptUp >= 1)
                                     bPromptIndallMoveUp = false;
                                 if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                                 {
                                     bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                        TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                        TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptIndallMoveUpbMultiTchr, bMultyTchr);
@@ -24331,7 +24355,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0)
                                     {
                                         bPromptIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
-                                            TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status);
+                                            TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveDownbIOAReqd, bIOA);
                                         bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bPromptIndallMoveDownbMultiTchr, bMultyTchr);
@@ -24371,12 +24395,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 // set Move up
                                 if (!bPromptIndallMoveUp && !bPromptIndallMoveDown)
                                 {
-                                    TempRules = GetSetRules(oTemp.TemplateId, iColId);
+                                    TempRules = GetSetRules(oTemp.TemplateId, iColId, trans, con);
 
                                     if (TempRules.pctIndAllMoveUp.iScoreRequired > 0 && !check)
                                     {
                                         bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
-                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status);
+                                            TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bIndallMoveUpbIOAReqd, bIOA);
@@ -24415,7 +24439,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if ((TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && check) || (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && !check1))
                                     {
                                         bIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
-                                            TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status);
+                                            TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bIndallMoveDownbIOAReqd, bIOA);
@@ -24964,12 +24988,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (nextSet == 0) { nextSet = 1; }
                                 else
                                 {
-                                    DataTable dtModificatn = GetModificationDetails("SET", oTemp.TemplateId);
+                                    DataTable dtModificatn = GetModificationDetails("SET", oTemp.TemplateId, trans, con);
                                     if (dtModificatn != null)
                                     {
                                         if (dtModificatn.Rows.Count > 0)
                                         {
-                                            bool mod_flag = CheckSetModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId);
+                                            bool mod_flag = CheckSetModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId, trans, con);
 
                                             //if (mod_flag)
                                             //{
@@ -24981,7 +25005,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             {
                                                 oData = new clsData();
                                                 string selqry = "SELECT ISNULL(ModificationInd, 0) as ModificationInd FROM DSTempHdr WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                                object mod = oData.FetchValue(selqry);
+                                                object mod = oData.FetchValueTrans(selqry, trans, con);
                                                 if (mod != null)
                                                 {
                                                     if (Convert.ToBoolean(mod) != true)
@@ -25188,18 +25212,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (nextStep == 0) { nextStep = 1; }
                                 else
                                 {
-                                    DataTable dtModificatn = GetModificationDetails("STEP", oTemp.TemplateId);
+                                    DataTable dtModificatn = GetModificationDetails("STEP", oTemp.TemplateId, trans, con);
                                     if (dtModificatn != null)
                                     {
                                         if (dtModificatn.Rows.Count > 0)
                                         {
-                                            bool mod_flag = CheckStepModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId, iCurrentStep);
+                                            bool mod_flag = CheckStepModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId, iCurrentStep, trans, con);
 
                                             if (mod_flag)
                                             {
                                                 oData = new clsData();
                                                 string selqry = "SELECT ISNULL(ModificationInd, 0) as ModificationInd FROM DSTempHdr WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                                object mod = oData.FetchValue(selqry);
+                                                object mod = oData.FetchValueTrans(selqry, trans, con);
                                                 if (mod != null)
                                                 {
                                                     if (Convert.ToBoolean(mod) != true)
@@ -25350,18 +25374,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         {
                             if (bRuleStatusIOA && bRuleStatusMultiTchr)
                             {
-                                DataTable dtModificatn = GetModificationDetails("PROMPT", oTemp.TemplateId);
+                                DataTable dtModificatn = GetModificationDetails("PROMPT", oTemp.TemplateId, trans, con);
                                 if (dtModificatn != null)
                                 {
                                     if (dtModificatn.Rows.Count > 0)
                                     {
-                                        bool mod_flag = CheckPromptModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId, iCurrentStep, Convert.ToInt32(sCurrentLessonPrompt));
+                                        bool mod_flag = CheckPromptModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId, iCurrentStep, Convert.ToInt32(sCurrentLessonPrompt), trans, con);
 
                                         if (mod_flag)
                                         {
                                             oData = new clsData();
                                             string selqry = "SELECT ISNULL(ModificationInd, 0) as ModificationInd FROM DSTempHdr WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                            object mod = oData.FetchValue(selqry);
+                                            object mod = oData.FetchValueTrans(selqry, trans, con);
                                             if (mod != null)
                                             {
                                                 if (Convert.ToBoolean(mod) != true)
@@ -25669,18 +25693,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         if (nextSet == 0) { nextSet = 1; }
                         else
                         {
-                            DataTable dtModificatn = GetModificationDetails("SET", oTemp.TemplateId);
+                            DataTable dtModificatn = GetModificationDetails("SET", oTemp.TemplateId, trans, con);
                             if (dtModificatn != null)
                             {
                                 if (dtModificatn.Rows.Count > 0)
                                 {
-                                    bool mod_flag = CheckSetModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId);
+                                    bool mod_flag = CheckSetModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId, trans, con);
 
                                     if (mod_flag)
                                     {
                                         oData = new clsData();
                                         string selqry = "SELECT ISNULL(ModificationInd, 0) as ModificationInd FROM DSTempHdr WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                        object mod = oData.FetchValue(selqry);
+                                        object mod = oData.FetchValueTrans(selqry, trans, con);
                                         if (mod != null)
                                         {
                                             if (Convert.ToBoolean(mod) != true)
@@ -25821,18 +25845,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     if (bRuleStatusIOA && bRuleStatusMultiTchr)
                     {
                         iCurrentStep = 0;
-                        DataTable dtModificatn = GetModificationDetails("PROMPT", oTemp.TemplateId);
+                        DataTable dtModificatn = GetModificationDetails("PROMPT", oTemp.TemplateId, trans, con);
                         if (dtModificatn != null)
                         {
                             if (dtModificatn.Rows.Count > 0)
                             {
-                                bool mod_flag = CheckPromptModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId, iCurrentStep, Convert.ToInt32(sCurrentLessonPrompt));
+                                bool mod_flag = CheckPromptModification(Convert.ToInt32(dtModificatn.Rows[0]["ModificationRule"].ToString()), oTemp.TemplateId, iCurrentSetId, iCurrentStep, Convert.ToInt32(sCurrentLessonPrompt), trans, con);
 
                                 if (mod_flag)
                                 {
                                     oData = new clsData();
                                     string selqry = "SELECT ISNULL(ModificationInd, 0) as ModificationInd FROM DSTempHdr WHERE DSTempHdrId=" + oTemp.TemplateId;
-                                    object mod = oData.FetchValue(selqry);
+                                    object mod = oData.FetchValueTrans(selqry, trans, con);
                                     if (mod != null)
                                     {
                                         if (Convert.ToBoolean(mod) != true)
@@ -26040,22 +26064,22 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
     }
 
 
-    public DataTable GetModificationDetails(string RuleType, int TemplateId)
+    public DataTable GetModificationDetails(string RuleType, int TemplateId, SqlTransaction trans, SqlConnection con)
     {
         oData = new clsData();
         DataTable dt = new DataTable();
         string sqlstr = "SELECT CriteriaDetails,IsComment,ModificationComment,ModificationRule FROM DSTempRule WHERE DSTempHdrId=" + TemplateId +
                         " AND ActiveInd='A' AND CriteriaType='MODIFICATION'";
-        dt = oData.ReturnDataTable(sqlstr, false);
+        dt = oData.ReturnDataTableWithTransaction(sqlstr, con, trans, false);
 
         return dt;
     }
-    public bool CheckSetModification(int ModificationRule, int TemplateId, int SetId)
+    public bool CheckSetModification(int ModificationRule, int TemplateId, int SetId, SqlTransaction trans, SqlConnection con)
     {
         bool flag = false;
         string selstr = "SELECT COUNT(*)+1 FROM StdtSessEvent WHERE CheckUp_Down='SET MOVEDOWN' AND StudentId= " + oSession.StudentId + " AND DSTempHdrId=" + TemplateId;
         oData = new clsData();
-        object count = oData.FetchValue(selstr);
+        object count = oData.FetchValueTrans(selstr, trans, con);
         if (count != null)
         {
             if (Convert.ToInt32(count) >= ModificationRule)
@@ -26065,20 +26089,20 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         }
         string selbanner = "SELECT isnull(Bannerstatus,2) FROM DSTemphdr WHERE StudentId= " + oSession.StudentId + " AND DSTempHdrId=" + TemplateId;
         oData = new clsData();
-        int chkbanner = Convert.ToInt32(oData.FetchValue(selbanner));
+        int chkbanner = Convert.ToInt32(oData.FetchValueTrans(selbanner, trans, con));
         if (chkbanner != 0 && flag == true)
         {
             string UpdateQuerybnr = "UPDATE DSTempHdr SET Bannerstatus=1 WHERE StudentId= " + oSession.StudentId + " AND DSTempHdrId=" + oTemp.TemplateId; 
-        oData.Execute(UpdateQuerybnr);
+        oData.ExecuteWithTrans(UpdateQuerybnr, con, trans);
         }
         return flag;
     }
-    public bool CheckStepModification(int ModificationRule, int TemplateId, int SetId, int StepId)
+    public bool CheckStepModification(int ModificationRule, int TemplateId, int SetId, int StepId, SqlTransaction trans, SqlConnection con)
     {
         bool flag = false;
         string selstr = "SELECT COUNT(*)+1 FROM StdtSessEvent WHERE CheckUp_Down='STEP MOVEDOWN' AND StudentId= " + oSession.StudentId + " AND DSTempHdrId=" + TemplateId;
         oData = new clsData();
-        object count = oData.FetchValue(selstr);
+        object count = oData.FetchValueTrans(selstr, trans, con);
         if (count != null)
         {
             if (Convert.ToInt32(count) >= ModificationRule)
@@ -26088,20 +26112,20 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         }
         string selbanner = "SELECT  isnull(Bannerstatus,2)  FROM DSTemphdr WHERE StudentId= " + oSession.StudentId + " AND DSTempHdrId=" + TemplateId;
         oData = new clsData();
-        int chkbanner = Convert.ToInt32(oData.FetchValue(selbanner));
+        int chkbanner = Convert.ToInt32(oData.FetchValueTrans(selbanner, trans, con));
         if (chkbanner != 0 && flag == true)
         {
             string UpdateQuerybnr = "UPDATE DSTempHdr SET Bannerstatus=1 WHERE StudentId= " + oSession.StudentId + " AND DSTempHdrId=" + oTemp.TemplateId;
-            oData.Execute(UpdateQuerybnr);
+            oData.ExecuteWithTrans(UpdateQuerybnr, con, trans);
         }
         return flag;
     }
-    public bool CheckPromptModification(int ModificationRule, int TemplateId, int SetId, int StepId, int PromptId)
+    public bool CheckPromptModification(int ModificationRule, int TemplateId, int SetId, int StepId, int PromptId, SqlTransaction trans, SqlConnection con)
     {
         bool flag = false;
         string selstr = "SELECT COUNT(*)+1 FROM StdtSessEvent WHERE CheckUp_Down='PROMPT MOVEDOWN' AND StudentId= " + oSession.StudentId + " AND DSTempHdrId=" + TemplateId;
         oData = new clsData();
-        object count = oData.FetchValue(selstr);
+        object count = oData.FetchValueTrans(selstr, trans, con);
         if (count != null)
         {
             if (Convert.ToInt32(count) >= ModificationRule)
@@ -26111,16 +26135,16 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         }
         string selbanner = "SELECT  isnull(Bannerstatus,2)  FROM DSTemphdr WHERE StudentId= " + oSession.StudentId + " AND DSTempHdrId=" + TemplateId;
         oData = new clsData();
-        int chkbanner = Convert.ToInt32(oData.FetchValue(selbanner));
+        int chkbanner = Convert.ToInt32(oData.FetchValueTrans(selbanner, trans, con));
         if (chkbanner != 0 && flag == true)
         {
             string UpdateQuerybnr = "UPDATE DSTempHdr SET Bannerstatus=1 WHERE StudentId= " + oSession.StudentId + " AND DSTempHdrId=" + oTemp.TemplateId;
-            oData.Execute(UpdateQuerybnr);
+            oData.ExecuteWithTrans(UpdateQuerybnr, con, trans);
         }
         return flag;
     }
 
-    protected bool ValidateUp(int iStudentId, int colCalId, float iScoreRequired, int iSessonNumber, int iTotalCorrectInstance, bool bConsequetiveIndex, bool flag)
+    protected bool ValidateUp(int iStudentId, int colCalId, float iScoreRequired, int iSessonNumber, int iTotalCorrectInstance, bool bConsequetiveIndex, bool flag, SqlTransaction trans, SqlConnection con)
     {
         oData = new clsData();
         bool status = false;
@@ -26134,7 +26158,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         "(SELECT ISNULL(MAX(EvntTs),'1900-01-01') FROM StdtSessEvent " +
                         "WHERE  StudentId =" + iStudentId + " ) ORDER BY SH.StdtSessionHdrId";
 
-        dt = oData.ReturnDataTable(sqlstr, false);
+        dt = oData.ReturnDataTableWithTransaction(sqlstr, con, trans, false);
         int length = dt.Rows.Count;
         float[] values = new float[length];
         freqDurMUPcount = length;
@@ -26186,7 +26210,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         return status;
     }
 
-    protected bool ValidateUp1(int iStudentId, int colCalId, float iScoreRequired, int iSessonNumber, int iTotalCorrectInstance, bool bConsequetiveIndex, bool flag)
+    protected bool ValidateUp1(int iStudentId, int colCalId, float iScoreRequired, int iSessonNumber, int iTotalCorrectInstance, bool bConsequetiveIndex, bool flag, SqlTransaction trans, SqlConnection con)
     {
         oData = new clsData();
         bool status = false;
@@ -26200,7 +26224,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         "(SELECT ISNULL(MAX(EvntTs),'1900-01-01') FROM StdtSessEvent " +
                         "WHERE  StudentId =" + iStudentId + " ) ORDER BY SH.StdtSessionHdrId";
 
-        dt = oData.ReturnDataTable(sqlstr, false);
+        dt = oData.ReturnDataTableWithTransaction(sqlstr, con, trans, false);
         int length = dt.Rows.Count;
         float[] values = new float[length];
         int itreator = 0;
@@ -26245,7 +26269,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         return status;
     }
 
-    protected bool ValidateDown(int iStudentId, int colCalId, float iScoreRequired, int iSessonNumber, int iTotalCorrectInstance, bool bConsequetiveIndex, bool flag)
+    protected bool ValidateDown(int iStudentId, int colCalId, float iScoreRequired, int iSessonNumber, int iTotalCorrectInstance, bool bConsequetiveIndex, bool flag, SqlTransaction trans, SqlConnection con)
     {
         oData = new clsData();
         bool status = false;
@@ -26259,7 +26283,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         "(SELECT ISNULL(MAX(EvntTs),'1900-01-01') FROM StdtSessEvent " +
                         "WHERE  StudentId =" + iStudentId + " ) ORDER BY SH.StdtSessionHdrId";
 
-        dt = oData.ReturnDataTable(sqlstr, false);
+        dt = oData.ReturnDataTableWithTransaction(sqlstr, con, trans, false);
         int length = dt.Rows.Count;
         freqDurMDWNcount = length;
         float[] values = new float[length];
@@ -26305,7 +26329,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         return status;
     }
 
-    protected bool ValidateDown1(int iStudentId, int colCalId, float iScoreRequired, int iSessonNumber, int iTotalCorrectInstance, bool bConsequetiveIndex, bool flag)
+    protected bool ValidateDown1(int iStudentId, int colCalId, float iScoreRequired, int iSessonNumber, int iTotalCorrectInstance, bool bConsequetiveIndex, bool flag, SqlTransaction trans, SqlConnection con)
     {
         oData = new clsData();
         bool status = false;
@@ -26364,7 +26388,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         return status;
     }
 
-    protected Rules GetSetRules(int tempId, int colId)
+    protected Rules GetSetRules(int tempId, int colId, SqlTransaction trans, SqlConnection con)
     {
         oData = new clsData();
         //bSetMoveUp = true;
@@ -26383,7 +26407,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                    " INNER JOIN DSTempRule DR ON DR.DSTempSetColCalcId = DC.DSTempSetColCalcId " +
                    " WHERE (DT.DSTempHdrId =" + tempId + ")AND DR.RuleType='SET' AND DR.DSTempSetColId=" + colId + " AND DR.ActiveInd='A' AND DR.IsNA<>1";
         DataTable dt = new DataTable();
-        dt = oData.ReturnDataTable(sql, false);
+        dt = oData.ReturnDataTableWithTransaction(sql, con, trans, false);
         foreach (DataRow dr in dt.Rows)
         {
             ruleData.count++;
@@ -27203,7 +27227,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
     }
 
-    protected Rules GetPromptRules(int tempId, int colId)
+    protected Rules GetPromptRules(int tempId, int colId, SqlTransaction trans, SqlConnection con)
     {
         oData = new clsData();
         bool bIOAReq = false;
@@ -27219,7 +27243,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                    " INNER JOIN DSTempSetColCalc DC ON DST.DSTempSetColId = DC.DSTempSetColId " +
                    " INNER JOIN DSTempRule DR ON DR.DSTempSetColCalcId = DC.DSTempSetColCalcId " +
                    " WHERE (DT.DSTempHdrId =" + tempId + ")AND DR.RuleType='PROMPT' AND DR.DSTempSetColId=" + colId + " AND DR.ActiveInd='A' AND DR.IsNA<>1";
-        DataTable dt = oData.ReturnDataTable(sql, false);
+        DataTable dt = oData.ReturnDataTableWithTransaction(sql, con, trans, false);
         foreach (DataRow dr in dt.Rows)
         {
             ruleData.count++;
@@ -28180,7 +28204,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         return ruleData;
     }
 
-    protected Rules GetStepRules(int tempId, int colId)
+    protected Rules GetStepRules(int tempId, int colId, SqlTransaction trans, SqlConnection con)
     {
         oData = new clsData();
         Rules ruleData = new Rules();
@@ -28196,7 +28220,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                    " INNER JOIN DSTempRule DR ON DR.DSTempSetColCalcId = DC.DSTempSetColCalcId " +
                    " WHERE (DT.DSTempHdrId =" + tempId + ")AND DR.RuleType='STEP' AND DR.DSTempSetColId=" + colId + " AND DR.ActiveInd='A' AND DR.IsNA<>1";
         DataTable dt = new DataTable();
-        dt = oData.ReturnDataTable(sql, false);
+        dt = oData.ReturnDataTableWithTransaction(sql, con, trans, false);
         foreach (DataRow dr in dt.Rows)
         {
             ruleData.count++;
