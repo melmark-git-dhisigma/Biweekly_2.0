@@ -261,6 +261,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         }
         else
         {
+            ClsTestDataLog clsData = new ClsTestDataLog();
             if (ViewState["hfTextScore"] != null)
             {
                 if (hfTextScore.Value == "")
@@ -519,24 +520,42 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
     public void SaveHiddenfieldVS()
     {
-        ViewState["hfTextScore"] = hfTextScore.Value;
-        ViewState["hfResultStep_Acc"] = hfResultStep_Acc.Value;
-        ViewState["hfResultStep_Prmpt"] = hfResultStep_Prmpt.Value;
-        ViewState["hfRslt1_ExcludeCrntStep_Acc"] = hfRslt1_ExcludeCrntStep_Acc.Value;
-        ViewState["hfRslt2_ExcludeCrntStep_Acc"] = hfRslt2_ExcludeCrntStep_Acc.Value;
-        ViewState["hfRslt1_Acc"] = hfRslt1_Acc.Value;
-        ViewState["hfRslt2_Acc"] = hfRslt2_Acc.Value;
-        ViewState["hfRslt1_Prmt"] = hfRslt1_Prmt.Value;
-        ViewState["hfRslt2_Prmt"] = hfRslt2_Prmt.Value;
-        ViewState["hfRslt1_Ind"] = hfRslt1_Ind.Value;
-        ViewState["hfRslt2_Ind"] = hfRslt2_Ind.Value;
-        ViewState["hfRslt1_IndAll"] = hfRslt1_IndAll.Value;
-        ViewState["hfRslt2_IndAll"] = hfRslt2_IndAll.Value;
-        ViewState["hfAvgDur"] = hfAvgDur.Value;
-        ViewState["hfTotDur"] = hfTotDur.Value;
-        ViewState["hf_Freq"] = hf_Freq.Value;
-        ViewState["hfTotCorct"] = hfTotCorct.Value;
-        ViewState["hfInTotCorct"] = hfInTotCorct.Value;
+        if (!string.IsNullOrEmpty(hfTextScore.Value))
+                ViewState["hfTextScore"] = hfTextScore.Value;
+        if (!string.IsNullOrEmpty(hfResultStep_Acc.Value))
+                ViewState["hfResultStep_Acc"] = hfResultStep_Acc.Value;
+        if (!string.IsNullOrEmpty(hfResultStep_Prmpt.Value))
+                ViewState["hfResultStep_Prmpt"] = hfResultStep_Prmpt.Value;
+        if (!string.IsNullOrEmpty(hfRslt1_ExcludeCrntStep_Acc.Value))
+                ViewState["hfRslt1_ExcludeCrntStep_Acc"] = hfRslt1_ExcludeCrntStep_Acc.Value;
+        if (!string.IsNullOrEmpty(hfRslt2_ExcludeCrntStep_Acc.Value))
+                ViewState["hfRslt2_ExcludeCrntStep_Acc"] = hfRslt2_ExcludeCrntStep_Acc.Value;
+        if (!string.IsNullOrEmpty(hfRslt1_Acc.Value))
+                ViewState["hfRslt1_Acc"] = hfRslt1_Acc.Value;
+        if (!string.IsNullOrEmpty(hfRslt2_Acc.Value))
+                ViewState["hfRslt2_Acc"] = hfRslt2_Acc.Value;
+        if (!string.IsNullOrEmpty(hfRslt1_Prmt.Value))
+                ViewState["hfRslt1_Prmt"] = hfRslt1_Prmt.Value;
+        if (!string.IsNullOrEmpty(hfRslt2_Prmt.Value))
+                ViewState["hfRslt2_Prmt"] = hfRslt2_Prmt.Value;
+        if (!string.IsNullOrEmpty(hfRslt1_Ind.Value))
+                ViewState["hfRslt1_Ind"] = hfRslt1_Ind.Value;
+        if (!string.IsNullOrEmpty(hfRslt2_Ind.Value))
+                ViewState["hfRslt2_Ind"] = hfRslt2_Ind.Value;
+        if (!string.IsNullOrEmpty(hfRslt1_IndAll.Value))
+                ViewState["hfRslt1_IndAll"] = hfRslt1_IndAll.Value;
+        if (!string.IsNullOrEmpty(hfRslt2_IndAll.Value))
+                ViewState["hfRslt2_IndAll"] = hfRslt2_IndAll.Value;
+        if (!string.IsNullOrEmpty(hfAvgDur.Value))
+                ViewState["hfAvgDur"] = hfAvgDur.Value;
+        if (!string.IsNullOrEmpty(hfTotDur.Value))
+                ViewState["hfTotDur"] = hfTotDur.Value;
+        if (!string.IsNullOrEmpty(hf_Freq.Value))
+                ViewState["hf_Freq"] = hf_Freq.Value;
+        if (!string.IsNullOrEmpty(hfTotCorct.Value))
+                ViewState["hfTotCorct"] = hfTotCorct.Value;
+        if (!string.IsNullOrEmpty(hfInTotCorct.Value))
+                ViewState["hfInTotCorct"] = hfInTotCorct.Value;
     }
 
     //protected void Page_PreRender(object sender, EventArgs e)
@@ -3462,7 +3481,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     DataTable dtsteps = oDS.dtSteps;
 
                                     string strQuery = "SELECT COUNT(1) from StdtSessStimuliActivity where DSTempHdrId=" + oTemp.TemplateId;
-                                    int stimulyCount = Convert.ToInt32(oData.FetchValue(strQuery));
+                                    int stimulyCount = Convert.ToInt32(oData.FetchValueTrans(strQuery, trans, con));
                                     if (stimulyCount == 0)
                                     {
                                         object verNo = oData.FetchValueTrans("select VerNbr from DSTempHdr where DSTempHdrId=" + oTemp.TemplateId + "", trans, con);
@@ -4279,7 +4298,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
     protected bool SaveMeasuremnts(int sessHdrId, SqlConnection con, SqlTransaction tran)
     {
-        ClsErrorLog clErr = new ClsErrorLog();
+        ClsTestDataLog clsData = new ClsTestDataLog();
         bool valid = false;
         string value = "";
         try
@@ -4560,15 +4579,53 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             {
                                                 try
                                                 {
-                                                    clErr.WriteToLog("ScoreMismatch:\n" + "StdtSessionHdrId=" + sessHdrId + 
-                                                        "\nQuery:\n" + sqlStr + "\nDataTable:\n" + ConvertDataTableToString(dt) +
-                                                        "\nCalcType:"+dr["CalcType"].ToString() +
-                                                        "\nHF Values:-\n" +
-                                                        "hfTextScore:" + hfTextScore.Value + "\nhfResultStep_Acc:" + hfResultStep_Acc.Value + "\nhfResultStep_Prmpt:" + hfResultStep_Prmpt.Value + "\nhfRslt1_ExcludeCrntStep_Acc:" + hfRslt1_ExcludeCrntStep_Acc.Value + "\nhfRslt2_ExcludeCrntStep_Acc:" + hfRslt2_ExcludeCrntStep_Acc.Value + "\nhfRslt1_Acc:" + hfRslt1_Acc.Value + "\nhfRslt2_Acc:" + hfRslt2_Acc.Value + "\nhfRslt1_Prmt:" + hfRslt1_Prmt.Value + "\nhfRslt2_Prmt:" + hfRslt2_Prmt.Value + "\nhfRslt1_Ind:" + hfRslt1_Ind.Value + "\nhfRslt2_Ind:" + hfRslt2_Ind.Value + "\nhfRslt1_IndAll:" + hfRslt1_IndAll.Value + "\nhfRslt2_IndAll:" + hfRslt2_IndAll.Value + "\nhfAvgDur:" + hfAvgDur.Value + "\nhfTotDur:" + hfTotDur.Value + "\nhf_Freq:" + hf_Freq.Value + "\nhfTotCorct:" + hfTotCorct.Value + "\nhfInTotCorct:" + hfInTotCorct.Value);
+                                                    clsData.WriteToLog("ScoreMismatch:\n" + 
+                                                    "StdtSessionHdrId=" + sessHdrId + 
+                                                    "\nQuery:\n" + (sqlStr ?? "") + 
+                                                    "\nDataTable:\n" + ConvertDataTableToString(dt) +
+                                                    "\nCalcType:" + (dr["CalcType"] != DBNull.Value ? dr["CalcType"].ToString() : "") + 
+                                                    "\nViewState Values:-\n" +
+                                                    "hfTextScore:" + (ViewState["hfTextScore"] ?? "") + "\n" +
+                                                    "hfResultStep_Acc:" + (ViewState["hfResultStep_Acc"] ?? "") + "\n" +
+                                                    "hfResultStep_Prmpt:" + (ViewState["hfResultStep_Prmpt"] ?? "") + "\n" +
+                                                    "hfRslt1_ExcludeCrntStep_Acc:" + (ViewState["hfRslt1_ExcludeCrntStep_Acc"] ?? "") + "\n" +
+                                                    "hfRslt2_ExcludeCrntStep_Acc:" + (ViewState["hfRslt2_ExcludeCrntStep_Acc"] ?? "") + "\n" +
+                                                    "hfRslt1_Acc:" + (ViewState["hfRslt1_Acc"] != null ? ViewState["hfRslt1_Acc"].ToString() : "") + "\n" +
+                                                    "hfRslt2_Acc:" + (ViewState["hfRslt2_Acc"] ?? "") + "\n" +
+                                                    "hfRslt1_Prmt:" + (ViewState["hfRslt1_Prmt"] ?? "null") + "\n" +
+                                                    "hfRslt2_Prmt:" + (ViewState["hfRslt2_Prmt"] ?? "null") + "\n" +
+                                                    "hfRslt1_Ind:" + (ViewState["hfRslt1_Ind"] ?? "null") + "\n" +
+                                                    "hfRslt2_Ind:" + (ViewState["hfRslt2_Ind"] ?? "null") + "\n" +
+                                                    "hfRslt1_IndAll:" + (ViewState["hfRslt1_IndAll"] ?? "null") + "\n" +
+                                                    "hfRslt2_IndAll:" + (ViewState["hfRslt2_IndAll"] ?? "null") + "\n" +
+                                                    "hfAvgDur:" + (ViewState["hfAvgDur"] ?? "null") + "\n" +
+                                                    "hfTotDur:" + (ViewState["hfTotDur"] ?? "null") + "\n" +
+                                                    "hf_Freq:" + (ViewState["hf_Freq"] ?? "null") + "\n" +
+                                                    "hfTotCorct:" + (ViewState["hfTotCorct"] ?? "null") + "\n" +
+                                                    "hfInTotCorct:" + (ViewState["hfInTotCorct"] ?? "null") +
+                                                    "\nHF Values:-\n" +
+                                                    "hfTextScore:" + (hfTextScore.Value ?? "null") + "\n" +
+                                                    "hfResultStep_Acc:" + (hfResultStep_Acc.Value ?? "null") + "\n" +
+                                                    "hfResultStep_Prmpt:" + (hfResultStep_Prmpt.Value ?? "null") + "\n" +
+                                                    "hfRslt1_ExcludeCrntStep_Acc:" + (hfRslt1_ExcludeCrntStep_Acc.Value ?? "null") + "\n" +
+                                                    "hfRslt2_ExcludeCrntStep_Acc:" + (hfRslt2_ExcludeCrntStep_Acc.Value ?? "null") + "\n" +
+                                                    "hfRslt1_Acc:" + (hfRslt1_Acc.Value ?? "null") + "\n" +
+                                                    "hfRslt2_Acc:" + (hfRslt2_Acc.Value ?? "null") + "\n" +
+                                                    "hfRslt1_Prmt:" + (hfRslt1_Prmt.Value ?? "null") + "\n" +
+                                                    "hfRslt2_Prmt:" + (hfRslt2_Prmt.Value ?? "null") + "\n" +
+                                                    "hfRslt1_Ind:" + (hfRslt1_Ind.Value ?? "null") + "\n" +
+                                                    "hfRslt2_Ind:" + (hfRslt2_Ind.Value ?? "null") + "\n" +
+                                                    "hfRslt1_IndAll:" + (hfRslt1_IndAll.Value ?? "null") + "\n" +
+                                                    "hfRslt2_IndAll:" + (hfRslt2_IndAll.Value ?? "null") + "\n" +
+                                                    "hfAvgDur:" + (hfAvgDur.Value ?? "null") + "\n" +
+                                                    "hfTotDur:" + (hfTotDur.Value ?? "null") + "\n" +
+                                                    "hf_Freq:" + (hf_Freq.Value ?? "null") + "\n" +
+                                                    "hfTotCorct:" + (hfTotCorct.Value ?? "null") + "\n" +
+                                                    "hfInTotCorct:" + (hfInTotCorct.Value ?? "null"));
                                                 }
                                                 catch (Exception exep)
                                                 {
-                                                    clErr.WriteToLog("ScoreMismatch:Error:" + exep.ToString() + "StdtSessionHdrId=" + sessHdrId);
+                                                    clsData.WriteToLog("ScoreMismatch:Error:" + exep.ToString() + "StdtSessionHdrId=" + sessHdrId);
                                                 }
                                             }
 
@@ -4595,6 +4652,59 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             //    oData.ExecuteWithTrans(updateQry, con, tran); valid = true;
                                             //}
 
+                                            if (score == "0" && tbl_Measure.Rows.Count == 0)
+                                            {
+                                                try
+                                                {
+                                                    clsData.WriteToLog("ScoreMismatch After Insert:\n" +
+                                                    "StdtSessionHdrId=" + sessHdrId +
+                                                    "\nQuery:\n" + (sqlStr ?? "") +
+                                                    "\nDataTable:\n" + ConvertDataTableToString(dt) +
+                                                    "\nCalcType:" + (dr["CalcType"] != DBNull.Value ? dr["CalcType"].ToString() : "") +
+                                                    "\nViewState Values:-\n" +
+                                                    "hfTextScore:" + (ViewState["hfTextScore"] ?? "") + "\n" +
+                                                    "hfResultStep_Acc:" + (ViewState["hfResultStep_Acc"] ?? "") + "\n" +
+                                                    "hfResultStep_Prmpt:" + (ViewState["hfResultStep_Prmpt"] ?? "") + "\n" +
+                                                    "hfRslt1_ExcludeCrntStep_Acc:" + (ViewState["hfRslt1_ExcludeCrntStep_Acc"] ?? "") + "\n" +
+                                                    "hfRslt2_ExcludeCrntStep_Acc:" + (ViewState["hfRslt2_ExcludeCrntStep_Acc"] ?? "") + "\n" +
+                                                    "hfRslt1_Acc:" + (ViewState["hfRslt1_Acc"] != null ? ViewState["hfRslt1_Acc"].ToString() : "") + "\n" +
+                                                    "hfRslt2_Acc:" + (ViewState["hfRslt2_Acc"] ?? "") + "\n" +
+                                                    "hfRslt1_Prmt:" + (ViewState["hfRslt1_Prmt"] ?? "null") + "\n" +
+                                                    "hfRslt2_Prmt:" + (ViewState["hfRslt2_Prmt"] ?? "null") + "\n" +
+                                                    "hfRslt1_Ind:" + (ViewState["hfRslt1_Ind"] ?? "null") + "\n" +
+                                                    "hfRslt2_Ind:" + (ViewState["hfRslt2_Ind"] ?? "null") + "\n" +
+                                                    "hfRslt1_IndAll:" + (ViewState["hfRslt1_IndAll"] ?? "null") + "\n" +
+                                                    "hfRslt2_IndAll:" + (ViewState["hfRslt2_IndAll"] ?? "null") + "\n" +
+                                                    "hfAvgDur:" + (ViewState["hfAvgDur"] ?? "null") + "\n" +
+                                                    "hfTotDur:" + (ViewState["hfTotDur"] ?? "null") + "\n" +
+                                                    "hf_Freq:" + (ViewState["hf_Freq"] ?? "null") + "\n" +
+                                                    "hfTotCorct:" + (ViewState["hfTotCorct"] ?? "null") + "\n" +
+                                                    "hfInTotCorct:" + (ViewState["hfInTotCorct"] ?? "null") +
+                                                    "\nHF Values:-\n" +
+                                                    "hfTextScore:" + (hfTextScore.Value ?? "null") + "\n" +
+                                                    "hfResultStep_Acc:" + (hfResultStep_Acc.Value ?? "null") + "\n" +
+                                                    "hfResultStep_Prmpt:" + (hfResultStep_Prmpt.Value ?? "null") + "\n" +
+                                                    "hfRslt1_ExcludeCrntStep_Acc:" + (hfRslt1_ExcludeCrntStep_Acc.Value ?? "null") + "\n" +
+                                                    "hfRslt2_ExcludeCrntStep_Acc:" + (hfRslt2_ExcludeCrntStep_Acc.Value ?? "null") + "\n" +
+                                                    "hfRslt1_Acc:" + (hfRslt1_Acc.Value ?? "null") + "\n" +
+                                                    "hfRslt2_Acc:" + (hfRslt2_Acc.Value ?? "null") + "\n" +
+                                                    "hfRslt1_Prmt:" + (hfRslt1_Prmt.Value ?? "null") + "\n" +
+                                                    "hfRslt2_Prmt:" + (hfRslt2_Prmt.Value ?? "null") + "\n" +
+                                                    "hfRslt1_Ind:" + (hfRslt1_Ind.Value ?? "null") + "\n" +
+                                                    "hfRslt2_Ind:" + (hfRslt2_Ind.Value ?? "null") + "\n" +
+                                                    "hfRslt1_IndAll:" + (hfRslt1_IndAll.Value ?? "null") + "\n" +
+                                                    "hfRslt2_IndAll:" + (hfRslt2_IndAll.Value ?? "null") + "\n" +
+                                                    "hfAvgDur:" + (hfAvgDur.Value ?? "null") + "\n" +
+                                                    "hfTotDur:" + (hfTotDur.Value ?? "null") + "\n" +
+                                                    "hf_Freq:" + (hf_Freq.Value ?? "null") + "\n" +
+                                                    "hfTotCorct:" + (hfTotCorct.Value ?? "null") + "\n" +
+                                                    "hfInTotCorct:" + (hfInTotCorct.Value ?? "null"));
+                                                }
+                                                catch (Exception exep)
+                                                {
+                                                    clsData.WriteToLog("ScoreMismatch:Error:" + exep.ToString() + "StdtSessionHdrId=" + sessHdrId);
+                                                }
+                                            }
 
 
                                         }
@@ -6008,8 +6118,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                  " ,ISNULL(MAX(NextStepId),0)NextStepId,ISNULL(MAX(NextPromptId),0)NextPromptId" +
                  " FROM DSTempHdr Hdr LEFT JOIN StdtDSStat Stat  ON Hdr.DSTempHdrId = Stat.DSTempHdrId " +
                   " WHERE Hdr.DSTempHdrId= " + oTemp.TemplateId + " GROUP BY Hdr.SkillType, Hdr.LessonPlanId ";
-
-                reader = oData.ReturnDataReader(strQry, false);
+                SqlCommand cmd = con.CreateCommand();
+                cmd.Transaction = trans;
+                cmd.CommandText = strQry;
+                reader = cmd.ExecuteReader(CommandBehavior.Default);
+                //reader = oData.ReturnDataReader(strQry, false);
                 if (reader.Read())
                 {
                     iCurrentSetId = Convert.ToInt32(reader["NextSetId"]);
@@ -6773,15 +6886,15 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
 
                     oDisc = new DiscreteSession();
-                    TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
+                    TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
 
                     //if (chainedInptData.MultiTeacherRequired)
-                    bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId);
+                    bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId, trans, con);
                     // else
                     //    bMultyTchr = false;
 
                     // if (chainedInptData.IOARequired)
-                    bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId);
+                    bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId, trans, con);
                     // else
                     //    bIOA = false;
                     //Trials = trails.GetTrialLists(8, 1, ht[key].RequiredSession(), key);
@@ -10638,7 +10751,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             //Check for all previous step that it all succeeds to move forward
                             for (int istep = 1; istep < iCurrentStepExecuting; istep++)
                             {
-                                TrialLists = oDisc.GetTrialListsForPreStep(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, istep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
+                                TrialLists = oDisc.GetTrialListsForPreStep(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, istep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                                 chainedCols[sColName].SessionCount = TrialLists.sessionCount;
                                 sesResultchain[index] = null;
                                 chainedCols[sColName].SetInputData(istep.ToString(), TargetPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -10799,7 +10912,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             {
                                 bStepCountCriteria = false;
                                 sesResultchain[index] = null;
-                                TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
+                                TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                                 chainedCols[sColName].SessionCount = TrialLists.sessionCount;
                                 chainedCols[sColName].SetInputData(iCurrentStep.ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
                                 sesResultchain[index] = Chained.Model.Execute(chainedCols[sColName], false, bpromptColumn, oDS.ChainType);
@@ -10838,7 +10951,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         {
                                             bool stepMoveUpflag = sesResultchain[index].MovedForwardStep;
                                             bool stepMoveDownflag = sesResultchain[index].MovedBackStep;
-                                            TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
+                                            TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                                             chainedCols[sColName].StepCount = TrialLists.trialsCount;
 
                                             chainedCols[sColName].SetInputData((iCurrentStep - 1).ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -10906,7 +11019,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     else
                                     {
-                                        TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
+                                        TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                                         chainedCols[sColName].StepCount = TrialLists.trialsCount;
 
                                         chainedCols[sColName].SetInputData((iCurrentStep - 1).ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -11597,7 +11710,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             }
 
 
-                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveUp, "Set");
+                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveUp, "Set", trans, con);
                         }
                         #endregion
                         #region setmoveback
@@ -11728,7 +11841,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                 }
                             }
-                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveBack, "Set");
+                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveBack, "Set", trans, con);
                         }
                         #endregion
                         #region stepmoveup
@@ -11820,7 +11933,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                 }
                             }
-                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntStep, bStepMoveUp, "Step");
+                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntStep, bStepMoveUp, "Step", trans, con);
                         }
                         #endregion
                         #region stepmoveback
@@ -11938,7 +12051,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                 }
                             }
-                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntStep, bStepMoveBack, "Step");
+                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntStep, bStepMoveBack, "Step", trans, con);
                         }
                         #endregion
                         #region promptmoveup
@@ -11985,7 +12098,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                 }
                             }
-                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveUp, "Prompt");
+                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveUp, "Prompt", trans, con);
                         }
                         #endregion
                         #region promptmoveback
@@ -12058,7 +12171,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                 }
                             }
-                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveBack, "Prompt");
+                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveBack, "Prompt", trans, con);
                         }
                         #endregion
                         if (sesResultchain != null)
@@ -12083,7 +12196,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 {
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bSetMoveUpMultiTecher, bMultyTchr);
-                                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete");
+                                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete", trans, con);
                                 }
                             }
                         }
@@ -12519,14 +12632,14 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     int counter = discreteCols.Count;
                     int ind = 0;
                     oDisc = new DiscreteSession();
-                    TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, discreteCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
+                    TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, discreteCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                     //if (discreteInptData.MultiTeacherRequired)
-                    bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId);
+                    bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId, trans, con);
                     // else
                     //    bMultyTchr = false;
 
                     // if (discreteInptData.IOARequired)
-                    bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId);
+                    bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId, trans, con);
                     // else
                     //     bIOA = false;
                     //Trials = trails.GetTrialLists(8, 1, ht[key].RequiredSession(), key);
@@ -14873,7 +14986,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 bSetCompleted = false;
                             }
 
-                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveUp, "Set");
+                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveUp, "Set", trans, con);
                         }
                         #endregion
                         #region setmoveback
@@ -14974,7 +15087,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                             }
 
-                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveBack, "Set");
+                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveBack, "Set", trans, con);
                         }
                         #endregion
                         #region promptmoveup
@@ -15027,7 +15140,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 }
                             }
 
-                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveUp, "Prompt");
+                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveUp, "Prompt", trans, con);
                         }
                         #endregion
                         #region promptmoveback
@@ -15107,7 +15220,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 }
                             }
 
-                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveBack, "Prompt");
+                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveBack, "Prompt", trans, con);
                         }
                         #endregion
                         if (sesResult != null)
@@ -15125,7 +15238,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     {
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
                                         bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bSetMoveUpMultiTecher, bMultyTchr);
-                                        DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete");
+                                        DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete", trans, con);
                                     }
                                 }
                                 else
@@ -15140,7 +15253,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         {
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bSetMoveUpMultiTecher, bMultyTchr);
-                                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete");
+                                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete", trans, con);
                                         }
                                     }
                                 }
@@ -15156,7 +15269,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     {
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
                                         bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bSetMoveUpMultiTecher, bMultyTchr);
-                                        DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete");
+                                        DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete", trans, con);
                                     }
                                 }
                         }
@@ -16547,15 +16660,15 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
 
                         oDisc = new DiscreteSession();
-                        TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
+                        TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
 
                         //if (chainedInptData.MultiTeacherRequired)
-                        bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId);
+                        bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId, trans, con);
                         // else
                         //    bMultyTchr = false;
 
                         // if (chainedInptData.IOARequired)
-                        bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId);
+                        bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId, trans, con);
                         // else
                         //    bIOA = false;
                         //Trials = trails.GetTrialLists(8, 1, ht[key].RequiredSession(), key);
@@ -20809,7 +20922,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 //Check for all previous step that it all succeeds to move forward
                                 for (int istep = 1; istep < iCurrentStepExecuting; istep++)
                                 {
-                                    TrialLists = oDisc.GetTrialListsForPreStep(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, istep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
+                                    TrialLists = oDisc.GetTrialListsForPreStep(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, istep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                                     chainedCols[sColName].SessionCount = TrialLists.sessionCount;
                                     sesResultchain[index] = null;
                                     chainedCols[sColName].SetInputData(istep.ToString(), TargetPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -20970,7 +21083,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 {
                                     bStepCountCriteria = false;
                                     sesResultchain[index] = null;
-                                    TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
+                                    TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                                     chainedCols[sColName].SessionCount = TrialLists.sessionCount;
                                     chainedCols[sColName].SetInputData(iCurrentStep.ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
                                     sesResultchain[index] = Chained.Model.Execute(chainedCols[sColName], false, bpromptColumn, oDS.ChainType);
@@ -21009,7 +21122,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             {
                                                 bool stepMoveUpflag = sesResultchain[index].MovedForwardStep;
                                                 bool stepMoveDownflag = sesResultchain[index].MovedBackStep;
-                                                TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
+                                                TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                                                 chainedCols[sColName].StepCount = TrialLists.trialsCount;
 
                                                 chainedCols[sColName].SetInputData((iCurrentStep - 1).ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -21077,7 +21190,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         else
                                         {
-                                            TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
+                                            TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                                             chainedCols[sColName].StepCount = TrialLists.trialsCount;
 
                                             chainedCols[sColName].SetInputData((iCurrentStep - 1).ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -22295,14 +22408,14 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         int counter = discreteCols.Count;
                         int ind = 0;
                         oDisc = new DiscreteSession();
-                        TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, discreteCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
+                        TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, discreteCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                         //if (discreteInptData.MultiTeacherRequired)
-                        bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId);
+                        bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId, trans, con);
                         // else
                         //    bMultyTchr = false;
 
                         // if (discreteInptData.IOARequired)
-                        bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId);
+                        bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId, trans, con);
                         // else
                         //     bIOA = false;
                         //Trials = trails.GetTrialLists(8, 1, ht[key].RequiredSession(), key);
@@ -24834,7 +24947,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     }
 
 
-                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveUp, "Set");
+                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveUp, "Set", trans, con);
                 }
                 #endregion
                 #region setmoveback
@@ -24965,7 +25078,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             }
                         }
                     }
-                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveBack, "Set");
+                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveBack, "Set", trans, con);
                 }
                 #endregion
                 #region stepmoveup
@@ -25058,7 +25171,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             }
                         }
                     }
-                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntStep, bStepMoveUp, "Step");
+                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntStep, bStepMoveUp, "Step", trans, con);
                 }
                 #endregion
                 #region stepmoveback
@@ -25176,7 +25289,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             }
                         }
                     }
-                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntStep, bStepMoveBack, "Step");
+                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntStep, bStepMoveBack, "Step", trans, con);
                 }
                 #endregion
                 #region promptmoveup
@@ -25223,7 +25336,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             }
                         }
                     }
-                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveUp, "Prompt");
+                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveUp, "Prompt", trans, con);
                 }
                 #endregion
                 #region promptmoveback
@@ -25296,7 +25409,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             }
                         }
                     }
-                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveBack, "Prompt");
+                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveBack, "Prompt", trans, con);
                 }
                 #endregion
                 if (sesResultchain != null)
@@ -25321,7 +25434,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         {
                             bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bSetMoveUpMultiTecher, bMultyTchr);
-                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete");
+                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete", trans, con);
                         }
                     }
                 }
@@ -25540,7 +25653,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         bSetCompleted = false;
                     }
 
-                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveUp, "Set");
+                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveUp, "Set", trans, con);
                 }
                 #endregion
                 #region setmoveback
@@ -25641,7 +25754,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                     }
 
-                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveBack, "Set");
+                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveBack, "Set", trans, con);
                 }
                 #endregion
                 #region promptmoveup
@@ -25694,7 +25807,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         }
                     }
 
-                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveUp, "Prompt");
+                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveUp, "Prompt", trans, con);
                 }
                 #endregion
                 #region promptmoveback
@@ -25774,7 +25887,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         }
                     }
 
-                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveBack, "Prompt");
+                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveBack, "Prompt", trans, con);
                 }
                 #endregion
                 if (sesResult != null)
@@ -25792,7 +25905,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             {
                                 bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bSetMoveUpMultiTecher, bMultyTchr);
-                                DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete");
+                                DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete", trans, con);
                             }
                         }
                         else
@@ -25807,7 +25920,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 {
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bSetMoveUpMultiTecher, bMultyTchr);
-                                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete");
+                                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete", trans, con);
                                 }
                             }
                         }
@@ -25823,7 +25936,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             {
                                 bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bSetMoveUpMultiTecher, bMultyTchr);
-                                DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete");
+                                DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete", trans, con);
                             }
                         }
                 }
@@ -25839,7 +25952,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         oData.Execute(strQry);
     }
     //To display IOA / Multiteacher required for MOVEUP or MOVEDOWN
-    private void DisplayIOA_MTstatus(bool bRuleStatusIOA, bool bRuleStatusMultiTchr, int Id, bool Completed, string Type)
+    private void DisplayIOA_MTstatus(bool bRuleStatusIOA, bool bRuleStatusMultiTchr, int Id, bool Completed, string Type, SqlTransaction trans, SqlConnection con)
     {
         if (Type == "Set")
         {
@@ -25849,7 +25962,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 {
                     if (Completed == true)
                     {
-                        UpdateRequirementCriteria(bRuleStatusIOA, bRuleStatusMultiTchr);
+                        UpdateRequirementCriteria(bRuleStatusIOA, bRuleStatusMultiTchr, trans, con);
                     }
                 }
             }
@@ -25862,7 +25975,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 {
                     if (Completed == true)
                     {
-                        UpdateRequirementCriteria(bRuleStatusIOA, bRuleStatusMultiTchr);
+                        UpdateRequirementCriteria(bRuleStatusIOA, bRuleStatusMultiTchr, trans, con);
                     }
                 }
             }
@@ -25876,19 +25989,19 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 {
                     if (Completed == true)
                     {
-                        UpdateRequirementCriteria(bRuleStatusIOA, bRuleStatusMultiTchr);
+                        UpdateRequirementCriteria(bRuleStatusIOA, bRuleStatusMultiTchr, trans, con);
                     }
                 }
             }
         }
         else if (Type == "Complete")
         {
-            UpdateRequirementCriteria(bRuleStatusIOA, bRuleStatusMultiTchr);
+            UpdateRequirementCriteria(bRuleStatusIOA, bRuleStatusMultiTchr, trans, con);
         }
 
     }
 
-    private void UpdateRequirementCriteria(bool bRuleStatusIOA, bool bRuleStatusMultiTchr)
+    private void UpdateRequirementCriteria(bool bRuleStatusIOA, bool bRuleStatusMultiTchr, SqlTransaction trans, SqlConnection con)
     {
         oData = new clsData();
         oTemp = (ClsTemplateSession)Session["BiweeklySession"];
@@ -25921,7 +26034,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 UpdateQuery = "UPDATE DSTempHdr SET IsMT_IOA=0 WHERE DSTempHdrId=" + oTemp.TemplateId;
             }
         }
-        oData.Execute(UpdateQuery);
+        oData.ExecuteWithTrans(UpdateQuery, con, trans);
 
         Session["ioa_mt_message"] = message;
     }
