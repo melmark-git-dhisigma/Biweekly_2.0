@@ -7,7 +7,6 @@ using System.Data.SqlClient;
 using System.Configuration;
 using System.Data;
 using System.Web;
-using System.Drawing;
 
 
 public class DiscreteTrials
@@ -26,7 +25,7 @@ public class DiscreteSession
     clsSession oSession = null;
 
 
-    public DiscreteTrials GetTrialLists(int studentId, int templateID, int iCrntSet, int iCrntStep, int nmbrOfSession, string colName, bool flag, string correctResponse, string coltypeCode, string chainedtype, SqlTransaction trans, SqlConnection con)
+    public DiscreteTrials GetTrialLists(int studentId, int templateID, int iCrntSet, int iCrntStep, int nmbrOfSession, string colName, bool flag, string correctResponse, string coltypeCode, string chainedtype)
     {
 
 
@@ -69,11 +68,7 @@ public class DiscreteSession
         //string sessnmbr = "SELECT MAX(SessionNbr) AS SessionNbr FROM StdtSessEvent WHERE LessonPlanId =" + lessonplannid + "AND StudentId=" + studentId;
 
         SqlDataReader rdr = null;
-        SqlCommand cmd = con.CreateCommand();
-        cmd.Transaction = trans;
-        cmd.CommandText = sessnmbr;
-        rdr = cmd.ExecuteReader(CommandBehavior.Default);
-        //rdr = objData.ReturnDataReader(sessnmbr, false);
+        rdr = objData.ReturnDataReader(sessnmbr, false);
         int sesnnmbr = 0;
         while (rdr.Read())
         {
@@ -129,7 +124,6 @@ public class DiscreteSession
                                     " AND SH.SessionNbr>ISNULL((SELECT MAX(SessionNbr) FROM StdtSessEvent " +
                                     "WHERE DSTempHdrId=" + templateID + " AND StudentId=" + studentId + "),0)" + cond + " ORDER BY SS.StdtSessionHdrId " + cond2;
         }
-        rdr.Close();
         /*
          SELECT S.StdtSessionStepId,S.StepVal, SS.SessionStatusCd, SS.StdtSessionHdrId, S.DSTempSetColId,DCol.ColName FROM StdtSessionDtl S 
 INNER JOIN StdtSessionStep SS ON S.StdtSessionStepId = SS.StdtSessionStepId 
@@ -154,17 +148,15 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
 
             objTrails.sessionCount = 0;
 
-            SqlCommand cmd2 = new SqlCommand(strSql, con);
-            cmd2.Transaction = trans;
-            reader = cmd2.ExecuteReader(CommandBehavior.Default);
+            reader = objData.ReturnDataReader(strSql, false);
+            dt = objData.ReturnDataTable(strSql, false);
+            foreach (DataRow dr in dt.Rows)
+            {
+                //if (dr["StepCd"].ToString() != "" && dr["StepCd"].ToString() != null)
 
-            //reader = objData.ReturnDataReader(strSql, false);
 
-            //dt = objData.ReturnDataTable(strSql, false);
-            //foreach (DataRow dr in dt.Rows)
-            //{
-            //    //if (dr["StepCd"].ToString() != "" && dr["StepCd"].ToString() != null)
-            //}
+
+            }
 
 
             while (reader.Read())
@@ -229,7 +221,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
         return objTrails;
     }
 
-    public DiscreteTrials GetTrialListsForPreStep(int studentId, int templateID, int iCrntSet, int iCrntStep, int nmbrOfSession, string colName, bool flag, string correctResponse, string coltypeCode, string chainedtype, SqlTransaction trans, SqlConnection con)
+    public DiscreteTrials GetTrialListsForPreStep(int studentId, int templateID, int iCrntSet, int iCrntStep, int nmbrOfSession, string colName, bool flag, string correctResponse, string coltypeCode, string chainedtype)
     {
 
 
@@ -293,11 +285,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
         SqlDataReader reader = null;
         try
         {
-            SqlCommand cmd3 = con.CreateCommand();
-            cmd3.Transaction = trans;
-            cmd3.CommandText = strSql;
-            reader = cmd3.ExecuteReader(CommandBehavior.Default);
-            //reader = objData.ReturnDataReader(strSql, false);
+            reader = objData.ReturnDataReader(strSql, false);
 
             int previousHdrId = 0;
 
@@ -403,13 +391,13 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
         else return null;
     }
 
-    public bool MultiTeacherStatus(int studentId, int templateId, SqlTransaction trans, SqlConnection con)
+    public bool MultiTeacherStatus(int studentId, int templateId)
     {
         clsData objData = new clsData();
         bool bMultiTrchr = false;
         string strSql = "select count(distinct ModifiedBy) from StdtSessionHdr where DSTempHdrId=" + templateId + " AND SessionStatusCd='S' AND  EndTs > (SELECT ISNULL(MAX(EvntTs),'1900-01-01') "
         + " FROM StdtSessEvent WHERE DSTempHdrId =" + templateId + " AND StudentId = " + studentId + ") ";
-        int userCount = Convert.ToInt32(objData.FetchValueTrans(strSql, trans, con));
+        int userCount = Convert.ToInt32(objData.FetchValue(strSql));
         if (userCount > 1)
         {
             bMultiTrchr = true;
@@ -417,13 +405,13 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
         return bMultiTrchr;
     }
 
-    public bool IOAStats(int studentId, int templateId, SqlTransaction trans, SqlConnection con)
+    public bool IOAStats(int studentId, int templateId)
     {
         clsData objData = new clsData();
         bool bIOAStatus = false;
         string strSql = "select count(distinct IOAInd) from StdtSessionHdr where DSTempHdrId=" + templateId + " AND SessionStatusCd='S' AND IOAInd='Y' AND EndTs > (SELECT ISNULL(MAX(EvntTs),'1900-01-01') "
         + " FROM StdtSessEvent WHERE DSTempHdrId =" + templateId + " AND StudentId =" + studentId + ")";
-        int IOACount = Convert.ToInt32(objData.FetchValueTrans(strSql, trans, con));
+        int IOACount = Convert.ToInt32(objData.FetchValue(strSql));
         if (IOACount > 0)
         {
             bIOAStatus = true;
@@ -455,7 +443,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
     }
 
 
-    public bool updateSetStatus(int schoolId, int classId, int studentId, int templateId, int SetId, int promptId, string nextSet, string resultMessage, string Type, int iSessionNmbr, int loginId, int sLessonPlanId)
+    public bool updateSetStatus(int schoolId, int classId, int studentId, int templateId, int SetId, int promptId, string nextSet, string resultMessage, string Type, int iSessionNmbr, int loginId, int sLessonPlanId, SqlConnection con, SqlTransaction trans)
     {
         bool IsMaintanace = false;
         clsData objData = new clsData();
@@ -476,7 +464,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
             if (totalset > Convert.ToInt32(nextSet))
             {
                 string updateqry = "UPDATE DSTempHdr SET LessonStatusforBanner= 'SET MOVEDOWN' WHERE DSTempHdrId=" + templateId + "";
-                objData.Execute(updateqry);
+                objData.ExecuteWithTrans(updateqry, con, trans);
             }
             return true;
         }
@@ -502,7 +490,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
             }
             //Code for Not Deleting data from Stdtdsstat Preview Issue in Maintenance [16-jul-2020] - Dev 2
 
-            if (objData.Execute(strQuery) > 0) IsSaved = true;
+            if (objData.ExecuteWithTrans(strQuery, con, trans) > 0) IsSaved = true;
             string arrowSymbol = "";
             if (Type == "SET MOVEUP")
             {
@@ -517,7 +505,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
             {
                 strQuery = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,CheckUp_Down,EventName,StdtSessEventType,SetId,EvntTs,SessionNbr,EventType,LessonPlanId,TimeStampForReport)VALUES" +
                 "(" + schoolId + "," + classId + "," + studentId + "," + templateId + ",'" + Type + "',N'" + arrowSymbol + clsGeneral.convertQuotes(setName) + "','Major'," + SetId + ",GETDATE()," + iSessionNmbr + ",'EV', " + sLessonPlanId + ",DATEADD(HH,(SELECT (COUNT(*)+1) FROM StdtSessEvent WHERE CONVERT(DATE,EvntTs)=CONVERT(DATE,GETDATE()) AND " + "SchoolId=" + schoolId + " AND StudentId=" + studentId + " AND EventType='EV' AND LessonPlanId=" + sLessonPlanId + ")," + "CONVERT(datetime,GETDATE())))";
-                objData.ExecuteWithScope(strQuery);
+                objData.ExecuteWithScopeandConnection(strQuery, con, trans);
             }
 
 
@@ -525,11 +513,11 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
             {
 
                 string strqry = "select max(StimulyActivityId) from StdtSessStimuliActivity where DSTempHdrId=" + templateId + " and ActivitiType='SET'";
-                string stimuliId = objData.FetchValue(strqry).ToString();
+                string stimuliId = objData.ExecuteWithTrans(strqry, con, trans).ToString();
                 if (stimuliId != null && stimuliId != "")
                 {
                     strQuery = "Update StdtSessStimuliActivity Set DateMastered=GETDATE() where StimulyActivityId=" + Convert.ToInt32(stimuliId);
-                    objData.Execute(strQuery);
+                    objData.ExecuteWithTrans(strQuery, con, trans);
                 }
 
             }
@@ -537,14 +525,14 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
             {
                 strQuery = "INSERT INTO StdtSessStimuliActivity(SchoolId,ClassId,StudentId,DSTempHdrId,ActivitiType,StartTime,ActivityId,CreatedBy,CreatedOn)VALUES" +
             "(" + schoolId + "," + classId + "," + studentId + "," + templateId + ",'SET',GETDATE()," + iSetId + "," + loginId + ",GETDATE())";
-                objData.ExecuteWithScope(strQuery);
+                objData.ExecuteWithScopeandConnection(strQuery, con, trans);
             }
 
             return IsSaved;
         }
     }
 
-    public bool updateSetStatus(int schoolId, int classId, int studentId, int templateId, int SetId, string nextSet, string resultMessage, string Type, int iSessionNmbr, int loginId, int sLessonPlanId)
+    public bool updateSetStatus(int schoolId, int classId, int studentId, int templateId, int SetId, string nextSet, string resultMessage, string Type, int iSessionNmbr, int loginId, int sLessonPlanId, SqlConnection con, SqlTransaction trans)
     {
         bool IsMaintanace = false;
         clsData objData = new clsData();
@@ -565,7 +553,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
             if (totalset > Convert.ToInt32(nextSet))
             {
                 string updateqry = "UPDATE DSTempHdr SET LessonStatusforBanner='SET MOVEDOWN' WHERE DSTempHdrId=" + templateId + "";
-                objData.Execute(updateqry);
+                objData.ExecuteWithTrans(updateqry, con, trans);
             }
             return true;
         }
@@ -585,7 +573,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
             {
                 strQuery = "UPDATE StdtDSStat SET NextSetId=" + iSetId + ",NextStepId=1, NextSetNmbr='" + nextSet + "',statusMessage='" + resultMessage + "' ,ModifiedBy=" + loginId + " ,ModifiedOn=GETDATE() WHERE DSTempHdrId=" + templateId + "";
             }
-            if (objData.Execute(strQuery) > 0) IsSaved = true;
+            if (objData.ExecuteWithTrans(strQuery, con, trans) > 0) IsSaved = true;
             //strQuery = "SELECT SetCd FROM [DSTempSet] WHERE [DSTempSet].DSTempSetId=" + SetId;
             strQuery = " SELECT SetCd FROM [DSTempSet] WHERE [DSTempSet].DSTempSetId=" + iSetId;
             string setName = objData.FetchValue(strQuery).ToString();
@@ -600,29 +588,29 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
             }
             strQuery = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,CheckUp_Down,EventName,StdtSessEventType,SetId,EvntTs,SessionNbr,EventType,LessonPlanId,TimeStampForReport)VALUES" +
                 "(" + schoolId + "," + classId + "," + studentId + "," + templateId + ",'" + Type + "',N'" + arrowSymbol + clsGeneral.convertQuotes(setName) + "','Major'," + SetId + ",GETDATE()," + iSessionNmbr + ",'EV', " + sLessonPlanId + ",DATEADD(HH,(SELECT (COUNT(*)+1) FROM StdtSessEvent WHERE CONVERT(DATE,EvntTs)=CONVERT(DATE,getdate()) AND " + "SchoolId=" + schoolId + " AND StudentId=" + studentId + " AND EventType='EV' AND LessonPlanId=" + sLessonPlanId + ")," + "CONVERT(datetime,getdate())))";
-            objData.ExecuteWithScope(strQuery);
+            objData.ExecuteWithScopeandConnection(strQuery, con, trans);
             if (Type != "SET MOVEDOWN")
             {
 
                 string strqry = "select top(1) StimulyActivityId from StdtSessStimuliActivity where DSTempHdrId=" + templateId + "and ActivitiType='SET'";
-                string stimuliId = objData.FetchValue(strqry).ToString();
+                string stimuliId = objData.ExecuteWithTrans(strqry, con, trans).ToString();
                 if (stimuliId != null && stimuliId != "")
                 {
                     strQuery = "Update StdtSessStimuliActivity Set DateMastered=GETDATE() where StimulyActivityId=" + Convert.ToInt32(stimuliId);
-                    objData.Execute(strQuery);
+                    objData.ExecuteWithTrans(strQuery, con, trans);
                 }
             }
             if (resultMessage != "COMPLETED")
             {
                 strQuery = "INSERT INTO StdtSessStimuliActivity(SchoolId,ClassId,StudentId,DSTempHdrId,ActivitiType,StartTime,ActivityId,CreatedBy,CreatedOn)VALUES" +
                     "(" + schoolId + "," + classId + "," + studentId + "," + templateId + ",'SET',GETDATE()," + iSetId + "," + loginId + ",GETDATE())";
-                objData.ExecuteWithScope(strQuery);
+                objData.ExecuteWithScopeandConnection(strQuery, con, trans);
             }
             return IsSaved;
         }
     }
 
-    public void updateStepPromptForTotalTask(int templateId, int studentId, int loginId, int promptid)
+    public void updateStepPromptForTotalTask(int templateId, int studentId, int loginId, int promptid, SqlConnection con, SqlTransaction trans)
     {
         clsData objData = new clsData();
         string selSteps = "SELECT DSTempStepId FROM DSTempStep WHERE DSTempHdrId=" + templateId;
@@ -641,12 +629,12 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
             {
                 string strQuery = "UPDATE StdtDSStepStat SET PromptId=" + promptid.ToString() + ",ModifiedBy=" + loginId + " ,ModifiedOn=GETDATE() " +
                     "WHERE DSTempStepId=" + drStp["DSTempStepId"].ToString();
-                objData.Execute(strQuery);
+                objData.ExecuteWithTrans(strQuery, con, trans);
             }
         }
     }
 
-    public bool updateStepStatus(int schoolId, int classId, int studentId, int StepId, int SetId, int templateId, int promptId, string nextStep, string resultMessage, string Type, int iSessionNmbr, int loginId, int sLessonPlanId)
+    public bool updateStepStatus(int schoolId, int classId, int studentId, int StepId, int SetId, int templateId, int promptId, string nextStep, string resultMessage, string Type, int iSessionNmbr, int loginId, int sLessonPlanId, SqlConnection con, SqlTransaction trans)
     {
         bool IsMaintanace = false;
         clsData objData = new clsData();
@@ -665,7 +653,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
             if (Type == "STEP MOVEDOWN")
             {
                 string updateqry = "UPDATE DSTempHdr SET LessonStatusforBanner='" + Type + "' WHERE DSTempHdrId=" + templateId + "";
-                objData.Execute(updateqry);
+                objData.ExecuteWithTrans(updateqry, con, trans);
             }
             return true;
         }
@@ -673,12 +661,13 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
         {
         bool IsSaved = false;
         string strQuery = "";
+        string strQueryMo = "";
         string dateTime = DateTime.Now.ToShortDateString();
         strQuery = "SELECT DSTempStepId FROM (SELECT DSTempStepId,RANK() OVER (ORDER BY SortOrder) RNK FROM DSTempStep " +
                     " WHERE DSTempHdrId = " + templateId + " AND DSTempSetId=" + SetId + " AND ActiveInd='A' ) AS Temp WHERE RNK = " + nextStep;
         int iStepId = Convert.ToInt32(objData.FetchValue(strQuery));
         strQuery = "UPDATE StdtDSStat SET NextStepId='" + nextStep + "',NextPromptId='" + promptId + "',statusMessage='" + resultMessage + "' ,ModifiedBy=" + loginId + " ,ModifiedOn=GETDATE() WHERE DSTempHdrId=" + templateId + "";
-        if (objData.Execute(strQuery) > 0) IsSaved = true;
+        if (objData.ExecuteWithTrans(strQuery, con, trans) > 0) IsSaved = true;
         string sqlStr = "SELECT ChainType FROM DSTempHdr where DSTempHdrId=" + templateId;
         string chType = objData.FetchValue(sqlStr).ToString();
         strQuery = "SELECT SortOrder FROM (SELECT DSTempStepId,SortOrder,RANK() OVER (ORDER BY SortOrder) RNK FROM DSTempStep " +
@@ -689,6 +678,19 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
                     " WHERE DSTempHdrId = " + templateId + " AND DSTempSetId=" + SetId + " AND ActiveInd='A' ) AS Temp WHERE RNK = " + nextStep;
         }
         string stepNumber = objData.FetchValue(strQuery).ToString();
+
+
+        strQueryMo = "SELECT RNK FROM (SELECT DSTempStepId,SortOrder,RANK() OVER (ORDER BY SortOrder) RNK FROM DSTempStep " +
+                    " WHERE DSTempHdrId = " + templateId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId=" + templateId + " AND ActiveInd = 'A') AND ActiveInd='A' ) AS Temp WHERE SortOrder = " + stepNumber;
+
+        object stepNumMo = objData.FetchValue(strQueryMo);
+        string MasterOrder = "";
+        if (stepNumMo != null && stepNumMo.ToString() != "")
+        {
+            MasterOrder = stepNumMo.ToString();
+        }
+
+
         string arrowSymbol = "";
         if (Type == "STEP MOVEUP")
         {
@@ -699,8 +701,8 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
             arrowSymbol = "↓ STEP ";
         }
         strQuery = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,CheckUp_Down,EventName,StdtSessEventType,EvntTs,SessionNbr,EventType,StepId,SetId,LessonPlanId,TimeStampForReport)VALUES" +
-            "(" + schoolId + "," + classId + "," + studentId + "," + templateId + ",'" + Type + "',N'" + arrowSymbol + stepNumber + "','Minor'," + "GETDATE()," + iSessionNmbr + ",'EV'," + iStepId + "," + SetId + "," + sLessonPlanId + ",DATEADD(HH,(SELECT (COUNT(*)+1) FROM StdtSessEvent WHERE CONVERT(DATE,EvntTs)=CONVERT(DATE,getdate()) AND " + "SchoolId=" + schoolId + " AND StudentId=" + studentId + " AND EventType='EV' AND LessonPlanId=" + sLessonPlanId + ")," + "CONVERT(datetime,getdate())))";
-        objData.ExecuteWithScope(strQuery);
+            "(" + schoolId + "," + classId + "," + studentId + "," + templateId + ",'" + Type + "',N'" + arrowSymbol + MasterOrder +"','Minor'," + "GETDATE()," + iSessionNmbr + ",'EV'," + iStepId + "," + SetId + "," + sLessonPlanId + ",DATEADD(HH,(SELECT (COUNT(*)+1) FROM StdtSessEvent WHERE CONVERT(DATE,EvntTs)=CONVERT(DATE,getdate()) AND " + "SchoolId=" + schoolId + " AND StudentId=" + studentId + " AND EventType='EV' AND LessonPlanId=" + sLessonPlanId + ")," + "CONVERT(datetime,getdate())))";
+        objData.ExecuteWithScopeandConnection(strQuery, con, trans);
         //strQuery = "INSERT INTO StdtSessStimuliActivity(SchoolId,ClassId,StudentId,DSTempHdrId,ActivitiType,StartTime,ActivityId,CreatedBy,CreatedOn)VALUES" +
         //   "(" + schoolId + "," + classId + "," + studentId + "," + templateId + ",'STEP',GETDATE()," + iStepId + "," + loginId + ",GETDATE())";
         //objData.ExecuteWithScope(strQuery);
@@ -708,7 +710,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
         }
     }
 
-    public bool updateStepStatus(int schoolId, int classId, int studentId, int StepId, int SetId, int templateId, string nextStep, string resultMessage, string Type, int iSessionNmbr, int loginId, int sLessonPlanId)
+    public bool updateStepStatus(int schoolId, int classId, int studentId, int StepId, int SetId, int templateId, string nextStep, string resultMessage, string Type, int iSessionNmbr, int loginId, int sLessonPlanId, SqlConnection con, SqlTransaction trans)
     {
         bool IsMaintanace = false;
         clsData objData = new clsData();
@@ -727,7 +729,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
             if (Type == "STEP MOVEDOWN")
             {
                 string updateqry = "UPDATE DSTempHdr SET LessonStatusforBanner='" + Type + "' WHERE DSTempHdrId=" + templateId + "";
-                objData.Execute(updateqry);
+                objData.ExecuteWithTrans(updateqry, con, trans);
             }
             return true;
         }
@@ -735,28 +737,45 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
         {
             bool IsSaved = false;
             string strQuery = "";
+            string strQueryMo = "";
             string dateTime = DateTime.Now.ToShortDateString();
             strQuery = "SELECT DSTempStepId FROM (SELECT DSTempStepId,RANK() OVER (ORDER BY SortOrder) RNK FROM DSTempStep " +
                         " WHERE DSTempHdrId = " + templateId + " AND DSTempSetId=" + SetId + " AND ActiveInd='A' ) AS Temp WHERE RNK = " + nextStep;
             int iStepId = Convert.ToInt32(objData.FetchValue(strQuery));
             strQuery = "UPDATE StdtDSStat SET NextStepId='" + nextStep + "',statusMessage='" + resultMessage + "' ,ModifiedBy=" + loginId + " ,ModifiedOn=GETDATE() WHERE DSTempHdrId=" + templateId + "";
-            if (objData.Execute(strQuery) > 0) IsSaved = true;
+            if (objData.ExecuteWithTrans(strQuery, con, trans) > 0) IsSaved = true;
             string sqlStr = "SELECT ChainType FROM DSTempHdr where DSTempHdrId=" + templateId;
             string chType = objData.FetchValue(sqlStr).ToString();
             strQuery = "SELECT SortOrder FROM (SELECT DSTempStepId,SortOrder,RANK() OVER (ORDER BY SortOrder) RNK FROM DSTempStep " +
                         " WHERE DSTempHdrId = " + templateId + " AND DSTempSetId=" + SetId + " AND ActiveInd='A' ) AS Temp WHERE RNK = " + nextStep;
 
+            
             if (chType == "Backward chain")
             {
-                strQuery = "SELECT SortOrder FROM (SELECT DSTempStepId,SortOrder,RANK() OVER (ORDER BY SortOrder DESC) RNK FROM DSTempStep " +
-                        " WHERE DSTempHdrId = " + templateId + " AND DSTempSetId=" + SetId + " AND ActiveInd='A' ) AS Temp WHERE RNK = " + nextStep;
-            }
+             strQuery = "SELECT SortOrder FROM (SELECT DSTempStepId,SortOrder,RANK() OVER (ORDER BY SortOrder DESC) RNK FROM DSTempStep " +
+                        " WHERE DSTempHdrId = " + templateId + " AND DSTempSetId=" + SetId + " AND ActiveInd='A' ) AS Temp WHERE RNK = " + nextStep;            
+            
+             }
+           
             object stepNum = objData.FetchValue(strQuery);
             string stepNumber = "";
             if (stepNum != null && stepNum.ToString() != "")
             {
                 stepNumber = stepNum.ToString();
             }
+
+
+            strQueryMo = "SELECT RNK FROM (SELECT DSTempStepId,SortOrder,RANK() OVER (ORDER BY SortOrder) RNK FROM DSTempStep " +
+                        " WHERE DSTempHdrId = " + templateId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId=" + templateId + " AND ActiveInd = 'A') AND ActiveInd='A' ) AS Temp WHERE SortOrder = " + stepNumber;
+          
+            object stepNumMo = objData.FetchValue(strQueryMo);
+            string MasterOrder = "";
+            if (stepNumMo != null && stepNumMo.ToString() != "")
+            {
+                MasterOrder = stepNumMo.ToString();
+            }
+
+
             string arrowSymbol = "";
             if (Type == "STEP MOVEUP")
             {
@@ -767,8 +786,8 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
                 arrowSymbol = "↓ STEP ";
             }
             strQuery = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,CheckUp_Down,EventName,StdtSessEventType,EvntTs,SessionNbr,EventType,SetId,StepId,LessonPlanId,TimeStampForReport)VALUES" +
-                "(" + schoolId + "," + classId + "," + studentId + "," + templateId + ",'" + Type + "',N'" + arrowSymbol + stepNumber + "','Minor'," + "GETDATE()," + iSessionNmbr + ",'EV'," + SetId + "," + iStepId + "," + sLessonPlanId + ",DATEADD(HH,(SELECT (COUNT(*)+1) FROM StdtSessEvent WHERE CONVERT(DATE,EvntTs)=CONVERT(DATE,getdate()) AND " + "SchoolId=" + schoolId + " AND StudentId=" + studentId + " AND EventType='EV' AND LessonPlanId=" + sLessonPlanId + ")," + "CONVERT(datetime,getdate())))";
-            objData.ExecuteWithScope(strQuery);
+                "(" + schoolId + "," + classId + "," + studentId + "," + templateId + ",'" + Type + "',N'" + arrowSymbol + MasterOrder + "','Minor'," + "GETDATE()," + iSessionNmbr + ",'EV'," + SetId + "," + iStepId + "," + sLessonPlanId + ",DATEADD(HH,(SELECT (COUNT(*)+1) FROM StdtSessEvent WHERE CONVERT(DATE,EvntTs)=CONVERT(DATE,getdate()) AND " + "SchoolId=" + schoolId + " AND StudentId=" + studentId + " AND EventType='EV' AND LessonPlanId=" + sLessonPlanId + ")," + "CONVERT(datetime,getdate())))";
+            objData.ExecuteWithScopeandConnection(strQuery, con, trans);
             //strQuery = "INSERT INTO StdtSessStimuliActivity(SchoolId,ClassId,StudentId,DSTempHdrId,ActivitiType,StartTime,ActivityId,CreatedBy,CreatedOn)VALUES" +
             //   "(" + schoolId + "," + classId + "," + studentId + "," + templateId + ",'STEP',GETDATE()," + iStepId + "," + loginId + ",GETDATE())";
             //objData.ExecuteWithScope(strQuery);
@@ -776,7 +795,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
         }
     }
 
-    public bool updatePromptStatus(int schoolId, int classId, int studentId, int templateId, string nextPrompt, string resultMessage, string Type, int iSessionNmbr, int loginId, int crntPromptId, int crntSetId, int crntStepId, int sLessonPlanId)
+    public bool updatePromptStatus(int schoolId, int classId, int studentId, int templateId, string nextPrompt, string resultMessage, string Type, int iSessionNmbr, int loginId, int crntPromptId, int crntSetId, int crntStepId, int sLessonPlanId, SqlConnection con, SqlTransaction trans)
     {
         bool IsMaintanace = false;
         clsData objData = new clsData();
@@ -795,7 +814,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
             if (Type == "PROMPT MOVEDOWN")
             {
                 string updateqry = "UPDATE DSTempHdr SET LessonStatusforBanner='" + Type + "' WHERE DSTempHdrId=" + templateId + "";
-                objData.Execute(updateqry);
+                objData.ExecuteWithTrans(updateqry, con, trans);
             }
             return true;
         }
@@ -818,7 +837,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
             }
             //Code for Not Deleting data from Stdtdsstat Preview Issue in Maintenance [16-jul-2020] - Dev 2
 
-            if (objData.Execute(strQuery) > 0) IsSaved = true;
+            if (objData.ExecuteWithTrans(strQuery, con, trans) > 0) IsSaved = true;
             strQuery = "SELECT LookUpName FROM LookUp WHERE lookuptype='DSTempPrompt' and LookupId=" + nextPrompt;
             string promptName = objData.FetchValue(strQuery).ToString();
             string arrowSymbol = "";
@@ -832,7 +851,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
             }
             strQuery = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,CheckUp_Down,EventName,StdtSessEventType,EvntTs,SessionNbr,EventType,SetId,StepId,PromptId,LessonPlanId,TimeStampForReport)VALUES" +
                "(" + schoolId + "," + classId + "," + studentId + "," + templateId + ",'" + Type + "',N'" + arrowSymbol + promptName + "','Minor'," + "GETDATE()," + iSessionNmbr + ",'EV'," + crntSetId + "," + crntStepId + "," + crntPromptId + "," + sLessonPlanId + ",DATEADD(HH,(SELECT (COUNT(*)+1) FROM StdtSessEvent WHERE CONVERT(DATE,EvntTs)=CONVERT(DATE,getdate()) AND " + "SchoolId=" + schoolId + " AND StudentId=" + studentId + " AND EventType='EV' AND LessonPlanId=" + sLessonPlanId + ")," + "getdate()))";
-            objData.ExecuteWithScope(strQuery);
+            objData.ExecuteWithScopeandConnection(strQuery, con, trans);
             //strQuery = "INSERT INTO StdtSessStimuliActivity(SchoolId,ClassId,StudentId,DSTempHdrId,ActivitiType,StartTime,ActivityId,CreatedBy,CreatedOn)VALUES" +
             //   "(" + schoolId + "," + classId + "," + studentId + "," + templateId + ",'PROMPT',GETDATE()," + nextPrompt + "," + loginId + ",GETDATE())";
             //objData.ExecuteWithScope(strQuery);
@@ -853,7 +872,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
 
     //    return IsSaved;
     //}
-    public bool insertEventStatus(int schoolId, int classId, int studentId, int templateId, int SetId, string resultMessage, string Type, int iSessionNmbr, int loginId, int sLessonPlanId)
+    public bool insertEventStatus(int schoolId, int classId, int studentId, int templateId, int SetId, string resultMessage, string Type, int iSessionNmbr, int loginId, int sLessonPlanId, SqlConnection con, SqlTransaction trans)
     {
         clsData objData = new clsData();
         bool IsSaved = false;
@@ -888,19 +907,19 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
         else
         strQuery = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,CheckUp_Down,SetId,EventName,StdtSessEventType,EvntTs,SessionNbr,LessonPlanId,EventType,TimeStampForReport)VALUES" +
            "(" + schoolId + "," + classId + "," + studentId + "," + templateId + ",'" + Type + "'," + SetId + ",'LP Complete','Major',GETDATE()," + iSessionNmbr + "," + sLessonPlanId + ",'EV',DATEADD(HH,(SELECT (COUNT(*)+1) FROM StdtSessEvent WHERE CONVERT(DATE,EvntTs)=CONVERT(DATE,getdate()) AND " + "SchoolId=" + schoolId + " AND StudentId=" + studentId + " AND EventType='EV' AND LessonPlanId=" + sLessonPlanId + ")," + "CONVERT(datetime,getdate())))";
-        objData.ExecuteWithScope(strQuery);
+        objData.ExecuteWithScopeandConnection(strQuery, con, trans);
         if (resultMessage == "COMPLETED")
         {
             strQuery = "UPDATE DSTempHdr SET DSMode='MAINTENANCE', StatusId=" + statusId + " WHERE DSTempHdrId=" + templateId;
-            objData.Execute(strQuery);
+            objData.ExecuteWithTrans(strQuery, con, trans);
             if (Type != "SET MOVEDOWN")
             {
                 string strqry = "select max(StimulyActivityId) from StdtSessStimuliActivity where DSTempHdrId=" + templateId + " and ActivitiType='SET'";
-                string stimuliId = objData.FetchValue(strqry).ToString();
+                string stimuliId = objData.ExecuteWithTrans(strqry, con, trans).ToString();
                 if (stimuliId != null && stimuliId != "")
                 {
                     strQuery = "Update StdtSessStimuliActivity Set DateMastered=GETDATE() where StimulyActivityId=" + Convert.ToInt32(stimuliId);
-                    objData.Execute(strQuery);
+                    objData.ExecuteWithTrans(strQuery, con, trans);
                 }
             }
         }

@@ -1994,7 +1994,7 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
                     foreach (DataRow row in dtset.Rows)
                     {
                         strQuery = "INSERT INTO DSTempSet(SchoolId,DSTempHdrId,PrevSetId,SetCd,SetName,Samples,SortOrder,ActiveInd,CreatedBy,CreatedOn) ";
-                        strQuery += "SELECT  SchoolId," + TId + ",PrevSetId,SetCd,SetName,Samples,SortOrder,ActiveInd," + oSession.LoginId + ",getdate() FROM DSTempSet WHERE DSTempSetId = " + Convert.ToInt32(row["DSTempSetId"]) + " ";
+                        strQuery += "SELECT  SchoolId," + TId + ",PrevSetId,SetCd,SetName,Samples,SortOrder,ActiveInd," + oSession.LoginId + ",getdate() FROM DSTempSet WHERE ActiveInd='A' AND DSTempSetId = " + Convert.ToInt32(row["DSTempSetId"]) + " ";
                         int SetId = Convert.ToInt32(oData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                         if (!ht.ContainsKey(row["DSTempSetId"]))
                         {
@@ -2030,7 +2030,7 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
                             parentSetId = AssignLP.SetUpdateCopy(oldSetId, TId, Trans, Con);
                         }
                         strQuery = "INSERT INTO DSTempStep(SchoolId,DSTempHdrId,DSTempSetId,PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder,CreatedBy,ActiveInd,CreatedOn) ";
-                        strQuery += "SELECT SchoolId," + TId + "," + parentSetId + ",PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder," + oSession.LoginId + ",ActiveInd,GETDATE() FROM DSTempStep WHERE DSTempStepId = " + Convert.ToInt32(row["DSTempStepId"]) + " AND IsDynamic=0 ";
+                        strQuery += "SELECT SchoolId," + TId + "," + parentSetId + ",PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder," + oSession.LoginId + ",ActiveInd,GETDATE() FROM DSTempStep WHERE ActiveInd='A' AND DSTempStepId = " + Convert.ToInt32(row["DSTempStepId"]) + " AND IsDynamic=0 ";
                         int StepId = Convert.ToInt32(oData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                     }
                 }
@@ -2040,7 +2040,7 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
                 int oldParentSetId = 0;
                 DataTable dtParentStep = new DataTable();
                 strQuery = "SELECT  DSTempParentStepId,SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn"
-                    + " FROM DSTempParentStep WHERE DSTempHdrId = " + tempHdrId;
+                    + " FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempHdrId = " + tempHdrId;
                 dtParentStep = oData.ReturnDataTable(strQuery, Con, Trans, false);
                 if (dtParentStep != null)
                 {
@@ -2062,7 +2062,7 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
                             oldParentSetId = Convert.ToInt32(row["DSTempParentStepId"]);
                             strQuery = "INSERT INTO DSTempParentStep(SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn) "
                                         + "SELECT  SchoolId," + TId + ",StepCd,StepName,DSTempSetId,SortOrder,'" + newsetids + "',SetNames,ActiveInd," + oSession.LoginId + ",getdate()"
-                                        + " FROM DSTempParentStep WHERE DSTempHdrId = " + tempHdrId + " AND DSTempParentStepId=" + oldParentSetId;
+                                        + " FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempHdrId = " + tempHdrId + " AND DSTempParentStepId=" + oldParentSetId;
                             parentSetId = Convert.ToInt32(oData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
 
                             DataTable dtstep = new DataTable();
@@ -2076,9 +2076,9 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
                                     oldSetId = Convert.ToInt32(rows["DSTempSetId"]);
                                     strQuery = "INSERT INTO DSTempStep(SchoolId,DSTempHdrId,DSTempSetId,PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder,CreatedBy,ActiveInd,CreatedOn) ";
                                     strQuery += "SELECT SchoolId," + TId + ",DSTempSetId,PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder," + oSession.LoginId + ",ActiveInd,GETDATE()"
-                                        + "	FROM DSTempStep WHERE DSTempSetId = " + oldSetId + " AND IsDynamic=0 AND DSTempParentStepId=" + oldParentSetId;
+                                        + "	FROM DSTempStep WHERE ActiveInd='A' AND DSTempSetId = " + oldSetId + " AND IsDynamic=0 AND DSTempParentStepId=" + oldParentSetId;
                                     int StepId = Convert.ToInt32(oData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
-                                    strQuery = "SELECT DSTempSetId FROM DSTempStep WHERE DSTempStepId=" + StepId + " AND IsDynamic=0";
+                                    strQuery = "SELECT DSTempSetId FROM DSTempStep WHERE ActiveInd='A' AND DSTempStepId=" + StepId + " AND IsDynamic=0";
                                     int NewSetId = Convert.ToInt32(oData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                                     if (ht.ContainsKey(Convert.ToInt32(NewSetId)))
                                     {

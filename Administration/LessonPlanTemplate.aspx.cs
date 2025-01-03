@@ -1461,7 +1461,7 @@ public partial class Administration_AAa : System.Web.UI.Page
                     foreach (DataRow row in dtset.Rows)
                     {
                         strQuery = "INSERT INTO DSTempSet(SchoolId,DSTempHdrId,PrevSetId,SetCd,SetName,Samples,SortOrder,ActiveInd,CreatedBy,CreatedOn) ";
-                        strQuery += "SELECT  SchoolId," + TId + ",PrevSetId,SetCd,SetName,Samples,SortOrder,ActiveInd," + loginid + ",getdate() FROM DSTempSet WHERE DSTempSetId = " + Convert.ToInt32(row["DSTempSetId"]) + " ";
+                        strQuery += "SELECT  SchoolId," + TId + ",PrevSetId,SetCd,SetName,Samples,SortOrder,ActiveInd," + loginid + ",getdate() FROM DSTempSet WHERE ActiveInd='A' AND DSTempSetId = " + Convert.ToInt32(row["DSTempSetId"]) + " ";
                         int SetId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                         if (!ht.ContainsKey(row["DSTempSetId"]))
                         {
@@ -1486,7 +1486,7 @@ public partial class Administration_AAa : System.Web.UI.Page
             if (teachingProc == "Match-to-Sample")
             {
                 DataTable dtstep = new DataTable();
-                dtstep = objData.ReturnDataTable("SELECT DSTempStepId,DSTempSetId FROM DSTempStep WHERE DSTempHdrId=" + templateid + " AND IsDynamic=0", Con, Trans, false);
+                dtstep = objData.ReturnDataTable("SELECT DSTempStepId,DSTempSetId FROM DSTempStep WHERE DSTempHdrId=" + templateid + " AND ActiveInd='A' AND IsDynamic=0", Con, Trans, false);
                 if (dtstep.Rows.Count > 0)
                 {
                     foreach (DataRow row in dtstep.Rows)
@@ -1498,7 +1498,7 @@ public partial class Administration_AAa : System.Web.UI.Page
                         }
                         strQuery =
                         strQuery = "INSERT INTO DSTempStep(SchoolId,DSTempHdrId,DSTempSetId,PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder,CreatedBy,ActiveInd,CreatedOn) ";
-                        strQuery += "SELECT SchoolId," + TId + "," + parentSetId + ",PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder," + loginid + ",ActiveInd,GETDATE()	FROM DSTempStep WHERE DSTempStepId = " + Convert.ToInt32(row["DSTempStepId"]) + " AND IsDynamic=0 ";
+                        strQuery += "SELECT SchoolId," + TId + "," + parentSetId + ",PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder," + loginid + ",ActiveInd,GETDATE()	FROM DSTempStep WHERE DSTempStepId = " + Convert.ToInt32(row["DSTempStepId"]) + " AND ActiveInd='A' AND IsDynamic=0 ";
                         int StepId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                     }
                 }
@@ -1508,7 +1508,7 @@ public partial class Administration_AAa : System.Web.UI.Page
                 int oldParentSetId = 0;
                 DataTable dtParentStep = new DataTable();
                 strQuery = "SELECT  DSTempParentStepId,SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn"
-                    + " FROM DSTempParentStep WHERE DSTempHdrId = " + templateid;
+                    + " FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempHdrId = " + templateid;
                 dtParentStep = objData.ReturnDataTable(strQuery, Con, Trans, false);
                 if (dtParentStep != null)
                 {
@@ -1530,13 +1530,13 @@ public partial class Administration_AAa : System.Web.UI.Page
                             oldParentSetId = Convert.ToInt32(row["DSTempParentStepId"]);
                             strQuery = "INSERT INTO DSTempParentStep(SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn) "
                                         + "SELECT  SchoolId," + TId + ",StepCd,StepName,DSTempSetId,SortOrder,'" + newsetids + "',SetNames,ActiveInd," + loginid + ",getdate()"
-                                        + " FROM DSTempParentStep WHERE DSTempHdrId = " + templateid + " AND DSTempParentStepId=" + oldParentSetId;
+                                        + " FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempHdrId = " + templateid + " AND DSTempParentStepId=" + oldParentSetId;
                             parentSetId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
 
                             DataTable dtstep = new DataTable();
 
                             strQuery = "SELECT  SchoolId,PrevStepId,SortOrder,PreDefinedInd,CustomById,VTStepId,DSTempSetId,StepCd,StepName,ActiveInd,"
-                                    + "DSTempParentStepId FROM DSTempStep WHERE DSTempParentStepId=" + oldParentSetId + " AND IsDynamic=0 AND DSTempHdrId = " + templateid;
+                                    + "DSTempParentStepId FROM DSTempStep WHERE DSTempParentStepId=" + oldParentSetId + " AND IsDynamic=0 AND ActiveInd='A' AND DSTempHdrId = " + templateid;
                             dtstep = objData.ReturnDataTable(strQuery, Con, Trans, false);
                             if (dtstep.Rows.Count > 0)
                             {
@@ -1546,9 +1546,9 @@ public partial class Administration_AAa : System.Web.UI.Page
 
                                     strQuery = "INSERT INTO DSTempStep(SchoolId,DSTempHdrId,DSTempSetId,PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder,CreatedBy,ActiveInd,CreatedOn) ";
                                     strQuery += "SELECT SchoolId," + TId + ",DSTempSetId,PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder," + loginid + ",ActiveInd,GETDATE()"
-                                        + "	FROM DSTempStep WHERE DSTempSetId = " + oldSetId + " AND IsDynamic=0 AND DSTempParentStepId=" + oldParentSetId + " AND DSTempHdrId = " + templateid;
+                                        + "	FROM DSTempStep WHERE DSTempSetId = " + oldSetId + " AND IsDynamic=0 AND DSTempParentStepId=" + oldParentSetId + " AND ActiveInd='A' AND DSTempHdrId = " + templateid;
                                     int StepId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
-                                    strQuery = "SELECT DSTempSetId FROM DSTempStep WHERE DSTempStepId=" + StepId + " AND IsDynamic=0";
+                                    strQuery = "SELECT DSTempSetId FROM DSTempStep WHERE DSTempStepId=" + StepId + " AND ActiveInd='A' AND IsDynamic=0";
                                     int NewSetId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                                     if (ht.ContainsKey(Convert.ToInt32(NewSetId)))
                                     {
@@ -1572,7 +1572,7 @@ public partial class Administration_AAa : System.Web.UI.Page
                     foreach (DataRow row in dtsetcol.Rows)
                     {
                         strQuery = "INSERT INTO DSTempSetCol(SchoolId, DSTempHdrId,ColName,ColTypeCd,CorrRespType,CorrResp,CorrRespDesc	,InCorrRespDesc,CorrStdtResp	,InCorrStdResp,IncMisTrialInd,MisTrialDesc,CalcuType,CalcuData,ActiveInd,CreatedBy,CreatedOn) ";
-                        strQuery += "SELECT SchoolId, " + TId + ",ColName,ColTypeCd,CorrRespType,CorrResp,CorrRespDesc	,InCorrRespDesc,CorrStdtResp,InCorrStdResp,IncMisTrialInd,MisTrialDesc,CalcuType,CalcuData,ActiveInd," + loginid + ",CreatedOn FROM DSTempSetCol WHERE DSTempSetColId = " + Convert.ToInt32(row["DSTempSetColId"]) + " ";
+                        strQuery += "SELECT SchoolId, " + TId + ",ColName,ColTypeCd,CorrRespType,CorrResp,CorrRespDesc	,InCorrRespDesc,CorrStdtResp,InCorrStdResp,IncMisTrialInd,MisTrialDesc,CalcuType,CalcuData,ActiveInd," + loginid + ",CreatedOn FROM DSTempSetCol WHERE ActiveInd='A' AND DSTempSetColId = " + Convert.ToInt32(row["DSTempSetColId"]) + " ";
                         int setColNewId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                         DataTable dtsetcolcalc = new DataTable();
                         dtsetcolcalc = objData.ReturnDataTable("SELECT DSTempSetColCalcId FROM DSTempSetColCalc WHERE DSTempSetColId=" + Convert.ToInt32(row["DSTempSetColId"]) + "", Con, Trans, false);

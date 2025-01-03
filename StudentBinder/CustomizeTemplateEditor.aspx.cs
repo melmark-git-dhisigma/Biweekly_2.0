@@ -7235,7 +7235,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 DropDownList drpSortId = (DropDownList)diGoal.FindControl("ddlSortingstep");
                 stepId = Convert.ToInt32(currentStepId.Value);
                 currentsortId = Convert.ToInt32(drpSortId.SelectedValue);
-                strQuerry = "Update DSTempStep Set SortOrder=" + currentsortId + " Where DSTempStepId =" + stepId + " And DSTempSetId=" + setId + " AND IsDynamic=0";
+                strQuerry = "Update DSTempStep Set SortOrder=" + currentsortId + " Where DSTempStepId =" + stepId + " And DSTempSetId=" + setId + " AND ActiveInd='A' AND IsDynamic=0";
                 objData.Execute(strQuerry);
 
                 ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "CloseSortingPopup();", true);
@@ -8012,7 +8012,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         }
                     }
                     // UpdateCompleteSteponSet(Convert.ToInt32(items.Value), headerId);
-                 }
+                }
                string strQurryNosetchk = "SELECT DSTempStepId FROM DSTempStep WHERE DSTempSetId = " +0+ " AND DSTempParentStepId=" + editStepId + " AND DSTempHdrId=" + headerId +" AND IsDynamic=0 AND ActiveInd = 'A'";
                object objNosetStep = objData.FetchValue(strQurryNosetchk);
                if (objNosetStep == null)
@@ -8067,10 +8067,10 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     for (int i = 0; i < dtList.Rows.Count; i++)
                     {
                         int sortOderToChange = Convert.ToInt32(dtList.Rows[i]["SortOrder"].ToString()) - 1;
-                        strQurry = "UPDATE DSTempStep SET SortOrder = " + sortOderToChange + " WHERE DSTempStepId = " + Convert.ToInt32(dtList.Rows[i]["DSTempStepId"].ToString());
+                        strQurry = "UPDATE DSTempStep SET SortOrder = " + sortOderToChange + " WHERE ActiveInd='A' AND DSTempStepId = " + Convert.ToInt32(dtList.Rows[i]["DSTempStepId"].ToString());
                         objData.Execute(strQurry);
                     }
-                    strQurry = "UPDATE DSTempStep SET SortOrder = " + newSortOrder + " WHERE DSTempParentStepId = " + editStepId;
+                    strQurry = "UPDATE DSTempStep SET SortOrder = " + newSortOrder + " WHERE ActiveInd='A' AND DSTempParentStepId = " + editStepId;
                     objData.Execute(strQurry);
                 }
 
@@ -8102,11 +8102,11 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     for (int i = 0; i < dtList.Rows.Count; i++)
                     {
                         int sortOderToChange = Convert.ToInt32(dtList.Rows[i]["SortOrder"].ToString()) + 1;
-                        strQurry = "UPDATE DSTempStep SET SortOrder = " + sortOderToChange + " WHERE DSTempStepId = "
+                        strQurry = "UPDATE DSTempStep SET SortOrder = " + sortOderToChange + " WHERE ActiveInd='A' AND DSTempStepId = "
                             + Convert.ToInt32(dtList.Rows[i]["DSTempStepId"].ToString());
                         objData.Execute(strQurry);
                     }
-                    strQurry = "UPDATE DSTempStep SET SortOrder = " + newSortOrder + " WHERE DSTempParentStepId = " + editStepId;
+                    strQurry = "UPDATE DSTempStep SET SortOrder = " + newSortOrder + " WHERE ActiveInd='A' AND DSTempParentStepId = " + editStepId;
                     objData.Execute(strQurry);
                 }
 
@@ -8160,7 +8160,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
                 foreach (DataRow row in dtList.Rows)
                 {
-                    updateQuerry = "UPDATE DsTempStep SET SortOrder = " + row["SortRank"].ToString() + " WHERE DSTempStepId= " + row["DSTempStepId"].ToString() + " AND IsDynamic=0";
+                    updateQuerry = "UPDATE DsTempStep SET SortOrder = " + row["SortRank"].ToString() + " WHERE ActiveInd='A' AND DSTempStepId= " + row["DSTempStepId"].ToString() + " AND IsDynamic=0";
                     objData.Execute(updateQuerry);
                 }
 
@@ -8206,7 +8206,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         string updateQuerry = "";
         objData = new clsData();
         strQuerry = "SELECT DSTempStepId,DSTempSetId,SortOrder,DSTempHdrId,RANK() OVER (ORDER BY SortOrder) As SortRank FROM DSTempStep WHERE " +
-                                 "   DSTempHdrId = " + headerId + " AND DSTempParentStepId =" + parentSetId + " AND IsDynamic=0";
+                                 "   DSTempHdrId = " + headerId + " AND DSTempParentStepId =" + parentSetId + " AND ActiveInd='A' AND IsDynamic=0";
 
         DataTable dtList = objData.ReturnDataTable(strQuerry, false);
         if (dtList != null)
@@ -8215,7 +8215,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             {
                 foreach (DataRow row in dtList.Rows)
                 {
-                    updateQuerry = "UPDATE DsTempStep SET SortOrder = " + row["SortRank"].ToString() + " WHERE DSTempStepId= " + row["DSTempStepId"].ToString() + " AND IsDynamic=0";
+                    updateQuerry = "UPDATE DsTempStep SET SortOrder = " + row["SortRank"].ToString() + " WHERE DSTempStepId= " + row["DSTempStepId"].ToString() + " AND ActiveInd='A' AND IsDynamic=0";
                     objData.Execute(updateQuerry);
                 }
 
@@ -8642,10 +8642,10 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             for (int i = 0; i < dtList.Rows.Count; i++)
             {
                 int sortOderToChange = Convert.ToInt32(dtList.Rows[i]["SortOrder"].ToString()) - 1;
-                strQurry = "UPDATE DSTempParentStep SET SortOrder = " + sortOderToChange + " WHERE DSTempParentStepId = " + Convert.ToInt32(dtList.Rows[i]["DSTempParentStepId"].ToString());
+                strQurry = "UPDATE DSTempParentStep SET SortOrder = " + sortOderToChange + " WHERE ActiveInd='A' AND DSTempParentStepId = " + Convert.ToInt32(dtList.Rows[i]["DSTempParentStepId"].ToString());
                 objData.ExecuteWithTrans(strQurry, con, Transs);
 
-                strQurry = "UPDATE DSTempStep SET SortOrder = " + sortOderToChange + " WHERE DSTempParentStepId = " + Convert.ToInt32(dtList.Rows[i]["DSTempParentStepId"].ToString());
+                strQurry = "UPDATE DSTempStep SET SortOrder = " + sortOderToChange + " WHERE ActiveInd='A' AND DSTempParentStepId = " + Convert.ToInt32(dtList.Rows[i]["DSTempParentStepId"].ToString());
                 objData.ExecuteWithTrans(strQurry, con, Transs);
             }
 
@@ -13193,20 +13193,20 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     if (skilltype == "Chained")
                     {
                         string SetIdCheck = "";
-                        string steptname = "";
+                        string steptname = "";  
                         DataTable dtParentstepListF = new DataTable();
-                        dtParentstepListF.Columns.Add("SetId", typeof(string));
+                        dtParentstepListF.Columns.Add("SetId", typeof(string));                          
 
                         string DSParentStep = "SELECT  DSTempParentStepId,SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames FROM DSTempParentStep " +
                              " WHERE DSTempHdrId = " + TemplateId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + TemplateId + " AND ActiveInd = 'A') " +
                              " AND ActiveInd = 'A' ORDER BY SortOrder";
                         DataTable dtParentstepList = objData.ReturnDataTable(DSParentStep, false);
-
+                                          
                         string Activeset = "select DSTempSetId FROM DSTempSet WHERE DSTempHdrId = " + TemplateId + " AND ActiveInd ='A'";
                         DataTable dtActivesetList = objData.ReturnDataTable(Activeset, false);
 
                         List<string> ListSetIds = new List<string>();
-
+                       
                         if (dtActivesetList != null)
                         {
                             if (dtActivesetList.Rows.Count > 0)
@@ -13217,11 +13217,11 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                 }
                             }
                         }
-
+                        
                         if (dtParentstepList != null)
                         {
                             if (dtParentstepList.Rows.Count > 0)
-                            {
+                            {                                                          
                                 foreach (DataRow dr in dtParentstepList.Rows)
                                 {
                                     SetIdCheck = dr["SetIds"].ToString();
@@ -13231,7 +13231,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                     {
                                         if (value != "" && ListSetIds.Contains(value))
                                         {
-                                            dtParentstepListF.Rows.Add(value.Trim());
+                                            dtParentstepListF.Rows.Add(value.Trim()); 
                                         }
                                     }
                                 }
@@ -13244,7 +13244,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         if (dtDstemstepcountList != null && dtParentstepListF != null)
                         {
                             if (dtParentstepListF.Rows.Count != dtDstemstepcountList.Rows.Count)
-                            {
+                            {                               
                                 string DissetId = "SELECT distinct(DSTempsetId) FROM  DSTempset WHERE DSTempHdrId = " + TemplateId + " AND ActiveInd = 'A'";
                                 DataTable dtDissetIdList = objData.ReturnDataTable(DissetId, false);
 
@@ -13255,7 +13255,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                     {
                                         foreach (DataRow dr in dtDissetIdList.Rows)
                                         {
-
+                                             
                                             int DsSetId = Convert.ToInt32(dr["DSTempsetId"]);
                                             string Dupsortorder = "SELECT sortOrder, COUNT(*) as Count FROM DStempStep where DSTempHdrId = " + TemplateId + " and DSTempSetId=" + DsSetId + " and ActiveInd='A' GROUP BY sortOrder HAVING COUNT(*) > 1";
                                             DataTable dtDupsortorderList = objData.ReturnDataTable(Dupsortorder, false);
@@ -13268,7 +13268,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                                         int sortno = Convert.ToInt32(drds["sortOrder"]);
                                                         string strstepnames = "select STUFF((SELECT ' - ' + StepCd+' '+StepName FROM DSTempStep where SortOrder=" + sortno + " and DSTempSetId=" + DsSetId + " and ActiveInd='A' and DSTempHdrId=" + TemplateId + " FOR XML PATH('')), 1, 2, '') AS setname";
                                                         steptname = steptname + " (" + Convert.ToString(objData.FetchValue(strstepnames)) + " ) ";
-
+                                                        
                                                     }
 
                                                 }
@@ -13295,12 +13295,12 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
                             }
                         }
-
+                      
                     }
                     else if (skilltype == "Discrete")
                     {
-                        string DisTrialDsStep = "SELECT * FROM  DSTempStep WHERE DSTempHdrId = " + TemplateId + " AND ActiveInd = 'A' and IsDynamic=0 And DSTempSetId in (select DSTempSetId from DSTempSet where DSTempHdrId =" + TemplateId + " AND ActiveInd = 'A' )";
-                        DataTable dtDisTrialDstempList = objData.ReturnDataTable(DisTrialDsStep, false);
+                       string DisTrialDsStep = "SELECT * FROM  DSTempStep WHERE DSTempHdrId = " + TemplateId + " AND ActiveInd = 'A' and IsDynamic=0 And DSTempSetId in (select DSTempSetId from DSTempSet where DSTempHdrId =" + TemplateId + " AND ActiveInd = 'A' )";
+                       DataTable dtDisTrialDstempList = objData.ReturnDataTable(DisTrialDsStep, false);
                         //string strsetnames = "SELECT NbrOfTrials FROM DSTempHdr WHERE DSTempHdrId = " + TemplateId + " ";
                         string DisTrialDsHdr = "SELECT NbrOfTrials * (select count(distinct DSTempSetId) from DSTempStep where  DSTempHdrId =  " + TemplateId + " and ActiveInd='A' and DSTempSetId in(select  DSTempSetId from DSTempSet where ActiveInd='A' and DSTempHdrId =  " + TemplateId + "))  FROM DSTempHdr WHERE DSTempHdrId =  " + TemplateId;
                         int DisTrial = Convert.ToInt32(objData.FetchValue(DisTrialDsHdr));
@@ -14092,7 +14092,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                 previewSuccess = false;
                                 tdReadMsg.InnerHtml = clsGeneral.warningMsg("The lesson contain step count mismatch Please Create a New LessonPlan");
                                 FillTypeOfInstruction(TemplateId);
-                                return;
+                                return;                                
                             }
 
                         }
@@ -14123,6 +14123,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 }
 
                 //Step Mismatch Validation End
+
 
                 string strdupsort = "SELECT SortOrder as sortorder, COUNT(*) as count FROM DSTempSet where ActiveInd='A' and DSTempHdrId=" + TemplateId + " GROUP BY SortOrder HAVING COUNT(*) > 1";
                 DataTable dtdupsort = objData.ReturnDataTable(strdupsort, false);
@@ -18399,7 +18400,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     foreach (DataRow row in dtset.Rows)
                     {
                         strQuery = "INSERT INTO DSTempSet(SchoolId,DSTempHdrId,PrevSetId,SetCd,SetName,Samples,SortOrder,ActiveInd,CreatedBy,CreatedOn,DistractorSamples,DistractorSamplesCount) ";
-                        strQuery += "SELECT  SchoolId," + TId + ",PrevSetId,SetCd,SetName,Samples,SortOrder,ActiveInd," + loginid + ",getdate(),DistractorSamples,DistractorSamplesCount FROM DSTempSet WHERE DSTempSetId = " + Convert.ToInt32(row["DSTempSetId"]) + " ";
+                        strQuery += "SELECT  SchoolId," + TId + ",PrevSetId,SetCd,SetName,Samples,SortOrder,ActiveInd," + loginid + ",getdate(),DistractorSamples,DistractorSamplesCount FROM DSTempSet WHERE ActiveInd='A' AND DSTempSetId = " + Convert.ToInt32(row["DSTempSetId"]) + " ";
                         int SetId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                         if (!ht.ContainsKey(row["DSTempSetId"]))
                         {
@@ -18437,7 +18438,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         }
                         strQuery =
                         strQuery = "INSERT INTO DSTempStep(SchoolId,DSTempHdrId,DSTempSetId,PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder,CreatedBy,ActiveInd,CreatedOn) ";
-                        strQuery += "SELECT SchoolId," + TId + "," + parentSetId + ",PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder," + loginid + ",ActiveInd,GETDATE()	FROM DSTempStep WHERE DSTempStepId = " + Convert.ToInt32(row["DSTempStepId"]) + " AND IsDynamic=0 ";
+                        strQuery += "SELECT SchoolId," + TId + "," + parentSetId + ",PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder," + loginid + ",ActiveInd,GETDATE()	FROM DSTempStep WHERE ActiveInd='A' AND DSTempStepId = " + Convert.ToInt32(row["DSTempStepId"]) + " AND IsDynamic=0 ";
                         int StepId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                     }
                 }
@@ -18472,7 +18473,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             oldParentSetId = Convert.ToInt32(row["DSTempParentStepId"]);
                             strQuery = "INSERT INTO DSTempParentStep(SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn) "
                                         + "SELECT  SchoolId," + TId + ",StepCd,StepName,DSTempSetId,SortOrder,'" + newsetids + "',SetNames,ActiveInd," + loginid + ",getdate()"
-                                        + " FROM DSTempParentStep WHERE DSTempHdrId = " + templateid + " AND DSTempParentStepId=" + oldParentSetId;
+                                        + " FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempHdrId = " + templateid + " AND DSTempParentStepId=" + oldParentSetId;
                             parentSetId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
 
                             DataTable dtstep = new DataTable();
@@ -18488,15 +18489,15 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
                                     strQuery = "INSERT INTO DSTempStep(SchoolId,DSTempHdrId,DSTempSetId,PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder,CreatedBy,ActiveInd,CreatedOn) ";
                                     strQuery += "SELECT SchoolId," + TId + ",DSTempSetId,PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder," + loginid + ",ActiveInd,GETDATE()"
-                                        + "	FROM DSTempStep WHERE DSTempSetId = " + oldSetId + " AND IsDynamic=0 AND DSTempParentStepId=" + oldParentSetId + " AND DSTempHdrId = " + templateid;
+                                        + "	FROM DSTempStep WHERE ActiveInd='A' AND DSTempSetId = " + oldSetId + " AND IsDynamic=0 AND DSTempParentStepId=" + oldParentSetId + " AND DSTempHdrId = " + templateid;
                                     int StepId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
-                                    strQuery = "SELECT DSTempSetId FROM DSTempStep WHERE DSTempStepId=" + StepId + " AND IsDynamic=0";
+                                    strQuery = "SELECT DSTempSetId FROM DSTempStep WHERE DSTempStepId=" + StepId + " AND ActiveInd='A' AND IsDynamic=0";
                                     int NewSetId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                                     if (ht.ContainsKey(Convert.ToInt32(NewSetId)))
                                     {
                                         newsetids = ht[Convert.ToInt32(NewSetId)].ToString();
                                         strQuery = "UPDATE DSTempStep SET DSTempSetId=" + Convert.ToInt32(ht[Convert.ToInt32(NewSetId)]) + ",DSTempParentStepId=" + parentSetId + " "
-                                            + " WHERE DSTempStepId=" + StepId + " AND IsDynamic=0";
+                                            + " WHERE ActiveInd='A' AND DSTempStepId=" + StepId + " AND IsDynamic=0";
                                         int updateId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                                     }
 
@@ -19546,63 +19547,63 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
     {
         try
         {
-            int TemplateId = Convert.ToInt32(ViewState["HeaderId"]);
-            string type = "";
-            string typesel = "";
+        int TemplateId = Convert.ToInt32(ViewState["HeaderId"]);
+        string type = "";
+        string typesel= "";
 
-            int parentLookupId = Convert.ToInt16(drp_teachingFormat.SelectedValue);
-            int FormatLookupId = Convert.ToInt16(drpTeachingProc.SelectedValue);
-            objData = new clsData();
-            objData.ReturnDropDown("Select LookupId as Id , LookupName as Name from dbo.LookUp where ParentLookupId=" + parentLookupId, drpTeachingProc);
+		int parentLookupId = Convert.ToInt16(drp_teachingFormat.SelectedValue);
+        int FormatLookupId = Convert.ToInt16(drpTeachingProc.SelectedValue);
+		objData = new clsData();
+        objData.ReturnDropDown("Select LookupId as Id , LookupName as Name from dbo.LookUp where ParentLookupId=" + parentLookupId, drpTeachingProc);
 
-            string temptype = "SELECT SkillType  FROM DSTempHdr WHERE DSTempHdrId = " + TemplateId;
-            string skill = Convert.ToString(objData.FetchValue(temptype));
-            string tempformattype = "SELECT LookupName  FROM lookup WHERE LookupId in( SELECT TeachingProcId  FROM DSTempHdr WHERE DSTempHdrId = " + TemplateId + ")";
-            string Formatname = Convert.ToString(objData.FetchValue(tempformattype));
-            string tempformatDectype = "SELECT LookupDesc  FROM lookup WHERE LookupId in( SELECT TeachingProcId  FROM DSTempHdr WHERE DSTempHdrId = " + TemplateId + ")";
-            string Format = Convert.ToString(objData.FetchValue(tempformatDectype));
+        string temptype = "SELECT SkillType  FROM DSTempHdr WHERE DSTempHdrId = " + TemplateId;
+        string skill = Convert.ToString(objData.FetchValue(temptype));
+        string tempformattype = "SELECT LookupName  FROM lookup WHERE LookupId in( SELECT TeachingProcId  FROM DSTempHdr WHERE DSTempHdrId = " + TemplateId + ")";
+        string Formatname = Convert.ToString(objData.FetchValue(tempformattype));
+        string tempformatDectype = "SELECT LookupDesc  FROM lookup WHERE LookupId in( SELECT TeachingProcId  FROM DSTempHdr WHERE DSTempHdrId = " + TemplateId + ")";
+        string Format = Convert.ToString(objData.FetchValue(tempformatDectype));
 
-            if (Formatname == "Incidental- Discrete" || (Format == "Discrete" && Formatname == "Others"))
-            {
-                skill = "Discrete";
-            }
-            else if (Formatname == "Incidental- Total Task")
-            {
-                skill = "Chained";
-            }
+        if (Formatname == "Incidental- Discrete" || (Format == "Discrete" && Formatname == "Others"))
+        {
+            skill = "Discrete";
+        }
+        else if(Formatname == "Incidental- Total Task")
+        {
+            skill = "Chained";
+        }
 
-            if (skill == "Chained")
-            {
-                type = "step";
-            }
-            else
-            {
-                type = "Trial";
-            }
-            string selTeachformatitem = drp_teachingFormat.SelectedItem.ToString();
-            string selTeachMethoditem = drpTeachingProc.SelectedItem.ToString();
+        if (skill == "Chained")
+        {
+            type = "step";
+        }
+        else
+        {
+            type = "Trial";
+        }
+        string selTeachformatitem = drp_teachingFormat.SelectedItem.ToString();
+        string selTeachMethoditem = drpTeachingProc.SelectedItem.ToString();
 
-            if (selTeachformatitem == "Task Analysis" || selTeachformatitem == "Other")
-            {
-                typesel = "step";
-            }
-            else if (selTeachformatitem != "Incidental")
-            {
-                typesel = "Trial";
-            }
+        if (selTeachformatitem == "Task Analysis" ||selTeachformatitem=="Other")
+        {
+            typesel = "step";
+        }
+        else if(selTeachformatitem!= "Incidental")
+        {
+            typesel = "Trial";
+        }
 
 
             //if (selitem != "Task Analysis" && selitem != "Other")
-            if (type != typesel || selTeachformatitem == "Incidental")
+        if (type != typesel || selTeachformatitem == "Incidental")
             {
                 string selectQuerry = "SELECT COUNT(*)  FROM DSTempStep WHERE ActiveInd = 'A' AND DSTempHdrId = " + TemplateId;
-                int stepcount = Convert.ToInt32(objData.FetchValue(selectQuerry));
+                int stepcount =Convert.ToInt32( objData.FetchValue(selectQuerry));
                 if (stepcount > 0)
                 {
-                    string scripts = "showPopup();";
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "Showpop", scripts, true);
+                string scripts = "showPopup();";
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "Showpop", scripts, true);
                 }
-            }
+        }
         }
         catch (Exception Ex)
         {
@@ -20159,6 +20160,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         }
 
                         //Step Mismatch Validation End
+
 
                         string strdupsort = "SELECT SortOrder as sortorder, COUNT(*) as count FROM DSTempSet where ActiveInd='A' and DSTempHdrId=" + TemplateId + " GROUP BY SortOrder HAVING COUNT(*) > 1";
                         DataTable dtdupsort = objData.ReturnDataTable(strdupsort, false);
