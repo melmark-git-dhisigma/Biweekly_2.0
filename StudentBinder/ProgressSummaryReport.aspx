@@ -90,12 +90,47 @@
         }
         
     </style>
-    <style>
-        .nowrapText {
-            white-space: nowrap; /* Prevent text wrapping */
+      <style>
+        /* Overlay Styles */
+         #overlay {
+             display: none; /* Hidden by default */
+             position: fixed;
+             top: 0;
+             left: 0;
+             width: 100%;
+             height: 100%;
+             background-color: rgba(0, 0, 0, 0.7);
+             color: white;
+             text-align: center;
+             font-size: 24px;
+             z-index: 9999;
+             padding-top: 200px; /* Center the text vertically */
+         }
+         .web_dialog11 {
+            background: url("../images/smalllgomlmark.JPG") no-repeat scroll right bottom #F8F7FC;
+            border: 5px solid #B2CCCA;
+            color: #333333;
+            display: block;
+            font-family: Arial,Helvetica,sans-serif;
+            font-size: 100%;
+            height: auto;
+            left: 30%;
+            top: 5%;
+            margin-left: -190px;
+            padding: 5px 5px 30px;
+            position: fixed;
+            display: none;            
+            width: 800px;
+            z-index: 102;
         }
+       
     </style>
-
+    <style>
+    .nowrapText {
+        white-space: nowrap; /* Prevent text wrapping */
+    }
+</style>
+  
     <script type="text/javascript">
         window.onload = function () {
             new JsDatePick({
@@ -111,6 +146,7 @@
         };
         function showMessage() {
             $('#PSRLoadingImage').show();
+
         }
 
         function closeMessage() {
@@ -119,7 +155,20 @@
         function showMessage2() {
             var checkbox = document.getElementById('<%= highcheck.ClientID %>');
             if (checkbox.checked) {
-                $('#PSRLoadingImage').show();
+                $('#overlay').show();
+            }
+        }
+        function hideOverlay() {
+            document.getElementById("downloadPopup").style.display = "block";
+            $('#overlay').hide();
+
+        }
+        function CloseDownload(val) {
+            document.getElementById("hdnExport").value = "";
+            document.getElementById("downloadPopup").style.display = "none";
+            var checkbox = document.getElementById('<%= highcheck.ClientID %>');
+            if (val == 1) {
+                
             }
         }
     </script>
@@ -211,13 +260,13 @@
                 <asp:button id="Button2" runat="server" text="Session View" cssclass="NFButton" tooltip="Show Session View" onclick="btnShow_Click" OnClientClick="showMessage()"   />
 
                 
-                <asp:button id="Button1" runat="server" text="Classic View" cssclass="NFButton" tooltip="Show Classic View" onclick="btnsubmit_Click" OnClientClick="showMessage2()" />
+                <asp:button id="Button1" runat="server" text="Classic View" cssclass="NFButton" tooltip="Show Classic View" onclick="btnsubmit_Click" OnClientClick="showMessage2()"  />
                 
             </td>
 
             
             <td>
-                        <asp:ImageButton ID="btnExport" runat="server" ImageUrl="~/Administration/images/Excelexp.png" OnClick="btnExport_Click1" ToolTip="Export" />
+                        <asp:ImageButton ID="btnExport" runat="server" ImageUrl="~/Administration/images/Excelexp.png" OnClick="btnExport_Click1" ToolTip="Export" OnClientClick="showMessage2()"/>
 
                     <td class="auto-style4" colspan="2"></td>
                 </tr>
@@ -233,7 +282,7 @@
         </tr>
         <tr>
             <td colspan="2">
-                <h2 id="PSRLoadingImage" style="font-family: Calibri, sans-serif; color: #6C7598; font-size: 20px; margin-top: 15px; text-align: center; display: none;">Loading......</h2>
+                <h2 id="PSRLoadingImage" runat="server" style="font-family: Calibri, sans-serif; color: #6C7598; font-size: 20px; margin-top: 15px; text-align: center; display: none;">Loading......</h2>
 
             </td>
             <td id="td1" runat="server" colspan="2" visible="false" class="auto-style8"> <!-- my code -->
@@ -259,7 +308,9 @@
                             </div>
             </td>
         </tr>
-        </table>
+
+                      
+                    </table>
           <%------------------------------------DataList to List the Classic  Data--------------------------------------%>
 
          <div style="display: flex; align-items: flex-start; gap: 0; margin: 0; padding: 0;">
@@ -267,7 +318,7 @@
                         
                                <tr>
                                    <td>
-  <asp:GridView ID="Gvclsdate" runat="server" Width="100%" AutoGenerateColumns="false" GridLines="Both" BackColor="White" BorderColor="#336666" 
+  <asp:GridView ID="Gvclsdate" runat="server" Width="100%" AutoGenerateColumns="false" GridLines="Both" BackColor="White" BorderColor="#336666"
                                             BorderStyle="None" BorderWidth="1px" Style="width: 100%" HorizontalAlign="Justify" >
                                             <RowStyle CssClass="RowStyle RowStyleN" />
                                             <FooterStyle CssClass="FooterStyle" ForeColor="#333333" />
@@ -333,6 +384,7 @@
                 </asp:DataList>
                  </div>
              </div>
+
 
          <%------------------------------------DataList to List the Session Data--------------------------------------%>
             <div id="divLesson" runat="server" style="width: 100%; height: 600px; overflow: auto">
@@ -564,6 +616,51 @@
             </asp:DataList>
         </div>
         <%-- End --%>
+        <%-- export --%>
+          <div id="overlay" runat="server">
+            
+            <p> please wait...</p>
+                                 
+        </div>
+         <asp:GridView ID="exportgrid" runat="server" AutoGenerateColumns="False" Visible="false" >
+                <Columns>
+                </Columns>
+            </asp:GridView>
+        <div id="downloadPopup" class="web_dialog11" style="width: 600px;" runat="server">
+             
+            <div id="Div53" style="width: 700px;">
+
+
+                <table style="width: 97%">
+                    <tr>
+                        <td colspan="2">
+                            <table style="width: 85%">
+                                <tr>
+                                    <td runat="server" id="tdMsgExport" style="height: 50px"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: right">
+
+                                    <asp:Button ID="btnDownload" runat="server" Text="Download" CssClass="NFButton" OnClick="btnDownload_Click" OnClientClick="CloseDownload(1);" />
+
+                        </td>
+                        <td style="text-align: left">
+                             <input type="button" value="Done" class="NFButton" id="btnDone" onclick="CloseDownload(0);" />
+                           <%-- <asp:Button ID="btnDone" runat="server" Text="Done" CssClass="NFButton" OnClientClick="CloseDownload();" />--%>
+
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+        </div>
+                <asp:hiddenfield id="hdnExport" runat="server" value="" />
+
+     
+        <%-- end --%>
     </div>
     </form>
 </body>
