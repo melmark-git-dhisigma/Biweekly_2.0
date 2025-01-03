@@ -813,6 +813,187 @@
                 }
             
             }
+
+
+            function loadAcademicbyStaff(acstaffdata)
+            {
+                var aData = JSON.parse(acstaffdata);
+                if (aData.length != 0) {
+                    aData = aData.reverse();
+                    var categoriesdata = [];
+                    var seriesdata = [];
+                    var result = [];
+                    var lessonname = []; var uniqueless = [];
+                    $.map(aData, function (item, index) {
+                        categoriesdata.push(item['StaffName']);
+                    });
+                    $.map(categoriesdata, function (item, index) {
+                        if (!result.includes(item)) {
+                            result.push(item);
+                        }
+                    });
+                    $.map(aData, function (item, index) {
+                        lessonname.push(item['LessonNameToolTip']);
+                    });
+                    $.map(lessonname, function (item, index) {
+                        if (!uniqueless.includes(item)) {
+                            uniqueless.push(item);
+                        }
+                    });
+                    var colorDictionary = createDictionary(uniqueless);
+                    var len = result.length;
+                    $.map(aData, function (item, index) {
+                        if (result.includes(item['StaffName'])) {
+                            var index;
+                            result.some(function (elem, inx) {
+                                if (elem === item['StaffName']) {
+                                    index = inx;
+                                }
+                            });
+                            var dt = [];
+                            var i = 0;
+                            while (i < len) {
+                                if (i == index) {
+                                    var key = item['LessonNameToolTip'];
+                                    var color = colorDictionary[key];
+                                    dt.push({ y: item['SessionCount'], name: item['LessonName'], ToolTip: item['LessonNameToolTip'] + '(' + item['StudentName'] + ')', color: color });
+                                }
+                                else {
+                                    dt.push({ y: 0, name: '' });
+                                }
+                                i = i + 1;
+                            }
+                            var daa = JSON.parse(JSON.stringify(dt));
+                            var seriesdict = new Object;
+                            seriesdict['name'] = item['LessonName'];
+                            seriesdict['data'] = daa;
+                            seriesdata.push(seriesdict);
+                            while (dt.length > 0) {
+                                dt.pop();
+                            }
+                        }
+                    });
+                    var cat = JSON.parse(JSON.stringify(result));
+                    var dat = JSON.parse(JSON.stringify(seriesdata));
+                    DrawAcStaff(cat, dat);
+                    HideWait();
+                }
+                else {
+                    HideWait();
+                    var nodata = document.getElementById('lblNoData');
+                    nodata.innerHTML = "No Data Available";
+                }
+            }
+            function DrawAcStaff(cat, da) {
+
+                Highcharts.chart('graphcontainer', {
+                    chart: {
+                        type: 'bar'
+                    },
+                    title: {
+                        text: 'Academic by Staff'
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    xAxis: {
+                        categories: cat,
+                        title: {
+                            text: 'Staff Name',
+                            useHTML: true,
+                            style: {
+                                fontWeight: 'bold',
+                                color: 'black',
+                                fontSize: '12px',
+                                fontFamily: 'Arial'
+
+                            }
+                        },
+                        labels: {
+                            enabled: true,
+                            useHTML: true,
+                            style: {
+                                color: 'black',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                fontFamily: 'Arial'
+
+                            }
+                        },
+                    },
+                    yAxis: {
+                        min: 0,
+                        tickInterval: 1,
+                        opposite: true,
+                        title: {
+                            text: 'Total Sessions',
+                            useHTML: true,
+                            style: {
+                                fontWeight: 'bold',
+                                color: 'black',
+                                fontSize: '12px',
+                                fontFamily: 'Arial'
+
+                            }
+                        },
+                        labels: {
+                            enabled: true,
+                            useHTML: true,
+                            style: {
+                                color: 'black',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                fontFamily: 'Arial'
+
+                            }
+                        },
+                    },
+                    legend: {
+                        reversed: true,
+                        enabled: false,
+                    },
+                    tooltip: {
+                        formatter: function () {
+                            return this.point.ToolTip;
+                        }
+                    },
+                    plotOptions: {
+                        bar: {
+                            dataLabels: {
+                                enabled: true,
+                                formatter: function () {
+                                    return this.point.name;
+                                },
+                                style: {
+                                    fontWeight: 'bold',
+                                    fontSize: '12px',
+                                    fontFamily: 'Arial',
+                                    color: 'black',
+                                }
+                            }
+                        },
+                        series: {
+                            stacking: 'normal'
+                        }
+
+                    },
+                    series: da
+                });
+
+            }
+            function createDictionary(uniqueless) {
+                var dictionary = {};
+                for (var i = 0; i < uniqueless.length; i++) {
+                    var item = uniqueless[i];
+                    dictionary[item] = generateRandomColor();
+                }
+
+                return dictionary;
+            }
+            function generateRandomColor() {
+                var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+                return randomColor;
+            }
         </script>
     </form>
 </body>
