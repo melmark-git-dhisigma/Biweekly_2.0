@@ -11597,7 +11597,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             }
 
 
-                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveUp, "Set");
+                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveUp, "Set", trans, con);
                         }
                         #endregion
                         #region setmoveback
@@ -11728,7 +11728,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                 }
                             }
-                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveBack, "Set");
+                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveBack, "Set", trans, con);
                         }
                         #endregion
                         #region stepmoveup
@@ -11820,7 +11820,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                 }
                             }
-                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntStep, bStepMoveUp, "Step");
+                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntStep, bStepMoveUp, "Step", trans, con);
                         }
                         #endregion
                         #region stepmoveback
@@ -11938,7 +11938,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                 }
                             }
-                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntStep, bStepMoveBack, "Step");
+                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntStep, bStepMoveBack, "Step", trans, con);
                         }
                         #endregion
                         #region promptmoveup
@@ -11985,7 +11985,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                 }
                             }
-                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveUp, "Prompt");
+                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveUp, "Prompt", trans, con);
                         }
                         #endregion
                         #region promptmoveback
@@ -12058,7 +12058,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                 }
                             }
-                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveBack, "Prompt");
+                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveBack, "Prompt", trans, con);
                         }
                         #endregion
                         if (sesResultchain != null)
@@ -12083,7 +12083,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 {
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bSetMoveUpMultiTecher, bMultyTchr);
-                                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete");
+                                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete", trans, con);
                                 }
                             }
                         }
@@ -14873,7 +14873,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 bSetCompleted = false;
                             }
 
-                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveUp, "Set");
+                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveUp, "Set", trans, con);
                         }
                         #endregion
                         #region setmoveback
@@ -14974,7 +14974,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                             }
 
-                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveBack, "Set");
+                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveBack, "Set", trans, con);
                         }
                         #endregion
                         #region promptmoveup
@@ -15027,7 +15027,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 }
                             }
 
-                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveUp, "Prompt");
+                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveUp, "Prompt", trans, con);
                         }
                         #endregion
                         #region promptmoveback
@@ -15107,7 +15107,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 }
                             }
 
-                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveBack, "Prompt");
+                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveBack, "Prompt", trans, con);
                         }
                         #endregion
                         if (sesResult != null)
@@ -15125,7 +15125,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     {
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
                                         bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bSetMoveUpMultiTecher, bMultyTchr);
-                                        DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete");
+                                        DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete", trans, con);
                                     }
                                 }
                                 else
@@ -15140,7 +15140,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         {
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
                                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bSetMoveUpMultiTecher, bMultyTchr);
-                                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete");
+                                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete", trans, con);
                                         }
                                     }
                                 }
@@ -15156,7 +15156,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     {
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
                                         bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bSetMoveUpMultiTecher, bMultyTchr);
-                                        DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete");
+                                        DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete", trans, con);
                                     }
                                 }
                         }
@@ -24834,7 +24834,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     }
 
 
-                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveUp, "Set");
+                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveUp, "Set", trans, con);
                 }
                 #endregion
                 #region setmoveback
@@ -24965,7 +24965,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             }
                         }
                     }
-                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveBack, "Set");
+                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveBack, "Set", trans, con);
                 }
                 #endregion
                 #region stepmoveup
@@ -25058,7 +25058,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             }
                         }
                     }
-                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntStep, bStepMoveUp, "Step");
+                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntStep, bStepMoveUp, "Step", trans, con);
                 }
                 #endregion
                 #region stepmoveback
@@ -25176,7 +25176,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             }
                         }
                     }
-                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntStep, bStepMoveBack, "Step");
+                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntStep, bStepMoveBack, "Step", trans, con);
                 }
                 #endregion
                 #region promptmoveup
@@ -25223,7 +25223,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             }
                         }
                     }
-                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveUp, "Prompt");
+                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveUp, "Prompt", trans, con);
                 }
                 #endregion
                 #region promptmoveback
@@ -25296,7 +25296,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             }
                         }
                     }
-                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveBack, "Prompt");
+                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveBack, "Prompt", trans, con);
                 }
                 #endregion
                 if (sesResultchain != null)
@@ -25321,7 +25321,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         {
                             bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
                             bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bSetMoveUpMultiTecher, bMultyTchr);
-                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete");
+                            DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete", trans, con);
                         }
                     }
                 }
@@ -25540,7 +25540,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         bSetCompleted = false;
                     }
 
-                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveUp, "Set");
+                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveUp, "Set", trans, con);
                 }
                 #endregion
                 #region setmoveback
@@ -25641,7 +25641,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                     }
 
-                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveBack, "Set");
+                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntSet, bSetMoveBack, "Set", trans, con);
                 }
                 #endregion
                 #region promptmoveup
@@ -25694,7 +25694,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         }
                     }
 
-                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveUp, "Prompt");
+                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveUp, "Prompt", trans, con);
                 }
                 #endregion
                 #region promptmoveback
@@ -25774,7 +25774,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         }
                     }
 
-                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveBack, "Prompt");
+                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, oDS.CrntPrompt, bPromptMoveBack, "Prompt", trans, con);
                 }
                 #endregion
                 if (sesResult != null)
@@ -25792,7 +25792,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             {
                                 bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bSetMoveUpMultiTecher, bMultyTchr);
-                                DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete");
+                                DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete", trans, con);
                             }
                         }
                         else
@@ -25807,7 +25807,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 {
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
                                     bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bSetMoveUpMultiTecher, bMultyTchr);
-                                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete");
+                                    DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete", trans, con);
                                 }
                             }
                         }
@@ -25823,7 +25823,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             {
                                 bRuleStatusIOA = oDisc.checkConditionIOA(bSetMoveUpIOA, bIOA);
                                 bRuleStatusMultiTchr = oDisc.checkConditionMultiTchr(bSetMoveUpMultiTecher, bMultyTchr);
-                                DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete");
+                                DisplayIOA_MTstatus(bRuleStatusIOA, bRuleStatusMultiTchr, 0, false, "Complete", trans, con);
                             }
                         }
                 }
@@ -25839,7 +25839,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         oData.Execute(strQry);
     }
     //To display IOA / Multiteacher required for MOVEUP or MOVEDOWN
-    private void DisplayIOA_MTstatus(bool bRuleStatusIOA, bool bRuleStatusMultiTchr, int Id, bool Completed, string Type)
+    private void DisplayIOA_MTstatus(bool bRuleStatusIOA, bool bRuleStatusMultiTchr, int Id, bool Completed, string Type, SqlTransaction trans, SqlConnection con)
     {
         if (Type == "Set")
         {
@@ -25849,7 +25849,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 {
                     if (Completed == true)
                     {
-                        UpdateRequirementCriteria(bRuleStatusIOA, bRuleStatusMultiTchr);
+                        UpdateRequirementCriteria(bRuleStatusIOA, bRuleStatusMultiTchr, trans, con);
                     }
                 }
             }
@@ -25862,7 +25862,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 {
                     if (Completed == true)
                     {
-                        UpdateRequirementCriteria(bRuleStatusIOA, bRuleStatusMultiTchr);
+                        UpdateRequirementCriteria(bRuleStatusIOA, bRuleStatusMultiTchr, trans, con);
                     }
                 }
             }
@@ -25876,19 +25876,19 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 {
                     if (Completed == true)
                     {
-                        UpdateRequirementCriteria(bRuleStatusIOA, bRuleStatusMultiTchr);
+                        UpdateRequirementCriteria(bRuleStatusIOA, bRuleStatusMultiTchr, trans, con);
                     }
                 }
             }
         }
         else if (Type == "Complete")
         {
-            UpdateRequirementCriteria(bRuleStatusIOA, bRuleStatusMultiTchr);
+            UpdateRequirementCriteria(bRuleStatusIOA, bRuleStatusMultiTchr, trans, con);
         }
 
     }
 
-    private void UpdateRequirementCriteria(bool bRuleStatusIOA, bool bRuleStatusMultiTchr)
+    private void UpdateRequirementCriteria(bool bRuleStatusIOA, bool bRuleStatusMultiTchr, SqlTransaction trans, SqlConnection con)
     {
         oData = new clsData();
         oTemp = (ClsTemplateSession)Session["BiweeklySession"];
@@ -25921,7 +25921,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 UpdateQuery = "UPDATE DSTempHdr SET IsMT_IOA=0 WHERE DSTempHdrId=" + oTemp.TemplateId;
             }
         }
-        oData.Execute(UpdateQuery);
+        oData.ExecuteWithTrans(UpdateQuery, con, trans);
 
         Session["ioa_mt_message"] = message;
     }
