@@ -1,4 +1,4 @@
-<%@ Page Language="C#" AutoEventWireup="true" CodeFile="ProgressSummaryReportClinical.aspx.cs" Inherits="StudentBinder_ProgressSummaryReportClinical" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="ProgressSummaryReportClinical.aspx.cs" Inherits="StudentBinder_ProgressSummaryReportClinical" %>
 <%@ Register Assembly="Microsoft.ReportViewer.WebForms, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91" Namespace="Microsoft.Reporting.WebForms" TagPrefix="rsweb" %>
 
 <!DOCTYPE html>
@@ -34,6 +34,41 @@
                .nowrap {
         white-space: nowrap;
     }
+               </style>
+                <style>
+        /* Overlay Styles */
+         #overlay {
+             display: none; /* Hidden by default */
+             position: fixed;
+             top: 0;
+             left: 0;
+             width: 100%;
+             height: 100%;
+             background-color: rgba(0, 0, 0, 0.7);
+             color: white;
+             text-align: center;
+             font-size: 24px;
+             z-index: 9999;
+             padding-top: 200px; /* Center the text vertically */
+         }
+         .web_dialog11 {
+            background: url("../images/smalllgomlmark.JPG") no-repeat scroll right bottom #F8F7FC;
+            border: 5px solid #B2CCCA;
+            color: #333333;
+            display: block;
+            font-family: Arial,Helvetica,sans-serif;
+            font-size: 100%;
+            height: auto;
+            left: 30%;
+            top: 5%;
+            margin-left: -190px;
+            padding: 5px 5px 30px;
+            position: fixed;
+            display: none;            
+            width: 800px;
+            z-index: 102;
+        }
+       
     </style>
     <script type="text/javascript">
         window.onload = function () {
@@ -57,6 +92,17 @@
             if (checkbox.checked) {
                 $('#PSRLoadingImage').show();
             }
+        }
+       
+        function hideOverlay() {
+            document.getElementById("downloadPopup").style.display = "block";
+            $('#PSRLoadingImage').hide();
+
+        }
+        function CloseDownload() {
+            document.getElementById("hdnExport").value = "";
+            document.getElementById("downloadPopup").style.display = "none";
+            var checkbox = document.getElementById('<%= highcheck.ClientID %>');
         }
     </script>
     <script>
@@ -108,7 +154,7 @@
                 
             </td>
                 <td style="width:275px">
-                     <asp:ImageButton ID="btnExport" runat="server" style="float: left" ImageUrl="~/Administration/images/Excelexp.png" OnClick="btnExport_Click" ToolTip="Export" />
+                     <asp:ImageButton ID="btnExport" runat="server" style="float: left" ImageUrl="~/Administration/images/Excelexp.png" OnClick="btnExport_Click" ToolTip="Export" OnClientClick="showMessage2()" />
                     <asp:ImageButton ID="btnRefresh" runat="server" style="float: right" Text="Refresh" ImageUrl="~/Administration/images/RefreshStudentBinder.png" OnClick="btnRefresh_Click" />
                 </td>
 
@@ -135,7 +181,7 @@
             </tr>
             <tr>
                 <td colspan="7">
-                    <h2 id="PSRLoadingImage" style="font-family: Calibri, sans-serif; color: #6C7598; font-size: 20px; margin-top: 15px; text-align: center; display: none;">Loading......</h2>
+                    <h2 id="PSRLoadingImage" runat="server" style="font-family: Calibri, sans-serif; color: #6C7598; font-size: 20px; margin-top: 15px; text-align: center; display: none;">Loading......</h2>
                 </td>
             </tr>
             <tr>
@@ -375,6 +421,51 @@
                     </ItemTemplate>
                 </asp:DataList>
             </div>
+         <div id="overlay" runat="server">
+            
+            <p> please wait...</p>
+                                 
+        </div>
+        <asp:GridView ID="exportgrid" runat="server" AutoGenerateColumns="False" 
+                OnDataBound="SummaryBound" >
+                
+
+                <Columns>
+                </Columns>
+            </asp:GridView>
+        <div id="downloadPopup" class="web_dialog11" style="width: 600px;">
+             
+            <div id="Div53" style="width: 700px;">
+
+
+                <table style="width: 97%">
+                    <tr>
+                        <td colspan="2">
+                            <table style="width: 85%">
+                                <tr>
+                                    <td runat="server" id="tdMsgExport" style="height: 50px"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: right">
+
+                                    <asp:Button ID="btnDownload" runat="server" Text="Download" CssClass="NFButton" OnClick="btnDownload_Click" OnClientClick="CloseDownload();" />
+
+                        </td>
+                        <td style="text-align: left">
+                             <input type="button" value="Done" class="NFButton" id="btnDone" onclick="CloseDownload();" />
+                           <%-- <asp:Button ID="btnDone" runat="server" Text="Done" CssClass="NFButton" OnClientClick="CloseDownload();" />--%>
+
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+        </div>
+                <asp:hiddenfield id="hdnExport" runat="server" value="" />
+
     </div>
     </form>
 </body>
