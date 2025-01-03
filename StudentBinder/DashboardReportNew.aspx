@@ -117,10 +117,16 @@
 
         };
         function loadWait() {
-            $('.loading').fadeIn('fast');//, function () { });
+            var checkbox = document.getElementById('<%= highcheck.ClientID %>');
+            if (checkbox.checked) {
+                $('.loading').fadeIn('fast');//, function () { });
+            }
         }
         function HideWait() {
-            $('.loading').fadeOut('fast');//, function () { });
+            var checkbox = document.getElementById('<%= highcheck.ClientID %>');
+            if (checkbox.checked) {
+                $('.loading').fadeOut('fast');//, function () { });
+            }
         }
         
         $(function () {
@@ -235,7 +241,7 @@
                                  <asp:button id="BtnClientAcademic" runat="server" text="" cssclass="NFButton" tooltip="Academic by Client" OnClick="BtnClientAcademic_Click" BackColor="#00549F"  />
                                  <asp:button id="BtnStaffAcademic" runat="server" text="" cssclass="NFButton" tooltip="Academic by Staff" OnClick="BtnStaffAcademic_Click" BackColor="#00549F"   />
                                  <asp:button id="BtnClientClinical" runat="server" text="" cssclass="NFButton" tooltip="Clinical by Client" OnClick="BtnClientClinical_Click" BackColor="#00549F"   />
-                                 <asp:Button id="BtnStaffClinical" runat="server" text="" cssclass="NFButton" style="width:102px" tooltip="Clinical by Staff" OnClick="BtnStaffClinical_Click" BackColor="#00549F"  />
+                                 <asp:Button id="BtnStaffClinical" runat="server" text="" cssclass="NFButton" style="width:102px" tooltip="Clinical by Staff" OnClick="BtnStaffClinical_Click" OnClientClick="loadWait();" BackColor="#00549F"  />
                             </td>
                             <td>
                                 <asp:CheckBox ID="chkbx_Mistrial" runat="server" style=" color: #00549f;font-size:12px" Checked="True" OnCheckedChanged="chkbx_Mistrial_CheckedChanged"/>
@@ -993,6 +999,171 @@
             function generateRandomColor() {
                 var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
                 return randomColor;
+            }
+            function loadClinicalbyStaff(clstaffdata) {
+                var aData = JSON.parse(clstaffdata);
+                if (aData.length != 0) {
+                    aData = aData.reverse();
+                    var categoriesdata = [];
+                    var seriesdata = [];
+                    var result = [];
+                    var lessonname = []; var uniqueless = [];
+                    $.map(aData, function (item, index) {
+                        categoriesdata.push(item['StaffName']);
+                    });
+                    $.map(categoriesdata, function (item, index) {
+                        if (!result.includes(item)) {
+                            result.push(item);
+                        }
+                    });
+                    $.map(aData, function (item, index) {
+                        lessonname.push(item['BehaviorNameToolTip']);
+                    });
+                    $.map(lessonname, function (item, index) {
+                        if (!uniqueless.includes(item)) {
+                            uniqueless.push(item);
+                        }
+                    });
+                    var colorDictionary = createDictionary(uniqueless);
+                    var len = result.length;
+                    $.map(aData, function (item, index) {
+                        if (result.includes(item['StaffName'])) {
+                            var index;
+                            result.some(function (elem, inx) {
+                                if (elem === item['StaffName']) {
+                                    index = inx;
+                                }
+                            });
+                            var dt = [];
+                            var i = 0;
+                            while (i < len) {
+                                if (i == index) {
+                                    var key = item['BehaviorNameToolTip'];
+                                    var color = colorDictionary[key];
+                                    dt.push({ y: item['MeasurementCount'], name: item['BehaviourName'], ToolTip: item['BehaviorNameToolTip'] + '(' + item['StudentName'] + ')', color: color });
+                                }
+                                else {
+                                    dt.push({ y: 0, name: '' });
+                                }
+                                i = i + 1;
+                            }
+                            var daa = JSON.parse(JSON.stringify(dt));
+                            var seriesdict = new Object;
+                            seriesdict['name'] = item['BehaviourName'];
+                            seriesdict['data'] = daa;
+                            seriesdata.push(seriesdict);
+                            while (dt.length > 0) {
+                                dt.pop();
+                            }
+                        }
+                    });
+                    var cat = JSON.parse(JSON.stringify(result));
+                    var dat = JSON.parse(JSON.stringify(seriesdata));
+                    DrawClStaff(cat, dat);
+                    HideWait();
+                }
+                else {
+                    HideWait();
+                    var nodata = document.getElementById('lblNoData');
+                    nodata.innerHTML = "No Data Available";
+                }
+            }
+            function DrawClStaff(cat, da) {
+
+                Highcharts.chart('graphcontainer', {
+                    chart: {
+                        type: 'bar'
+                    },
+                    title: {
+                        text: 'Clinical by Staff'
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    xAxis: {
+                        categories: cat,
+                        title: {
+                            text: 'Staff Name',
+                            useHTML: true,
+                            style: {
+                                fontWeight: 'bold',
+                                color: 'black',
+                                fontSize: '12px',
+                                fontFamily: 'Arial'
+
+                            }
+                        },
+                        labels: {
+                            enabled: true,
+                            useHTML: true,
+                            style: {
+                                color: 'black',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                fontFamily: 'Arial'
+
+                            }
+                        },
+                    },
+                    yAxis: {
+                        min: 0,
+                        tickInterval: 1,
+                        opposite: true,
+                        title: {
+                            text: 'Total Sessions',
+                            useHTML: true,
+                            style: {
+                                fontWeight: 'bold',
+                                color: 'black',
+                                fontSize: '12px',
+                                fontFamily: 'Arial'
+
+                            }
+                        },
+                        labels: {
+                            enabled: true,
+                            useHTML: true,
+                            style: {
+                                color: 'black',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                fontFamily: 'Arial'
+
+                            }
+                        },
+                    },
+                    legend: {
+                        reversed: true,
+                        enabled: false,
+                    },
+                    tooltip: {
+                        formatter: function () {
+                            return this.point.ToolTip;
+                        }
+                    },
+                    plotOptions: {
+                        bar: {
+                            dataLabels: {
+                                enabled: true,
+                                formatter: function () {
+                                    return this.point.name;
+                                },
+                                style: {
+                                    fontWeight: 'bold',
+                                    fontSize: '12px',
+                                    fontFamily: 'Arial',
+                                    color: 'black',
+                                }
+                            }
+                        },
+                        series: {
+                            stacking: 'normal'
+                        }
+
+                    },
+                    series: da
+                });
+
             }
         </script>
     </form>
