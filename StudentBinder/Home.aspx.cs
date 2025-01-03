@@ -1434,7 +1434,7 @@ public partial class Home : System.Web.UI.Page
             ///
             string strQuery = " SELECT  distinct top(51) * FROM (SELECT " + dayOrResi + ",DSTemplateName as Name,DSTempHdr.DSTempHdrId as ID, " +
  " DSTempHdr.StatusId as StatusID,LessonOrder FROM DSTempHdr INNER JOIN StdtLessonPlan ON DSTempHdr.StdtLessonplanId=StdtLessonPlan.StdtLessonPlanId " +
- " WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained'"+
+ " INNER JOIN  DSTempPrompt P ON DSTempHdr.DSTempHdrId = P.DSTempHdrId AND P.ActiveInd = 'A' WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained'" +
  //AND DSTempHdr.ChainType<>'Total Task' 
  "AND  DSTempHdr.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND (LookupName='Approved' OR " +
  " LookupName='Maintenance'))) DATA ORDER BY  DATA.LessonOrder";
@@ -1466,7 +1466,7 @@ public partial class Home : System.Web.UI.Page
                 "AND HDR.StudentId=" + sess.StudentId + " ORDER BY HDR.DSTempHdrId DESC) as Name,(SELECT TOP 1 DSTempHdrId FROM DSTempHdr HDR WHERE LP.LessonPlanId=HDR.LessonPlanId and HDR.StatusId = LP.StatusID " +
                 "AND HDR.StudentId=" + sess.StudentId + " ORDER BY HDR.DSTempHdrId DESC) as ID,LP.StatusID,LP.lessonorder from (SELECT " + dayOrResi + ",DSTempHdr.LessonPlanId, " +
  " DSTempHdr.StatusId as StatusID,ISNULL(lessonorder, 0 ) AS lessonorder FROM DSTempHdr INNER JOIN StdtLessonPlan StdtLP ON DSTempHdr.StdtLessonplanId=StdtLP.StdtLessonPlanId " +
- " WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' "+
+ " INNER JOIN  DSTempPrompt P ON DSTempHdr.DSTempHdrId = P.DSTempHdrId AND P.ActiveInd = 'A' WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' " +
  //AND DSTempHdr.ChainType<>'Total Task' 
  " AND  DSTempHdr.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND (LookupName='Approved' OR LookupName='Inactive' OR " +
  " LookupName='Maintenance')) " + optString + ")LP) DATA ORDER BY  DATA.LessonOrder";
@@ -1496,7 +1496,7 @@ public partial class Home : System.Web.UI.Page
  " AND HDR.StudentId=" + sess.StudentId + " AND HDR.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND LookupName='Inactive') ORDER BY HDR.DSTempHdrId DESC) as Name,(SELECT TOP 1 DSTempHdrId FROM DSTempHdr HDR WHERE HDR.LessonPlanId=DSTempHdr.LessonPlanId " +
  " AND HDR.StudentId=" + sess.StudentId + " AND HDR.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND LookupName='Inactive') ORDER BY HDR.DSTempHdrId DESC) ID, " +
  " DSTempHdr.StatusId as StatusID,ISNULL(lessonorder, 0 ) AS lessonorder FROM DSTempHdr INNER JOIN StdtLessonPlan StdtLP ON DSTempHdr.StdtLessonplanId=StdtLP.StdtLessonPlanId " +
- " WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' "+
+ " INNER JOIN  DSTempPrompt P ON DSTempHdr.DSTempHdrId = P.DSTempHdrId AND P.ActiveInd = 'A' WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' "+
  //AND DSTempHdr.ChainType<>'Total Task' 
  " AND  DSTempHdr.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND ( LookupName='Inactive' " +
  " )) " + optString + ") DATA ORDER BY  DATA.LessonOrder";
@@ -1526,7 +1526,7 @@ public partial class Home : System.Web.UI.Page
             //string strQuery = "SELECT DISTINCT top(50) StdtLP.LessonPlanTypeDay as DayFlag,hdr.LessonOrder,StdtLP.LessonPlanTypeResi as ResFlag, hdr.StatusId as StatusID,hdr.DSTemplateName as Name,hdr.DSTempHdrId As ID FROM DSTempHdr hdr INNER JOIN StdtLessonPlan StdtLP ON hdr.LessonPlanId=StdtLP.LessonPlanId AND hdr.studentid=StdtLP.studentid Inner Join LessonPlan LP On LP.LessonPlanId=hdr.LessonPlanId WHERE hdr.StudentId=" + sess.StudentId + " and (hdr.StatusId =" + StatusIdAppr + ")" + optString + " AND hdr.DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND hdr.SkillType='Chained' AND hdr.ChainType<>'Total Task' ORDER BY hdr.LessonOrder ";
             string strQuery = " SELECT  distinct top(51) * FROM (SELECT " + dayOrResi + ",DSTemplateName as Name,DSTempHdr.DSTempHdrId as ID, " +
 " DSTempHdr.StatusId as StatusID,ISNULL(lessonorder, 0 ) AS lessonorder FROM DSTempHdr INNER JOIN StdtLessonPlan StdtLP ON DSTempHdr.StdtLessonplanId=StdtLP.StdtLessonPlanId " +
-" WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' "+
+" INNER JOIN  DSTempPrompt P ON DSTempHdr.DSTempHdrId = P.DSTempHdrId AND P.ActiveInd = 'A' WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' "+
 //AND DSTempHdr.ChainType<>'Total Task' 
 " AND  DSTempHdr.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND (LookupName='Approved' " +
 " )) " + optString + ") DATA ORDER BY  DATA.LessonOrder";
@@ -1555,7 +1555,7 @@ public partial class Home : System.Web.UI.Page
             //string strQuery = "SELECT DISTINCT top(50)  StdtLP.LessonPlanTypeDay as DayFlag,hdr.LessonOrder,StdtLP.LessonPlanTypeResi as ResFlag,hdr.StatusId as StatusID,hdr.DSTemplateName as Name,hdr.DSTempHdrId As ID FROM DSTempHdr hdr INNER JOIN StdtLessonPlan StdtLP ON hdr.LessonPlanId=StdtLP.LessonPlanId AND hdr.studentid=StdtLP.studentid Inner Join LessonPlan LP On LP.LessonPlanId=hdr.LessonPlanId WHERE hdr.StudentId=" + sess.StudentId + " and (hdr.StatusId =" + StatusIdMai + ")" + optString + " AND hdr.DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND hdr.SkillType='Chained' AND hdr.ChainType<>'Total Task' ORDER BY hdr.LessonOrder ";
             string strQuery = " SELECT  distinct top(51) * FROM (SELECT " + dayOrResi + ",DSTemplateName as Name,DSTempHdr.DSTempHdrId as ID, " +
  " DSTempHdr.StatusId as StatusID,ISNULL(lessonorder, 0 ) AS lessonorder FROM DSTempHdr INNER JOIN StdtLessonPlan StdtLP ON DSTempHdr.StdtLessonplanId=StdtLP.StdtLessonPlanId " +
- " WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' "+
+ " INNER JOIN  DSTempPrompt P ON DSTempHdr.DSTempHdrId = P.DSTempHdrId AND P.ActiveInd = 'A' WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' "+
  //AND DSTempHdr.ChainType<>'Total Task'
  " AND  DSTempHdr.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND ( " +
  " LookupName='Maintenance')) " + optString + ") DATA ORDER BY  DATA.LessonOrder";
@@ -1744,7 +1744,7 @@ public partial class Home : System.Web.UI.Page
             //string strQuery = "SELECT DISTINCT top(50) StdtLP.LessonPlanTypeDay as DayFlag,hdr.LessonOrder,StdtLP.LessonPlanTypeResi as ResFlag,hdr.DSTemplateName as Name,hdr.DSTempHdrId As ID,hdr.StatusId FROM DSTempHdr hdr INNER JOIN StdtLessonPlan StdtLP ON hdr.LessonPlanId=StdtLP.LessonPlanId AND hdr.studentid=StdtLP.studentid Inner Join LessonPlan LP On LP.LessonPlanId=hdr.LessonPlanId WHERE hdr.StudentId=" + sess.StudentId + " and hdr.StatusId in (" + StatusIdAppr + "," + StatusIdIna + "," + StatusIdMai + ")  AND hdr.SkillType='Chained' AND hdr.ChainType<>'Total Task' ORDER BY hdr.LessonOrder ";
             string strQuery = " SELECT  distinct top(51) * FROM (SELECT " + dayOrResi + ",DSTemplateName as Name,DSTempHdr.DSTempHdrId as ID, " +
  " DSTempHdr.StatusId as StatusID,ISNULL(lessonorder, 0 ) AS lessonorder FROM DSTempHdr INNER JOIN StdtLessonPlan ON DSTempHdr.StdtLessonplanId=StdtLessonPlan.StdtLessonPlanId " +
- " WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTempHdr.SkillType='Chained'"+
+ " INNER JOIN  DSTempPrompt P ON DSTempHdr.DSTempHdrId = P.DSTempHdrId AND P.ActiveInd = 'A' WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTempHdr.SkillType='Chained'"+
  //AND DSTempHdr.ChainType<>'Total Task' 
  " AND  DSTempHdr.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND (LookupName='Approved' OR " +
  " LookupName='Maintenance'))) DATA ORDER BY  DATA.LessonOrder";
@@ -2328,7 +2328,7 @@ public partial class Home : System.Web.UI.Page
             HttpContext.Current.Session["Url"] = Url.ToString();
             string strQuery = "SELECT * FROM (SELECT  distinct top(51) * FROM (SELECT " + dayOrResi + ",DSTemplateName as Name,DSTempHdr.DSTempHdrId as ID, " +
  " DSTempHdr.StatusId as StatusID,ISNULL(LessonOrder, 0 ) AS lessonorder FROM DSTempHdr INNER JOIN StdtLessonPlan StdtLP ON DSTempHdr.StdtLessonplanId=StdtLP.StdtLessonPlanId " +
- " WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained'" +
+ " INNER JOIN  DSTempPrompt P ON DSTempHdr.DSTempHdrId = P.DSTempHdrId AND P.ActiveInd = 'A' WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained'" +
  "AND  DSTempHdr.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND (LookupName='Approved' OR " +
  " LookupName='Maintenance'))) DATA WHERE LessonOrder <" + lastitem1 + " ORDER BY  DATA.LessonOrder DESC ) DATA ORDER BY lessonorder";
             dtSubmenu = objData.ReturnDataTable(strQuery, false);
@@ -2341,7 +2341,7 @@ public partial class Home : System.Web.UI.Page
                 "AND HDR.StudentId=" + sess.StudentId + " ORDER BY HDR.DSTempHdrId DESC) as Name,(SELECT TOP 1 DSTempHdrId FROM DSTempHdr HDR WHERE LP.LessonPlanId=HDR.LessonPlanId and HDR.StatusId = LP.StatusID " +
                 "AND HDR.StudentId=" + sess.StudentId + " ORDER BY HDR.DSTempHdrId DESC) as ID,LP.StatusID,LP.lessonorder from (SELECT " + dayOrResi + ",DSTempHdr.LessonPlanId, " +
  " DSTempHdr.StatusId as StatusID,ISNULL(LessonOrder, 0 ) AS lessonorder FROM DSTempHdr INNER JOIN StdtLessonPlan StdtLP ON DSTempHdr.StdtLessonplanId=StdtLP.StdtLessonPlanId " +
- " WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' " +
+ " INNER JOIN  DSTempPrompt P ON DSTempHdr.DSTempHdrId = P.DSTempHdrId AND P.ActiveInd = 'A' WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' " +
  " AND  DSTempHdr.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND (LookupName='Approved' OR LookupName='Inactive' OR " +
  " LookupName='Maintenance')) " + optString + ")LP) DATA WHERE LessonOrder <" + lastitem1 + " ORDER BY  DATA.LessonOrder DESC ) DATA ORDER BY lessonorder";
             dtSubmenu = objData.ReturnDataTable(strQuery, false);
@@ -2354,7 +2354,7 @@ public partial class Home : System.Web.UI.Page
  " AND HDR.StudentId=" + sess.StudentId + " AND HDR.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND LookupName='Inactive') ORDER BY HDR.DSTempHdrId DESC) as Name,(SELECT TOP 1 DSTempHdrId FROM DSTempHdr HDR WHERE HDR.LessonPlanId=DSTempHdr.LessonPlanId " +
  " AND HDR.StudentId=" + sess.StudentId + " AND HDR.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND LookupName='Inactive') ORDER BY HDR.DSTempHdrId DESC) ID, " +
  " DSTempHdr.StatusId as StatusID,ISNULL(LessonOrder, 0 ) AS lessonorder FROM DSTempHdr INNER JOIN StdtLessonPlan StdtLP ON DSTempHdr.StdtLessonplanId=StdtLP.StdtLessonPlanId " +
- " WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' " +
+ " INNER JOIN  DSTempPrompt P ON DSTempHdr.DSTempHdrId = P.DSTempHdrId AND P.ActiveInd = 'A' WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' " +
  " AND  DSTempHdr.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND ( LookupName='Inactive' " +
  " )) " + optString + ") DATA WHERE LessonOrder <" + lastitem1 + " ORDER BY  DATA.LessonOrder DESC ) DATA ORDER BY lessonorder";
             dtSubmenu = objData.ReturnDataTable(strQuery, false);
@@ -2365,7 +2365,7 @@ public partial class Home : System.Web.UI.Page
             HttpContext.Current.Session["Url"] = Url.ToString();
             string strQuery = "SELECT * FROM (SELECT  distinct top(51) * FROM (SELECT " + dayOrResi + ",DSTemplateName as Name,DSTempHdr.DSTempHdrId as ID, " +
 " DSTempHdr.StatusId as StatusID,ISNULL(LessonOrder, 0 ) AS lessonorder FROM DSTempHdr INNER JOIN StdtLessonPlan StdtLP ON DSTempHdr.StdtLessonplanId=StdtLP.StdtLessonPlanId " +
-" WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' " +
+" INNER JOIN  DSTempPrompt P ON DSTempHdr.DSTempHdrId = P.DSTempHdrId AND P.ActiveInd = 'A' WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' " +
 " AND  DSTempHdr.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND (LookupName='Approved' " +
 " )) " + optString + ") DATA WHERE LessonOrder <" + lastitem1 + " ORDER BY  DATA.LessonOrder DESC ) DATA ORDER BY lessonorder";
             dtSubmenu = objData.ReturnDataTable(strQuery, false);
@@ -2376,7 +2376,7 @@ public partial class Home : System.Web.UI.Page
             HttpContext.Current.Session["Url"] = Url.ToString();
             string strQuery = "SELECT * FROM (SELECT  distinct top(51) * FROM (SELECT " + dayOrResi + ",DSTemplateName as Name,DSTempHdr.DSTempHdrId as ID, " +
  " DSTempHdr.StatusId as StatusID,ISNULL(LessonOrder, 0 ) AS lessonorder FROM DSTempHdr INNER JOIN StdtLessonPlan StdtLP ON DSTempHdr.StdtLessonplanId=StdtLP.StdtLessonPlanId " +
- " WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' " +
+ " INNER JOIN  DSTempPrompt P ON DSTempHdr.DSTempHdrId = P.DSTempHdrId AND P.ActiveInd = 'A' WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' " +
  " AND  DSTempHdr.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND ( " +
  " LookupName='Maintenance')) " + optString + ") DATA WHERE LessonOrder <" + lastitem1 + " ORDER BY  DATA.LessonOrder DESC ) DATA ORDER BY lessonorder";
             dtSubmenu = objData.ReturnDataTable(strQuery, false);
@@ -2660,7 +2660,7 @@ public partial class Home : System.Web.UI.Page
             HttpContext.Current.Session["Url"] = Url.ToString();
             string strQuery = " SELECT  distinct top(51) * FROM (SELECT " + dayOrResi + ",DSTemplateName as Name,DSTempHdr.DSTempHdrId as ID, " +
  " DSTempHdr.StatusId as StatusID,ISNULL(LessonOrder, 0 ) AS lessonorder FROM DSTempHdr INNER JOIN StdtLessonPlan StdtLP ON DSTempHdr.StdtLessonplanId=StdtLP.StdtLessonPlanId " +
- " WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTempHdr.SkillType='Chained'" +
+ " INNER JOIN  DSTempPrompt P ON DSTempHdr.DSTempHdrId = P.DSTempHdrId AND P.ActiveInd = 'A' WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTempHdr.SkillType='Chained'" +
  " AND  DSTempHdr.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND (LookupName='Approved' OR " +
  " LookupName='Maintenance'))) DATA WHERE LessonOrder >" + lastitem + " ORDER BY  DATA.LessonOrder";
             dtSubmenu = objData.ReturnDataTable(strQuery, false);
@@ -2673,7 +2673,7 @@ public partial class Home : System.Web.UI.Page
                 "AND HDR.StudentId=" + sess.StudentId + " ORDER BY HDR.DSTempHdrId DESC) as Name,(SELECT TOP 1 DSTempHdrId FROM DSTempHdr HDR WHERE LP.LessonPlanId=HDR.LessonPlanId and HDR.StatusId = LP.StatusID " +
                 "AND HDR.StudentId=" + sess.StudentId + " ORDER BY HDR.DSTempHdrId DESC) as ID,LP.StatusID,LP.lessonorder from (SELECT " + dayOrResi + ",DSTempHdr.LessonPlanId, " +
  " DSTempHdr.StatusId as StatusID,ISNULL(LessonOrder, 0 ) AS lessonorder FROM DSTempHdr INNER JOIN StdtLessonPlan StdtLP ON DSTempHdr.StdtLessonplanId=StdtLP.StdtLessonPlanId " +
- " WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' " +
+ " INNER JOIN  DSTempPrompt P ON DSTempHdr.DSTempHdrId = P.DSTempHdrId AND P.ActiveInd = 'A' WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' " +
  " AND  DSTempHdr.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND (LookupName='Approved' OR LookupName='Inactive' OR " +
  " LookupName='Maintenance')) " + optString + ")LP) DATA WHERE LessonOrder >" + lastitem + " ORDER BY  DATA.LessonOrder";
             dtSubmenu = objData.ReturnDataTable(strQuery, false);
@@ -2686,7 +2686,7 @@ public partial class Home : System.Web.UI.Page
  " AND HDR.StudentId=" + sess.StudentId + " AND HDR.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND LookupName='Inactive') ORDER BY HDR.DSTempHdrId DESC) as Name,(SELECT TOP 1 DSTempHdrId FROM DSTempHdr HDR WHERE HDR.LessonPlanId=DSTempHdr.LessonPlanId " +
  " AND HDR.StudentId=" + sess.StudentId + " AND HDR.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND LookupName='Inactive') ORDER BY HDR.DSTempHdrId DESC) ID, " +
  " DSTempHdr.StatusId as StatusID,ISNULL(LessonOrder, 0 ) AS lessonorder FROM DSTempHdr INNER JOIN StdtLessonPlan StdtLP ON DSTempHdr.StdtLessonplanId=StdtLP.StdtLessonPlanId " +
- " WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' " +
+ " INNER JOIN  DSTempPrompt P ON DSTempHdr.DSTempHdrId = P.DSTempHdrId AND P.ActiveInd = 'A' WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' " +
  " AND  DSTempHdr.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND ( LookupName='Inactive' " +
  " )) " + optString + ") DATA WHERE LessonOrder >" + lastitem + " ORDER BY  DATA.LessonOrder";
             dtSubmenu = objData.ReturnDataTable(strQuery, false);
@@ -2697,7 +2697,7 @@ public partial class Home : System.Web.UI.Page
             HttpContext.Current.Session["Url"] = Url.ToString();
             string strQuery = " SELECT  distinct top(51) * FROM (SELECT " + dayOrResi + ",DSTemplateName as Name,DSTempHdr.DSTempHdrId as ID, " +
 " DSTempHdr.StatusId as StatusID,ISNULL(LessonOrder, 0 ) AS lessonorder FROM DSTempHdr INNER JOIN StdtLessonPlan StdtLP ON DSTempHdr.StdtLessonplanId=StdtLP.StdtLessonPlanId " +
-" WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' " +
+" INNER JOIN  DSTempPrompt P ON DSTempHdr.DSTempHdrId = P.DSTempHdrId AND P.ActiveInd = 'A' WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' " +
 " AND  DSTempHdr.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND (LookupName='Approved' " +
 " )) " + optString + ") DATA WHERE LessonOrder >" + lastitem + " ORDER BY  DATA.LessonOrder";
             dtSubmenu = objData.ReturnDataTable(strQuery, false);
@@ -2708,7 +2708,7 @@ public partial class Home : System.Web.UI.Page
             HttpContext.Current.Session["Url"] = Url.ToString();
             string strQuery = " SELECT  distinct top(51) * FROM (SELECT " + dayOrResi + ",DSTemplateName as Name,DSTempHdr.DSTempHdrId as ID, " +
  " DSTempHdr.StatusId as StatusID,ISNULL(LessonOrder, 0 ) AS lessonorder FROM DSTempHdr INNER JOIN StdtLessonPlan StdtLP ON DSTempHdr.StdtLessonplanId=StdtLP.StdtLessonPlanId " +
- " WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' " +
+ " INNER JOIN  DSTempPrompt P ON DSTempHdr.DSTempHdrId = P.DSTempHdrId AND P.ActiveInd = 'A' WHERE DSTempHdr.StudentId=" + sess.StudentId + " AND DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND DSTempHdr.SkillType='Chained' " +
  " AND  DSTempHdr.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND ( " +
  " LookupName='Maintenance')) " + optString + ") DATA WHERE LessonOrder >" + lastitem + " ORDER BY  DATA.LessonOrder";
             dtSubmenu = objData.ReturnDataTable(strQuery, false);
