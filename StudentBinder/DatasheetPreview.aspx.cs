@@ -4275,7 +4275,7 @@ public partial class StudentBinder_DatasheetPreview : System.Web.UI.Page
 
 
                     oDisc = new DiscreteSession();
-                    TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
+                    TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
 
                     //if (chainedInptData.MultiTeacherRequired)
                     bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId);
@@ -4573,7 +4573,7 @@ public partial class StudentBinder_DatasheetPreview : System.Web.UI.Page
                             {
                                 bStepCountCriteria = false;
                                 sesResultchain[index] = null;
-                                TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
+                                TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                                 chainedCols[sColName].SessionCount = TrialLists.sessionCount;
                                 chainedCols[sColName].SetInputData(iCurrentStep.ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
                                 sesResultchain[index] = Chained.Model.Execute(chainedCols[sColName], false, bpromptColumn, oDS.ChainType);
@@ -4613,7 +4613,7 @@ public partial class StudentBinder_DatasheetPreview : System.Web.UI.Page
                                         {
                                             bool stepMoveUpflag = sesResultchain[index].MovedForwardStep;
                                             bool stepMoveDownflag = sesResultchain[index].MovedBackStep;
-                                            TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
+                                            TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                                             chainedCols[sColName].StepCount = TrialLists.trialsCount;
 
                                             chainedCols[sColName].SetInputData((iCurrentStep - 1).ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -4681,7 +4681,7 @@ public partial class StudentBinder_DatasheetPreview : System.Web.UI.Page
                                     }
                                     else
                                     {
-                                        TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
+                                        TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                                         chainedCols[sColName].StepCount = TrialLists.trialsCount;
 
                                         chainedCols[sColName].SetInputData((iCurrentStep - 1).ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -5723,7 +5723,7 @@ public partial class StudentBinder_DatasheetPreview : System.Web.UI.Page
                     int counter = discreteCols.Count;
                     int ind = 0;
                     oDisc = new DiscreteSession();
-                    TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, discreteCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType);
+                    TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, discreteCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                     //if (discreteInptData.MultiTeacherRequired)
                     bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId);
                     // else
