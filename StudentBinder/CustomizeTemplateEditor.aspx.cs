@@ -723,7 +723,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         oData_ov = new clsData();
         //hdnRadBtnStep.Value = Convert.ToString(oData_ov.FetchValue("SELECT SortOrder FROM DSTempStep WHERE DSTempStepId=" + RadioButtonListSteps.SelectedValue));
         //Session["iCurrentStep"] = oData_ov.FetchValue("SELECT SortOrder FROM DSTempStep WHERE DSTempStepId=" + RadioButtonListSteps.SelectedValue);
-        string chainType = oData_ov.FetchValue("select chaintype from DSTempStep as dsts join DSTempHdr as dsth on dsts.DSTempHdrId = dsth.DSTempHdrId where dsts.dstempstepid = " + RadioButtonListSteps.SelectedValue).ToString();
+        //string chainType = oData_ov.FetchValue("select chaintype from DSTempStep as dsts join DSTempHdr as dsth on dsts.DSTempHdrId = dsth.DSTempHdrId where dsts.dstempstepid = " + RadioButtonListSteps.SelectedValue).ToString();
 
         //if (chainType == "Backward chain")
         //{
