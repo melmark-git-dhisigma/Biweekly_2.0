@@ -13,6 +13,11 @@ using System.IO;
 using System.Data.SqlClient;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Drawing;
+using System.Web.Script.Serialization;
+using System.IO.Compression;
+
+
 
 public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
 {
@@ -27,13 +32,13 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
     DataTable DSEventSessionZerodt = new DataTable();
     DataTable DSScoredt = new DataTable();
     DataTable DSScoreZerodt = new DataTable();
+    DataTable allless = new DataTable();
     Dictionary<string, int> dateandcount = new Dictionary<string, int>();
-    string[] columntypes = null;
+    string []columntypes=null;
     Dictionary<string, string> coltypedict = new Dictionary<string, string>();
     Dictionary<string, string> columntypesdict = new Dictionary<string, string>();
     int countlesson = 0;
     int countdatalist = 0;
-
     protected void Page_Load(object sender, EventArgs e)
     {
         if (!IsPostBack)
@@ -55,7 +60,7 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
             {
                 if (highcheck.Checked == false)
                 {
-                    GenerateReport();
+                GenerateReport();
                 }
                 else
                 {
@@ -65,6 +70,8 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
                 dlLesson.Visible = false;
                 td1.Visible = false;
                 tdMsg.Visible = false;
+                btnExport.Visible = true;
+
             }
             else
             {
@@ -179,18 +186,33 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
         getDSScore(sess.StudentId.ToString(), StartDate, enddate, LessonId);
         getDSSessionDataZero(sess.StudentId.ToString(), StartDate, enddate);
         getDSScoreZero(sess.StudentId.ToString(), StartDate, enddate);
+        //ViewState["alldata"] = allclsviewdata;
+        //ViewState["SessionData"] = DSSessionDatadt;
+        //ViewState["SessionDataZero"] = DSSessionDataZerodt;
+        //ViewState["EventSessionZero"] = DSEventSessionZerodt;
+        //ViewState["Score"] = DSScoredt;
+        //ViewState["ScoreZero"] = DSScoreZerodt;
+
+        ViewState["alldata"] = DataTableToJson(allclsviewdata);
+         ViewState["SessionData"] = DataTableToJson(DSSessionDatadt);
+        ViewState["SessionDataZero"]  = DataTableToJson(DSSessionDataZerodt);
+        ViewState["EventSessionZero"] = DataTableToJson(DSEventSessionZerodt);
+         ViewState["Score"] = DataTableToJson(DSScoredt);
+         ViewState["ScoreZero"] = DataTableToJson(DSScoreZerodt);
+
         int[] lessonids = allclsviewdata.AsEnumerable()
                     .Select(row => row.Field<int>("LessonPlanId"))
                     .Distinct()
                     .ToArray();
+
         countlesson = lessonids.Length;
         clsLoadRptLesson(lessonids);
         clsview.Visible = true;
         Gvclsdate.Visible = true;
-
+        
 
     }
-    public void getAllclassicViewData(String Sdate, String Edate, int studid, string lessonid, string lpstatus)
+    public void getAllclassicViewData(String Sdate, String Edate, int studid, string lessonid,string lpstatus)
     {
         SqlCommand cmd = null;
         SqlConnection con = ObjData.Open();
@@ -207,7 +229,7 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
             cmd.Parameters.AddWithValue("@LPStatus", lpstatus);
             da = new SqlDataAdapter(cmd);
             da.Fill(allclsviewdata);
-
+            
         }
         catch (Exception ex)
         {
@@ -224,26 +246,28 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
     private void selectcolumntype(string id)
     {
         columntypes = allclsviewdata.AsEnumerable()
-                                       .Where(row => row.Field<int>("LessonPlanId") == Convert.ToInt32(id))
+                                       .Where(row => row.Field<int>("LessonPlanId") ==Convert.ToInt32(id))
                                        .Select(row => row.Field<string>("ColName") + "-" + row.Field<string>("CalcType"))
                                        .Distinct()
                                        .ToArray();
-        coltypedict = allclsviewdata.AsEnumerable()
-   .Where(row => row.Field<int>("LessonPlanId") == Convert.ToInt32(id))
-   .Select(row => new
-   {
-       Key = row.Field<string>("ColName") + "-" + row.Field<string>("CalcType"),
-       Value = row.Field<string>("ColName") + "-<br/>" + row.Field<string>("CalcType")
-   })
-   .Distinct()
-   .ToDictionary(x => x.Key, x => x.Value);
+         coltypedict = allclsviewdata.AsEnumerable()
+    .Where(row => row.Field<int>("LessonPlanId") == Convert.ToInt32(id))
+    .Select(row => new
+    {
+        Key = row.Field<string>("ColName") + "-" + row.Field<string>("CalcType"),
+        Value = row.Field<string>("ColName") + "-<br/>" + row.Field<string>("CalcType")
+    })
+    .Distinct()
+    .ToDictionary(x => x.Key, x => x.Value);
 
-        for (int i = 0; i < columntypes.Length; i++)
-        {
-            columntypesdict[columntypes[i]] = "Subcolumn" + i + 1;
-        }
+         for (int i = 0; i < columntypes.Length; i++)
+         {
+             columntypesdict[columntypes[i]] = "Subcolumn" + i+1;
+         }
 
     }
+
+   
 
     private void GenerateReport()
     {
@@ -559,6 +583,20 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
             td1.InnerHtml = clsGeneral.failedMsg("No Lesson Found.");
         }
     }
+    public DataTable  clsLoadRptLessonexport(string[] lessoncount)
+    {
+        DataSet ds = LoadData();
+        DataTable dt = ds.Tables[0];
+        for (int i = dt.Rows.Count - 1; i >= 0; i--)
+        {
+            DataRow row = dt.Rows[i];
+            if (!lessoncount.Contains(row["LessonPlanId"].ToString()))
+            {
+                dt.Rows.RemoveAt(i);
+            }
+        }
+        return dt;
+    }
 
     public void clsLoadRptLesson(int[] lessoncount)
     {
@@ -598,19 +636,102 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
     }
     protected void btnExport_Click1(object sender, ImageClickEventArgs e)
     {
-        sess = (clsSession)Session["UserSession"];
-        Response.Clear();
-        string filename = sess.StudentName + "_ProgressSummaryReport.xls";
-        string enCodeFileName = Server.UrlEncode(filename);  
-        Response.AddHeader("Content-Disposition", "attachment; filename=" + enCodeFileName);
-        Response.ContentType = "application/ms-excel";
-        Response.ContentEncoding = System.Text.Encoding.Unicode;
-        Response.BinaryWrite(System.Text.Encoding.Unicode.GetPreamble());
-        System.IO.StringWriter sw = new System.IO.StringWriter();
-        System.Web.UI.HtmlTextWriter hw = new HtmlTextWriter(sw);
-        dlLesson.RenderControl(hw);
-        Response.Write(sw.ToString());
-        Response.End(); 
+        if (highcheck.Checked == false)
+        {
+            sess = (clsSession)Session["UserSession"];
+            Response.Clear();
+            string filename = sess.StudentName + "_ProgressSummaryReport.xls";
+            string enCodeFileName = Server.UrlEncode(filename);
+            Response.AddHeader("Content-Disposition", "attachment; filename=" + enCodeFileName);
+            Response.ContentType = "application/ms-excel";
+            Response.ContentEncoding = System.Text.Encoding.Unicode;
+            Response.BinaryWrite(System.Text.Encoding.Unicode.GetPreamble());
+            System.IO.StringWriter sw = new System.IO.StringWriter();
+            System.Web.UI.HtmlTextWriter hw = new HtmlTextWriter(sw);
+            dlLesson.RenderControl(hw);
+            Response.Write(sw.ToString());
+            Response.End();
+        }
+        else
+        {
+            ObjData = new clsData();
+            tdMsg.InnerHtml = "";
+            RV_ExcelReport.Visible = false;
+            sess = (clsSession)Session["UserSession"];
+            ObjTempSess = (ClsTemplateSession)Session["BiweeklySession"];
+            DateTime dtst = new DateTime();
+            DateTime dted = new DateTime();
+            dtst = DateTime.ParseExact(txtRepStart.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+            dted = DateTime.ParseExact(txtrepEdate.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+            string StartDate = dtst.ToString("yyyy-MM-dd");
+            string enddate = dted.ToString("yyyy-MM-dd") + " 23:59:59.999";
+
+            string LessonId = "";
+            foreach (System.Web.UI.WebControls.ListItem item in ddlLessonplan.Items)
+            {
+                if (item.Selected == true)
+                {
+                    LessonId += item.Value + ",";
+                }
+            }
+            LessonId = LessonId.Substring(0, (LessonId.Length - 1));
+
+            string LPStatus = "";
+            foreach (ListItem item in chkStatus.Items)
+            {
+                if (item.Selected == true)
+                {
+                    if (item.Text == "Active")
+                    {
+                        LPStatus += "'Approved',";
+                    }
+                    else if (item.Text == "Maintenance")
+                    {
+                        LPStatus += "'Maintenance',";
+                    }
+                    else if (item.Text == "Inactive")
+                    {
+                        LPStatus += "'Inactive',";
+                    }
+                }
+            }
+            LPStatus = LPStatus.Substring(0, (LPStatus.Length - 1));
+            string StrStat = "SELECT LookupId FROM Lookup WHERE LookupType='TemplateStatus' AND LookupName IN(" + LPStatus + ")";
+            DataTable LPStat = ObjData.ReturnDataTable(StrStat, false);
+            string StatusId = "";
+            for (int i = 0; i < LPStat.Rows.Count; i++)
+            {
+                StatusId += LPStat.Rows[i]["LookupId"].ToString() + ",";
+            }
+            //getAllclassicViewData(StartDate, enddate, sess.StudentId, LessonId, StatusId);
+            //getDSSessionData(sess.StudentId.ToString(), StartDate, enddate, LessonId);
+            //getDSEventSessionZero(sess.StudentId.ToString(), StartDate, enddate, LessonId);
+            //getDSScore(sess.StudentId.ToString(), StartDate, enddate, LessonId);
+            //getDSSessionDataZero(sess.StudentId.ToString(), StartDate, enddate);
+            //getDSScoreZero(sess.StudentId.ToString(), StartDate, enddate);
+            //allclsviewdata = (DataTable)ViewState["alldata"];
+            allclsviewdata = JsonToDataTable(ViewState["alldata"].ToString());
+            string[] lessonids = allclsviewdata.AsEnumerable()
+                        .Select(row => row.Field<string>("LessonPlanId"))
+                        .Distinct()
+                        .ToArray();
+
+            countlesson = lessonids.Length;
+            allless = clsLoadRptLessonexport(lessonids);
+            if (allless.Rows.Count > 0)
+            {
+                ViewState["alless"] = DataTableToJson(allless);
+                //ViewState["allless"] = allless;
+                exportgrid.Visible = true;
+                this.BindGrid();
+            }
+            else
+            {
+                ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "alert('No Data Available');", true);
+
+
+            }
+        }
     }
    
     protected void dlLesson_ItemDataBound(object sender, DataListItemEventArgs e)
@@ -908,136 +1029,143 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
 
     protected void clslist_ItemDataBound(object sender, DataListItemEventArgs e)
     {
-
-        Gvclsdate.DataSource = GetDataForDate();
-        Gvclsdate.DataBind();
-        if (e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem)
+        try
         {
-            countdatalist++;
-            ObjData = new clsData();
-            sess = (clsSession)Session["UserSession"];
-            DataSet ds = new DataSet();
-            DateTime dtst = new DateTime();
-            DateTime dted = new DateTime();
-            dtst = DateTime.ParseExact(txtRepStart.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
-            dted = DateTime.ParseExact(txtrepEdate.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
-            string StartDate = dtst.ToString("yyyy-MM-dd");
-            string enddate = dted.ToString("yyyy-MM-dd");
-            GridView less = (e.Item.FindControl("Gvclsless") as GridView);
-            string lessid = (e.Item.FindControl("lessid") as Label).Text;
-            selectcolumntype(lessid);
-            DataRowView rowData = (DataRowView)e.Item.DataItem;
-            DataTable dt = getClsDataBylessId(lessid, StartDate, enddate, rowData);
-            less.Columns.Clear();
-            less.AutoGenerateColumns = false;
-            foreach (var type in columntypes)
+
+            Gvclsdate.DataSource = GetDataForDate();
+            Gvclsdate.DataBind();
+            if (e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem)
             {
-                string item="";
-                if(columntypesdict.ContainsKey(type))
+                countdatalist++;
+                ObjData = new clsData();
+                sess = (clsSession)Session["UserSession"];
+                DataSet ds = new DataSet();
+                DateTime dtst = new DateTime();
+                DateTime dted = new DateTime();
+                dtst = DateTime.ParseExact(txtRepStart.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                dted = DateTime.ParseExact(txtrepEdate.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                string StartDate = dtst.ToString("yyyy-MM-dd");
+                string enddate = dted.ToString("yyyy-MM-dd");
+                GridView less = (e.Item.FindControl("Gvclsless") as GridView);
+                string lessid = (e.Item.FindControl("lessid") as Label).Text;
+                selectcolumntype(lessid);
+                DataRowView rowData = (DataRowView)e.Item.DataItem;
+                DataTable dt = getClsDataBylessId(lessid, StartDate, enddate, rowData);
+                less.Columns.Clear();
+                less.AutoGenerateColumns = false;
+                foreach (var type in columntypes)
                 {
-                item=columntypesdict[type];
+                    string item = "";
+                    if (columntypesdict.ContainsKey(type))
+                    {
+                        item = columntypesdict[type];
+                    }
+                    TemplateField templateField = new TemplateField();
+                    string textval = type;
+                    if (coltypedict.ContainsKey(type))
+                    {
+                        textval = coltypedict[type];
+                    }
+                    templateField.HeaderText = "<div style='border-bottom: 1px solid black;'>Row Data</div>" + textval;
+                    templateField.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+                    templateField.HeaderStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#4498c2");
+                    templateField.HeaderStyle.CssClass = "nowrapText";
+                    templateField.HeaderStyle.BorderColor = System.Drawing.Color.Black;
+                    templateField.HeaderStyle.VerticalAlign = VerticalAlign.Top;
+                    templateField.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+                    templateField.ItemTemplate = new AddGridViewTemplate(ListItemType.Item, item);
+                    less.Columns.Add(templateField);
                 }
-                TemplateField templateField = new TemplateField();
-                string textval = type;
-                if (coltypedict.ContainsKey(type))
+                TemplateField templateFieldtime = new TemplateField();
+                templateFieldtime.HeaderText = "Time";
+                templateFieldtime.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+                templateFieldtime.HeaderStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#FFDEAD");
+                templateFieldtime.HeaderStyle.VerticalAlign = VerticalAlign.Middle;
+                templateFieldtime.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+                templateFieldtime.HeaderStyle.BorderColor = System.Drawing.Color.Black;
+                templateFieldtime.ItemTemplate = new AddGridViewTemplate(ListItemType.Item, "Time");
+                templateFieldtime.ItemStyle.CssClass = "nowrapText";
+                less.Columns.Add(templateFieldtime);
+                TemplateField templateFielduser = new TemplateField();
+                templateFielduser.HeaderText = "User";
+                templateFielduser.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+                templateFielduser.HeaderStyle.BorderColor = System.Drawing.Color.Black;
+                templateFielduser.HeaderStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#FFDEAD");
+                templateFielduser.HeaderStyle.VerticalAlign = VerticalAlign.Middle;
+                templateFielduser.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+                templateFielduser.ItemTemplate = new AddGridViewTemplate(ListItemType.Item, "User");
+                templateFielduser.ItemStyle.CssClass = "nowrapText";
+                less.Columns.Add(templateFielduser);
+                TemplateField templateFieldset = new TemplateField();
+                templateFieldset.HeaderText = "Set";
+                templateFieldset.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+                templateFieldset.HeaderStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#FFDEAD");
+                templateFieldset.HeaderStyle.BorderColor = System.Drawing.Color.Black;
+                templateFieldset.HeaderStyle.VerticalAlign = VerticalAlign.Middle;
+                templateFieldset.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+                templateFieldset.ItemTemplate = new AddGridViewTemplate(ListItemType.Item, "Set");
+                templateFieldset.ItemStyle.CssClass = "nowrapText";
+                less.Columns.Add(templateFieldset);
+                TemplateField templateFieldprompt = new TemplateField();
+                templateFieldprompt.HeaderText = "Prompt";
+                templateFieldprompt.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+                templateFieldprompt.HeaderStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#FFDEAD");
+                templateFieldprompt.HeaderStyle.BorderColor = System.Drawing.Color.Black;
+                templateFieldprompt.HeaderStyle.VerticalAlign = VerticalAlign.Middle;
+                templateFieldprompt.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+                templateFieldprompt.ItemTemplate = new AddGridViewTemplate(ListItemType.Item, "Prompt");
+                templateFieldprompt.ItemStyle.CssClass = "nowrapText";
+                less.Columns.Add(templateFieldprompt);
+                TemplateField templateFieldEventName = new TemplateField();
+                templateFieldEventName.HeaderText = "EventName";
+                templateFieldEventName.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+                templateFieldEventName.HeaderStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#dbe4c0");
+                templateFieldEventName.HeaderStyle.BorderColor = System.Drawing.Color.Black;
+                templateFieldEventName.HeaderStyle.VerticalAlign = VerticalAlign.Middle;
+                templateFieldEventName.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+                templateFieldEventName.ItemTemplate = new AddGridViewTemplate(ListItemType.Item, "EventName");
+                templateFieldEventName.ItemStyle.CssClass = "nowrapText";
+                less.Columns.Add(templateFieldEventName);
+                TemplateField templateFieldStdtSessEventType = new TemplateField();
+                templateFieldStdtSessEventType.HeaderText = "StdtSessEventType";
+                templateFieldStdtSessEventType.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+                templateFieldStdtSessEventType.HeaderStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#dbe4c0");
+                templateFieldStdtSessEventType.HeaderStyle.BorderColor = System.Drawing.Color.Black;
+                templateFieldStdtSessEventType.HeaderStyle.VerticalAlign = VerticalAlign.Middle;
+                templateFieldStdtSessEventType.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+                templateFieldStdtSessEventType.ItemTemplate = new AddGridViewTemplate(ListItemType.Item, "StdtSessEventType");
+                templateFieldStdtSessEventType.ItemStyle.CssClass = "nowrapText";
+                less.Columns.Add(templateFieldStdtSessEventType);
+                TemplateField templateFieldStdtdate = new TemplateField();
+                templateFieldStdtdate.HeaderText = "Date";
+                templateFieldStdtdate.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+                templateFieldStdtdate.HeaderStyle.BorderColor = System.Drawing.Color.Black;
+                templateFieldStdtdate.HeaderStyle.VerticalAlign = VerticalAlign.Middle;
+                templateFieldStdtdate.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+                templateFieldStdtdate.ItemTemplate = new AddGridViewTemplate(ListItemType.Item, "PeriodDate");
+                templateFieldStdtdate.ItemStyle.CssClass = "nowrapText";
+                less.Columns.Add(templateFieldStdtdate);
+                if (columntypes.Length == 0)
                 {
-                    textval = coltypedict[type];
+                    e.Item.Visible = false;
+                    less.Visible = false;
                 }
-                templateField.HeaderText = "<div style='border-bottom: 1px solid black;'>Row Data</div>" + textval;
-                templateField.HeaderStyle.ForeColor = System.Drawing.Color.Black;
-                templateField.HeaderStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#4498c2");
-                templateField.HeaderStyle.CssClass = "nowrapText";
-                templateField.HeaderStyle.BorderColor = System.Drawing.Color.Black;
-                templateField.HeaderStyle.VerticalAlign = VerticalAlign.Top;
-                templateField.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
-                templateField.ItemTemplate = new AddGridViewTemplate(ListItemType.Item, item);
-                less.Columns.Add(templateField);
+                less.DataSource = dt;
+                less.DataBind();
+                AddCustomHeader(less);
+                ((DataControlField)less.Columns.Cast<DataControlField>()
+                        .Where(fld => (fld.HeaderText == "Date"))
+                        .SingleOrDefault()).Visible = false;
+                if (countdatalist == countlesson)
+                {
+                    daterow(less);
+                    setDatesize();
+                }
             }
-            TemplateField templateFieldtime = new TemplateField();
-            templateFieldtime.HeaderText = "Time";
-            templateFieldtime.HeaderStyle.ForeColor = System.Drawing.Color.Black;
-            templateFieldtime.HeaderStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#FFDEAD");
-            templateFieldtime.HeaderStyle.VerticalAlign = VerticalAlign.Middle;
-            templateFieldtime.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
-            templateFieldtime.HeaderStyle.BorderColor = System.Drawing.Color.Black;
-            templateFieldtime.ItemTemplate = new AddGridViewTemplate(ListItemType.Item, "Time");
-            templateFieldtime.ItemStyle.CssClass = "nowrapText";
-            less.Columns.Add(templateFieldtime);
-            TemplateField templateFielduser = new TemplateField();
-            templateFielduser.HeaderText = "User";
-            templateFielduser.HeaderStyle.ForeColor = System.Drawing.Color.Black;
-            templateFielduser.HeaderStyle.BorderColor = System.Drawing.Color.Black;
-            templateFielduser.HeaderStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#FFDEAD");
-            templateFielduser.HeaderStyle.VerticalAlign = VerticalAlign.Middle;
-            templateFielduser.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
-            templateFielduser.ItemTemplate = new AddGridViewTemplate(ListItemType.Item, "User");
-            templateFielduser.ItemStyle.CssClass = "nowrapText";
-            less.Columns.Add(templateFielduser);
-            TemplateField templateFieldset = new TemplateField();
-            templateFieldset.HeaderText = "Set";
-            templateFieldset.HeaderStyle.ForeColor = System.Drawing.Color.Black;
-            templateFieldset.HeaderStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#FFDEAD");
-            templateFieldset.HeaderStyle.BorderColor = System.Drawing.Color.Black;
-            templateFieldset.HeaderStyle.VerticalAlign = VerticalAlign.Middle;
-            templateFieldset.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
-            templateFieldset.ItemTemplate = new AddGridViewTemplate(ListItemType.Item, "Set");
-            templateFieldset.ItemStyle.CssClass = "nowrapText";
-            less.Columns.Add(templateFieldset);
-            TemplateField templateFieldprompt = new TemplateField();
-            templateFieldprompt.HeaderText = "Prompt";
-            templateFieldprompt.HeaderStyle.ForeColor = System.Drawing.Color.Black;
-            templateFieldprompt.HeaderStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#FFDEAD");
-            templateFieldprompt.HeaderStyle.BorderColor = System.Drawing.Color.Black;
-            templateFieldprompt.HeaderStyle.VerticalAlign = VerticalAlign.Middle;
-            templateFieldprompt.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
-            templateFieldprompt.ItemTemplate = new AddGridViewTemplate(ListItemType.Item, "Prompt");
-            templateFieldprompt.ItemStyle.CssClass = "nowrapText";
-            less.Columns.Add(templateFieldprompt);
-            TemplateField templateFieldEventName = new TemplateField();
-            templateFieldEventName.HeaderText = "EventName";
-            templateFieldEventName.HeaderStyle.ForeColor = System.Drawing.Color.Black;
-            templateFieldEventName.HeaderStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#dbe4c0");
-            templateFieldEventName.HeaderStyle.BorderColor = System.Drawing.Color.Black;
-            templateFieldEventName.HeaderStyle.VerticalAlign = VerticalAlign.Middle;
-            templateFieldEventName.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
-            templateFieldEventName.ItemTemplate = new AddGridViewTemplate(ListItemType.Item, "EventName");
-            templateFieldEventName.ItemStyle.CssClass = "nowrapText";
-            less.Columns.Add(templateFieldEventName);
-            TemplateField templateFieldStdtSessEventType = new TemplateField();
-            templateFieldStdtSessEventType.HeaderText = "StdtSessEventType";
-            templateFieldStdtSessEventType.HeaderStyle.ForeColor = System.Drawing.Color.Black;
-            templateFieldStdtSessEventType.HeaderStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#dbe4c0");
-            templateFieldStdtSessEventType.HeaderStyle.BorderColor = System.Drawing.Color.Black;
-            templateFieldStdtSessEventType.HeaderStyle.VerticalAlign = VerticalAlign.Middle;
-            templateFieldStdtSessEventType.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
-            templateFieldStdtSessEventType.ItemTemplate = new AddGridViewTemplate(ListItemType.Item, "StdtSessEventType");
-            templateFieldStdtSessEventType.ItemStyle.CssClass = "nowrapText";
-            less.Columns.Add(templateFieldStdtSessEventType);
-            TemplateField templateFieldStdtdate = new TemplateField();
-            templateFieldStdtdate.HeaderText = "Date";
-            templateFieldStdtdate.HeaderStyle.ForeColor = System.Drawing.Color.Black;
-            templateFieldStdtdate.HeaderStyle.BorderColor = System.Drawing.Color.Black;
-            templateFieldStdtdate.HeaderStyle.VerticalAlign = VerticalAlign.Middle;
-            templateFieldStdtdate.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
-            templateFieldStdtdate.ItemTemplate = new AddGridViewTemplate(ListItemType.Item, "PeriodDate");
-            templateFieldStdtdate.ItemStyle.CssClass = "nowrapText";
-            less.Columns.Add(templateFieldStdtdate);
-            if (columntypes.Length == 0)
-            {
-                e.Item.Visible = false;
-                less.Visible = false;
-            }
-            less.DataSource = dt;
-            less.DataBind();
-            AddCustomHeader(less);
-            ((DataControlField)less.Columns.Cast<DataControlField>()
-                    .Where(fld => (fld.HeaderText == "Date"))
-                    .SingleOrDefault()).Visible = false;
-            if (countdatalist == countlesson)
-            {
-                daterow(less);
-                setDatesize();
-            }
+        }
+        catch (Exception ex) {
+            throw ex;
+        
         }
     }
 
@@ -1599,4 +1727,763 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
         return table;
     }
 
+    protected void btnDownload_Click(object sender, EventArgs e)
+    {
+        sess = (clsSession)Session["UserSession"];
+        string sname = sess.StudentName.ToString().Replace(",", "");
+        string Filename = sname + "_ProgressSummaryReport.xls";
+        Filename = Server.UrlEncode(Filename);
+        string filePath = Server.MapPath("~/StudentBinder/ExportACPSR/" + Filename);
+        if (File.Exists(filePath))
+        {
+            Response.Clear();
+            Response.ContentType = "application/vnd.ms-excel";
+            Response.AddHeader("Content-Disposition", "attachment; filename=" + Filename);
+            Response.TransmitFile(filePath);
+            Response.End();
+            try
+            {
+                File.Delete(filePath);  
+            }
+            catch (Exception ex)
+            {
+              
+            }
+        }
+
+
+    }
+    private DataTable columntable(string lessid)
+    {
+        DataTable allcolumn = new DataTable();
+        allcolumn.Columns.Add("lessid", typeof(string));
+        allcolumn.Columns.Add("colname", typeof(string));
+        allcolumn.Columns.Add("colid", typeof(string));
+
+     
+        var query = (from row in allclsviewdata.AsEnumerable()
+                     where row.Field<string>("LessonPlanId") == lessid
+                     select new
+                     {
+                         Id = row.Field<string>("LessonPlanId"),
+                         Name = row.Field<string>("ColName") + "-</br> " + row.Field<string>("CalcType"),
+                         colid = row.Field<string>("DstempSetColCalcId")
+                     })
+             .GroupBy(x => new { x.Id, x.Name })
+             .Select(g => new
+             {
+                 g.Key.Id,
+                 g.Key.Name,
+                 colid = string.Join(", ", g.Select(x => x.colid).Distinct())
+             })
+             .ToList();
+
+        foreach (var item in query)
+        {
+            allcolumn.Rows.Add(item.Id, item.Name, item.colid);
+        }
+        return allcolumn;
+    }
+    private void BindGrid()
+    {
+        exportgrid.Columns.Clear();
+        int subcolumn = 0;
+       DSSessionDatadt = JsonToDataTable(ViewState["SessionData"].ToString());
+       DSSessionDataZerodt = JsonToDataTable(ViewState["SessionDataZero"].ToString());
+       DSEventSessionZerodt = JsonToDataTable(ViewState["EventSessionZero"].ToString());
+       DSScoredt = JsonToDataTable(ViewState["Score"].ToString());
+       DSScoreZerodt = JsonToDataTable(ViewState["ScoreZero"].ToString());
+
+       ViewState["allless"] = ""; ViewState["alldata"] = ""; ViewState["SessionData"] = "";
+       ViewState["SessionDataZero"] = ""; ViewState["EventSessionZero"] = ""; ViewState["Score"] = "";
+       ViewState["ScoreZero"] = "";
+        DataTable allcolumn = new DataTable();
+        allcolumn.Columns.Add("lessid", typeof(string));
+        allcolumn.Columns.Add("colname", typeof(string));
+        allcolumn.Columns.Add("subcol", typeof(int));
+        allcolumn.Columns.Add("colid", typeof(string));
+        foreach (DataRow rows in allless.Rows)
+        {
+            string lessid = rows["LessonPlanId"].ToString();
+            DataTable colforless= columntable(lessid);
+            foreach (DataRow rows1 in colforless.Rows)
+            {
+                subcolumn = subcolumn + 1;
+               string col = "<div style='border-bottom: 1px solid black;'>Row Data</div>" + rows1["colname"].ToString();
+               allcolumn.Rows.Add(lessid, col, subcolumn, rows1["colid"].ToString());
+            }
+            subcolumn = subcolumn + 1;
+            allcolumn.Rows.Add(lessid, "Time", subcolumn,"1");
+            subcolumn = subcolumn + 1;
+            allcolumn.Rows.Add(lessid, "User", subcolumn,"2");
+            subcolumn = subcolumn + 1;
+            allcolumn.Rows.Add(lessid, "Set", subcolumn,"3");
+            subcolumn = subcolumn + 1;
+            allcolumn.Rows.Add(lessid, "Prompt", subcolumn,"4");
+            
+            subcolumn = subcolumn + 1;
+            allcolumn.Rows.Add(lessid, "Name", subcolumn,"5");
+            subcolumn = subcolumn + 1;
+            allcolumn.Rows.Add(lessid, "Type", subcolumn,"6");
+
+        }
+        DataTable dt = new DataTable();
+        dt.Columns.Add("Date", typeof(string));
+        //BoundField boundField1 = new BoundField();
+        //boundField1.DataField = "Date";
+        //boundField1.HeaderText = "Date";
+        TemplateField templateField0 = new TemplateField();
+        templateField0.HeaderText = "Date";
+        templateField0.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+        //templateField.HeaderStyle.CssClass = "nowrapText";
+        //templateField.HeaderStyle.BorderColor = System.Drawing.Color.Black;
+        templateField0.HeaderStyle.VerticalAlign = VerticalAlign.Top;
+        templateField0.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+        templateField0.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
+        templateField0.ItemTemplate = new AddGridViewTemplate(ListItemType.Item, "Date");
+        templateField0.HeaderStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#0080FF");
+        templateField0.ItemStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#0080FF");
+        exportgrid.Columns.Add(templateField0);
+        foreach (DataRow rows in allcolumn.Rows)
+        {
+
+            TemplateField templateField = new TemplateField();
+            templateField.HeaderText = rows["colname"].ToString();
+            templateField.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+            //templateField.HeaderStyle.CssClass = "nowrapText";
+            //templateField.HeaderStyle.BorderColor = System.Drawing.Color.Black;
+            templateField.HeaderStyle.VerticalAlign = VerticalAlign.Top;
+            templateField.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            templateField.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
+            templateField.ItemTemplate = new AddGridViewTemplate(ListItemType.Item, "Subcol" + rows["subcol"].ToString());
+            if (templateField.HeaderText == "Time" || templateField.HeaderText == "User" || templateField.HeaderText == "Set" || templateField.HeaderText == "Prompt" || templateField.HeaderText == "Yes/No")
+            {
+                templateField.HeaderStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#FFDEAD");
+            }
+            else
+            {
+                if (templateField.HeaderText == "Name" || templateField.HeaderText == "Type")
+                {
+                    templateField.HeaderStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#dbe4c0");
+                    templateField.ItemStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#dbe4c0");
+                }
+                else
+                {
+                    templateField.HeaderStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#0080FF");
+                }
+            }
+
+            exportgrid.Columns.Add(templateField);
+            dt.Columns.Add("Subcol" + rows["subcol"].ToString(), typeof(string));
+        }
+        dt = getAllData(allcolumn, dt);
+        exportgrid.DataBound += new EventHandler(SummaryBound);
+        exportgrid.DataSource = dt;
+        exportgrid.DataBind();
+
+
+        ExportGridViewToExcel();
+    }
+    public void SummaryBound(object sender, EventArgs e)
+    {
+
+        GridViewRow row = new GridViewRow(0, 0, DataControlRowType.Header, DataControlRowState.Normal);
+
+        TableHeaderCell tec = new TableHeaderCell();
+        tec.ColumnSpan = 1;
+        tec.Text = "";
+        tec.BackColor = ColorTranslator.FromHtml("#0080FF");
+        row.Controls.Add(tec);
+        GridViewRow subRow = new GridViewRow(1, 0, DataControlRowType.Header, DataControlRowState.Normal);
+
+        TableHeaderCell subTec0 = new TableHeaderCell();
+        subTec0.ColumnSpan = 1;
+        subTec0.Text = "";
+        subTec0.BackColor = ColorTranslator.FromHtml("#0080FF");
+        subRow.Controls.Add(subTec0);
+        foreach (DataRow rows in allless.Rows)
+        {
+            string lessid = rows["LessonPlanId"].ToString();
+            DataTable colforless = columntable(lessid);
+            int len = colforless.Rows.Count;
+            tec = new TableHeaderCell();
+            tec.ColumnSpan = len + 6; 
+            tec.Text = rows["LessonName"].ToString();
+            tec.BackColor = ColorTranslator.FromHtml("#0080FF");
+            row.Controls.Add(tec);
+
+            TableHeaderCell subTec = new TableHeaderCell();
+            subTec.ColumnSpan = len;
+            subTec.Text = "Datasheet Data";
+            subTec.BackColor = ColorTranslator.FromHtml("#0080FF");
+            subRow.Controls.Add(subTec);
+
+            TableHeaderCell subTec1 = new TableHeaderCell();
+            subTec1.ColumnSpan = 4;
+            subTec1.Text = "Lesson Delivery - Sessions Data	";
+            subTec1.BackColor = ColorTranslator.FromHtml("#FFDEAD");
+            subRow.Controls.Add(subTec1);
+
+            TableHeaderCell subTec2 = new TableHeaderCell();
+            subTec2.ColumnSpan = 2;
+            subTec2.Text = "Condition Lines/ Arrow Notes";
+            subTec2.BackColor = ColorTranslator.FromHtml("#dbe4c0");
+            subRow.Controls.Add(subTec2);
+        }
+
+        exportgrid.HeaderRow.Parent.Controls.AddAt(0, row);
+        exportgrid.HeaderRow.Parent.Controls.AddAt(1, subRow);
+
+
+    }
+  
+    private DataTable getAllData(DataTable dt, DataTable findt)
+    {
+        DateTime dtst = DateTime.ParseExact(txtRepStart.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+        DateTime dted = DateTime.ParseExact(txtrepEdate.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
+        string startDate = dtst.ToString("yyyy-MM-dd");
+        string enddate = dted.ToString("yyyy-MM-dd");
+
+        DateTime startDateTime = DateTime.Parse(startDate);
+        DateTime endDateTime = DateTime.Parse(enddate);
+
+        var sessionDataZeroDict = new Dictionary<string, DataRow[]>();
+        foreach (DataRow row in DSSessionDataZerodt.Rows)
+        {
+            string date = row["SessPeriodDate"].ToString();
+            if (!sessionDataZeroDict.ContainsKey(date))
+            {
+                sessionDataZeroDict[date] = new DataRow[0]; 
+            }
+            sessionDataZeroDict[date] = sessionDataZeroDict[date].Concat(new[] { row }).ToArray();
+        }
+
+        var sessionDataDict = new Dictionary<string, DataRow[]>();
+        foreach (DataRow row in DSSessionDatadt.Rows)
+        {
+            string date = row["SessPeriodDate"].ToString();
+            if (!sessionDataDict.ContainsKey(date))
+            {
+                sessionDataDict[date] = new DataRow[0]; 
+            }
+            sessionDataDict[date] = sessionDataDict[date].Concat(new[] { row }).ToArray();
+        }
+
+        var eventSessionZeroDict = new Dictionary<string, DataRow[]>();
+        foreach (DataRow row in DSEventSessionZerodt.Rows)
+        {
+            string date = row["PeriodDate"].ToString();
+            if (!eventSessionZeroDict.ContainsKey(date))
+            {
+                eventSessionZeroDict[date] = new DataRow[0]; 
+            }
+            eventSessionZeroDict[date] = eventSessionZeroDict[date].Concat(new[] { row }).ToArray();
+        }
+
+        var scorezeroDict = new Dictionary<string, DataRow[]>();
+        foreach (DataRow row in DSScoreZerodt.Rows)
+        {
+            string date = row["PeriodDate"].ToString();
+            if (!scorezeroDict.ContainsKey(date))
+            {
+                scorezeroDict[date] = new DataRow[0]; 
+            }
+            scorezeroDict[date] = scorezeroDict[date].Concat(new[] { row }).ToArray();
+        }
+
+        var scoreDict = new Dictionary<string, DataRow[]>();
+        foreach (DataRow row in DSScoredt.Rows)
+        {
+            string date = row["PeriodDate"].ToString();
+            if (!scoreDict.ContainsKey(date))
+            {
+                scoreDict[date] = new DataRow[0]; 
+            }
+            scoreDict[date] = scoreDict[date].Concat(new[] { row }).ToArray();
+        }
+
+        for (DateTime date = startDateTime; date <= endDateTime; date = date.AddDays(1))
+        {
+            DataRow newRow = findt.NewRow();
+            string currDate = date.ToString("MM/dd/yyyy");
+            newRow["Date"] = currDate;
+
+            foreach (DataRow row in dt.Rows)
+            {
+                string subcol = "Subcol" + row["subcol"].ToString();
+                string lessid = row["lessid"].ToString();
+                StringBuilder valueBuilder = new StringBuilder();
+                string colId = row["colid"].ToString();
+                string[] colIds = row["colid"].ToString().Split(',');
+                string fullcolname = row["colname"].ToString();
+                string pattern = @"<div[^>]*>(.*?)<\/div>(.*?)<\/br>\s*(.*)";
+                Regex regex = new Regex(pattern);
+                string colname = ""; string calctype = "";
+                Match match = regex.Match(fullcolname);
+                if (match.Success)
+                {
+                    colname = match.Groups[2].Value.Split('-')[0].Trim();
+                     calctype = match.Groups[3].Value.Trim();
+                }
+          
+                    if (colId == "1") 
+                    {
+                        if (sessionDataZeroDict.ContainsKey(currDate))
+                        {
+                            foreach (DataRow sessionRow in sessionDataZeroDict[currDate])
+                            {
+                                valueBuilder.Append("<br/>").Append(sessionRow["StartTs"].ToString());
+                            }
+                        }
+
+                        if (sessionDataDict.ContainsKey(currDate))
+                        {
+                            foreach (DataRow sessionRow in sessionDataDict[currDate])
+                            {
+                                if (sessionRow["LessonPlanId"].ToString() == lessid)
+                                {
+                                    valueBuilder.Append("<br/>").Append(sessionRow["StartTs"].ToString());
+                                }
+                            }
+                        }
+                    }
+                    else if (colId == "2") 
+                    {
+                        if (sessionDataZeroDict.ContainsKey(currDate))
+                        {
+                            foreach (DataRow sessionRow in sessionDataZeroDict[currDate])
+                            {
+                                valueBuilder.Append("<br/>").Append(sessionRow["CurrentPrompt"].ToString());
+                            }
+                        }
+
+                        if (sessionDataDict.ContainsKey(currDate))
+                        {
+                            foreach (DataRow sessionRow in sessionDataDict[currDate])
+                            {
+                                if (sessionRow["LessonPlanId"].ToString() == lessid)
+                                {
+                                    valueBuilder.Append("<br/>").Append(sessionRow["UserName"].ToString());
+                                }
+                            }
+                        }
+                    }
+                    else if (colId == "3") 
+                    {
+                        if (sessionDataZeroDict.ContainsKey(currDate))
+                        {
+                            foreach (DataRow sessionRow in sessionDataZeroDict[currDate])
+                            {
+                                valueBuilder.Append("<br/>").Append(sessionRow["CurrentSet"].ToString());
+                            }
+                        }
+
+                        if (sessionDataDict.ContainsKey(currDate))
+                        {
+                            foreach (DataRow sessionRow in sessionDataDict[currDate])
+                            {
+                                if (sessionRow["LessonPlanId"].ToString() == lessid)
+                                {
+                                    valueBuilder.Append("<br/>").Append(sessionRow["CurrentSet"].ToString());
+                                }
+                            }
+                        }
+                    }
+                    else if (colId == "4") 
+                    {
+                        if (sessionDataZeroDict.ContainsKey(currDate))
+                        {
+                            foreach (DataRow sessionRow in sessionDataZeroDict[currDate])
+                            {
+                                valueBuilder.Append("<br/>").Append(sessionRow["CurrentPrompt"].ToString());
+                            }
+                        }
+
+                        if (sessionDataDict.ContainsKey(currDate))
+                        {
+                            foreach (DataRow sessionRow in sessionDataDict[currDate])
+                            {
+                                if (sessionRow["LessonPlanId"].ToString() == lessid)
+                                {
+                                    valueBuilder.Append("<br/>").Append(sessionRow["CurrentPrompt"].ToString());
+                                }
+                            }
+                        }
+                    }
+                    else if (colId == "5") 
+                    {
+                        if (sessionDataZeroDict.ContainsKey(currDate))
+                        {
+                            foreach (DataRow sessionRow in sessionDataZeroDict[currDate])
+                            {
+                                valueBuilder.Append("<br/>").Append(sessionRow["EventName"].ToString());
+                            }
+                        }
+
+                        if (sessionDataDict.ContainsKey(currDate))
+                        {
+                            foreach (DataRow sessionRow in sessionDataDict[currDate])
+                            {
+                                if (sessionRow["LessonPlanId"].ToString() == lessid)
+                                {
+                                    valueBuilder.Append("<br/>").Append(sessionRow["EventName"].ToString());
+                                }
+                            }
+                        }
+                    }
+                    else if (colId == "6")
+                    {
+                        if (sessionDataZeroDict.ContainsKey(currDate))
+                        {
+                            foreach (DataRow sessionRow in sessionDataZeroDict[currDate])
+                            {
+                                valueBuilder.Append("<br/>").Append(sessionRow["StdtSessEventType"].ToString());
+                            }
+                        }
+
+                        if (sessionDataDict.ContainsKey(currDate))
+                        {
+                            foreach (DataRow sessionRow in sessionDataDict[currDate])
+                            {
+                                if (sessionRow["LessonPlanId"].ToString() == lessid)
+                                {
+                                    valueBuilder.Append("<br/>").Append(sessionRow["StdtSessEventType"].ToString());
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+
+                        bool DSScoredtfound = false;
+                        bool Dseventsessionzerodtfound = false;
+
+                        if (scoreDict.ContainsKey(currDate))
+                        {
+                            foreach (DataRow sessionRow in scoreDict[currDate])
+                            {
+                                DSScoredtfound = true;
+                                break;
+                            }
+                        }
+
+                        if (DSScoredtfound)
+                        {
+                            if (eventSessionZeroDict.ContainsKey(currDate))
+                            {
+                                foreach (DataRow sessionRow in eventSessionZeroDict[currDate])
+                                {
+                                    if (sessionRow["LessonPlanId"].ToString() == lessid)
+                                    {
+                                        Dseventsessionzerodtfound = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (Dseventsessionzerodtfound)
+                            {
+                                if (eventSessionZeroDict.ContainsKey(currDate))
+                                {
+                                    foreach (DataRow sessionRow in eventSessionZeroDict[currDate])
+                                    {
+                                        if (sessionRow["LessonPlanId"].ToString() == lessid)
+                                        {
+                                            valueBuilder.Append("<br/>").Append(sessionRow["Score1"].ToString());
+                                        }
+                                    }
+                                }
+
+                                if (scorezeroDict.ContainsKey(currDate))
+                                {
+                                    foreach (DataRow sessionRow in scorezeroDict[currDate])
+                                    {
+                                        String Colcalcid = sessionRow["DstempSetColCalcId"].ToString();
+                                        colIds = colIds.Select(Id => Id.Trim()).ToArray();
+                                        string cname = sessionRow["ColName"].ToString();
+                                        string ctype = sessionRow["CalcType"].ToString();
+                                        if (sessionRow["LessonPlanId"].ToString() == lessid && colIds.Contains(Colcalcid) && colname == cname && calctype == ctype)
+                                        {
+                                            valueBuilder.Append("<br/>").Append(sessionRow["Score1"].ToString());
+                                        }
+                                    }
+                                }
+
+                                if (scoreDict.ContainsKey(currDate))
+                                {
+                                    foreach (DataRow sessionRow in scoreDict[currDate])
+                                    {
+                                        String Colcalcid = sessionRow["DstempSetColCalcId"].ToString();
+                                        colIds = colIds.Select(Id => Id.Trim()).ToArray();
+                                        string cname = sessionRow["ColName"].ToString();
+                                        string ctype = sessionRow["CalcType"].ToString();
+                                        if (sessionRow["LessonPlanId"].ToString() == lessid && colIds.Contains(Colcalcid) && colname == cname && calctype == ctype)
+                                        {
+                                            valueBuilder.Append("<br/>").Append(sessionRow["Score1"].ToString());
+                                        }
+                                    }
+                                }
+
+                            }
+                            else
+                            {
+                                if (scorezeroDict.ContainsKey(currDate))
+                                {
+                                    foreach (DataRow sessionRow in scorezeroDict[currDate])
+                                    {
+                                        String Colcalcid = sessionRow["DstempSetColCalcId"].ToString();
+                                        colIds = colIds.Select(Id => Id.Trim()).ToArray();
+                                        string cname = sessionRow["ColName"].ToString();
+                                        string ctype = sessionRow["CalcType"].ToString();
+                                        if (sessionRow["LessonPlanId"].ToString() == lessid && colIds.Contains(Colcalcid) && colname == cname && calctype == ctype)
+                                        {
+                                            valueBuilder.Append("<br/>").Append(sessionRow["Score1"].ToString());
+                                        }
+                                    }
+                                }
+
+                                if (scoreDict.ContainsKey(currDate))
+                                {
+                                    foreach (DataRow sessionRow in scoreDict[currDate])
+                                    {
+                                        String Colcalcid = sessionRow["DstempSetColCalcId"].ToString();
+                                        colIds = colIds.Select(Id => Id.Trim()).ToArray();
+                                        string cname = sessionRow["ColName"].ToString();
+                                        string ctype = sessionRow["CalcType"].ToString();
+                                        if (sessionRow["LessonPlanId"].ToString() == lessid && colIds.Contains(Colcalcid) && colname == cname && calctype == ctype)
+                                        {
+                                            valueBuilder.Append("<br/>").Append(sessionRow["Score1"].ToString());
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+                        else
+                        {
+                            if (eventSessionZeroDict.ContainsKey(currDate))
+                            {
+                                foreach (DataRow sessionRow in eventSessionZeroDict[currDate])
+                                {
+                                    if (sessionRow["LessonPlanId"].ToString() == lessid)
+                                    {
+                                        Dseventsessionzerodtfound = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (Dseventsessionzerodtfound)
+                            {
+                                if (eventSessionZeroDict.ContainsKey(currDate))
+                                {
+                                    foreach (DataRow sessionRow in eventSessionZeroDict[currDate])
+                                    {
+                                        if (sessionRow["LessonPlanId"].ToString() == lessid)
+                                        {
+                                            valueBuilder.Append("<br/>").Append(sessionRow["Score1"].ToString());
+                                        }
+                                    }
+                                }
+                                if (scoreDict.ContainsKey(currDate))
+                                {
+                                    foreach (DataRow sessionRow in scoreDict[currDate])
+                                    {
+                                        String Colcalcid = sessionRow["DstempSetColCalcId"].ToString();
+                                        colIds = colIds.Select(Id => Id.Trim()).ToArray();
+                                        string cname = sessionRow["ColName"].ToString();
+                                        string ctype = sessionRow["CalcType"].ToString();
+                                        if (sessionRow["LessonPlanId"].ToString() == lessid && colIds.Contains(Colcalcid) && colname == cname && calctype == ctype)
+                                        {
+                                            valueBuilder.Append("<br/>").Append(sessionRow["Score1"].ToString());
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+
+                                if (scoreDict.ContainsKey(currDate))
+                                {
+                                    foreach (DataRow sessionRow in scoreDict[currDate])
+                                    {
+                                        String Colcalcid = sessionRow["DstempSetColCalcId"].ToString();
+                                        colIds = colIds.Select(Id => Id.Trim()).ToArray();
+                                        string cname = sessionRow["ColName"].ToString();
+                                        string ctype = sessionRow["CalcType"].ToString();
+                                        if (sessionRow["LessonPlanId"].ToString() == lessid && colIds.Contains(Colcalcid) && colname == cname && calctype == ctype)
+                                        {
+                                            valueBuilder.Append("<br/>").Append(sessionRow["Score1"].ToString());
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+
+                        if (DSScoredt.Rows.Count == 0)
+                        {
+                            if (eventSessionZeroDict.ContainsKey(currDate))
+                            {
+                                foreach (DataRow sessionRow in eventSessionZeroDict[currDate])
+                                {
+                                    if (sessionRow["LessonPlanId"].ToString() == lessid)
+                                    {
+                                        Dseventsessionzerodtfound = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (Dseventsessionzerodtfound)
+                            {
+                                if (eventSessionZeroDict.ContainsKey(currDate))
+                                {
+                                    foreach (DataRow sessionRow in eventSessionZeroDict[currDate])
+                                    {
+                                        if (sessionRow["LessonPlanId"].ToString() == lessid)
+                                        {
+                                            valueBuilder.Append("<br/>").Append(sessionRow["Score1"].ToString());
+                                        }
+                                    }
+                                }
+                                if (scoreDict.ContainsKey(currDate))
+                                {
+                                    foreach (DataRow sessionRow in scoreDict[currDate])
+                                    {
+                                        String Colcalcid = sessionRow["DstempSetColCalcId"].ToString();
+                                        colIds = colIds.Select(Id => Id.Trim()).ToArray();
+                                        string cname = sessionRow["ColName"].ToString();
+                                        string ctype = sessionRow["CalcType"].ToString();
+                                        if (sessionRow["LessonPlanId"].ToString() == lessid && colIds.Contains(Colcalcid) &&  colname == cname && calctype == ctype)
+                                        {
+                                            valueBuilder.Append("<br/>").Append(sessionRow["Score1"].ToString());
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+
+                                if (scoreDict.ContainsKey(currDate))
+                                {
+                                    foreach (DataRow sessionRow in scoreDict[currDate])
+                                    {
+                                        String Colcalcid = sessionRow["DstempSetColCalcId"].ToString();
+                                        colIds = colIds.Select(Id => Id.Trim()).ToArray();
+                                        string cname = sessionRow["ColName"].ToString();
+                                        string ctype = sessionRow["CalcType"].ToString();
+                                        if (sessionRow["LessonPlanId"].ToString() == lessid && colIds.Contains(Colcalcid) && colname == cname && calctype == ctype)
+                                        {
+                                            valueBuilder.Append("<br/>").Append(sessionRow["Score1"].ToString());
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+   
+                newRow[subcol] = valueBuilder.ToString();
+            }
+            findt.Rows.Add(newRow);
+        }
+
+        return findt;
+    }
+
+    private void ExportGridViewToExcel()
+    {
+        StringWriter sw = new StringWriter();
+        HtmlTextWriter htw = new HtmlTextWriter(sw);
+        exportgrid.RenderControl(htw);
+        sess = (clsSession)Session["UserSession"];
+        string sname = sess.StudentName.ToString().Replace(",", "");
+        string Filename = sname + "_ProgressSummaryReport.xls";
+         Filename = Server.UrlEncode(Filename);
+        string filePath = Server.MapPath("~/StudentBinder/ExportACPSR/" + Filename);
+        string folderPath = Server.MapPath("~/StudentBinder/ExportACPSR/");
+        if (!Directory.Exists(folderPath))
+        {
+            Directory.CreateDirectory(folderPath);
+        }
+        foreach (string file in Directory.GetFiles(folderPath))
+        {
+            File.Delete(file);
+        }
+        File.WriteAllText(filePath, sw.ToString(), Encoding.UTF8);
+        tdMsgExport.InnerHtml = clsGeneral.sucessMsg("Export Successfully Created...");
+        hdnExport.Value = "true";
+        exportgrid.Visible = false;
+        exportgrid.Columns.Clear();
+        string script = "hideOverlay();";
+        ScriptManager.RegisterStartupScript(this, this.GetType(), "show", script, true);
+    }
+
+    private string DataTableToJson(DataTable dt)
+    {
+        var rows = new List<Dictionary<string, object>>();
+        foreach (DataRow row in dt.Rows)
+        {
+            var rowDict = new Dictionary<string, object>();
+            foreach (DataColumn column in dt.Columns)
+            {
+                rowDict[column.ColumnName] = row[column];
+            }
+            rows.Add(rowDict);
+        }
+
+        var serializer = new JavaScriptSerializer();
+        serializer.MaxJsonLength = 2147483647;
+        return CompressString(serializer.Serialize(rows));
+    }
+
+    private DataTable JsonToDataTable(string jsonString)
+    {
+        jsonString=DecompressString(jsonString);
+        var serializer = new JavaScriptSerializer();
+        serializer.MaxJsonLength = 2147483647;
+        var rows = serializer.Deserialize<List<Dictionary<string, object>>>(jsonString);
+        DataTable dt = new DataTable();
+        if (rows.Count > 0)
+        {
+            foreach (var column in rows[0].Keys)
+            {
+                dt.Columns.Add(column);
+            }
+
+            foreach (var rowDict in rows)
+            {
+                var row = dt.NewRow();
+                foreach (var column in rowDict.Keys)
+                {
+                    row[column] = rowDict[column];
+                }
+                dt.Rows.Add(row);
+            }
+        }
+
+        return dt;
+    }
+
+    public static string CompressString(string str)
+    {
+        var bytes = Encoding.UTF8.GetBytes(str);
+        using (var ms = new MemoryStream())
+        {
+            using (var gzip = new GZipStream(ms, CompressionMode.Compress))
+            {
+                gzip.Write(bytes, 0, bytes.Length);
+            }
+            return Convert.ToBase64String(ms.ToArray());
+        }
+    }
+
+    public static string DecompressString(string compressedStr)
+    {
+        var bytes = Convert.FromBase64String(compressedStr);
+        using (var ms = new MemoryStream(bytes))
+        using (var gzip = new GZipStream(ms, CompressionMode.Decompress))
+        using (var reader = new StreamReader(gzip, Encoding.UTF8))
+        {
+            return reader.ReadToEnd();
+        }
+    }
 }
