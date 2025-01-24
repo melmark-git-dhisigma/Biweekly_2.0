@@ -265,27 +265,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             ClsTestDataLog clsData = new ClsTestDataLog();
             try
             {
-                clsData.WriteToLog("ViewState Values:-\n" +
-                "DSTempHdrId=" + Convert.ToInt32(hdnTemplateId.Value) + "\n" +
-                "hfTextScore: " + (ViewState["hfTextScore"] ?? "") + "\n" +
-                "hfResultStep_Acc: " + (ViewState["hfResultStep_Acc"] ?? "") + "\n" +
-                "hfResultStep_Prmpt: " + (ViewState["hfResultStep_Prmpt"] ?? "") + "\n" +
-                "hfRslt1_ExcludeCrntStep_Acc: " + (ViewState["hfRslt1_ExcludeCrntStep_Acc"] ?? "") + "\n" +
-                "hfRslt2_ExcludeCrntStep_Acc: " + (ViewState["hfRslt2_ExcludeCrntStep_Acc"] ?? "") + "\n" +
-                "hfRslt1_Acc: " + (ViewState["hfRslt1_Acc"] ?? "") + "\n" +
-                "hfRslt2_Acc: " + (ViewState["hfRslt2_Acc"] ?? "") + "\n" +
-                "hfRslt1_Prmt: " + (ViewState["hfRslt1_Prmt"] ?? "") + "\n" +
-                "hfRslt2_Prmt: " + (ViewState["hfRslt2_Prmt"] ?? "") + "\n" +
-                "hfRslt1_Ind: " + (ViewState["hfRslt1_Ind"] ?? "") + "\n" +
-                "hfRslt2_Ind: " + (ViewState["hfRslt2_Ind"] ?? "") + "\n" +
-                "hfRslt1_IndAll: " + (ViewState["hfRslt1_IndAll"] ?? "") + "\n" +
-                "hfRslt2_IndAll: " + (ViewState["hfRslt2_IndAll"] ?? "") + "\n" +
-                "hfAvgDur: " + (ViewState["hfAvgDur"] ?? "") + "\n" +
-                "hfTotDur: " + (ViewState["hfTotDur"] ?? "") + "\n" +
-                "hf_Freq: " + (ViewState["hf_Freq"] ?? "") + "\n" +
-                "hfTotCorct: " + (ViewState["hfTotCorct"] ?? "") + "\n" +
-                "hfInTotCorct: " + (ViewState["hfInTotCorct"] ?? "") + "\n" +
-                "HF Values:-\n" +
+                clsData.WriteToLog("HF Values:-\n" +
                 "hfTextScore: " + hfTextScore.Value + "\n" +
                 "hfResultStep_Acc: " + hfResultStep_Acc.Value + "\n" +
                 "hfResultStep_Prmpt: " + hfResultStep_Prmpt.Value + "\n" +
@@ -307,143 +287,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             }
             catch (Exception exep)
             {
-                clsData.WriteToLog("ViewState Values:Error:" + exep.ToString());
-            }
-            if (ViewState["hfTextScore"] != null)
-            {
-                if (string.IsNullOrEmpty(hfTextScore.Value))
-                    hfTextScore.Value = ViewState["hfTextScore"].ToString();
-            }
-            if (ViewState["hfResultStep_Acc"] != null)
-            {
-                if (string.IsNullOrEmpty(hfResultStep_Acc.Value))
-                    hfResultStep_Acc.Value = ViewState["hfResultStep_Acc"].ToString();
-            }
-            if (ViewState["hfResultStep_Prmpt"] != null)
-            {
-                if (string.IsNullOrEmpty(hfResultStep_Prmpt.Value))
-                    hfResultStep_Prmpt.Value = ViewState["hfResultStep_Prmpt"].ToString();
-            }
-            if (ViewState["hfRslt1_ExcludeCrntStep_Acc"] != null)
-            {
-                if (string.IsNullOrEmpty(hfRslt1_ExcludeCrntStep_Acc.Value))
-                    hfRslt1_ExcludeCrntStep_Acc.Value = ViewState["hfRslt1_ExcludeCrntStep_Acc"].ToString();
-            }
-            if (ViewState["hfRslt2_ExcludeCrntStep_Acc"] != null)
-            {
-                if (string.IsNullOrEmpty(hfRslt2_ExcludeCrntStep_Acc.Value))
-                    hfRslt2_ExcludeCrntStep_Acc.Value = ViewState["hfRslt2_ExcludeCrntStep_Acc"].ToString();
-            }
-            if (ViewState["hfRslt1_Acc"] != null)
-            {
-                if (string.IsNullOrEmpty(hfRslt1_Acc.Value))
-                    hfRslt1_Acc.Value = ViewState["hfRslt1_Acc"].ToString();
-            }
-            if (ViewState["hfRslt2_Acc"] != null)
-            {
-                if (string.IsNullOrEmpty(hfRslt2_Acc.Value))
-                    hfRslt2_Acc.Value = ViewState["hfRslt2_Acc"].ToString();
-            }
-            if (ViewState["hfRslt1_Prmt"] != null)
-            {
-                if (string.IsNullOrEmpty(hfRslt1_Prmt.Value))
-                    hfRslt1_Prmt.Value = ViewState["hfRslt1_Prmt"].ToString();
-            }
-            if (ViewState["hfRslt2_Prmt"] != null)
-            {
-                if (string.IsNullOrEmpty(hfRslt2_Prmt.Value))
-                    hfRslt2_Prmt.Value = ViewState["hfRslt2_Prmt"].ToString();
-            }
-            if (ViewState["hfRslt1_Ind"] != null)
-            {
-                if (string.IsNullOrEmpty(hfRslt1_Ind.Value))
-                    hfRslt1_Ind.Value = ViewState["hfRslt1_Ind"].ToString();
-            }
-            if (ViewState["hfRslt2_Ind"] != null)
-            {
-                if (string.IsNullOrEmpty(hfRslt2_Ind.Value))
-                    hfRslt2_Ind.Value = ViewState["hfRslt2_Ind"].ToString();
-            }
-            if (ViewState["hfRslt1_IndAll"] != null)
-            {
-                if (string.IsNullOrEmpty(hfRslt1_IndAll.Value))
-                    hfRslt1_IndAll.Value = ViewState["hfRslt1_IndAll"].ToString();
-            }
-            if (ViewState["hfRslt2_IndAll"] != null)
-            {
-                if (string.IsNullOrEmpty(hfRslt2_IndAll.Value))
-                    hfRslt2_IndAll.Value = ViewState["hfRslt2_IndAll"].ToString();
-            }
-            if (ViewState["hfAvgDur"] != null)
-            {
-                if (string.IsNullOrEmpty(hfAvgDur.Value))
-                    hfAvgDur.Value = ViewState["hfAvgDur"].ToString();
-            }
-            if (ViewState["hfTotDur"] != null)
-            {
-                if (string.IsNullOrEmpty(hfTotDur.Value))
-                    hfTotDur.Value = ViewState["hfTotDur"].ToString();
-            }
-            if (ViewState["hf_Freq"] != null)
-            {
-                if (string.IsNullOrEmpty(hf_Freq.Value))
-                    hf_Freq.Value = ViewState["hf_Freq"].ToString();
-            }
-            if (ViewState["hfTotCorct"] != null)
-            {
-                if (string.IsNullOrEmpty(hfTotCorct.Value))
-                    hfTotCorct.Value = ViewState["hfTotCorct"].ToString();
-            }
-            if (ViewState["hfInTotCorct"] != null)
-            {
-                if (string.IsNullOrEmpty(hfInTotCorct.Value))
-                    hfInTotCorct.Value = ViewState["hfInTotCorct"].ToString();
-            }
-            try
-            {
-                clsData.WriteToLog("HiddenField Values Updated:-\n" +
-                "DSTempHdrId=" + Convert.ToInt32(hdnTemplateId.Value) + "\n" +
-                "hfTextScore: " + (ViewState["hfTextScore"] ?? "") + "\n" +
-                "hfResultStep_Acc: " + (ViewState["hfResultStep_Acc"] ?? "") + "\n" +
-                "hfResultStep_Prmpt: " + (ViewState["hfResultStep_Prmpt"] ?? "") + "\n" +
-                "hfRslt1_ExcludeCrntStep_Acc: " + (ViewState["hfRslt1_ExcludeCrntStep_Acc"] ?? "") + "\n" +
-                "hfRslt2_ExcludeCrntStep_Acc: " + (ViewState["hfRslt2_ExcludeCrntStep_Acc"] ?? "") + "\n" +
-                "hfRslt1_Acc: " + (ViewState["hfRslt1_Acc"] ?? "") + "\n" +
-                "hfRslt2_Acc: " + (ViewState["hfRslt2_Acc"] ?? "") + "\n" +
-                "hfRslt1_Prmt: " + (ViewState["hfRslt1_Prmt"] ?? "") + "\n" +
-                "hfRslt2_Prmt: " + (ViewState["hfRslt2_Prmt"] ?? "") + "\n" +
-                "hfRslt1_Ind: " + (ViewState["hfRslt1_Ind"] ?? "") + "\n" +
-                "hfRslt2_Ind: " + (ViewState["hfRslt2_Ind"] ?? "") + "\n" +
-                "hfRslt1_IndAll: " + (ViewState["hfRslt1_IndAll"] ?? "") + "\n" +
-                "hfRslt2_IndAll: " + (ViewState["hfRslt2_IndAll"] ?? "") + "\n" +
-                "hfAvgDur: " + (ViewState["hfAvgDur"] ?? "") + "\n" +
-                "hfTotDur: " + (ViewState["hfTotDur"] ?? "") + "\n" +
-                "hf_Freq: " + (ViewState["hf_Freq"] ?? "") + "\n" +
-                "hfTotCorct: " + (ViewState["hfTotCorct"] ?? "") + "\n" +
-                "hfInTotCorct: " + (ViewState["hfInTotCorct"] ?? "") + "\n" +
-                "HF Values:-\n" +
-                "hfTextScore: " + hfTextScore.Value + "\n" +
-                "hfResultStep_Acc: " + hfResultStep_Acc.Value + "\n" +
-                "hfResultStep_Prmpt: " + hfResultStep_Prmpt.Value + "\n" +
-                "hfRslt1_ExcludeCrntStep_Acc: " + hfRslt1_ExcludeCrntStep_Acc.Value + "\n" +
-                "hfRslt2_ExcludeCrntStep_Acc: " + hfRslt2_ExcludeCrntStep_Acc.Value + "\n" +
-                "hfRslt1_Acc: " + hfRslt1_Acc.Value + "\n" +
-                "hfRslt2_Acc: " + hfRslt2_Acc.Value + "\n" +
-                "hfRslt1_Prmt: " + hfRslt1_Prmt.Value + "\n" +
-                "hfRslt2_Prmt: " + hfRslt2_Prmt.Value + "\n" +
-                "hfRslt1_Ind: " + hfRslt1_Ind.Value + "\n" +
-                "hfRslt2_Ind: " + hfRslt2_Ind.Value + "\n" +
-                "hfRslt1_IndAll: " + hfRslt1_IndAll.Value + "\n" +
-                "hfRslt2_IndAll: " + hfRslt2_IndAll.Value + "\n" +
-                "hfAvgDur: " + hfAvgDur.Value + "\n" +
-                "hfTotDur: " + hfTotDur.Value + "\n" +
-                "hf_Freq: " + hf_Freq.Value + "\n" +
-                "hfTotCorct: " + hfTotCorct.Value + "\n" +
-                "hfInTotCorct: " + hfInTotCorct.Value);
-            }
-            catch (Exception exep)
-            {
-                clsData.WriteToLog("ViewState Values:Error:" + exep.ToString());
+                clsData.WriteToLog("Values:Error:" + exep.ToString());
             }
             bool ContrlEnable = true;
             DatasheetKey = "DataSht_Sess-" + hdnTemplateId.Value.ToString();
@@ -610,69 +454,6 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         oSession = clsGeneralSchk.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, PreClassid, Sessstname, Pagepath);
                 
     }
-
-    public void SaveHiddenfieldVS()
-    {
-        if (!string.IsNullOrEmpty(hfTextScore.Value))
-                ViewState["hfTextScore"] = hfTextScore.Value;
-        if (!string.IsNullOrEmpty(hfResultStep_Acc.Value))
-                ViewState["hfResultStep_Acc"] = hfResultStep_Acc.Value;
-        if (!string.IsNullOrEmpty(hfResultStep_Prmpt.Value))
-                ViewState["hfResultStep_Prmpt"] = hfResultStep_Prmpt.Value;
-        if (!string.IsNullOrEmpty(hfRslt1_ExcludeCrntStep_Acc.Value))
-                ViewState["hfRslt1_ExcludeCrntStep_Acc"] = hfRslt1_ExcludeCrntStep_Acc.Value;
-        if (!string.IsNullOrEmpty(hfRslt2_ExcludeCrntStep_Acc.Value))
-                ViewState["hfRslt2_ExcludeCrntStep_Acc"] = hfRslt2_ExcludeCrntStep_Acc.Value;
-        if (!string.IsNullOrEmpty(hfRslt1_Acc.Value))
-                ViewState["hfRslt1_Acc"] = hfRslt1_Acc.Value;
-        if (!string.IsNullOrEmpty(hfRslt2_Acc.Value))
-                ViewState["hfRslt2_Acc"] = hfRslt2_Acc.Value;
-        if (!string.IsNullOrEmpty(hfRslt1_Prmt.Value))
-                ViewState["hfRslt1_Prmt"] = hfRslt1_Prmt.Value;
-        if (!string.IsNullOrEmpty(hfRslt2_Prmt.Value))
-                ViewState["hfRslt2_Prmt"] = hfRslt2_Prmt.Value;
-        if (!string.IsNullOrEmpty(hfRslt1_Ind.Value))
-                ViewState["hfRslt1_Ind"] = hfRslt1_Ind.Value;
-        if (!string.IsNullOrEmpty(hfRslt2_Ind.Value))
-                ViewState["hfRslt2_Ind"] = hfRslt2_Ind.Value;
-        if (!string.IsNullOrEmpty(hfRslt1_IndAll.Value))
-                ViewState["hfRslt1_IndAll"] = hfRslt1_IndAll.Value;
-        if (!string.IsNullOrEmpty(hfRslt2_IndAll.Value))
-                ViewState["hfRslt2_IndAll"] = hfRslt2_IndAll.Value;
-        if (!string.IsNullOrEmpty(hfAvgDur.Value))
-                ViewState["hfAvgDur"] = hfAvgDur.Value;
-        if (!string.IsNullOrEmpty(hfTotDur.Value))
-                ViewState["hfTotDur"] = hfTotDur.Value;
-        if (!string.IsNullOrEmpty(hf_Freq.Value))
-                ViewState["hf_Freq"] = hf_Freq.Value;
-        if (!string.IsNullOrEmpty(hfTotCorct.Value))
-                ViewState["hfTotCorct"] = hfTotCorct.Value;
-        if (!string.IsNullOrEmpty(hfInTotCorct.Value))
-                ViewState["hfInTotCorct"] = hfInTotCorct.Value;
-    }
-
-    //protected void Page_PreRender(object sender, EventArgs e)
-    //{
-    //    // Store the hidden field value into ViewState
-    //    ViewState["hfTextScore"] = hfTextScore.Value;
-    //    ViewState["hfResultStep_Acc"] = hfResultStep_Acc.Value;
-    //    ViewState["hfResultStep_Prmpt"] = hfResultStep_Prmpt.Value;
-    //    ViewState["hfRslt1_ExcludeCrntStep_Acc"] = hfRslt1_ExcludeCrntStep_Acc.Value;
-    //    ViewState["hfRslt2_ExcludeCrntStep_Acc"] = hfRslt2_ExcludeCrntStep_Acc.Value;
-    //    ViewState["hfRslt1_Acc"] = hfRslt1_Acc.Value;
-    //    ViewState["hfRslt2_Acc"] = hfRslt2_Acc.Value;
-    //    ViewState["hfRslt1_Prmt"] = hfRslt1_Prmt.Value;
-    //    ViewState["hfRslt2_Prmt"] = hfRslt2_Prmt.Value;
-    //    ViewState["hfRslt1_Ind"] = hfRslt1_Ind.Value;
-    //    ViewState["hfRslt2_Ind"] = hfRslt2_Ind.Value;
-    //    ViewState["hfRslt1_IndAll"] = hfRslt1_IndAll.Value;
-    //    ViewState["hfRslt2_IndAll"] = hfRslt2_IndAll.Value;
-    //    ViewState["hfAvgDur"] = hfAvgDur.Value;
-    //    ViewState["hfTotDur"] = hfTotDur.Value;
-    //    ViewState["hf_Freq"] = hf_Freq.Value;
-    //    ViewState["hfTotCorct"] = hfTotCorct.Value;
-    //    ViewState["hfInTotCorct"] = hfInTotCorct.Value;
-    //}
 
     public string getFormulae(string calId)
     {
@@ -5364,7 +5145,6 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
     protected void btnSave_ClickCheck(object sender, EventArgs e)
     {
-        SaveHiddenfieldVS();
         oData = new clsData();
         oTemp = (ClsTemplateSession)Session["BiweeklySession"];
         oSession = (clsSession)Session["UserSession"];
@@ -31909,7 +31689,6 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
     public void ConfirmSubmissionCheck(object sender, EventArgs e)
     {
-        SaveHiddenfieldVS();
         oData = new clsData();
         oTemp = (ClsTemplateSession)Session["BiweeklySession"];
         oSession = (clsSession)Session["UserSession"];
