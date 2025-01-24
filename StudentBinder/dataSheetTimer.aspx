@@ -748,8 +748,8 @@
                                         $('#div' + behaveid + '_' + timeList[j]).parent().find('.current,.past').css('border-color', 'black');
 
                                         $('#div' + behaveid + '_' + timeList[j]).trigger('click');
-										
-										if (timeList[j].length == 4) {
+
+                                        if (timeList[j].length == 4) {
                                             var time = timeList[j];
                                             var hr = parseInt(time.substring(0, 2));
                                             var min = time.substring(2);
@@ -761,10 +761,10 @@
                                             var hr1 = hr.toString();
                                             if (hr < 10)
                                                 hr1 = "0" + hr1;
-                                            $('#txtTimeHr' + behaveId).val(hr1);
-                                            $('#txtTimeMin' + behaveId).val(min);
-                                            $('#txtTimeSec' + behaveId).val("00");
-                                            $('#drpTimeAmPm' + behaveId).val(amOrPM.toString());
+                                            $('#txtTimeHr' + behaveid).val(hr1);
+                                            $('#txtTimeMin' + behaveid).val(min);
+                                            $('#txtTimeSec' + behaveid).val("00");
+                                            $('#drpTimeAmPm' + behaveid).val(amOrPM.toString());
 
                                         }
 
@@ -1810,7 +1810,7 @@
                             + '<div class="tabContent4" style="top:400px; border: 0px;">'
                             //start
                           + '<div id="butSavReset" style="margin-top:25px"><input type="button" id="btnSaveOther,' + ulId[BehavCount] + '" class="btns save" value="Save" onclick="saveFreqYesOrNo(' + ulId[BehavCount] + ',this)"/>'
-                           + '<input type="button" class="btnr reset" value="Reset" onclick="resetTimeIntervals(' + ulId[BehavCount] + ', this)"/>'
+                            + '<input type="button" class="btnr reset" value="Reset" onclick="resetTimeIntervals(' + ulId[BehavCount] + ', this)"/>'
                            + '</div>'
                            //end
                            + '</div>'
@@ -1873,7 +1873,7 @@
                             + '<div class="tabContent4" style="top:230px; border: 0px;">'
                             //
                           + '<div id="butSavReset" style="margin-top:25px"><input type="button" id="btnSaveOther,' + ulId[BehavCount] + '" class="btns save" value="Save" onclick="saveYesOrNo(' + ulId[BehavCount] + ',this)"/>'
-                           + '<input type="button" class="btnr reset" value="Reset" onclick="resetTimeIntervals(' + ulId[BehavCount] + ', this)"/>'
+                            + '<input type="button" class="btnr reset" value="Reset" onclick="resetTimeIntervals(' + ulId[BehavCount] + ', this)"/>'
                            + '</div>'
                            //
                            + '</div>'
@@ -1955,7 +1955,7 @@
                             + '<div class="tabContent4" style="top:325px; border: 0px;">'
                             //
                           + '<div id="butSavReset" style="margin-top:25px"><input type="button" id="btnSaveOther,' + ulId[BehavCount] + '" class="btns save" value="Save" onclick="saveOtherFreq(' + ulId[BehavCount] + ',this)"/>'
-                           + '<input type="button" class="btnr reset" value="Reset" onclick="resetTimeIntervals(' + ulId[BehavCount] + ', this)"/>'
+                            + '<input type="button" class="btnr reset" value="Reset" onclick="resetTimeIntervals(' + ulId[BehavCount] + ', this)"/>'
                            + '</div>'
                            //
                            + '</div>'
@@ -2421,7 +2421,7 @@
                             + '<div class="tabContent4" style="top:460px; border: 0px;">'
                             //start
                           + '<div id="butSavReset" style="margin-top:25px"><input type="button" id="btnSaveOther,' + ulId[BehavCount] + '" class="btns save" value="Save" onclick="saveFreqYesOrNo(' + ulId[BehavCount] + ',this)"/>'
-                           + '<input type="button" class="btnr reset" value="Reset" onclick="resetTimeIntervals(' + ulId[BehavCount] + ', this)"/>'
+                            + '<input type="button" class="btnr reset" value="Reset" onclick="resetTimeIntervals(' + ulId[BehavCount] + ', this)"/>'
                            + '</div>'
                            //end
                            + '</div>'
@@ -2484,7 +2484,7 @@
                             + '<div class="tabContent4" style="top:295px; border: 0px;">'
                             //start
                           + '<div id="butSavReset" style="margin-top:25px"><input type="button" id="btnSaveOther,' + ulId[BehavCount] + '" class="btns save" value="Save" onclick="saveYesOrNo(' + ulId[BehavCount] + ',this)"/>'
-                           + '<input type="button" class="btnr reset" value="Reset" onclick="resetOther(this)"/>'
+                            + '<input type="button" class="btnr reset" value="Reset" onclick="resetTimeIntervals(' + ulId[BehavCount] + ', this)"/>'
                            + '</div>'
                            //end
                            + '</div>'
@@ -2551,7 +2551,7 @@
                              + '<div class="tabContent4" style="top:375px; border: 0px;">'
                              //start
                           + '<div id="butSavReset" style="margin-top:25px"><input type="button" id="btnSaveOther,' + ulId[BehavCount] + '" class="btns save" value="Save" onclick="saveOtherFreq(' + ulId[BehavCount] + ',this)"/>'
-                           + '<input type="button" class="btnr reset" value="Reset" onclick="resetTimeIntervals(' + ulId[BehavCount] + ', this)"/>'
+                            + '<input type="button" class="btnr reset" value="Reset" onclick="resetTimeIntervals(' + ulId[BehavCount] + ', this)"/>'
                            + '</div>'
                            //end
                            + '</div>'
@@ -3167,7 +3167,7 @@
             }
             $('#hdnchecktabchange').val('True');
         }
-		function resetTimeIntervals(behaveId, thisElem) {
+        function resetTimeIntervals(behaveId, thisElem) {
             var h = document.getElementById('txtTimeHr' + behaveId).value;
             var m = document.getElementById('txtTimeMin' + behaveId).value;
             var s = document.getElementById('txtTimeSec' + behaveId).value;
