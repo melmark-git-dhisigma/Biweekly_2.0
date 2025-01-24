@@ -263,95 +263,187 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         else
         {
             ClsTestDataLog clsData = new ClsTestDataLog();
+            try
+            {
+                clsData.WriteToLog("ViewState Values:-\n" +
+                "DSTempHdrId=" + Convert.ToInt32(hdnTemplateId.Value) + "\n" +
+                "hfTextScore: " + (ViewState["hfTextScore"] ?? "") + "\n" +
+                "hfResultStep_Acc: " + (ViewState["hfResultStep_Acc"] ?? "") + "\n" +
+                "hfResultStep_Prmpt: " + (ViewState["hfResultStep_Prmpt"] ?? "") + "\n" +
+                "hfRslt1_ExcludeCrntStep_Acc: " + (ViewState["hfRslt1_ExcludeCrntStep_Acc"] ?? "") + "\n" +
+                "hfRslt2_ExcludeCrntStep_Acc: " + (ViewState["hfRslt2_ExcludeCrntStep_Acc"] ?? "") + "\n" +
+                "hfRslt1_Acc: " + (ViewState["hfRslt1_Acc"] ?? "") + "\n" +
+                "hfRslt2_Acc: " + (ViewState["hfRslt2_Acc"] ?? "") + "\n" +
+                "hfRslt1_Prmt: " + (ViewState["hfRslt1_Prmt"] ?? "") + "\n" +
+                "hfRslt2_Prmt: " + (ViewState["hfRslt2_Prmt"] ?? "") + "\n" +
+                "hfRslt1_Ind: " + (ViewState["hfRslt1_Ind"] ?? "") + "\n" +
+                "hfRslt2_Ind: " + (ViewState["hfRslt2_Ind"] ?? "") + "\n" +
+                "hfRslt1_IndAll: " + (ViewState["hfRslt1_IndAll"] ?? "") + "\n" +
+                "hfRslt2_IndAll: " + (ViewState["hfRslt2_IndAll"] ?? "") + "\n" +
+                "hfAvgDur: " + (ViewState["hfAvgDur"] ?? "") + "\n" +
+                "hfTotDur: " + (ViewState["hfTotDur"] ?? "") + "\n" +
+                "hf_Freq: " + (ViewState["hf_Freq"] ?? "") + "\n" +
+                "hfTotCorct: " + (ViewState["hfTotCorct"] ?? "") + "\n" +
+                "hfInTotCorct: " + (ViewState["hfInTotCorct"] ?? "") + "\n" +
+                "HF Values:-\n" +
+                "hfTextScore: " + hfTextScore.Value + "\n" +
+                "hfResultStep_Acc: " + hfResultStep_Acc.Value + "\n" +
+                "hfResultStep_Prmpt: " + hfResultStep_Prmpt.Value + "\n" +
+                "hfRslt1_ExcludeCrntStep_Acc: " + hfRslt1_ExcludeCrntStep_Acc.Value + "\n" +
+                "hfRslt2_ExcludeCrntStep_Acc: " + hfRslt2_ExcludeCrntStep_Acc.Value + "\n" +
+                "hfRslt1_Acc: " + hfRslt1_Acc.Value + "\n" +
+                "hfRslt2_Acc: " + hfRslt2_Acc.Value + "\n" +
+                "hfRslt1_Prmt: " + hfRslt1_Prmt.Value + "\n" +
+                "hfRslt2_Prmt: " + hfRslt2_Prmt.Value + "\n" +
+                "hfRslt1_Ind: " + hfRslt1_Ind.Value + "\n" +
+                "hfRslt2_Ind: " + hfRslt2_Ind.Value + "\n" +
+                "hfRslt1_IndAll: " + hfRslt1_IndAll.Value + "\n" +
+                "hfRslt2_IndAll: " + hfRslt2_IndAll.Value + "\n" +
+                "hfAvgDur: " + hfAvgDur.Value + "\n" +
+                "hfTotDur: " + hfTotDur.Value + "\n" +
+                "hf_Freq: " + hf_Freq.Value + "\n" +
+                "hfTotCorct: " + hfTotCorct.Value + "\n" +
+                "hfInTotCorct: " + hfInTotCorct.Value);
+            }
+            catch (Exception exep)
+            {
+                clsData.WriteToLog("ViewState Values:Error:" + exep.ToString());
+            }
             if (ViewState["hfTextScore"] != null)
             {
-                if (hfTextScore.Value == "")
-                hfTextScore.Value = ViewState["hfTextScore"].ToString();
+                if (string.IsNullOrEmpty(hfTextScore.Value))
+                    hfTextScore.Value = ViewState["hfTextScore"].ToString();
             }
             if (ViewState["hfResultStep_Acc"] != null)
             {
-                if (hfResultStep_Acc.Value == "")
-                hfResultStep_Acc.Value = ViewState["hfResultStep_Acc"].ToString();
+                if (string.IsNullOrEmpty(hfResultStep_Acc.Value))
+                    hfResultStep_Acc.Value = ViewState["hfResultStep_Acc"].ToString();
             }
             if (ViewState["hfResultStep_Prmpt"] != null)
             {
-                if (hfResultStep_Prmpt.Value == "")
-                hfResultStep_Prmpt.Value = ViewState["hfResultStep_Prmpt"].ToString();
+                if (string.IsNullOrEmpty(hfResultStep_Prmpt.Value))
+                    hfResultStep_Prmpt.Value = ViewState["hfResultStep_Prmpt"].ToString();
             }
             if (ViewState["hfRslt1_ExcludeCrntStep_Acc"] != null)
             {
-                if (hfRslt1_ExcludeCrntStep_Acc.Value == "")
-                hfRslt1_ExcludeCrntStep_Acc.Value = ViewState["hfRslt1_ExcludeCrntStep_Acc"].ToString();
+                if (string.IsNullOrEmpty(hfRslt1_ExcludeCrntStep_Acc.Value))
+                    hfRslt1_ExcludeCrntStep_Acc.Value = ViewState["hfRslt1_ExcludeCrntStep_Acc"].ToString();
             }
             if (ViewState["hfRslt2_ExcludeCrntStep_Acc"] != null)
             {
-                if (hfRslt2_ExcludeCrntStep_Acc.Value == "")
-                hfRslt2_ExcludeCrntStep_Acc.Value = ViewState["hfRslt2_ExcludeCrntStep_Acc"].ToString();
+                if (string.IsNullOrEmpty(hfRslt2_ExcludeCrntStep_Acc.Value))
+                    hfRslt2_ExcludeCrntStep_Acc.Value = ViewState["hfRslt2_ExcludeCrntStep_Acc"].ToString();
             }
             if (ViewState["hfRslt1_Acc"] != null)
             {
-                if (hfRslt1_Acc.Value == "")
-                hfRslt1_Acc.Value = ViewState["hfRslt1_Acc"].ToString();
+                if (string.IsNullOrEmpty(hfRslt1_Acc.Value))
+                    hfRslt1_Acc.Value = ViewState["hfRslt1_Acc"].ToString();
             }
             if (ViewState["hfRslt2_Acc"] != null)
             {
-                if (hfRslt2_Acc.Value == "")
-                hfRslt2_Acc.Value = ViewState["hfRslt2_Acc"].ToString();
+                if (string.IsNullOrEmpty(hfRslt2_Acc.Value))
+                    hfRslt2_Acc.Value = ViewState["hfRslt2_Acc"].ToString();
             }
             if (ViewState["hfRslt1_Prmt"] != null)
             {
-                if (hfRslt1_Prmt.Value == "")
-                hfRslt1_Prmt.Value = ViewState["hfRslt1_Prmt"].ToString();
+                if (string.IsNullOrEmpty(hfRslt1_Prmt.Value))
+                    hfRslt1_Prmt.Value = ViewState["hfRslt1_Prmt"].ToString();
             }
             if (ViewState["hfRslt2_Prmt"] != null)
             {
-                if (hfRslt2_Prmt.Value == "")
-                hfRslt2_Prmt.Value = ViewState["hfRslt2_Prmt"].ToString();
+                if (string.IsNullOrEmpty(hfRslt2_Prmt.Value))
+                    hfRslt2_Prmt.Value = ViewState["hfRslt2_Prmt"].ToString();
             }
             if (ViewState["hfRslt1_Ind"] != null)
             {
-                if (hfRslt1_Ind.Value == "")
-                hfRslt1_Ind.Value = ViewState["hfRslt1_Ind"].ToString();
+                if (string.IsNullOrEmpty(hfRslt1_Ind.Value))
+                    hfRslt1_Ind.Value = ViewState["hfRslt1_Ind"].ToString();
             }
             if (ViewState["hfRslt2_Ind"] != null)
             {
-                if (hfRslt2_Ind.Value == "")
-                hfRslt2_Ind.Value = ViewState["hfRslt2_Ind"].ToString();
+                if (string.IsNullOrEmpty(hfRslt2_Ind.Value))
+                    hfRslt2_Ind.Value = ViewState["hfRslt2_Ind"].ToString();
             }
             if (ViewState["hfRslt1_IndAll"] != null)
             {
-                if (hfRslt1_IndAll.Value == "")
-                hfRslt1_IndAll.Value = ViewState["hfRslt1_IndAll"].ToString();
+                if (string.IsNullOrEmpty(hfRslt1_IndAll.Value))
+                    hfRslt1_IndAll.Value = ViewState["hfRslt1_IndAll"].ToString();
             }
             if (ViewState["hfRslt2_IndAll"] != null)
             {
-                if (hfRslt2_IndAll.Value == "")
-                hfRslt2_IndAll.Value = ViewState["hfRslt2_IndAll"].ToString();
+                if (string.IsNullOrEmpty(hfRslt2_IndAll.Value))
+                    hfRslt2_IndAll.Value = ViewState["hfRslt2_IndAll"].ToString();
             }
             if (ViewState["hfAvgDur"] != null)
             {
-                if (hfAvgDur.Value == "")
-                hfAvgDur.Value = ViewState["hfAvgDur"].ToString();
+                if (string.IsNullOrEmpty(hfAvgDur.Value))
+                    hfAvgDur.Value = ViewState["hfAvgDur"].ToString();
             }
             if (ViewState["hfTotDur"] != null)
             {
-                if (hfTotDur.Value == "")
-                hfTotDur.Value = ViewState["hfTotDur"].ToString();
+                if (string.IsNullOrEmpty(hfTotDur.Value))
+                    hfTotDur.Value = ViewState["hfTotDur"].ToString();
             }
             if (ViewState["hf_Freq"] != null)
             {
-                if (hf_Freq.Value == "")
-                hf_Freq.Value = ViewState["hf_Freq"].ToString();
+                if (string.IsNullOrEmpty(hf_Freq.Value))
+                    hf_Freq.Value = ViewState["hf_Freq"].ToString();
             }
             if (ViewState["hfTotCorct"] != null)
             {
-                if (hfTotCorct.Value == "")
-                hfTotCorct.Value = ViewState["hfTotCorct"].ToString();
+                if (string.IsNullOrEmpty(hfTotCorct.Value))
+                    hfTotCorct.Value = ViewState["hfTotCorct"].ToString();
             }
             if (ViewState["hfInTotCorct"] != null)
             {
-                if (hfInTotCorct.Value == "")
-                hfInTotCorct.Value = ViewState["hfInTotCorct"].ToString();
+                if (string.IsNullOrEmpty(hfInTotCorct.Value))
+                    hfInTotCorct.Value = ViewState["hfInTotCorct"].ToString();
+            }
+            try
+            {
+                clsData.WriteToLog("HiddenField Values Updated:-\n" +
+                "DSTempHdrId=" + Convert.ToInt32(hdnTemplateId.Value) + "\n" +
+                "hfTextScore: " + (ViewState["hfTextScore"] ?? "") + "\n" +
+                "hfResultStep_Acc: " + (ViewState["hfResultStep_Acc"] ?? "") + "\n" +
+                "hfResultStep_Prmpt: " + (ViewState["hfResultStep_Prmpt"] ?? "") + "\n" +
+                "hfRslt1_ExcludeCrntStep_Acc: " + (ViewState["hfRslt1_ExcludeCrntStep_Acc"] ?? "") + "\n" +
+                "hfRslt2_ExcludeCrntStep_Acc: " + (ViewState["hfRslt2_ExcludeCrntStep_Acc"] ?? "") + "\n" +
+                "hfRslt1_Acc: " + (ViewState["hfRslt1_Acc"] ?? "") + "\n" +
+                "hfRslt2_Acc: " + (ViewState["hfRslt2_Acc"] ?? "") + "\n" +
+                "hfRslt1_Prmt: " + (ViewState["hfRslt1_Prmt"] ?? "") + "\n" +
+                "hfRslt2_Prmt: " + (ViewState["hfRslt2_Prmt"] ?? "") + "\n" +
+                "hfRslt1_Ind: " + (ViewState["hfRslt1_Ind"] ?? "") + "\n" +
+                "hfRslt2_Ind: " + (ViewState["hfRslt2_Ind"] ?? "") + "\n" +
+                "hfRslt1_IndAll: " + (ViewState["hfRslt1_IndAll"] ?? "") + "\n" +
+                "hfRslt2_IndAll: " + (ViewState["hfRslt2_IndAll"] ?? "") + "\n" +
+                "hfAvgDur: " + (ViewState["hfAvgDur"] ?? "") + "\n" +
+                "hfTotDur: " + (ViewState["hfTotDur"] ?? "") + "\n" +
+                "hf_Freq: " + (ViewState["hf_Freq"] ?? "") + "\n" +
+                "hfTotCorct: " + (ViewState["hfTotCorct"] ?? "") + "\n" +
+                "hfInTotCorct: " + (ViewState["hfInTotCorct"] ?? "") + "\n" +
+                "HF Values:-\n" +
+                "hfTextScore: " + hfTextScore.Value + "\n" +
+                "hfResultStep_Acc: " + hfResultStep_Acc.Value + "\n" +
+                "hfResultStep_Prmpt: " + hfResultStep_Prmpt.Value + "\n" +
+                "hfRslt1_ExcludeCrntStep_Acc: " + hfRslt1_ExcludeCrntStep_Acc.Value + "\n" +
+                "hfRslt2_ExcludeCrntStep_Acc: " + hfRslt2_ExcludeCrntStep_Acc.Value + "\n" +
+                "hfRslt1_Acc: " + hfRslt1_Acc.Value + "\n" +
+                "hfRslt2_Acc: " + hfRslt2_Acc.Value + "\n" +
+                "hfRslt1_Prmt: " + hfRslt1_Prmt.Value + "\n" +
+                "hfRslt2_Prmt: " + hfRslt2_Prmt.Value + "\n" +
+                "hfRslt1_Ind: " + hfRslt1_Ind.Value + "\n" +
+                "hfRslt2_Ind: " + hfRslt2_Ind.Value + "\n" +
+                "hfRslt1_IndAll: " + hfRslt1_IndAll.Value + "\n" +
+                "hfRslt2_IndAll: " + hfRslt2_IndAll.Value + "\n" +
+                "hfAvgDur: " + hfAvgDur.Value + "\n" +
+                "hfTotDur: " + hfTotDur.Value + "\n" +
+                "hf_Freq: " + hf_Freq.Value + "\n" +
+                "hfTotCorct: " + hfTotCorct.Value + "\n" +
+                "hfInTotCorct: " + hfInTotCorct.Value);
+            }
+            catch (Exception exep)
+            {
+                clsData.WriteToLog("ViewState Values:Error:" + exep.ToString());
             }
             bool ContrlEnable = true;
             DatasheetKey = "DataSht_Sess-" + hdnTemplateId.Value.ToString();
@@ -2406,22 +2498,6 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         string selSteps = "SELECT DSS.StepCd,Step.DSTempStepId FROM StdtSessionStep Step INNER JOIN DSTempStep DSS ON DSS.DSTempStepId=Step.DSTempStepId WHERE StdtSessionHdrId=" + Convert.ToInt32(ViewState["StdtSessHdr"].ToString()) + "  AND IsDynamic=0 order by SortOrder";
         DataTable dtSteps = new DataTable();
         dtSteps = oData.ReturnDataTable(selSteps, false);
-        string selSessNbrQry = "SELECT SessionNbr FROM StdtSessionHdr WHERE StdtSessionHdrId = " + Convert.ToInt32(ViewState["StdtSessHdr"].ToString());
-        int sessNum = Convert.ToInt32(oData.FetchValue(selSessNbrQry));
-        if(sessNum == 1)
-        {
-            for (int i = 0; i < dtSteps.Rows.Count; i++)
-            {
-                string selqry = "SELECT ISNULL (StepByStepPrompt,-1) FROM DSTempStep WHERE DSTempStepId = " + dtSteps.Rows[i]["DSTempStepId"].ToString() + "";
-                int stepPtompId = Convert.ToInt32(oData.FetchValue(selqry));
-                if(stepPtompId>0)
-                {
-                    string updQry = "UPDATE StdtDSStepStat SET PromptId = (SELECT StepByStepPrompt FROM DSTempStep WHERE DSTempStepId = " + dtSteps.Rows[i]["DSTempStepId"].ToString() + ") WHERE DSTempStepId = " + dtSteps.Rows[i]["DSTempStepId"].ToString();
-                    oData.Execute(updQry);
-                }
-                
-            }
-        }
         string table = "<table>";
         for (int i = 0; i < dtSteps.Rows.Count + 1; i++)
         {
@@ -5518,7 +5594,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             int SetId = Convert.ToInt32(DTCurrentDtl.Rows[0]["CurrentSetId"]);  
                             int templateId =Convert.ToInt32(DTCurrentDtl.Rows[0]["DSTempHdrId"]);
                             string strQueryMo = "SELECT RNK FROM (SELECT DSTempStepId,SortOrder,RANK() OVER (ORDER BY SortOrder) RNK FROM DSTempStep " +
-                                               " WHERE DSTempHdrId = " + templateId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId=" + templateId + " AND ActiveInd = 'A') AND ActiveInd='A' ) AS Temp WHERE SortOrder = " + stepid;
+                                               " WHERE DSTempHdrId = " + templateId + " AND DSTempSetId=" + SetId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId=" + templateId + " AND ActiveInd = 'A') AND ActiveInd='A' ) AS Temp WHERE SortOrder = " + stepid;
                             int Stepindes = Convert.ToInt32(oData.FetchValueTrans(strQueryMo, trans, con));
                             stepName = "Step " + Stepindes;
                         }
@@ -30463,7 +30539,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                     string strQueryMo = "";
                     strQueryMo = "SELECT RNK FROM (SELECT DSTempStepId,SortOrder,RANK() OVER (ORDER BY SortOrder) RNK FROM DSTempStep " +
-                    " WHERE DSTempHdrId = " + oTemp.TemplateId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId=" + oTemp.TemplateId + " AND ActiveInd = 'A') AND ActiveInd='A' ) AS Temp WHERE SortOrder = " + stepNumber;
+                    " WHERE DSTempHdrId = " + oTemp.TemplateId + " AND DSTempSetId=" + SetId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId=" + oTemp.TemplateId + " AND ActiveInd = 'A') AND ActiveInd='A' ) AS Temp WHERE SortOrder = " + stepNumber;
 
                     object stepNumMo = objData.FetchValue(strQueryMo);
                     string MasterOrder = "";
@@ -30487,7 +30563,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                     string strQueryMo = "";
                     strQueryMo = "SELECT RNK FROM (SELECT DSTempStepId,SortOrder,RANK() OVER (ORDER BY SortOrder) RNK FROM DSTempStep " +
-                    " WHERE DSTempHdrId = " + oTemp.TemplateId + "AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId=" + oTemp.TemplateId + " AND ActiveInd = 'A') AND ActiveInd='A' ) AS Temp WHERE SortOrder = " + stepNumber;
+                    " WHERE DSTempHdrId = " + oTemp.TemplateId + " AND DSTempSetId=" + SetId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId=" + oTemp.TemplateId + " AND ActiveInd = 'A') AND ActiveInd='A' ) AS Temp WHERE SortOrder = " + stepNumber;
 
                     object stepNumMo = objData.FetchValue(strQueryMo);
                     string MasterOrder = "";
