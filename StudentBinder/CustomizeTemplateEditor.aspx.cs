@@ -14124,7 +14124,6 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
                 //Step Mismatch Validation End
 
-
                 string strdupsort = "SELECT SortOrder as sortorder, COUNT(*) as count FROM DSTempSet where ActiveInd='A' and DSTempHdrId=" + TemplateId + " GROUP BY SortOrder HAVING COUNT(*) > 1";
                 DataTable dtdupsort = objData.ReturnDataTable(strdupsort, false);
                 string setname = "";
@@ -17753,11 +17752,11 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             if (length >= 3)
             {
 
-                if (objData.IFExists("SELECT  StudentPersonalId,StudentFname FROM Student ST where ST.StudentFname='" + txtSname.Text.Trim() + "' OR ST.StudentLname='" + txtSname.Text.Trim() + "'  OR ST.StudentFname+' '+ST.StudentLname='" + txtSname.Text.Trim() + "' OR ST.StudentLname+' '+ST.StudentFname='" + txtSname.Text.Trim() + "' OR ST.StudentLname LIKE +'%'+'" + txtSname.Text.Trim() + "'+'%'  OR ST.StudentFname LIKE +'%'+'" + txtSname.Text.Trim() + "'+'%'") == true)
+                if (objData.IFExists("SELECT  StudentPersonalId,StudentFname FROM Student ST where ST.StudentFname='" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "' OR ST.StudentLname='" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "'  OR ST.StudentFname+' '+ST.StudentLname='" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "' OR ST.StudentLname+' '+ST.StudentFname='" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "' OR ST.StudentLname LIKE +'%'+'" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "'+'%'  OR ST.StudentFname LIKE +'%'+'" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "'+'%'") == true)
                 {
-                    string studentdetail = "SELECT  top(50) StudentPersonalId,StudentFname,StudentLname FROM Student ST where ST.StudentFname='" + txtSname.Text.Trim() + "' OR ST.StudentLname='" + txtSname.Text.Trim() + "' " +
-                                            "OR ST.StudentFname+' '+ST.StudentLname='" + txtSname.Text.Trim() + "' OR ST.StudentLname+' '+ST.StudentFname='" + txtSname.Text.Trim() + "' OR ST.StudentLname LIKE +'%'+'" + txtSname.Text.Trim() + "'+'%'  OR ST.StudentFname" +
-                                            " LIKE +'%'+'" + txtSname.Text.Trim() + "'+'%'";
+                    string studentdetail = "SELECT  top(50) StudentPersonalId,StudentFname,StudentLname FROM Student ST where ST.StudentFname='" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "' OR ST.StudentLname='" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "' " +
+                                            "OR ST.StudentFname+' '+ST.StudentLname='" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "' OR ST.StudentLname+' '+ST.StudentFname='" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "' OR ST.StudentLname LIKE +'%'+'" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "'+'%'  OR ST.StudentFname" +
+                                            " LIKE +'%'+'" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "'+'%'";
 
                     DataTable dt = objData.ReturnDataTable(studentdetail, false);
                     if (dt == null) return;
@@ -20160,7 +20159,6 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         }
 
                         //Step Mismatch Validation End
-
 
                         string strdupsort = "SELECT SortOrder as sortorder, COUNT(*) as count FROM DSTempSet where ActiveInd='A' and DSTempHdrId=" + TemplateId + " GROUP BY SortOrder HAVING COUNT(*) > 1";
                         DataTable dtdupsort = objData.ReturnDataTable(strdupsort, false);
