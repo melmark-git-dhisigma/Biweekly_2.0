@@ -5280,7 +5280,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 if (currSetNumber > 1)
                 {
 
-                    sqlStr = "select DSTempSetId,SetCd,SetName,SortOrder," + dt.Rows[0]["NextSetId"].ToString() + " as currSet, " + currSetNumber + " as currSetNmbr,case when DSTempSetId =" + dt.Rows[0]["NextSetId"].ToString() + " then 'Current Set' else 'Mastered Sets' end as GroupName from DSTempSet where DSTempHdrId=" + oTemp.TemplateId + " AND ActiveInd = 'A' order by DSTempSetId desc";
+                    sqlStr = "select DSTempSetId,SetCd,SetName,SortOrder," + dt.Rows[0]["NextSetId"].ToString() + " as currSet, " + currSetNumber + " as currSetNmbr,case when DSTempSetId =" + dt.Rows[0]["NextSetId"].ToString() + " then 'Current Set' else 'Mastered Sets' end as GroupName from DSTempSet where DSTempHdrId=" + oTemp.TemplateId + " AND ActiveInd = 'A' AND SortOrder is not null order by SortOrder desc";
                    //sqlStr = "select DSTempSetId,SetCd,SetName,SortOrder, " + dt.Rows[0]["NextSetId"].ToString() + " as currSet, " + currSetNumber + " as currSetNmbr from DSTempSet where DSTempHdrId=" + oTemp.TemplateId + " AND ActiveInd = 'A' order by SortOrder";
                     DataSet ds = oData.ReturnDataSet(sqlStr, false);
 
