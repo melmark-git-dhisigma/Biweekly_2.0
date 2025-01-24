@@ -41,7 +41,7 @@
         function enableButton() {
             multiClick = false;
         }
-        function = multiClickCheck(btn){
+        function multiClickCheck(btn){
             if (!multiClick) {
                 multiClick = true;
                 btn.style.opacity = '0.5';
