@@ -3842,6 +3842,33 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         try
         {
+            strQuery = "SELECT (SELECT COUNT(DSTempSetId) FROM DSTempSet WHERE ActiveInd = 'A' AND DSTempHdrId = " + templateId + ") AS DSTempSetCount,(SELECT COUNT(DSTempStepId) FROM DSTempStep "
+            + "WHERE ActiveInd = 'A' AND DSTempHdrId = " + templateId + ") AS DSTempStepCount,(SELECT COUNT(DSTempPromptId) FROM DSTempPrompt WHERE DSTempHdrId = " + templateId + ") AS DSTempPromptCount;";
+            DataTable LsnDtl = objData.ReturnDataTable(strQuery, false);
+            if (LsnDtl != null)
+            {
+                if (LsnDtl.Rows.Count > 0)
+                {
+                    hfTotalSetCount.Value = LsnDtl.Rows[0]["DSTempSetCount"].ToString();
+                    //hfTotalStepCount.Value = LsnDtl.Rows[0]["DSTempStepCount"].ToString();
+                    hfTotalPromptCount.Value = LsnDtl.Rows[0]["DSTempPromptCount"].ToString();
+                }
+            }
+            strQuery = "SELECT S.DSTempSetId,COUNT(DISTINCT St.DSTempStepId) AS DSTempStepCount FROM DSTempHdr H LEFT JOIN DSTempSet S ON H.DSTempHdrId = S.DSTempHdrId AND S.ActiveInd = 'A'"
+            + "LEFT JOIN DSTempStep St ON S.DSTempSetId = St.DSTempSetId AND St.ActiveInd = 'A' WHERE H.DSTempHdrId = " + templateId + " and StepCd IS NOT NULL group by S. DSTempSetId;";
+            DataTable LsnStepDtl = objData.ReturnDataTable(strQuery, false);
+            if (LsnStepDtl != null)
+            {
+                if (LsnStepDtl.Rows.Count > 0)
+                {
+                    string StepList = "";
+                    for (int i = 0; i < LsnStepDtl.Rows.Count; i++)
+                    {
+                        StepList += LsnStepDtl.Rows[i]["DSTempSetId"].ToString() + "=" + LsnStepDtl.Rows[i]["DSTempStepCount"].ToString() + ",";
+                    }
+                    hfTotalStepCount.Value = StepList.TrimEnd(',');
+                }
+            }
             strQuery = "SELECT DSTemplateName,FrameandStrand,LessonPlanGoal,SpecStandard,NoofTimesTried,NoofTimesTriedPer,SpecEntryPoint,PreReq,Materials,deletessn,(Select CONVERT(VARCHAR, DsTempHdr.LessonSDate, 101)) AS LessonSDate,(Select CONVERT(VARCHAR, DsTempHdr.LessonEDate, 101)) AS LessonEDate FROM DSTempHdr WHERE DSTempHdrId = " + templateId;
             DataTable dtNew = objData.ReturnDataTable(strQuery, false);
             strQuery = "Select EffStartDate from StDtLessonPlan inner join StDtIEP on StDtLessonPlan.StDtIEPId=StDtIEP.StDtIEPId where StDtLessonPlan.LessonPlanId = " + lessonPlanId + " and StDtLessonPlan.StudentId = " + sess.StudentId + " order by StDtIEP.StdtIEPId Desc ";

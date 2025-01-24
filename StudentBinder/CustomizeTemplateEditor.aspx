@@ -397,55 +397,97 @@
                 $('#divApprMsg').css("display", "none");
                 $('#divApprMsg').html('');
                 var isChecked = false;
+
+                var setCount = parseInt(document.getElementById('<%= hfTotalSetCount.ClientID %>').value) || 0;
+                var stepCount = document.getElementById('<%= hfTotalStepCount.ClientID %>').value || "";
+                var promptCount = parseInt(document.getElementById('<%= hfTotalPromptCount.ClientID %>').value) || 0;
+                var crntSelectedSetId = 0;
+                var data = {};
+                stepCount.split(",").forEach(function (pair) {
+                    var parts = pair.split("=");
+                    var key = parts[0];
+                    var value = parts[1];
+                    data[key] = parseInt(value, 10);
+                });
+
                 var panel = document.getElementById("<%= normalOverride.ClientID %>");
                 if (panel) {
                     var RB1 = document.getElementById("<%=RadioButtonListSets.ClientID%>");
+                    if (!RB1) {
+                        $('#divApprMsg').css("display", "block");
+                        $('#divApprMsg').html('The Set options are not properly listed. Please refresh or retake the lesson.');
+                        return false;
+                    }
                     var radio = RB1.getElementsByTagName("input");
                     isChecked = false;
                     for (var i = 0; i < radio.length; i++) {
                         if (radio[i].checked) {
                             isChecked = true;
+                            crntSelectedSetId = radio[i].value;
                             break;
                         }
                     }
                     if (!isChecked) {
                         $('#divApprMsg').css("display", "block");
-                        $('#divApprMsg').html('You must complete your selections above before hitting Save');
+                        $('#divApprMsg').html('You must select a Set before hitting Save.');
                     }
                     if (isChecked) {
                         var RB2 = document.getElementById("<%=RadioButtonListSteps.ClientID%>");
-                        if (RB2 != null) {
-                            isChecked = false;
-                            var radio1 = RB2.getElementsByTagName("input");
-                            for (var i = 0; i < radio1.length; i++) {
-                                if (radio1[i].checked) {
-                                    isChecked = true;
-                                    break;
+                        for (var key in data) {
+                            if (data.hasOwnProperty(key)) { // Check if key belongs to 'data'
+                                if (key === crntSelectedSetId) { // Compare the key with 'crntSelectedSetId'
+                                    //alert("Has Key " + key + ": " + data[key]); // Display the matching key and its value
+                                    stepCount = data[key]; // Assign the value to 'stepCount'
+                                    break; // Exit the loop as the key is found
                                 }
                             }
-                            if (!isChecked) {
-                                $('#divApprMsg').css("display", "block");
-                                $('#divApprMsg').html('You must complete your selections above before hitting Save');
-                                if (isChecked) {
-                                    multiClickSubmit = true;
-                                    btn.style.opacity = '0.5';
+                        }
+                        if (stepCount > 0) {
+                            if (RB2 != null) {
+                                isChecked = false;
+                                var radio1 = RB2.getElementsByTagName("input");
+                                for (var i = 0; i < radio1.length; i++) {
+                                    if (radio1[i].checked) {
+                                        isChecked = true;
+                                        break;
+                                    }
                                 }
-                                return isChecked;
+                                if (!isChecked) {
+                                    $('#divApprMsg').css("display", "block");
+                                    $('#divApprMsg').html('You must select a Step before hitting Save.');
+                                    if (isChecked) {
+                                        multiClickSubmit = true;
+                                        btn.style.opacity = '0.5';
+                                    }
+                                    return isChecked;
+                                }
+                            }
+                            else {
+                                $('#divApprMsg').css("display", "block");
+                                $('#divApprMsg').html('The Step options are not properly listed. Please refresh or retake the lesson.');
+                                return false;
                             }
                         }
                         var RB3 = document.getElementById("<%=RadioButtonListPrompts.ClientID%>");
-                        if (RB3 != null) {
-                            isChecked = false;
-                            var radio2 = RB3.getElementsByTagName("input");
-                            for (var i = 0; i < radio2.length; i++) {
-                                if (radio2[i].checked) {
-                                    isChecked = true;
-                                    break;
+                        if (promptCount > 0) {
+                            if (RB3 != null) {
+                                isChecked = false;
+                                var radio2 = RB3.getElementsByTagName("input");
+                                for (var i = 0; i < radio2.length; i++) {
+                                    if (radio2[i].checked) {
+                                        isChecked = true;
+                                        break;
+                                    }
+                                }
+                                if (!isChecked) {
+                                    $('#divApprMsg').css("display", "block");
+                                    $('#divApprMsg').html('You must select a Prompt before hitting Save.');
                                 }
                             }
-                            if (!isChecked) {
+                            else {
                                 $('#divApprMsg').css("display", "block");
-                                $('#divApprMsg').html('You must complete your selections above before hitting Save');
+                                $('#divApprMsg').html('The Prompt options are not properly listed. Please refresh or retake the lesson.');
+                                return false;
                             }
                         }
                     }
@@ -453,26 +495,33 @@
                 else {
                     isChecked = false;
                     var RB4 = document.getElementById("<%=RadioButtonListSets_tt.ClientID%>");
-                    if (RB4 != null) {
-                        var radio = RB4.getElementsByTagName("input");
-                        for (var i = 0; i < radio.length; i++) {
-                            if (radio[i].checked) {
-                                isChecked = true;
-                                break;
-                            }
-                        }
-                        if (!isChecked) {
-                            $('#divApprMsg').css("display", "block");
-                            $('#divApprMsg').html('You must complete your selections above before hitting Save');
-                        }
-                        if (isChecked) {
-                            if ($(".stepDiv").length > 0) {
-                                if ($(".stepDiv_sel").length == 0) {
-                                    isChecked = false;
-                                    $('#divApprMsg').css("display", "block");
-                                    $('#divApprMsg').html('You must complete your selections above before hitting Save');
+                    if (setCount > 0) {
+                        if (RB4 != null) {
+                            var radio = RB4.getElementsByTagName("input");
+                            for (var i = 0; i < radio.length; i++) {
+                                if (radio[i].checked) {
+                                    isChecked = true;
+                                    break;
                                 }
                             }
+                            if (!isChecked) {
+                                $('#divApprMsg').css("display", "block");
+                                $('#divApprMsg').html('The Set options are not properly listed. Please refresh or retake the lesson.');
+                            }
+                            if (isChecked) {
+                                if ($(".stepDiv").length > 0) {
+                                    if ($(".stepDiv_sel").length == 0) {
+                                        isChecked = false;
+                                        $('#divApprMsg').css("display", "block");
+                                        $('#divApprMsg').html('You must select a Step before hitting Save.');
+                                    }
+                                }
+                            }
+                        }
+                        else {
+                            $('#divApprMsg').css("display", "block");
+                            $('#divApprMsg').html('The Set options are not properly listed. Please refresh or retake the lesson.');
+                            return false;
                         }
                     }
 
@@ -1984,7 +2033,9 @@
 </head>
 <body>
     <form id="form1" runat="server">
-
+        <asp:HiddenField runat="server" ID="hfTotalSetCount" />
+        <asp:HiddenField runat="server" ID="hfTotalStepCount" />
+        <asp:HiddenField runat="server" ID="hfTotalPromptCount" />
         <asp:ScriptManager ID="ScriptManager1" runat="server" AsyncPostBackTimeOut="210000"></asp:ScriptManager>
         <div style="text-align: right">
         </div>
