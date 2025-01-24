@@ -2268,10 +2268,24 @@
                             if (lblIndAll != null) hfrsltind1All.value = resetHFvalue(colmnName, lblIndAll.innerHTML, hfrsltind1All.value);
                             if (lblPrmt != null) hfrsltpmt1.value = resetHFvalue(colmnName, lblPrmt.innerHTML, hfrsltpmt1.value);
                             //liju
-                            if (lblTotalCorrect != null) lblTotalCorrect.innerHTML = RespAcc; document.getElementById('<%=hfTotCorct.ClientID%>').value = RespAcc;
-                             if (lblTotalInCorrect != null) lblTotalInCorrect.innerHTML = RespInCorrect; document.getElementById('<%=hfInTotCorct.ClientID%>').value = RespInCorrect;
+                            //if (lblTotalCorrect != null) lblTotalCorrect.innerHTML = RespAcc; document.getElementById('<%=hfTotCorct.ClientID%>').value = RespAcc;
+                            //if (lblTotalInCorrect != null) lblTotalInCorrect.innerHTML = RespInCorrect; document.getElementById('<%=hfInTotCorct.ClientID%>').value = RespInCorrect;
 
+                            if (lblTotalCorrect != null) {
+                                lblTotalCorrect.innerHTML = RespAcc;
+                                var hfTotCorct = document.getElementById('<%=hfTotCorct.ClientID%>');
+                                if (hfTotCorct != null) {
+                                    hfTotCorct.value = RespAcc;
+                                }
+                            }
 
+                            if (lblTotalInCorrect != null) {
+                                lblTotalInCorrect.innerHTML = RespInCorrect;
+                                var hfInTotCorct = document.getElementById('<%=hfInTotCorct.ClientID%>');
+                                if (hfInTotCorct != null) {
+                                    hfInTotCorct.value = RespInCorrect;
+                                }
+                            }
                             //alert(" hfRslt1_Acc before totSteps--" + hfrsltacc1.value)
                             //document.getElementById('<%=hfRslt1_Acc.ClientID%>').value = Resp_AccPerc + '%';
                             //document.getElementById('<%=hfRslt1_Ind.ClientID%>').value = Resp_IndPerc + '%';
