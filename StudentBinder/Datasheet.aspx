@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="~/StudentBinder/Datasheet.aspx.cs" Inherits="StudentBinder_Datasheet" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="~/StudentBinder/Datasheet.aspx.cs" EnableViewState="true" Inherits="StudentBinder_Datasheet" %>
 
 <!DOCTYPE html>
 
@@ -1798,7 +1798,6 @@
         }
         var IOAtype;
         function temp() {
-            clearAllHf();
             <%clsDataSheet oDS = (clsDataSheet)Session["DataSht_Sess-" + hdnTemplateId.Value];%>
             var chaintype = "<%=oDS.SkillType.ToString()%>";
             var cntPrompt = "<%=oDS.CrntPrompt.ToString()%>";
@@ -2640,27 +2639,6 @@
             }
 
         }
-        function clearAllHf() {
-            document.getElementById('<%=hfRslt1_Acc.ClientID%>').value = "";
-            document.getElementById('<%=hfRslt1_Ind.ClientID%>').value = "";
-            document.getElementById('<%=hfRslt1_Prmt.ClientID%>').value = "";
-
-            document.getElementById('<%=hfRslt2_Acc.ClientID%>').value = "";
-            document.getElementById('<%=hfRslt2_Ind.ClientID%>').value = "";
-            document.getElementById('<%=hfRslt2_IndAll.ClientID%>').value = "";
-            document.getElementById('<%=hfRslt2_Prmt.ClientID%>').value = "";
-
-            document.getElementById('<%=hf_Freq.ClientID%>').value = "";
-
-            document.getElementById('<%=hfAvgDur.ClientID%>').value = "";
-            document.getElementById('<%=hfTotDur.ClientID%>').value = "";
-            document.getElementById('<%=hfTotCorct.ClientID%>').value = "";
-            document.getElementById('<%=hfInTotCorct.ClientID%>').value = "";
-
-            document.getElementById('<%=hfResultStep_Acc.ClientID%>').value = "";
-            document.getElementById('<%=hfResultStep_Prmpt.ClientID%>').value = "";
-
-        }
 
         function removeLastHfValue(hfvalue) {
             hfvalue = hfvalue.substring(0, hfvalue.length - 2);
@@ -3167,6 +3145,7 @@
              $('#btnSubmitAndRepeat2').attr({ "disabled": true, "value": "Submitting" }).removeClass("NFButtonNew").addClass("NFButtonNew1");
              $('#div_overlay').show();
              $("body").css("cursor", "progress");
+             temp();
              return true;
          }
 
@@ -3952,8 +3931,8 @@
                                     <td></td>
                                     <td align="center">
                                         <asp:Label ID="lbl_Freq" Text="" runat="server"></asp:Label>
-                                        <asp:HiddenField ID="hf_Freq" runat="server" />
-                                        <asp:HiddenField ID="hfTextScore" runat="server" />
+                                        <asp:HiddenField ID="hf_Freq" runat="server" EnableViewState="true"/>
+                                        <asp:HiddenField ID="hfTextScore" runat="server" EnableViewState="true"/>
                                     </td>
                                     <td></td>
                                 </tr>
@@ -3962,17 +3941,17 @@
                                     <td>%Accuracy</td>
                                     <td>
                                         <asp:Label ID="lblRslt1_Acc" Text="" runat="server"></asp:Label>
-                                        <asp:HiddenField ID="hfRslt1_Acc" runat="server" />
+                                        <asp:HiddenField ID="hfRslt1_Acc" runat="server" EnableViewState="true"/>
 
-                                        <asp:HiddenField ID="hfResultStep_Acc" runat="server" />
-                                        <asp:HiddenField ID="hfResultStep_Prmpt" runat="server" />
-                                        <asp:HiddenField ID="hfRslt1_ExcludeCrntStep_Acc" runat="server" />
+                                        <asp:HiddenField ID="hfResultStep_Acc" runat="server" EnableViewState="true"/>
+                                        <asp:HiddenField ID="hfResultStep_Prmpt" runat="server" EnableViewState="true"/>
+                                        <asp:HiddenField ID="hfRslt1_ExcludeCrntStep_Acc" runat="server" EnableViewState="true"/>
                                     </td>
                                     <td>
                                         <asp:Label ID="lblRslt2_Acc" Text="" runat="server"></asp:Label>
-                                        <asp:HiddenField ID="hfRslt2_Acc" runat="server" />
+                                        <asp:HiddenField ID="hfRslt2_Acc" runat="server" EnableViewState="true"/>
 
-                                        <asp:HiddenField ID="hfRslt2_ExcludeCrntStep_Acc" runat="server" />
+                                        <asp:HiddenField ID="hfRslt2_ExcludeCrntStep_Acc" runat="server" EnableViewState="true"/>
                                     </td>
                                     <td></td>
                                     <td></td>
@@ -3982,19 +3961,19 @@
                                     <td>%Independence</td>
                                     <td>
                                         <asp:Label ID="lblRslt1_Ind" Text="" runat="server"></asp:Label>
-                                        <asp:HiddenField ID="hfRslt1_Ind" runat="server" />
+                                        <asp:HiddenField ID="hfRslt1_Ind" runat="server" EnableViewState="true"/>
                                     </td>
                                     <td>
                                         <asp:Label ID="lblRslt1_IndAll" Text="" runat="server"></asp:Label>
-                                        <asp:HiddenField ID="hfRslt1_IndAll" runat="server" />
+                                        <asp:HiddenField ID="hfRslt1_IndAll" runat="server" EnableViewState="true"/>
                                     </td>
                                     <td>
                                         <asp:Label ID="lblRslt2_Ind" Text="" runat="server"></asp:Label>
-                                        <asp:HiddenField ID="hfRslt2_Ind" runat="server" />
+                                        <asp:HiddenField ID="hfRslt2_Ind" runat="server" EnableViewState="true"/>
                                     </td>
                                     <td>
                                         <asp:Label ID="lblRslt2_IndAll" Text="" runat="server"></asp:Label>
-                                        <asp:HiddenField ID="hfRslt2_IndAll" runat="server" />
+                                        <asp:HiddenField ID="hfRslt2_IndAll" runat="server" EnableViewState="true"/>
                                     </td>
                                     <td></td>
                                 </tr>
@@ -4003,11 +3982,11 @@
                                     <td>%Prompted</td>
                                     <td>
                                         <asp:Label ID="lblRslt1_Prmt" Text="" runat="server"></asp:Label>
-                                        <asp:HiddenField ID="hfRslt1_Prmt" runat="server" />
+                                        <asp:HiddenField ID="hfRslt1_Prmt" runat="server" EnableViewState="true"/>
                                     </td>
                                     <td>
                                         <asp:Label ID="lblRslt2_Prmt" Text="" runat="server"></asp:Label>
-                                        <asp:HiddenField ID="hfRslt2_Prmt" runat="server" />
+                                        <asp:HiddenField ID="hfRslt2_Prmt" runat="server" EnableViewState="true"/>
                                     </td>
                                     <td></td>
                                     <td></td>
@@ -4020,7 +3999,7 @@
                                     <td></td>
                                     <td align="left">
                                         <asp:Label ID="lblTotDur" Text="" runat="server"></asp:Label>
-                                        <asp:HiddenField ID="hfTotDur" runat="server" />
+                                        <asp:HiddenField ID="hfTotDur" runat="server" EnableViewState="true"/>
                                     </td>
                                 </tr>
                                 <tr>
@@ -4031,7 +4010,7 @@
                                     <td></td>
                                     <td align="left">
                                         <asp:Label ID="lblAvgDur" Text="" runat="server"></asp:Label>
-                                        <asp:HiddenField ID="hfAvgDur" runat="server" />
+                                        <asp:HiddenField ID="hfAvgDur" runat="server" EnableViewState="true"/>
                                     </td>
                                 </tr>
                                 <tr>
@@ -4042,7 +4021,7 @@
                                     <td></td>
                                     <td align="left">
                                         <asp:Label ID="lblTotCorct" Text="" runat="server"></asp:Label>
-                                        <asp:HiddenField ID="hfTotCorct" runat="server" />
+                                        <asp:HiddenField ID="hfTotCorct" runat="server" EnableViewState="true"/>
                                     </td>
                                 </tr>
                                 <tr>
@@ -4053,7 +4032,7 @@
                                     <td></td>
                                     <td align="left">
                                         <asp:Label ID="lblTotInCorct" Text="" runat="server"></asp:Label>
-                                        <asp:HiddenField ID="hfInTotCorct" runat="server" />
+                                        <asp:HiddenField ID="hfInTotCorct" runat="server" EnableViewState="true"/>
                                     </td>
                                 </tr>
 
