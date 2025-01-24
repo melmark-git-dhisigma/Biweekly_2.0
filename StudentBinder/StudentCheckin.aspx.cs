@@ -7,6 +7,7 @@ using System.Web.UI.WebControls;
 using System.Data;
 using System.Data.SqlClient;
 using System.Web.Services;
+using System.IO;
 
 public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
 {
@@ -146,7 +147,10 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
 
     private void fillStudent(string type, bool search)
     {
-        sess = (clsSession)Session["UserSession"];
+        try
+        {
+
+            sess = (clsSession)Session["UserSession"];
         objData = new clsData();
         string DayNRes = (type == "1") ? "OR c.ResidenceInd='0'" : "";
         if (search == true)
@@ -159,31 +163,62 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
             //strQuery = "Select s.StudentId,s.StudentLname+'  '+s.StudentFname+'-'+s.StudentNbr+'   '+'('+c.ClassName+')' as name,c.ClassId,chkStatus = CASE Ss.CheckStatus WHEN 1 THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END   from Student s Inner Join StdtClass sc on s.StudentId=sc.StdtId Inner Join Class c on c.ClassId=sc.ClassId Left Join StdtSessEvent Ss on s.StudentId=Ss.StudentId AND c.ClassId =Ss.ClassId where s.ActiveInd='A' AND sc.ActiveInd='A' AND (EventType='CH' OR c.ResidenceInd='" + hidSetVal.Value + "') And s.StudentLname like'%" + txtSearch.Text + "%'  ";
         }
         else
-        {
-            strQuery = "SELECT StudClass.StudentId,StudClass.name,StudClass.ClassId,chkStatus =CASE WHEN (SELECT COUNT(*) FROM StdtSessEvent WHERE " +
-                        "StudentId=StudClass.StudentId AND EventType='CH' AND  CONVERT(DATE,CheckinTime)=CONVERT(DATE,GETDATE()) AND CheckStatus='True' and ClassId=StudClass.ClassId AND SchoolId="+sess.SchoolId+")=0 THEN 0 ELSE 1 END " +
-                        "FROM (Select s.StudentId,s.StudentLname+'  '+s.StudentFname+'-'+s.StudentNbr+'   '+'('+c.ClassName+')' as name,c.ClassId " +
-                        "from Student s Inner Join StdtClass sc on s.StudentId=sc.StdtId Inner Join Class c " +
-                        "on c.ClassId=sc.ClassId where s.ActiveInd='A' AND sc.ActiveInd='A' AND  (c.ResidenceInd='" + hidSetVal.Value + "' " + DayNRes + " ) ) AS StudClass ";
-            //strQuery = "Select s.StudentId,s.StudentLname+'  '+s.StudentFname+'-'+s.StudentNbr+'   '+'('+c.ClassName+')' as name,c.ClassId,chkStatus = CASE Ss.CheckStatus WHEN 1 THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END   from Student s Inner Join StdtClass sc on s.StudentId=sc.StdtId Inner Join Class c on c.ClassId=sc.ClassId Left Join StdtSessEvent Ss on s.StudentId=Ss.StudentId AND c.ClassId =Ss.ClassId  where s.ActiveInd='A' AND sc.ActiveInd='A' AND (EventType='CH' OR c.ResidenceInd='" + hidSetVal.Value + "')";
-        }
-
-
-        DataTable Dt = objData.ReturnDataTable(strQuery, false);
-        if (Dt != null)
-        {
-            if (Dt.Rows.Count > 0)
+            {
+                strQuery = "SELECT StudClass.StudentId,StudClass.name,StudClass.ClassId,chkStatus =CASE WHEN (SELECT COUNT(*) FROM StdtSessEvent WHERE " +
+                            "StudentId=StudClass.StudentId AND EventType='CH' AND  CONVERT(DATE,CheckinTime)=CONVERT(DATE,GETDATE()) AND CheckStatus='True' and ClassId=StudClass.ClassId AND SchoolId=" + sess.SchoolId + ")=0 THEN 0 ELSE 1 END " +
+                            "FROM (Select s.StudentId,s.StudentLname+'  '+s.StudentFname+'-'+s.StudentNbr+'   '+'('+c.ClassName+')' as name,c.ClassId " +
+                            "from Student s Inner Join StdtClass sc on s.StudentId=sc.StdtId Inner Join Class c " +
+                            "on c.ClassId=sc.ClassId where s.ActiveInd='A' AND sc.ActiveInd='A' AND  (c.ResidenceInd='" + hidSetVal.Value + "' " + DayNRes + " ) ) AS StudClass ";
+                //strQuery = "Select s.StudentId,s.StudentLname+'  '+s.StudentFname+'-'+s.StudentNbr+'   '+'('+c.ClassName+')' as name,c.ClassId,chkStatus = CASE Ss.CheckStatus WHEN 1 THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END   from Student s Inner Join StdtClass sc on s.StudentId=sc.StdtId Inner Join Class c on c.ClassId=sc.ClassId Left Join StdtSessEvent Ss on s.StudentId=Ss.StudentId AND c.ClassId =Ss.ClassId  where s.ActiveInd='A' AND sc.ActiveInd='A' AND (EventType='CH' OR c.ResidenceInd='" + hidSetVal.Value + "')";
+            }
+            DataTable Dt = objData.ReturnDataTable(strQuery, false);
+            if (Dt != null)
+            {
+                if (Dt.Rows.Count > 0)
             {
                 grdGroup.DataSource = Dt;
                 grdGroup.DataBind();
             }
             else
-            {
-                grdGroup.DataSource = Dt;
-                grdGroup.DataBind();
+                {
+                    grdGroup.DataSource = Dt;
+                    grdGroup.DataBind();
+                }
             }
         }
+        catch (Exception ex)
+        {
+            //Null Reference Log
+            if (ex.ToString().Contains("System.NullReferenceException:"))
+            {
+                int studId = -1;
+                string nullVariable = "None";
+                
+                if (sess != null)
+                    studId = sess.StudentId;
+                
+                if (sess == null)
+                    nullVariable = "sess";
 
+                else if (objData == null)
+                    nullVariable = "ObjData";
+
+                else if (hidSetVal == null)
+                    nullVariable = "hidSetVal";
+
+                else if (hidSetVal.Value == null)
+                    nullVariable = "hidSetVal.Value";
+
+                else if (txtSearch == null)
+                    nullVariable = "txtSearch";
+
+                string errorLogFilePath = HttpContext.Current.Server.MapPath("~/ErrorLog/log.txt");
+                string errorLogMessage = string.Format("[{0}]\nError: {1}\n{2}\n{3}\n{4}\n{5}",
+                DateTime.Now,"StudentCheckin Null Reference Log", ex.Message, "Null Variable = " + nullVariable,"StudentId = " + studId, Environment.NewLine);
+                File.AppendAllText(errorLogFilePath, errorLogMessage);
+            }
+            throw ex;
+        }
     }
     private void checkSearch()
     {
