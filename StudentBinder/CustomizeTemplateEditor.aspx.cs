@@ -240,7 +240,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
         if (Write == true)
@@ -285,7 +286,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -396,7 +398,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -608,7 +611,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         }
                         catch (Exception ex)
                         {
-                            throw ex;
+                            postBackDetailsLogging(ex, -1, -1);throw ex;
                         }
                     }
 
@@ -641,7 +644,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -1357,7 +1361,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -1392,7 +1397,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
     protected void FillInactiveLessonData()
@@ -1426,7 +1431,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -1461,7 +1467,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -1539,7 +1545,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
     }
@@ -1578,7 +1585,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
     }
@@ -1789,7 +1797,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
     }
@@ -1911,7 +1920,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -1952,7 +1962,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception ex)
         {
-            throw ex;
+            
+            postBackDetailsLogging(ex, -1, -1);throw ex;
         }
 
     }
@@ -2009,7 +2020,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
     }
@@ -2064,7 +2076,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
     }
@@ -2135,7 +2148,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
     }
@@ -2257,7 +2271,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
 
@@ -2281,7 +2295,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+                postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -2303,7 +2318,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             }
             catch (Exception Ex)
             {
-                throw Ex;
+                
+                postBackDetailsLogging(Ex, -1, -1);throw Ex;
             }
     }
 
@@ -2323,7 +2339,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -2343,7 +2360,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -2364,7 +2382,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
     protected void dlMaintenanceLp_ItemDataBound(object sender, DataListItemEventArgs e)
@@ -2383,7 +2402,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -2403,7 +2423,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -2437,7 +2458,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -2518,7 +2540,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
     }
@@ -2824,7 +2847,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
     protected void dlSetCriteria_ItemDataBound(object sender, DataListItemEventArgs e)
@@ -3118,7 +3142,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -3414,7 +3439,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -3573,7 +3599,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
         drpTasklist_SelectedIndexChanged1(sender, e);
         ClearSetData();
@@ -3632,7 +3659,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
         setApprovePermission();
         drpTasklist_SelectedIndexChanged1(sender, e);
@@ -3691,7 +3719,14 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            int hdrId = -1;
+            try
+            {
+                hdrId = Convert.ToInt32(lnkApprvdless.CommandArgument);
+            }
+            catch
+            { }
+            postBackDetailsLogging(Ex, hdrId, -1);throw Ex;
         }
         drpTasklist_SelectedIndexChanged1(sender, e);
         
@@ -3771,7 +3806,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
         drpTasklist_SelectedIndexChanged1(sender, e);
     }
@@ -3908,7 +3944,13 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            int LPId = -1;
+            try
+            {
+                LPId = Convert.ToInt32(objId);
+            }
+            catch { }
+            postBackDetailsLogging(Ex, -1, LPId);throw Ex;
         }
     }
 
@@ -4030,7 +4072,13 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            int LPId = -1;
+            try
+            {
+                LPId = Convert.ToInt32(objId);
+            }
+            catch { }
+            postBackDetailsLogging(Ex, -1, LPId);throw Ex;
         }
     }
 
@@ -4136,7 +4184,14 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            int hdrId = -1;
+            try
+            {
+                hdrId = headerID;
+            }
+            catch{ }
+
+            postBackDetailsLogging(Ex, hdrId, -1); throw Ex;
         }
     }
 
@@ -4179,7 +4234,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         }
                         catch (Exception ex)
                         {
-                            throw ex;
+                            
+                            postBackDetailsLogging(ex, -1, -1);throw ex;
                         }
                     }
 
@@ -4269,7 +4325,14 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            int hdrId = -1;
+            try
+            {
+                hdrId = headerId;
+            }
+            catch { }
+
+            postBackDetailsLogging(Ex, hdrId, -1); throw Ex;
         }
     }
 
@@ -4314,7 +4377,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         }
                         catch (Exception ex)
                         {
-                            throw ex;
+                            
+                            postBackDetailsLogging(ex, -1, -1);throw ex;
                         }
                     }
 
@@ -4353,7 +4417,14 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            int hdrId = -1;
+            try
+            {
+                hdrId = headerId;
+            }
+            catch { }
+
+            postBackDetailsLogging(Ex, hdrId, -1); throw Ex;
         }
     }
 
@@ -4406,7 +4477,14 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            int hdrId = -1;
+            try
+            {
+                hdrId = headerId;
+            }
+            catch { }
+
+            postBackDetailsLogging(Ex, hdrId, -1); throw Ex;
         }
     }
 
@@ -4445,7 +4523,14 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            int hdrId = -1;
+            try
+            {
+                hdrId = headerId;
+            }
+            catch { }
+
+            postBackDetailsLogging(Ex, hdrId, -1); throw Ex;
         }
     }
 
@@ -4515,7 +4600,14 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            int hdrId = -1;
+            try
+            {
+                hdrId = headerId;
+            }
+            catch { }
+
+            postBackDetailsLogging(Ex, hdrId, -1); throw Ex;
         }
 
     }
@@ -4793,7 +4885,14 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 }
                 catch (Exception ex)
                 {
-                    throw ex;
+                    int hdrId = -1;
+                    try
+                    {
+                        hdrId = headerId;
+                    }
+                    catch { }
+
+                    postBackDetailsLogging(ex, hdrId, -1); throw ex;
                 }
             }
             //ash
@@ -4862,7 +4961,14 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            int hdrId = -1;
+            try
+            {
+                hdrId = headerId;
+            }
+            catch { }
+
+            postBackDetailsLogging(Ex, hdrId, -1); throw Ex;
         }
         lblSelParentSets.Text = "Not Assigned to any Sets";
         ClearStepData();
@@ -5400,7 +5506,14 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            int hdrId = -1;
+            try
+            {
+                hdrId = headerId;
+            }
+            catch { }
+
+            postBackDetailsLogging(Ex, hdrId, -1); throw Ex;
         }
 
     }
@@ -5529,7 +5642,17 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         catch (Exception Ex)
         {
             ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
-            throw Ex;
+            int hdrId = -1;
+            try
+            {
+                if (ViewState["HeaderId"] != null)
+                {
+                    hdrId = Convert.ToInt32(ViewState["HeaderId"]);
+                }
+            }
+            catch { }
+
+            postBackDetailsLogging(Ex, hdrId, -1); throw Ex;
         }
 
     }
@@ -5601,7 +5724,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
     protected clsMathToSamples.Step[] MatchSampDef2(int TId, string setMatch, int setId)
@@ -5652,7 +5776,14 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            int hdrId = -1;
+            try
+            {
+                hdrId = TId;
+            }
+            catch { }
+
+            postBackDetailsLogging(Ex, hdrId, -1); throw Ex;
         }
     }
 
@@ -5884,7 +6015,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
     }
@@ -6010,7 +6142,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                 string error = Ex.Message;
                 tdMsgCriteria.InnerHtml = clsGeneral.failedMsg("Insertion Failed! <br> '" + error + "' ");
-                throw Ex;
+                
+                postBackDetailsLogging(Ex, -1, -1);throw Ex;
             }
         }
         ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
@@ -6208,7 +6341,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                 string error = Ex.Message;
                 tdMsgCriteria.InnerHtml = clsGeneral.failedMsg("Insertion Failed! <br> '" + error + "' ");
-                throw Ex;
+                
+                postBackDetailsLogging(Ex, -1, -1);throw Ex;
             }
         }
         ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
@@ -6335,7 +6469,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                 string error = Ex.Message;
                 tdMsgCriteria.InnerHtml = clsGeneral.failedMsg("Insertion Failed! <br> '" + error + "' ");
-                throw Ex;
+                
+                postBackDetailsLogging(Ex, -1, -1);throw Ex;
             }
         }
         ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
@@ -6367,7 +6502,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
         drpTasklist_SelectedIndexChanged1(sender, e);
     }
@@ -6415,7 +6551,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
         drpTasklist_SelectedIndexChanged1(sender, e);
     }
@@ -6464,7 +6601,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -6526,7 +6664,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -6570,7 +6709,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -6641,7 +6781,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -6753,7 +6894,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
     }
@@ -6915,7 +7057,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
     }
@@ -6936,7 +7079,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
     }
@@ -6974,7 +7118,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
         drpTasklist_SelectedIndexChanged1(sender, e);
     }
@@ -6996,7 +7141,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
         drpTasklist_SelectedIndexChanged1(sender, e);
     }
@@ -7035,7 +7181,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -7099,7 +7246,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -7177,7 +7325,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         //}
         //catch (Exception Ex)
         //{
-        //    throw Ex;
+        //    postBackDetailsLogging(Ex, -1, -1);throw Ex;
         //}
     }
     private bool HasDuplicates(string[] arrayList)
@@ -7282,7 +7430,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
     }
@@ -7295,7 +7444,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
     }
@@ -7431,7 +7581,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception ex)
         {
-            throw ex;
+            
+            postBackDetailsLogging(ex, -1, -1);throw ex;
         }
 
 
@@ -7486,7 +7637,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         }
                         catch (Exception ex)
                         {
-                            throw ex;
+                            postBackDetailsLogging(ex, -1, -1);throw ex;
                         }
                     }
 
@@ -7515,7 +7666,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -7548,7 +7699,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -7579,7 +7730,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
     }
@@ -7624,7 +7775,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -7657,7 +7808,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
 
@@ -7705,7 +7856,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -7825,7 +7976,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
                 string error = Ex.Message;
                 tdMsgSet.InnerHtml = clsGeneral.failedMsg("Insertion Failed! <br> '" + error + "' ");
-                throw Ex;
+                postBackDetailsLogging(Ex, -1, -1);throw Ex;
             }
         }
 
@@ -8136,7 +8287,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             string error = Ex.Message;
             tdMsg.InnerHtml = clsGeneral.failedMsg("Updation Failed! <br> '" + error + "' ");
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
     }
@@ -8195,7 +8346,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
         //-----------------------------
     }
@@ -8308,7 +8459,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         catch (Exception Ex)
         {
             ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
     }
@@ -8397,7 +8548,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         catch (Exception Ex)
         {
             ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -8484,7 +8635,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         catch (Exception Ex)
         {
             ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -8532,7 +8683,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             //            }
             //            catch (Exception ex)
             //            {
-            //                throw ex;
+            //                postBackDetailsLogging(ex, -1, -1);throw ex;
             //            }
             //        }
             //    }
@@ -8588,7 +8739,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
         drpTasklist_SelectedIndexChanged1(sender, e);
     }
@@ -8746,7 +8897,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
     }
@@ -8771,7 +8922,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -8795,7 +8946,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -9586,7 +9737,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         catch (Exception Ex)
         {
             ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
         ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
     }
@@ -10652,7 +10803,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         catch (Exception Ex)
         {
             ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
         showMatchToSampleDrop();
     }
@@ -10712,7 +10863,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
 
@@ -10745,7 +10896,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
     protected void viewMeasures()
@@ -11393,7 +11544,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -11494,7 +11645,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -11530,7 +11681,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
     protected void BtnRemvePrmptSelctd_Click(object sender, EventArgs e)
@@ -11563,7 +11714,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
     protected void BtnRemoveAllPrmpt_Click(object sender, EventArgs e)
@@ -11596,7 +11747,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -11815,7 +11966,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         catch (Exception Ex)
         {
             ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
     }
@@ -12013,7 +12164,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         {
             string error = Ex.Message;
             ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AlertFailedMsg();", true);
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
     protected void btnUpdateset_Click(object sender, EventArgs e)
@@ -12037,7 +12188,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         {
             string error = Ex.Message;
             ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AlertFailedMsg();", true);
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
     protected void btnUpdatesteps_Click(object sender, EventArgs e)
@@ -12061,7 +12212,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         {
             string error = Ex.Message;
             ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AlertFailedMsg();", true);
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
     }
@@ -12086,7 +12237,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         {
             string error = Ex.Message;
             ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AlertFailedMsg();", true);
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
     
@@ -12129,7 +12280,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         {
             string error = Ex.Message;
             ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "AlertFailedMsg();", true);
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
         showMatchToSampleDrop();
         drpTasklist_SelectedIndexChanged1(sender, e);
@@ -12214,7 +12365,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 }
                 catch (Exception Ex)
                 {
-                    throw Ex;
+                    postBackDetailsLogging(Ex, -1, -1);throw Ex;
                 }
 
             }
@@ -12312,7 +12463,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -12707,7 +12858,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     }
                     catch (Exception Ex)
                     {
-                        throw Ex;
+                        postBackDetailsLogging(Ex, -1, -1);throw Ex;
                     }
                 }
             }
@@ -12822,7 +12973,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
     }
@@ -13142,7 +13293,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                 catch (Exception ex)
                                 {
                                     ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
-                                    throw ex;
+                                    postBackDetailsLogging(ex, -1, -1);throw ex;
                                 }
                             }
                         }
@@ -13829,7 +13980,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 catch (Exception Ex)
                 {
                     ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
-                    throw Ex;
+                    postBackDetailsLogging(Ex, -1, -1);throw Ex;
                 }
             }
             else
@@ -13955,7 +14106,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             catch (Exception ex)
                             {
                                 previewSuccess = false;
-                                throw ex;
+                                postBackDetailsLogging(ex, -1, -1);throw ex;
                             }
                         }
                     }
@@ -14123,6 +14274,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 }
 
                 //Step Mismatch Validation End
+
 
                 string strdupsort = "SELECT SortOrder as sortorder, COUNT(*) as count FROM DSTempSet where ActiveInd='A' and DSTempHdrId=" + TemplateId + " GROUP BY SortOrder HAVING COUNT(*) > 1";
                 DataTable dtdupsort = objData.ReturnDataTable(strdupsort, false);
@@ -14669,7 +14821,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             catch (Exception Ex)
             {
                 previewSuccess = false;
-                throw Ex;
+                postBackDetailsLogging(Ex, -1, -1);throw Ex;
             }
         }
         else
@@ -14804,7 +14956,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 catch (Exception Ex)
                 {
                     returnData = false;
-                    throw Ex;
+                    postBackDetailsLogging(Ex, -1, -1);throw Ex;
                     // tdMsg.InnerHtml = clsGeneral.failedMsg("Set Step Management Failed!!!!! Please try again!!!");
                 }
             }
@@ -14866,7 +15018,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 catch (Exception Ex)
                 {
                     returnData = false;
-                    throw Ex;
+                    postBackDetailsLogging(Ex, -1, -1);throw Ex;
                     // tdMsg.InnerHtml = clsGeneral.failedMsg("Set Step Management Failed!!!!! Please try again!!!");
                 }
             }
@@ -14906,7 +15058,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -14953,7 +15105,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
     }
@@ -15021,7 +15173,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception ex)
         {
-            throw ex;
+            postBackDetailsLogging(ex, -1, -1);throw ex;
         }
     }
 
@@ -15108,14 +15260,14 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 catch (Exception Ex)
                 {
                     ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
-                    throw Ex;
+                    postBackDetailsLogging(Ex, -1, -1);throw Ex;
                 }
             }
         }
         catch (Exception Ex)
         {
             ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
         drpTasklist_SelectedIndexChanged1(sender, e);
         ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
@@ -15207,7 +15359,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     }
                     catch (Exception Ex)
                     {
-                        throw Ex;
+                        postBackDetailsLogging(Ex, -1, -1);throw Ex;
                     }
                 }
             drpTasklist_SelectedIndexChanged1(sender, e);
@@ -15221,7 +15373,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
     }
@@ -15333,14 +15485,14 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 catch (Exception Ex)
                 {
                     ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
-                    throw Ex;
+                    postBackDetailsLogging(Ex, -1, -1);throw Ex;
                 }
             }
         }
         catch (Exception Ex)
         {
             ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
         ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
         drpTasklist_SelectedIndexChanged1(sender, e);
@@ -15442,14 +15594,14 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 catch (Exception Ex)
                 {
                     ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
-                    throw Ex;
+                    postBackDetailsLogging(Ex, -1, -1);throw Ex;
                 }
             }
         }
         catch (Exception Ex)
         {
             ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
         drpTasklist_SelectedIndexChanged1(sender, e);
     }
@@ -15711,7 +15863,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
     //            }
     //            catch (Exception Ex)
     //            {
-    //                throw Ex;
+    //                postBackDetailsLogging(Ex, -1, -1);throw Ex;
     //            }
     //        }
 
@@ -15876,7 +16028,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
     protected void imgDown_Click(object sender, ImageClickEventArgs e)
@@ -15919,7 +16071,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
     //protected void imgUp_Click(object sender, ImageClickEventArgs e)
@@ -15963,7 +16115,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
     //    }
     //    catch (Exception Ex)
     //    {
-    //        throw Ex;
+    //        postBackDetailsLogging(Ex, -1, -1);throw Ex;
     //    }
     //}
     //protected void imgDown_Click(object sender, ImageClickEventArgs e)
@@ -16006,7 +16158,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
     //    }
     //    catch (Exception Ex)
     //    {
-    //        throw Ex;
+    //        postBackDetailsLogging(Ex, -1, -1);throw Ex;
     //    }
     //}
     private bool ModificationExit()
@@ -16149,13 +16301,13 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 }
                 catch (Exception Ex)
                 {
-                    throw Ex;
+                    postBackDetailsLogging(Ex, -1, -1);throw Ex;
                 }
             }
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
         drpTasklist_SelectedIndexChanged1(sender, e);
     }
@@ -16440,7 +16592,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         catch (Exception Ex)
         {
             ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
 
@@ -16475,7 +16627,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
     protected void grdFile_RowDataBound(object sender, GridViewRowEventArgs e)
@@ -16490,7 +16642,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception ex)
         {
-            throw ex;
+            postBackDetailsLogging(ex, -1, -1);throw ex;
         }
     }
     protected void btnrejectedNotes_Click(object sender, EventArgs e)
@@ -16503,7 +16655,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception ex)
         {
-            throw ex;
+            postBackDetailsLogging(ex, -1, -1);throw ex;
         }
         drpTasklist_SelectedIndexChanged1(sender, e);
     }
@@ -16576,7 +16728,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception ex)
         {
-            throw ex;
+            postBackDetailsLogging(ex, -1, -1);throw ex;
         }
     }
 
@@ -16622,7 +16774,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
         drpTasklist_SelectedIndexChanged1(sender, e);
     }
@@ -16674,7 +16826,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
         drpTasklist_SelectedIndexChanged1(sender, e);
 
@@ -16746,13 +16898,13 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 }
                 catch (Exception Ex)
                 {
-                    throw Ex;
+                    postBackDetailsLogging(Ex, -1, -1);throw Ex;
                 }
             }
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
     }
@@ -16847,7 +16999,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
                 catch (Exception Ex)
                 {
-                    throw Ex;
+                    postBackDetailsLogging(Ex, -1, -1);throw Ex;
                 }
             }       
         drpTasklist_SelectedIndexChanged1(sender, e);
@@ -16860,7 +17012,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
     }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
     //public void updateApprovedStatus(int TemplateId, int LessonPlanId, int StatusId)
@@ -16998,13 +17150,13 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 }
                 catch (Exception Ex)
                 {
-                    throw Ex;
+                    postBackDetailsLogging(Ex, -1, -1);throw Ex;
                 }
             }
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
         drpTasklist_SelectedIndexChanged1(sender, e);
     }
@@ -17657,7 +17809,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception ex)
         {
-            throw ex;
+            postBackDetailsLogging(ex, -1, -1);throw ex;
         }
         drpTasklist_SelectedIndexChanged1(sender, e);
     }
@@ -17882,7 +18034,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             objData.RollBackTransation(trans, con);
             con.Close();
             return 0;
-            throw ex;
+            postBackDetailsLogging(ex, -1, -1);throw ex;
         }
 
     }
@@ -18057,7 +18209,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         catch (Exception Ex)
         {
             ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
         //objData = new clsData();
@@ -18711,7 +18863,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             oData.RollBackTransation(Trans, Con);
             ClsErrorLog errlog = new ClsErrorLog();
             errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\n" + ex.ToString());
-            throw ex;
+            postBackDetailsLogging(ex, -1, -1);throw ex;
         }
 
 
@@ -18774,7 +18926,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
     protected void FillApprovedLessonDataAdmin()
@@ -18805,7 +18957,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
     protected void lnkApprovedLessonsAdmin_Click(object sender, EventArgs e)
@@ -18872,7 +19024,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
         drpTasklist_SelectedIndexChanged1(sender, e);
     }
@@ -19051,7 +19203,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
     protected bool ValidateLesson()
@@ -19102,7 +19254,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
     }
     protected void Clear()
@@ -19494,6 +19646,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         if (promptDDL.SelectedValue != "")
                         {
                             Session["sCurrentPrompt"] = objData.FetchValue("SELECT PromptId FROM DSTempPrompt WHERE DSTempPromptId=" + promptDDL.SelectedValue);
+                            string prmptUpdQry = "UPDATE DSTempStep SET StepByStepPrompt = " + promptDDL.SelectedValue + " WHERE DSTempStepId = " + stepId.Value;
+                            objData.Execute(prmptUpdQry);
                         }
                     }
 
@@ -19608,7 +19762,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         {
            ClsErrorLog clError = new ClsErrorLog();
             clError.WriteToLog(Ex.ToString());
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
         
     }
@@ -19651,7 +19805,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             con.Close();
             ClsErrorLog clError = new ClsErrorLog();
             clError.WriteToLog(Ex.ToString());
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
         
     }
@@ -19980,7 +20134,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                     }
                                     catch (Exception ex)
                                     {
-                                        throw ex;
+                                        postBackDetailsLogging(ex, -1, -1);throw ex;
                                     }
                                 }
                             }
@@ -20159,6 +20313,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         }
 
                         //Step Mismatch Validation End
+
 
                         string strdupsort = "SELECT SortOrder as sortorder, COUNT(*) as count FROM DSTempSet where ActiveInd='A' and DSTempHdrId=" + TemplateId + " GROUP BY SortOrder HAVING COUNT(*) > 1";
                         DataTable dtdupsort = objData.ReturnDataTable(strdupsort, false);
@@ -20638,7 +20793,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     }
                     catch (Exception Ex)
                     {
-                        throw Ex;
+                        postBackDetailsLogging(Ex, -1, -1);throw Ex;
                     }
                 }
                 else
@@ -20773,7 +20928,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             catch (Exception ex)
                             {
                                 previewSuccess = false;
-                                throw ex;
+                                postBackDetailsLogging(ex, -1, -1);throw ex;
                             }
                         }
                     }
@@ -21285,7 +21440,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             catch (Exception Ex)
             {
                 previewSuccess = false;
-                throw Ex;
+                postBackDetailsLogging(Ex, -1, -1);throw Ex;
             }
         }
         else
@@ -22008,7 +22163,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
-            throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);throw Ex;
         }
 
         if (Write == true)
@@ -22035,6 +22190,54 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception Ex)
         {
+        }
+    }
+
+    //Postback Error Log
+    protected override void RaisePostBackEvent(IPostBackEventHandler sourceControl, string eventArgument)
+    {
+        try
+        {
+            LogPostBackDetails(sourceControl, eventArgument);
+
+            base.RaisePostBackEvent(sourceControl, eventArgument);
+        }
+        catch (HttpException ex)
+        {
+            string sourceControlId = sourceControl is Control ? ((Control)sourceControl).ID : "Unknown";
+            LogError(string.Format("Invalid postback exception: {0}, Source Control ID: {1}", ex.Message, sourceControlId));
+        }
+    }
+
+    private void LogPostBackDetails(IPostBackEventHandler sourceControl, string eventArgument)
+    {
+        string logFilePath = HttpContext.Current.Server.MapPath("~/ErrorLog/DataLog.txt");
+        string sourceControlId = sourceControl is Control ? ((Control)sourceControl).ID : "Unknown";
+
+        string logMessage = string.Format("[{0}] PostBack Source ID: {1}, Event Argument: {2}{3}",
+            DateTime.Now, sourceControlId, eventArgument, Environment.NewLine);
+
+        File.AppendAllText(logFilePath, logMessage);
+    }
+
+    private void LogError(string errorMessage)
+    {
+        sess = (clsSession)Session["UserSession"];
+        
+        string errorLogFilePath = HttpContext.Current.Server.MapPath("~/ErrorLog/log.txt");
+        string errorLogMessage = string.Format("[{0}]\nError: {1}\n{2}\n{3}\n{4}",
+            DateTime.Now, errorMessage,"StudentId = " + sess.StudentId, "DSTempHdrId = ", Environment.NewLine);
+
+        File.AppendAllText(errorLogFilePath, errorLogMessage);
+    }
+    private void postBackDetailsLogging(Exception ex, int hdrId, int LPId) 
+    {
+        if (ex.ToString().Contains("Invalid postback or callback argument."))
+        {
+            string errorLogFilePath = HttpContext.Current.Server.MapPath("~/ErrorLog/log.txt");
+            string errorLogMessage = string.Format("[{0}]\nError: {1}\n{2}\n{3}\n{4}",
+            DateTime.Now, ex.Message, "StudentId = " + sess.StudentId, "DSTempHdrId = " + hdrId, "LessonPlanId = " + LPId, Environment.NewLine);
+            File.AppendAllText(errorLogFilePath, errorLogMessage);
         }
     }
 
