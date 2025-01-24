@@ -5806,7 +5806,14 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             oData.Execute(qry);
             updateCheck = false;
             ClsErrorLog clError = new ClsErrorLog();
-            clError.WriteToLog(ex.ToString());
+            if (ViewState["StdtSessHdr"] != null)
+            {
+                clError.WriteToLog("StdtsessionHdrId :"+ViewState["StdtSessHdr"]+"\n" +ex.ToString());
+            }
+            else
+            {
+                clError.WriteToLog(ex.ToString());
+            }
             tdMsg.InnerHtml = clsGeneral.failedMsg("Submission Failed");
             ScriptManager.RegisterStartupScript(this, this.GetType(), "RemoveOverlay", "hideOverlay();", true);
             //ScriptManager.RegisterStartupScript(this, this.GetType(), "closewindow", "closeIframe1(" + oSession.StudentId + ");", true);
