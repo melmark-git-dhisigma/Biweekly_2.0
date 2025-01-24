@@ -519,7 +519,7 @@ public partial class Admin_UserCreate : System.Web.UI.Page
             {
                 objData = new clsData();
 
-                if (Convert.ToInt32(objData.FetchValue("SELECT COUNT(*) FROM [User] WHERE Login=CONVERT(varbinary(50),'" + txtLogin.Text.Trim() + "') and ActiveInd='A'")) == 0)
+                if (Convert.ToInt32(objData.FetchValue("SELECT COUNT(*) FROM [User] WHERE Login=CONVERT(varbinary(50),'" + clsGeneral.convertQuotes(txtLogin.Text.Trim()) + "') and ActiveInd='A'")) == 0)
                 {
                     clsData.blnTrans = true;
                     SqlConnection con = objData.Open();
@@ -539,7 +539,7 @@ public partial class Admin_UserCreate : System.Web.UI.Page
                         else{
                             UsrEmailid = "";
                         }
-                        strQuery = "Insert into [User](AddressId ,SchoolId,UserNo,UserInitial,UserFName ,UserLName ,Login ,Position,Gender,Password ,ManagerId, ActiveInd ,CreatedBy ,CreatedOn,ModifiedBy ,ModifiedOn, UserEmail) values(" + intAddressId + ", " + intSchoolId + ", '" + clsGeneral.convertQuotes(txtUserNo.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtUserNo.Text.Trim()) + "', '" + clsGeneral.convertQuotes(txtFirstName.Text.Trim()) + "', '" + clsGeneral.convertQuotes(txtLastName.Text.Trim()) + "',convert(varbinary(80), '" + txtLogin.Text.Trim() + "'),'" + txtposition.Text.Trim() + "','" + ddlGender.SelectedItem.Text + "',convert(varbinary(80),'" + txtPassword.Text.Trim() + "'), " + 0 + ",'A' ," + sess.LoginId + ",(SELECT Convert(Varchar,getdate(),100)),'" + sess.LoginId + "' ,(SELECT Convert(Varchar,getdate(),100)),'"+ UsrEmailid +"')";
+                        strQuery = "Insert into [User](AddressId ,SchoolId,UserNo,UserInitial,UserFName ,UserLName ,Login ,Position,Gender,Password ,ManagerId, ActiveInd ,CreatedBy ,CreatedOn,ModifiedBy ,ModifiedOn, UserEmail) values(" + intAddressId + ", " + intSchoolId + ", '" + clsGeneral.convertQuotes(txtUserNo.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtUserNo.Text.Trim()) + "', '" + clsGeneral.convertQuotes(txtFirstName.Text.Trim()) + "', '" + clsGeneral.convertQuotes(txtLastName.Text.Trim()) + "',convert(varbinary(80), '" + clsGeneral.convertQuotes(txtLogin.Text.Trim()) + "'),'" + txtposition.Text.Trim() + "','" + ddlGender.SelectedItem.Text + "',convert(varbinary(80),'" + txtPassword.Text.Trim() + "'), " + 0 + ",'A' ," + sess.LoginId + ",(SELECT Convert(Varchar,getdate(),100)),'" + sess.LoginId + "' ,(SELECT Convert(Varchar,getdate(),100)),'"+ UsrEmailid +"')";
                         intUserId = objData.ExecuteWithScopeandConnection(strQuery, con, Trans);
                         Save(intUserId, con, Trans);
                         SaveClass(intUserId, con, Trans);
@@ -682,7 +682,7 @@ public partial class Admin_UserCreate : System.Web.UI.Page
                 {
                     UsrEmailid = "";
                 }
-                strQuery = "Update [User] Set AddressId='" + addressUpdateId + "' , SchoolId='" + intSchoolId + "' , UserNo='" + clsGeneral.convertQuotes(txtUserNo.Text.Trim()) + "' ,UserInitial='" + clsGeneral.convertQuotes(txtUserNo.Text.Trim()) + "',UserFname='" + clsGeneral.convertQuotes(txtFirstName.Text.Trim()) + "' ,UserLname='" + clsGeneral.convertQuotes(txtLastName.Text.Trim()) + "', Login= convert(varbinary(80),'" + txtLogin.Text.Trim() + "'), Gender = '" + ddlGender.Text.Trim() + "',Position='" + txtposition.Text.Trim() + "', ManagerId='" + 0 + "' ,ModifiedBy='" + sess.LoginId + "' ,ModifiedOn= (SELECT Convert(Varchar,getdate(),100)), UserEmail='" + UsrEmailid + "'  where UserId=" + intUserId + "";
+                strQuery = "Update [User] Set AddressId='" + addressUpdateId + "' , SchoolId='" + intSchoolId + "' , UserNo='" + clsGeneral.convertQuotes(txtUserNo.Text.Trim()) + "' ,UserInitial='" + clsGeneral.convertQuotes(txtUserNo.Text.Trim()) + "',UserFname='" + clsGeneral.convertQuotes(txtFirstName.Text.Trim()) + "' ,UserLname='" + clsGeneral.convertQuotes(txtLastName.Text.Trim()) + "', Login= convert(varbinary(80),'" + clsGeneral.convertQuotes(txtLogin.Text.Trim()) + "'), Gender = '" + ddlGender.Text.Trim() + "',Position='" + txtposition.Text.Trim() + "', ManagerId='" + 0 + "' ,ModifiedBy='" + sess.LoginId + "' ,ModifiedOn= (SELECT Convert(Varchar,getdate(),100)), UserEmail='" + UsrEmailid + "'  where UserId=" + intUserId + "";
                 updateCode = Convert.ToBoolean(objData.Execute(strQuery));
                 updateclass(intUserId);
                 UpdateRole(intUserId);
@@ -1204,7 +1204,7 @@ public partial class Admin_UserCreate : System.Web.UI.Page
                                 if (!itemRegexFirst && !itemRegexLast)
                                 {
                                     byte[] LoginCheck = Encoding.UTF8.GetBytes(item.LogonName);
-                                    bool loginExist = objData.IFExists("SELECT Login FROM [User] WHERE Login=CONVERT(VARBINARY(80),'" + item.LogonName + "') AND ActiveInd='A' ");
+                                    bool loginExist = objData.IFExists("SELECT Login FROM [User] WHERE Login=CONVERT(VARBINARY(80),'" + clsGeneral.convertQuotes(item.LogonName) + "') AND ActiveInd='A' ");
                                     if (!loginExist)
                                     {
                                         val = drpRol.SelectedValue;
