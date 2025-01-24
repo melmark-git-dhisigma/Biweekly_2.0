@@ -18500,7 +18500,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                    "'" + visualLessonId + "',[Baseline],[Objective],[GeneralProcedure],[BaselineProc],[BaselineStart],[BaselineEnd]," +
                    "[CorrRespDef],[CorrectResponse],[StudCorrRespDef],[IncorrRespDef],[StudIncorrRespDef],[CorrectionProc],[ReinforcementProc]," +
                    "[TeacherRespReadness],[StudentReadCrita],[MajorSetting],[MinorSetting],[LessonDefInst],[Mistrial],[MistrialResponse]," +
-                   "[TeacherPrepare],[StudentPrepare],[StudResponse],[DSMode]," + loginid + ",GETDATE()," + loginid + ",GETDATE(),[FrameandStrand],[LessonPlanGoal]," +
+                   "[TeacherPrepare],[StudentPrepare],[StudResponse],NULL," + loginid + ",GETDATE()," + loginid + ",GETDATE(),[FrameandStrand],[LessonPlanGoal]," +
                    "[SpecStandard],[SpecEntryPoint],[PreReq],[Materials],[ApprNoteLessonInfo],[ApprNoteTypeInstruction],[ApprNoteMeasurement],[ApprNoteSet],[ApprNoteStep],[ApprNotePrompt],[ApprNoteLessonProc],[deletessn],(select isnull( max(LessonOrder)+1,1) from dstemphdr where studentid=" + studentid + "),"+
                    "(Select DISTINCT EffStartDate  from StDtLessonPlan inner join StDtIEP on StDtLessonPlan.StDtIEPId=StDtIEP.StDtIEPId where StDtLessonPlan.StudentId = " + studentid + " AND StdtIEP.StatusId=65) ," +
                     "(Select DISTINCT EffEndDate  from StDtLessonPlan inner join StDtIEP on StDtLessonPlan.StDtIEPId=StDtIEP.StDtIEPId where StDtLessonPlan.StudentId = " + studentid + " AND StdtIEP.StatusId=65) FROM DSTempHdr WHERE DSTempHdrId='" + templateid + "'";
@@ -18519,7 +18519,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                   "'" + visualLessonId + "',[Baseline],[Objective],[GeneralProcedure],[BaselineProc],[BaselineStart],[BaselineEnd]," +
                   "[CorrRespDef],[CorrectResponse],[StudCorrRespDef],[IncorrRespDef],[StudIncorrRespDef],[CorrectionProc],[ReinforcementProc]," +
                   "[TeacherRespReadness],[StudentReadCrita],[MajorSetting],[MinorSetting],[LessonDefInst],[Mistrial],[MistrialResponse]," +
-                  "[TeacherPrepare],[StudentPrepare],[StudResponse],[DSMode]," + loginid + ",GETDATE()," + loginid + ",GETDATE(),[FrameandStrand],[LessonPlanGoal]," +
+                  "[TeacherPrepare],[StudentPrepare],[StudResponse],NULL," + loginid + ",GETDATE()," + loginid + ",GETDATE(),[FrameandStrand],[LessonPlanGoal]," +
                   "[SpecStandard],[SpecEntryPoint],[PreReq],[Materials],[ApprNoteLessonInfo],[ApprNoteTypeInstruction],[ApprNoteMeasurement],[ApprNoteSet],[ApprNoteStep],[ApprNotePrompt],[ApprNoteLessonProc],[deletessn],(select isnull( max(LessonOrder)+1,1) from dstemphdr where studentid=" + studentid + ")," +
                   "(Select DISTINCT EffStartDate  from StDtLessonPlan inner join StDtIEP_PE on StDtLessonPlan.StDtIEPId=StDtIEP_PE.StDtIEP_PEId where StDtLessonPlan.StudentId = " + studentid + " AND StdtIEP_PE.StatusId=65) ," +
                    "(Select DISTINCT EffEndDate  from StDtLessonPlan inner join StDtIEP_PE on StDtLessonPlan.StDtIEPId=StDtIEP_PE.StDtIEP_PEId where StDtLessonPlan.StudentId = " + studentid + " AND StdtIEP_PE.StatusId=65) FROM DSTempHdr WHERE DSTempHdrId='" + templateid + "'";
