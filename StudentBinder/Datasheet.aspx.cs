@@ -262,33 +262,6 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         }
         else
         {
-            ClsTestDataLog clsData = new ClsTestDataLog();
-            try
-            {
-                clsData.WriteToLog("HF Values:-\n" +
-                "hfTextScore: " + hfTextScore.Value + "\n" +
-                "hfResultStep_Acc: " + hfResultStep_Acc.Value + "\n" +
-                "hfResultStep_Prmpt: " + hfResultStep_Prmpt.Value + "\n" +
-                "hfRslt1_ExcludeCrntStep_Acc: " + hfRslt1_ExcludeCrntStep_Acc.Value + "\n" +
-                "hfRslt2_ExcludeCrntStep_Acc: " + hfRslt2_ExcludeCrntStep_Acc.Value + "\n" +
-                "hfRslt1_Acc: " + hfRslt1_Acc.Value + "\n" +
-                "hfRslt2_Acc: " + hfRslt2_Acc.Value + "\n" +
-                "hfRslt1_Prmt: " + hfRslt1_Prmt.Value + "\n" +
-                "hfRslt2_Prmt: " + hfRslt2_Prmt.Value + "\n" +
-                "hfRslt1_Ind: " + hfRslt1_Ind.Value + "\n" +
-                "hfRslt2_Ind: " + hfRslt2_Ind.Value + "\n" +
-                "hfRslt1_IndAll: " + hfRslt1_IndAll.Value + "\n" +
-                "hfRslt2_IndAll: " + hfRslt2_IndAll.Value + "\n" +
-                "hfAvgDur: " + hfAvgDur.Value + "\n" +
-                "hfTotDur: " + hfTotDur.Value + "\n" +
-                "hf_Freq: " + hf_Freq.Value + "\n" +
-                "hfTotCorct: " + hfTotCorct.Value + "\n" +
-                "hfInTotCorct: " + hfInTotCorct.Value);
-            }
-            catch (Exception exep)
-            {
-                clsData.WriteToLog("Values:Error:" + exep.ToString());
-            }
             bool ContrlEnable = true;
             DatasheetKey = "DataSht_Sess-" + hdnTemplateId.Value.ToString();
             oTemp.TemplateId = Convert.ToInt32(hdnTemplateId.Value);
@@ -32829,7 +32802,51 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         
         
     }
-   
+    [WebMethod]
+    public static void LogCombinedData(Dictionary<string, object> combinedValues)
+    {
+        ClsTestDataLog clsData = new ClsTestDataLog();
+        try
+        {
+            ClsTemplateSession oTemp = (ClsTemplateSession)HttpContext.Current.Session["BiweeklySession"];
+            string logHF = "";
+            string logSess = "";
+            
+            // Log HiddenField data
+            if (combinedValues.ContainsKey("hiddenFields"))
+            {
+                var hiddenFields = (Dictionary<string, object>)combinedValues["hiddenFields"];
+                logHF += "DSTempHdrId:" + oTemp.TemplateId + ",HiddenField - ";
+                foreach (var item in hiddenFields)
+                {
+                    logHF += item.Key + ": " + item.Value + "-";
+                }
+            }
+
+            // Log Session Storage data
+            if (combinedValues.ContainsKey("sessionData"))
+            {
+                var sessionData = (Dictionary<string, object>)combinedValues["sessionData"];
+                logSess += "SessionStorage - ";
+                foreach (var item in sessionData)
+                {
+                    logSess += item.Key + ": " + item.Value + "-";
+                }
+            }
+
+            string calledFrom = (combinedValues.ContainsKey("calledFrom") && combinedValues["calledFrom"] != null) ? combinedValues["calledFrom"].ToString() : "Unknown";
+            string currentDateTime = (combinedValues.ContainsKey("currentDateTime") && combinedValues["currentDateTime"] != null) ? combinedValues["currentDateTime"].ToString() : "Unknown";
+            string datestamp = DateTime.Now.ToString("yyyy-MM-dd");
+            string timestamp = DateTime.Now.ToString("HH:mm:ss");
+            // Log the data (for example, to a file)
+            ClsScoreErrorlog scorelog = new ClsScoreErrorlog();
+            scorelog.WriteToLog(datestamp + ',' + timestamp + ',' + calledFrom + "," + logHF + "," + logSess);
+        }
+        catch (Exception ex)
+        {
+            clsData.WriteToLog("Error logging combined data:"+ex.ToString());
+        }
+    }
       
 }
 
