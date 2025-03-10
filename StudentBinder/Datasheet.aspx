@@ -27,6 +27,71 @@
          window.onhashchange = function () { window.location.hash = "no-back-button"; }
     </script> 
     <script>
+        function logHiddenFieldsAndSessionStorage(calledFrom) {
+            //console.log("logHiddenFieldsAndSessionStorage called from:", calledFrom);
+            var hiddenFields = {}; // To store HiddenField values
+            var sessionData = {};  // To store Session Storage values
+
+            // Collect HiddenField values (server-side)
+            hiddenFields.hfTextScore = document.getElementById('<%= hfTextScore.ClientID %>') ? document.getElementById('<%= hfTextScore.ClientID %>').value : "N/A";
+            hiddenFields.hfResultStep_Acc = document.getElementById('<%= hfResultStep_Acc.ClientID %>') ? document.getElementById('<%= hfResultStep_Acc.ClientID %>').value : "N/A";
+            hiddenFields.hfResultStep_Prmpt = document.getElementById('<%= hfResultStep_Prmpt.ClientID %>') ? document.getElementById('<%= hfResultStep_Prmpt.ClientID %>').value : "N/A";
+            hiddenFields.hfRslt1_ExcludeCrntStep_Acc = document.getElementById('<%= hfRslt1_ExcludeCrntStep_Acc.ClientID %>') ? document.getElementById('<%= hfRslt1_ExcludeCrntStep_Acc.ClientID %>').value : "N/A";
+            hiddenFields.hfRslt2_ExcludeCrntStep_Acc = document.getElementById('<%= hfRslt2_ExcludeCrntStep_Acc.ClientID %>') ? document.getElementById('<%= hfRslt2_ExcludeCrntStep_Acc.ClientID %>').value : "N/A";
+            hiddenFields.hfRslt1_Acc = document.getElementById('<%= hfRslt1_Acc.ClientID %>') ? document.getElementById('<%= hfRslt1_Acc.ClientID %>').value : "N/A";
+            hiddenFields.hfRslt2_Acc = document.getElementById('<%= hfRslt2_Acc.ClientID %>') ? document.getElementById('<%= hfRslt2_Acc.ClientID %>').value : "N/A";
+            hiddenFields.hfRslt1_Prmt = document.getElementById('<%= hfRslt1_Prmt.ClientID %>') ? document.getElementById('<%= hfRslt1_Prmt.ClientID %>').value : "N/A";
+            hiddenFields.hfRslt2_Prmt = document.getElementById('<%= hfRslt2_Prmt.ClientID %>') ? document.getElementById('<%= hfRslt2_Prmt.ClientID %>').value : "N/A";
+            hiddenFields.hfRslt1_Ind = document.getElementById('<%= hfRslt1_Ind.ClientID %>') ? document.getElementById('<%= hfRslt1_Ind.ClientID %>').value : "N/A";
+            hiddenFields.hfRslt2_Ind = document.getElementById('<%= hfRslt2_Ind.ClientID %>') ? document.getElementById('<%= hfRslt2_Ind.ClientID %>').value : "N/A";
+            hiddenFields.hfRslt1_IndAll = document.getElementById('<%= hfRslt1_IndAll.ClientID %>') ? document.getElementById('<%= hfRslt1_IndAll.ClientID %>').value : "N/A";
+            hiddenFields.hfRslt2_IndAll = document.getElementById('<%= hfRslt2_IndAll.ClientID %>') ? document.getElementById('<%= hfRslt2_IndAll.ClientID %>').value : "N/A";
+            hiddenFields.hfAvgDur = document.getElementById('<%= hfAvgDur.ClientID %>') ? document.getElementById('<%= hfAvgDur.ClientID %>').value : "N/A";
+            hiddenFields.hfTotDur = document.getElementById('<%= hfTotDur.ClientID %>') ? document.getElementById('<%= hfTotDur.ClientID %>').value : "N/A";
+            hiddenFields.hf_Freq = document.getElementById('<%= hf_Freq.ClientID %>') ? document.getElementById('<%= hf_Freq.ClientID %>').value : "N/A";
+            hiddenFields.hfTotCorct = document.getElementById('<%= hfTotCorct.ClientID %>') ? document.getElementById('<%= hfTotCorct.ClientID %>').value : "N/A";
+            hiddenFields.hfInTotCorct = document.getElementById('<%= hfInTotCorct.ClientID %>') ? document.getElementById('<%= hfInTotCorct.ClientID %>').value : "N/A";
+
+            // Define an array of relevant session storage keys related to hidden fields
+            var relevantSessionKeys = [
+                "hfTextScore", "hfResultStep_Acc", "hfResultStep_Prmpt", "hfRslt1_ExcludeCrntStep_Acc",
+                "hfRslt2_ExcludeCrntStep_Acc", "hfRslt1_Acc", "hfRslt2_Acc", "hfRslt1_Prmt",
+                "hfRslt2_Prmt", "hfRslt1_Ind", "hfRslt2_Ind", "hfRslt1_IndAll", "hfRslt2_IndAll",
+                "hfAvgDur", "hfTotDur", "hf_Freq", "hfTotCorct", "hfInTotCorct"
+            ];
+
+            // Collect only relevant Session Storage values
+            relevantSessionKeys.forEach(function (key) {
+                var storedValue = sessionStorage.getItem(key);
+                if (storedValue !== null) {
+                    sessionData[key] = storedValue;
+                }
+            });
+
+            var currentDateTime = new Date().toISOString();
+
+            // Combine both HiddenField and Session Storage data
+            var combinedData = {
+                calledFrom: calledFrom,
+                currentDateTime: currentDateTime,
+                hiddenFields: hiddenFields,
+                sessionData: sessionData
+            };
+
+            // Send combined data to server via AJAX (XMLHttpRequest)
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "Datasheet.aspx/LogCombinedData", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    //console.log("HiddenFields and Session Storage Logged Successfully");
+                }
+            };
+
+            xhr.send(JSON.stringify({ combinedValues: combinedData }));
+        }
+        //logHiddenFieldsAndSessionStorage("Before Page_Load");
         //Function for printing datasheet [01-07-2020] Dev1 start--
         function printpage() {
             window.print();
@@ -3311,8 +3376,8 @@
 
          function setDecision(decision) {
              var operation = document.getElementById('hiddenOperation').value;
-             console.log("Decision:", decision);
-             console.log("Operation:", operation);
+             //console.log("Decision:", decision);
+             //console.log("Operation:", operation);
              $.ajax({
                  type: "POST",
                  url: "Datasheet.aspx/SetDecisionOperation",
@@ -3347,6 +3412,86 @@
          //function popUpTriggerAnotherClick() {
          //    $('#btnAnotherOperation').trigger("click");
          //}
+         
+         function saveHiddenFields(buttonElement) {
+             // Function to store the value of a hidden field in sessionStorage
+             function storeHiddenFieldValue(fieldId, storageKey) {
+                 var field = document.getElementById(fieldId);
+                 if (field) {
+                     sessionStorage.setItem(storageKey, field.value);
+                 } else {
+                     //console.warn("Hidden field not found:", storageKey); // Log missing fields
+                 }
+             }
+
+             // Store all hidden fields in sessionStorage with checks
+             storeHiddenFieldValue('<%= hfTextScore.ClientID %>', "hfTextScore");
+             storeHiddenFieldValue('<%= hfResultStep_Acc.ClientID %>', "hfResultStep_Acc");
+             storeHiddenFieldValue('<%= hfResultStep_Prmpt.ClientID %>', "hfResultStep_Prmpt");
+             storeHiddenFieldValue('<%= hfRslt1_ExcludeCrntStep_Acc.ClientID %>', "hfRslt1_ExcludeCrntStep_Acc");
+             storeHiddenFieldValue('<%= hfRslt2_ExcludeCrntStep_Acc.ClientID %>', "hfRslt2_ExcludeCrntStep_Acc");
+             storeHiddenFieldValue('<%= hfRslt1_Acc.ClientID %>', "hfRslt1_Acc");
+             storeHiddenFieldValue('<%= hfRslt2_Acc.ClientID %>', "hfRslt2_Acc");
+             storeHiddenFieldValue('<%= hfRslt1_Prmt.ClientID %>', "hfRslt1_Prmt");
+             storeHiddenFieldValue('<%= hfRslt2_Prmt.ClientID %>', "hfRslt2_Prmt");
+             storeHiddenFieldValue('<%= hfRslt1_Ind.ClientID %>', "hfRslt1_Ind");
+             storeHiddenFieldValue('<%= hfRslt2_Ind.ClientID %>', "hfRslt2_Ind");
+             storeHiddenFieldValue('<%= hfRslt1_IndAll.ClientID %>', "hfRslt1_IndAll");
+             storeHiddenFieldValue('<%= hfRslt2_IndAll.ClientID %>', "hfRslt2_IndAll");
+             storeHiddenFieldValue('<%= hfAvgDur.ClientID %>', "hfAvgDur");
+             storeHiddenFieldValue('<%= hfTotDur.ClientID %>', "hfTotDur");
+             storeHiddenFieldValue('<%= hf_Freq.ClientID %>', "hf_Freq");
+             storeHiddenFieldValue('<%= hfTotCorct.ClientID %>', "hfTotCorct");
+             storeHiddenFieldValue('<%= hfInTotCorct.ClientID %>', "hfInTotCorct");
+
+             // Get the button text to log
+             var buttonText = buttonElement.innerText || buttonElement.value;
+             logHiddenFieldsAndSessionStorage(buttonText);
+
+             // Return true to allow postback
+             return true;
+         }
+
+        window.addEventListener('load', function () {
+            //console.log("Window has loaded!");
+            logHiddenFieldsAndSessionStorage("Page_Load");
+
+            var hiddenFields = {
+                "hfTextScore": "<%= hfTextScore.ClientID %>",
+                "hfResultStep_Acc": "<%= hfResultStep_Acc.ClientID %>",
+                "hfResultStep_Prmpt": "<%= hfResultStep_Prmpt.ClientID %>",
+                "hfRslt1_ExcludeCrntStep_Acc": "<%= hfRslt1_ExcludeCrntStep_Acc.ClientID %>",
+                "hfRslt2_ExcludeCrntStep_Acc": "<%= hfRslt2_ExcludeCrntStep_Acc.ClientID %>",
+                "hfRslt1_Acc": "<%= hfRslt1_Acc.ClientID %>",
+                "hfRslt2_Acc": "<%= hfRslt2_Acc.ClientID %>",
+                "hfRslt1_Prmt": "<%= hfRslt1_Prmt.ClientID %>",
+                "hfRslt2_Prmt": "<%= hfRslt2_Prmt.ClientID %>",
+                "hfRslt1_Ind": "<%= hfRslt1_Ind.ClientID %>",
+                "hfRslt2_Ind": "<%= hfRslt2_Ind.ClientID %>",
+                "hfRslt1_IndAll": "<%= hfRslt1_IndAll.ClientID %>",
+                "hfRslt2_IndAll": "<%= hfRslt2_IndAll.ClientID %>",
+                "hfAvgDur": "<%= hfAvgDur.ClientID %>",
+                "hfTotDur": "<%= hfTotDur.ClientID %>",
+                "hf_Freq": "<%= hf_Freq.ClientID %>",
+                "hfTotCorct": "<%= hfTotCorct.ClientID %>",
+                "hfInTotCorct": "<%= hfInTotCorct.ClientID %>"
+            };
+
+            for (var fieldKey in hiddenFields) {
+                var fieldId = hiddenFields[fieldKey]; // Correctly get ClientID
+                var field = document.getElementById(fieldId);
+
+                if (field) {
+                    var storedValue = sessionStorage.getItem(fieldKey);
+                    if (storedValue) {
+                        field.value = storedValue;
+                        //console.log("Updated " + fieldKey + " with sessionStorage value: " + storedValue);
+                    }
+                } else {
+                    //console.warn("Field not found: " + fieldKey); // Log if field doesn't exist
+                }
+            }
+        });
     </script>
 </head>
 <body>
@@ -3437,7 +3582,7 @@
 
                                         <ContentTemplate>
                                             <%--<asp:Button ID="btnPriorSessn1" CssClass="NFButtonNew" runat="server" Text="Prior Sessions" OnClick="btnPriorSessn_Click" Style="height: 30px !important; font-size: 10px;" />--%>
-                                            <asp:Button ID="btnSave1" runat="server" Text="Save Draft" CssClass="NFButtonNew" Style="font-size: 12px" OnClick="btnSave_ClickCheck" />
+                                            <asp:Button ID="btnSave1" runat="server" Text="Save Draft" CssClass="NFButtonNew" Style="font-size: 12px" OnClientClick="saveHiddenFields(this);" OnClick="btnSave_ClickCheck" />
                                             <asp:Button ID="btnSaveConfirm" runat="server" Text="Save Draft" CssClass="NFButtonNew" Style="font-size: 12px;display: none;" OnClientClick="loadBeforeSave('Save');" OnClick="btnSave_Click"/>
                                             <asp:HiddenField ID="printPrev" runat="server" Value="0" />
                                             <%--<asp:Button ID="btnSubmit1" runat="server" Text="Submit Scores" CssClass="NFButtonNew" style="font-size:12px; display:none;" OnClientClick="return loadBeforeSave('Submit');" OnClick="btnSubmit_Click" />                                     
@@ -3448,11 +3593,11 @@
 
 
                                             <asp:Button ID="btnSubmit1" runat="server" Text="Submit Scores" CssClass="NFButtonNew" Style="font-size: 12px; display: none;" OnClientClick="return loadBeforeSave('Submit');" OnClick=" btnSubmit_Click" />
-                                            <asp:Button ID="btnSubmit2" runat="server" Text="Submit Scores" CssClass="NFButtonNew" Style="font-size: 10px" OnClick="ConfirmSubmissionCheck" />
+                                            <asp:Button ID="btnSubmit2" runat="server" Text="Submit Scores" CssClass="NFButtonNew" Style="font-size: 10px" OnClientClick="saveHiddenFields(this);" OnClick="ConfirmSubmissionCheck" />
                                             <asp:Button ID="btnSubmitConfirm" runat="server" Text="Submit Scores" CssClass="NFButtonNew" Style="font-size: 10px;display: none;" OnClientClick="closecheck(); " OnClick="ConfirmSubmission" />
                                             <asp:Button ID="btnSubmitAndRepeat1" runat="server" Text="Submit & Repeat" CssClass="NFButtonNew" Style="font-size: 10px; display: none;" OnClientClick="return submitMe(this);" OnClick="btnSubmitAndRepeat_Click" />
 <%--                                            <asp:Button ID="btnDiscard" runat="server" Text="Discard" CssClass="NFButtonNew" Style="font-size: 12px; display: none;" OnClientClick="return submitDisable(this);" OnClick="btnDiscard_ok_Click" />--%>
-                                            <asp:Button ID="btnSubmitAndRepeat3" runat="server" Text="Submit & Repeat" CssClass="NFButtonNew" Style="font-size: 10px" OnClick="ConfirmSubmissionCheck" />
+                                            <asp:Button ID="btnSubmitAndRepeat3" runat="server" Text="Submit & Repeat" CssClass="NFButtonNew" Style="font-size: 10px" OnClientClick="saveHiddenFields(this);" OnClick="ConfirmSubmissionCheck" />
                                             <asp:Button ID="btnSubmitAndRepeatConfirm" runat="server" Text="Submit & Repeat" CssClass="NFButtonNew" Style="font-size: 10px;display: none;" OnClientClick="closecheck(); " OnClick="ConfirmSubmission"/>
                                            <asp:Button ID="Print1" runat="server" Text="Print Blank" CssClass="NFButtonNew" Style="font-size: 12px" onclick ="btnSave2_Click" /> <!--OnClientClick="printpage1();SaveData();"-->
                                             <asp:Button ID="print2" runat="server" Text="Print" CssClass="NFButtonNew" Style="font-size: 12px" Visible="false" OnClientClick="printpage1(); printpage(); " OnClick="btnNotSave_Click"   />
@@ -4053,13 +4198,13 @@
 
                             <asp:Button ID="ImgBtn_Inactive" CssClass="NFButtonNew" Text="Inactivate" runat="server" OnClientClick="javascript: return confirm('Are you sure you want to Inactivate?')" OnClick="ImgBtn_Inactive_Click" Style="background-color: red; color: white; font-size: 12px" />
                             <asp:Button ID="btnPriorSessn" CssClass="NFButtonNew" Style="font-size: 12px" runat="server" Text="View Prior Sessions" OnClick="btnPriorSessn_Click" OnClientClick="scrollToTop()" />
-                            <asp:Button ID="btnSave" runat="server" Text="Save Draft" Style="font-size: 12px" CssClass="NFButtonNew" OnClick="btnSave_ClickCheck" OnClientClick="scrollToTop();" />
+                            <asp:Button ID="btnSave" runat="server" Text="Save Draft" Style="font-size: 12px" CssClass="NFButtonNew" OnClick="btnSave_ClickCheck" OnClientClick="saveHiddenFields(this);scrollToTop();" />
                             <asp:Button ID="btnSaveBottomConfirm" runat="server" Text="Save Draft" Style="font-size: 12px;display: none;" CssClass="NFButtonNew" OnClientClick="loadBeforeSave('Save'); scrollToTop();" OnClick="btnSave_Click" />
                             <asp:Button ID="btnProbe" runat="server" Text="Probe Mode" Style="font-size: 12px" CssClass="NFButtonNew" OnClientClick="probe();" OnClick="btnProbe_Click" />
                             <asp:Button ID="ImgBtn_Override" runat="server" Style="font-size: 12px" BackColor="#03507d" CssClass="NFButtonNew" Text="Override" OnClientClick="scrollToTop(); return popOverride(); " />
-                            <asp:Button ID="btnSubmit" runat="server" Text="Submit Scores" Style="font-size: 12px" CssClass="NFButtonNew" OnClick="ConfirmSubmissionCheck" OnClientClick="scrollToTop();" />
+                            <asp:Button ID="btnSubmit" runat="server" Text="Submit Scores" Style="font-size: 12px" CssClass="NFButtonNew" OnClick="ConfirmSubmissionCheck" OnClientClick="saveHiddenFields(this);scrollToTop();" />
                             <asp:Button ID="btnSubmitBottomConfirm" runat="server" Text="Submit Scores" Style="font-size: 12px;display: none;" CssClass="NFButtonNew" OnClick="ConfirmSubmission" OnClientClick="scrollToTop();" />
-                            <asp:Button ID="btnSubmitAndRepeat2" runat="server" Style="font-size: 12px" Text="Submit & Repeat" CssClass="NFButtonNew" OnClick="ConfirmSubmissionCheck" OnClientClick="scrollToTop();" />
+                            <asp:Button ID="btnSubmitAndRepeat2" runat="server" Style="font-size: 12px" Text="Submit & Repeat" CssClass="NFButtonNew" OnClick="ConfirmSubmissionCheck" OnClientClick="saveHiddenFields(this);scrollToTop();" />
                             <asp:Button ID="btnSubmitAndRepeatBottomConfirm" runat="server" Style="font-size: 12px;display: none;" Text="Submit & Repeat" CssClass="NFButtonNew" OnClick="ConfirmSubmission" OnClientClick="scrollToTop();"/>
                             <asp:Button ID="btnAddTrial" runat="server" Text="Add Trials" CssClass="NFButtonNew" OnClick="btnAddTrial_Click" Style="float: right; font-size: 12px" OnClientClick="loadBeforeSave('Save'); scrollToTop();" />
                             <asp:Label ID="LabelvisualToolEdit" runat="server" Text="Label" Visible="false" Style="color: red; font-size: 17px; padding: 5px;"></asp:Label>
