@@ -659,8 +659,8 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             {
                                 
                                 oSession = (clsSession)Session["UserSession"];
-                                string s1 = "SELECT TOP 1 * FROM StdtSessionHdr WHERE StudentId=" + oSession.StudentId + " AND SchoolId=" + oSession.SchoolId + /*" AND StdtClassId=" + oSession.Classid +*/ " AND DSTempHdrId=" + oTemp.TemplateId + " AND SessionStatusCd='D' AND IsMaintanace ='" + hdn_isMaintainance.Value + "' AND IOAInd='N'";
-                                string s2 = "SELECT TOP 1 * FROM StdtSessionHdr WHERE StudentId=" + oSession.StudentId + " AND SchoolId=" + oSession.SchoolId + " AND DSTempHdrId=" + oTemp.TemplateId + " AND SessionStatusCd='D' AND IsMaintanace ='" + hdn_isMaintainance.Value + "' AND IOAInd='Y'";
+                                string s1 = "SELECT TOP 1 * FROM StdtSessionHdr WHERE StudentId=" + oSession.StudentId + " AND SchoolId=" + oSession.SchoolId + /*" AND StdtClassId=" + oSession.Classid +*/ " AND DSTempHdrId=" + oTemp.TemplateId + " AND SessionStatusCd='D' AND IsMaintanace ='" + hdn_isMaintainance.Value + "' AND IOAInd='N' AND CurrentSetId = " + oDS.CrntSet;
+                                string s2 = "SELECT TOP 1 * FROM StdtSessionHdr WHERE StudentId=" + oSession.StudentId + " AND SchoolId=" + oSession.SchoolId + " AND DSTempHdrId=" + oTemp.TemplateId + " AND SessionStatusCd='D' AND IsMaintanace ='" + hdn_isMaintainance.Value + "' AND IOAInd='Y' AND CurrentSetId = " + oDS.CrntSet;
                                 DataTable dtHdrs = oData.ReturnDataTable(s1, false);
                                 DataTable dtHdrsIOA = oData.ReturnDataTable(s2, false);
                                 dtHdrs.Merge(dtHdrsIOA, true);
@@ -1469,8 +1469,8 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (dtcstatus.Rows[0]["SessionStatusCd"].ToString() == "D")
                                         {
                                             oSession = (clsSession)Session["UserSession"];
-                                            string s1 = "SELECT TOP 1 * FROM StdtSessionHdr WHERE StudentId=" + oSession.StudentId + " AND SchoolId=" + oSession.SchoolId + /*" AND StdtClassId=" + oSession.Classid +*/ " AND DSTempHdrId=" + oTemp.TemplateId + " AND SessionStatusCd='D' AND IsMaintanace ='" + hdn_isMaintainance.Value + "' AND IOAInd='N'";
-                                            string s2 = "SELECT TOP 1 * FROM StdtSessionHdr WHERE StudentId=" + oSession.StudentId + " AND SchoolId=" + oSession.SchoolId + " AND DSTempHdrId=" + oTemp.TemplateId + " AND SessionStatusCd='D' AND IsMaintanace ='" + hdn_isMaintainance.Value + "' AND IOAInd='Y'";
+                                            string s1 = "SELECT TOP 1 * FROM StdtSessionHdr WHERE StudentId=" + oSession.StudentId + " AND SchoolId=" + oSession.SchoolId + /*" AND StdtClassId=" + oSession.Classid +*/ " AND DSTempHdrId=" + oTemp.TemplateId + " AND SessionStatusCd='D' AND IsMaintanace ='" + hdn_isMaintainance.Value + "' AND IOAInd='N' AND CurrentSetId = " + oDS.CrntSet;
+                                            string s2 = "SELECT TOP 1 * FROM StdtSessionHdr WHERE StudentId=" + oSession.StudentId + " AND SchoolId=" + oSession.SchoolId + " AND DSTempHdrId=" + oTemp.TemplateId + " AND SessionStatusCd='D' AND IsMaintanace ='" + hdn_isMaintainance.Value + "' AND IOAInd='Y' AND CurrentSetId = " + oDS.CrntSet;
                                             dtHdrs = oData.ReturnDataTable(s1, false);
                                             dtHdrsIOA = oData.ReturnDataTable(s2, false);
                                             dtHdrs.Merge(dtHdrsIOA, true);
@@ -1898,8 +1898,8 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             {
                                 dtHdrs = null;
                                 dtHdrsIOA = null;
-                                sel = "SELECT TOP 1 * FROM StdtSessionHdr WHERE StudentId=" + oSession.StudentId + " AND SchoolId=" + oSession.SchoolId + /*" AND StdtClassId=" + oSession.Classid +*/ " AND DSTempHdrId=" + oTemp.TemplateId + " AND SessionStatusCd='D' AND IsMaintanace ='" + hdn_isMaintainance.Value + "' AND IOAInd='N'";
-                                selIOA = "SELECT TOP 1 * FROM StdtSessionHdr WHERE StudentId=" + oSession.StudentId + " AND SchoolId=" + oSession.SchoolId + " AND DSTempHdrId=" + oTemp.TemplateId + " AND SessionStatusCd='D' AND IsMaintanace ='" + hdn_isMaintainance.Value + "' AND IOAInd='Y'";
+                                sel = "SELECT TOP 1 * FROM StdtSessionHdr WHERE StudentId=" + oSession.StudentId + " AND SchoolId=" + oSession.SchoolId + /*" AND StdtClassId=" + oSession.Classid +*/ " AND DSTempHdrId=" + oTemp.TemplateId + " AND SessionStatusCd='D' AND IsMaintanace ='" + hdn_isMaintainance.Value + "' AND IOAInd='N' AND CurrentSetId = " + oDS.CrntSet;
+                                selIOA = "SELECT TOP 1 * FROM StdtSessionHdr WHERE StudentId=" + oSession.StudentId + " AND SchoolId=" + oSession.SchoolId + " AND DSTempHdrId=" + oTemp.TemplateId + " AND SessionStatusCd='D' AND IsMaintanace ='" + hdn_isMaintainance.Value + "' AND IOAInd='Y' AND CurrentSetId = " + oDS.CrntSet;
 
                                 objSessNbr = oData.FetchValue("SELECT ISNULL(MAX(SessionNbr),0)+1 FROM StdtSessionHdr WHERE StudentId=" + oSession.StudentId + " AND SchoolId=" + oSession.SchoolId +/* " AND StdtClassId=" + oSession.Classid +*/ " AND LessonPlanId=(SELECT LessonPlanId FROM DSTempHdr WHERE DSTempHdrId=" + oTemp.TemplateId + ")");
 
