@@ -1722,7 +1722,9 @@
                             if (txtdur.disabled == true) txtdur.disabled = false;
 
                             var durBtn = $(grid.rows[j].cells[i]).find(".NFButtonWithNoImage")[0];
-                            if (durBtn.disabled == true) durBtn.disabled = false;
+                            if (durBtn != null) {
+                                if (durBtn.disabled == true) durBtn.disabled = false;
+                            }
                         }
                         if (cType == 'Text') {
                             var txtcust = $(grid.rows[j].cells[i]).find(".clsText")[0];
@@ -3411,7 +3413,7 @@
          //}
          //function popUpTriggerAnotherClick() {
          //    $('#btnAnotherOperation').trigger("click");
-         //}
+        //}
          
          function saveHiddenFields(buttonElement) {
              // Function to store the value of a hidden field in sessionStorage
