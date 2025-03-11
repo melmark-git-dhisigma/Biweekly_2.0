@@ -814,7 +814,30 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             reader = oData_ov.ReturnDataReader(strQry, false);
             if (reader.Read())
             {
-                Session["iCurrentSetId"] = oData_ov.FetchValue("SELECT DSTempSetId FROM DSTempSet WHERE DSTempHdrId=" + NewTempId + " AND SetCd=(SELECT SetCd FROM DSTempSet WHERE DSTempHdrId=" + prevTempId + " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ") AND SetName=(SELECT SetName FROM DSTempSet WHERE DSTempHdrId=" + prevTempId + " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ")");
+                //Session["iCurrentSetId"] = oData_ov.FetchValue("SELECT DSTempSetId FROM DSTempSet WHERE DSTempHdrId=" + NewTempId + " AND SetCd=(SELECT SetCd FROM DSTempSet WHERE DSTempHdrId=" + prevTempId + " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ") AND SetName=(SELECT SetName FROM DSTempSet WHERE DSTempHdrId=" + prevTempId + " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ")");
+                string query1 = "SELECT DSTempSetId FROM DSTempSet " +
+                "WHERE DSTempHdrId=" + NewTempId +
+                " AND SetCd=(SELECT SetCd FROM DSTempSet WHERE DSTempHdrId=" + prevTempId +
+                " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ") " +
+                "AND SetName=(SELECT SetName FROM DSTempSet WHERE DSTempHdrId=" + prevTempId +
+                " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ")";
+
+                object result = oData_ov.FetchValue(query1);
+
+                if (result != null && result != DBNull.Value)
+                {
+                    Session["iCurrentSetId"] = result;
+                }
+                else
+                {
+                    // If the first query returns no result, run the second query without SetName condition
+                    string query2 = "SELECT DSTempSetId FROM DSTempSet " +
+                                    "WHERE DSTempHdrId=" + NewTempId +
+                                    " AND SetCd=(SELECT SetCd FROM DSTempSet WHERE DSTempHdrId=" + prevTempId +
+                                    " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ")";
+
+                    Session["iCurrentSetId"] = oData_ov.FetchValue(query2);
+                }
                 Session["iCurrentStep"] = Convert.ToInt32(reader["NextStepId"]);
                 string sCurrentPrompt = reader["NextPromptId"].ToString();
                 if (!String.IsNullOrEmpty(sCurrentPrompt))
