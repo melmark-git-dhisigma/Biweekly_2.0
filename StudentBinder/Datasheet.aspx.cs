@@ -5514,7 +5514,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 Response.Redirect("Datasheet.aspx?pageid=" + oTemp.TemplateId + "&studid=" + oSession.StudentId, false);
                             }
                         }
-                    }
+                   }
                     if(transCheck1 && transCheck2)
                     {
                         string updQry = "update StdtSessionHdr SET SessionStatusCd='S' WHERE StdtSessionHdrId=" + Convert.ToInt32(ViewState["StdtSessHdr"]) + "";
@@ -32116,12 +32116,59 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         String sqlqry3 = "select MAX(SessionNbr) from StdtSessionHdr where LessonPlanId= " + Lpid;
         int MaxSessNum = Convert.ToInt32(oData.FetchValue(sqlqry3));
         DataTable tempid = oDta.ReturnDataTable("SELECT SessionNbr, DSTempHdrId,CurrentSetId,IsMaintanace FROM StdtSessionHdr WHERE StdtSessionHdrId=" + sessionId, false);
+        SessionNum = Convert.ToInt32(tempid.Rows[0]["SessionNbr"]);
+
+
+        if (SessionNum < MaxSessNum)
+        {
+
         if (tempid != null)
         {
             if (tempid.Rows.Count > 0)
             {
-                Objtempsess.TemplateId = Convert.ToInt32(tempid.Rows[0]["DSTempHdrId"].ToString());
 
+                    string SessionNbrAct = "SELECT SessionNbr, StdtSessionHdrId,CurrentSetId,IsMaintanace FROM StdtSessionHdr where DSTempHdrId>0 AND LessonPlanId= " + Lpid + " order by SessionNbr asc";
+                    DataTable dtSessionNbrAct = oData.ReturnDataTable(SessionNbrAct, false);
+
+                    if (dtSessionNbrAct != null && dtSessionNbrAct.Rows.Count > 0)
+                {
+                        for (int i = 0; i < dtSessionNbrAct.Rows.Count; i++)
+                        {
+                            if (dtSessionNbrAct.Rows[i]["SessionNbr"] != null && dtSessionNbrAct.Rows[i]["SessionNbr"].ToString() != "")
+                            {
+                                if (Convert.ToInt32(tempid.Rows[0]["SessionNbr"]) == Convert.ToInt32(dtSessionNbrAct.Rows[i]["SessionNbr"]))
+                                {
+                                    SessId = Convert.ToInt32(dtSessionNbrAct.Rows[i + 1]["StdtSessionHdrId"]);
+                                    CurrentSetId = Convert.ToInt32(dtSessionNbrAct.Rows[i + 1]["CurrentSetId"]);
+                                    if (dtSessionNbrAct.Rows[i + 1]["IsMaintanace"].ToString() == "True")
+                                    {
+                    isMaintanance = "true";
+                }
+                else
+                {
+                    isMaintanance = "false";
+                }
+
+                                    break;
+
+            }
+            }
+                        }
+
+
+        }
+
+    }
+                //if (SessionNum <= MaxSessNum)
+                //{
+                Response.Redirect("Datasheet.aspx?SessHdrID=" + SessId + "&isMaint=" + isMaintanance + "&currSetId=" + CurrentSetId);
+            }
+        }
+        else
+        {
+            if (SessionNum == MaxSessNum)
+            {
+                SessId = sessionId;
                 if (tempid.Rows[0]["IsMaintanace"].ToString() == "True")
                 {
                     isMaintanance = "true";
@@ -32130,21 +32177,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 {
                     isMaintanance = "false";
                 }
-
                 CurrentSetId = Convert.ToInt32(tempid.Rows[0]["CurrentSetId"]);
-                SessionNum = Convert.ToInt32(tempid.Rows[0]["SessionNbr"]) + 1;
-                //String sqlqry2 = "select StdtSessionHdrId from StdtSessionHdr where SessionNbr= " + SessionNum + " AND LessonPlanId= " + Lpid;
-                String sqlqry2 = "select StdtSessionHdrId from StdtSessionHdr where SessionNbr= " + SessionNum + " AND LessonPlanId= " + Lpid + " and StudentId = " + sess.StudentId; //View Prior Bug 
-                SessId = Convert.ToInt32(oData.FetchValue(sqlqry2));
-            }
-            if (SessionNum <= MaxSessNum)
-            {
                 Response.Redirect("Datasheet.aspx?SessHdrID=" + SessId + "&isMaint=" + isMaintanance + "&currSetId=" + CurrentSetId);
             }
-
-
         }
-
     }
     protected void right_View(object sender, EventArgs e)
     {
@@ -32163,12 +32199,61 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         String sqlqry = "select LessonPlanId from StdtSessionHdr where StdtSessionHdrId= " + sessionId;
         int Lpid = Convert.ToInt32(oData.FetchValue(sqlqry));
         DataTable tempid = oDta.ReturnDataTable("SELECT SessionNbr, DSTempHdrId,CurrentSetId,IsMaintanace FROM StdtSessionHdr WHERE StdtSessionHdrId=" + sessionId, false);
+        SessionNum = Convert.ToInt32(tempid.Rows[0]["SessionNbr"]);
+
+        String sqlqryMin = "select Min(SessionNbr) from StdtSessionHdr where LessonPlanId= " + Lpid;
+        int MinSessNum = Convert.ToInt32(oData.FetchValue(sqlqryMin));
+
+        if (SessionNum > MinSessNum)
+        {
+
         if (tempid != null)
         {
             if (tempid.Rows.Count > 0)
             {
-                Objtempsess.TemplateId = Convert.ToInt32(tempid.Rows[0]["DSTempHdrId"].ToString());
 
+                    string SessionNbrAct = "SELECT SessionNbr, StdtSessionHdrId,CurrentSetId,IsMaintanace FROM StdtSessionHdr where DSTempHdrId>0 AND LessonPlanId= " + Lpid + " order by SessionNbr asc";
+                    DataTable dtSessionNbrAct = oData.ReturnDataTable(SessionNbrAct, false);
+
+                    if (dtSessionNbrAct != null && dtSessionNbrAct.Rows.Count > 0)
+                {
+                        for (int i = 0; i < dtSessionNbrAct.Rows.Count; i++)
+                        {
+                            if (dtSessionNbrAct.Rows[i]["SessionNbr"] != null && dtSessionNbrAct.Rows[i]["SessionNbr"].ToString() != "")
+                            {
+                                if (Convert.ToInt32(tempid.Rows[0]["SessionNbr"]) == Convert.ToInt32(dtSessionNbrAct.Rows[i]["SessionNbr"]))
+                                {
+                                    SessId = Convert.ToInt32(dtSessionNbrAct.Rows[i - 1]["StdtSessionHdrId"]);
+                                    CurrentSetId = Convert.ToInt32(dtSessionNbrAct.Rows[i - 1]["CurrentSetId"]);
+                                    if (dtSessionNbrAct.Rows[i - 1]["IsMaintanace"].ToString() == "True")
+                                    {
+                    isMaintanance = "true";
+                }
+                else
+                {
+                    isMaintanance = "false";
+                }
+
+                                    break;
+
+            }
+                            }
+                        }
+
+                    }
+
+                }
+                //if (SessionNum > 0)
+                //{
+                Response.Redirect("Datasheet.aspx?SessHdrID=" + SessId + "&isMaint=" + isMaintanance + "&currSetId=" + CurrentSetId);
+            }
+
+        }
+        else
+        {
+            if (SessionNum == MinSessNum)
+            {
+                SessId = sessionId;
                 if (tempid.Rows[0]["IsMaintanace"].ToString() == "True")
                 {
                     isMaintanance = "true";
@@ -32177,18 +32262,9 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 {
                     isMaintanance = "false";
                 }
-
                 CurrentSetId = Convert.ToInt32(tempid.Rows[0]["CurrentSetId"]);
-                SessionNum = Convert.ToInt32(tempid.Rows[0]["SessionNbr"]) - 1;
-                //String sqlqry2 = "select StdtSessionHdrId from StdtSessionHdr where SessionNbr= " + SessionNum + " AND LessonPlanId= " + Lpid;
-                String sqlqry2 = "select StdtSessionHdrId from StdtSessionHdr where SessionNbr= " + SessionNum + " AND LessonPlanId= " + Lpid + " and StudentId = " + sess.StudentId; //View Prior Bug 
-                SessId = Convert.ToInt32(oData.FetchValue(sqlqry2));
-            }
-            if (SessionNum > 0)
-            {
                 Response.Redirect("Datasheet.aspx?SessHdrID=" + SessId + "&isMaint=" + isMaintanance + "&currSetId=" + CurrentSetId);
             }
-
         }
 
     }
