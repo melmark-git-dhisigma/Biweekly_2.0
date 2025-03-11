@@ -10,6 +10,7 @@ using System.Data;
 using System.Threading;
 using System.Web.Script.Serialization;
 using System.Net;
+using System.Text.RegularExpressions;
 
 public partial class StudentBinder_DatasheetTimerIpad : System.Web.UI.Page
 {
@@ -395,6 +396,11 @@ public partial class StudentBinder_DatasheetTimerIpad : System.Web.UI.Page
         int bCount = 0, updateStat = 0;
         string condition = "";
         int BehaviorIOAId = 0, NormalBehavId = 0;
+        toe = objData.formatDateTime(toe);
+        if (toe == "Invalid time format")
+            return "Invalid time format";
+        if (toe == "Invalid datetime structure")
+            return "Invalid datetime structure";
         if (chkIOA == false)
         {
             if (isBehUpdate == "False")
@@ -516,7 +522,11 @@ public partial class StudentBinder_DatasheetTimerIpad : System.Web.UI.Page
         int bCount = 0, updateStat = 0;
         string condition = "";
         int BehaviorIOAId = 0, NormalBehavId = 0;
-
+        toe = objData.formatDateTime(toe);
+        if (toe == "Invalid time format")
+            return "Invalid time format";
+        if (toe == "Invalid datetime structure")
+            return "Invalid datetime structure";
         if (YNautoSave == "False")
         {
             if (chkIOA == false)
@@ -614,7 +624,11 @@ public partial class StudentBinder_DatasheetTimerIpad : System.Web.UI.Page
         objData = new clsData();
 
         int insertresult = 0;
-
+        toe = objData.formatDateTime(toe);
+        if (toe == "Invalid time format")
+            return "Invalid time format";
+        if (toe == "Invalid datetime structure")
+            return "Invalid datetime structure";
         if (duration != "" && duration != string.Empty && duration != null && FrqSave == "False")
         {
             int frq = 0, yesNo = 0;
@@ -790,7 +804,11 @@ public partial class StudentBinder_DatasheetTimerIpad : System.Web.UI.Page
         {
             yesNo = Convert.ToInt32(behaviorDT.Rows[0]["YesOrNo"]);
         }
-
+        toe = objData.formatDateTime(toe);
+        if (toe == "Invalid time format")
+            return "Invalid time format";
+        if (toe == "Invalid datetime structure")
+            return "Invalid datetime structure";
         if (chkIOA == false)
         {
             if (frequency != string.Empty && frequency != "" && frequency != null && FrqSave == "False")  //frequency != "0"&&

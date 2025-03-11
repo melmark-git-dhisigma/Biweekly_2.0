@@ -400,6 +400,11 @@ public partial class StudentBinder_dataSheetTimer : System.Web.UI.Page
         int bCount = 0, updateStat = 0;
         string condition = "";
         int BehaviorIOAId = 0, NormalBehavId = 0;
+        toe = objData.formatDateTime(toe);
+        if (toe == "Invalid time format")
+            return "Invalid time format";
+        if (toe == "Invalid datetime structure")
+            return "Invalid datetime structure";
         if (chkIOA == false)
         {
             if (isBehUpdate == "False")
@@ -511,7 +516,7 @@ public partial class StudentBinder_dataSheetTimer : System.Web.UI.Page
         bool validDate= false;
         string formatPattern = @"^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\s(?:AM|PM)$";
         bool isValidFormat = Regex.IsMatch(toe, formatPattern);
-
+        objData = new clsData();
         if (isValidFormat)
         {            
             if (DateTime.TryParse(toe, out result))
@@ -519,6 +524,11 @@ public partial class StudentBinder_dataSheetTimer : System.Web.UI.Page
                 validDate = true;
             }
         }
+        toe = objData.formatDateTime(toe);
+        if (toe == "Invalid time format")
+            return "Invalid time format";
+        if (toe == "Invalid datetime structure")
+            return "Invalid datetime structure";
         if (isValidFormat == false || (isValidFormat == true && validDate == true))
         {
         clsSession oSession = (clsSession)HttpContext.Current.Session["UserSession"];
@@ -638,7 +648,7 @@ public partial class StudentBinder_dataSheetTimer : System.Web.UI.Page
         bool isValidFormat = Regex.IsMatch(toe, formatPattern);
         string condition = "";
         int updateStat = 0, BehaviorIOAId = 0, NormalBehavId = 0;
-
+        objData = new clsData();
         if (isValidFormat)
         {
            
@@ -647,6 +657,11 @@ public partial class StudentBinder_dataSheetTimer : System.Web.UI.Page
                 validDate = true;
             }
         }
+        toe = objData.formatDateTime(toe);
+        if (toe == "Invalid time format")
+            return "Invalid time format";
+        if (toe == "Invalid datetime structure")
+            return "Invalid datetime structure";
         if (isValidFormat == false || (isValidFormat == true && validDate == true))
         {
 
@@ -825,7 +840,7 @@ public partial class StudentBinder_dataSheetTimer : System.Web.UI.Page
         bool validDate= false;
         string formatPattern = @"^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\s(?:AM|PM)$";
         bool isValidFormat = Regex.IsMatch(toe, formatPattern);
-
+        objData = new clsData();
         if (isValidFormat)
         {
             if (DateTime.TryParse(toe, out result))
@@ -833,6 +848,11 @@ public partial class StudentBinder_dataSheetTimer : System.Web.UI.Page
                 validDate = true;
             }
         }
+        toe = objData.formatDateTime(toe);
+        if(toe == "Invalid time format")
+            return "Invalid time format";
+        if (toe == "Invalid datetime structure")
+            return "Invalid datetime structure";
         if (isValidFormat == false || (isValidFormat == true && validDate == true))
         {
         clsSession oSession = (clsSession)HttpContext.Current.Session["UserSession"];

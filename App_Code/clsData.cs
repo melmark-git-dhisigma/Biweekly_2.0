@@ -2025,5 +2025,43 @@ public class clsData
 
 
     }
+    public string formatDateTime(string toe)
+    {
+        string[] parts = toe.Split(' ');
+
+        if (parts.Length == 3) // Ensure we have a valid structure (date, time, AM/PM)
+        {
+            string datePart = parts[0];
+            string timePart = parts[1]; // "20:000:00"
+            string amPmPart = parts[2]; // "AM"
+
+            // Fix the time part by removing extra digits
+            string[] timeComponents = timePart.Split(':');
+            if (timeComponents.Length == 3)
+            {
+                // Convert each component to numeric and format as two digits
+                string hour = int.Parse(timeComponents[0]).ToString("D2");    // "004" → "04"
+                string minutes = int.Parse(timeComponents[1]).ToString("D2"); // "11" → "11"
+                string seconds = int.Parse(timeComponents[2]).ToString("D2"); // "000" → "00"
+
+                // Rebuild the corrected time
+                string correctedTime = hour + ":" + minutes + ":" + seconds;
+
+                // Combine back to a properly formatted datetime string
+                toe = datePart + " " + correctedTime + " " + amPmPart;
+
+                //Console.WriteLine("Corrected DateTime String: " + toe);
+            }
+            else
+            {
+                return "Invalid time format";
+            }
+        }
+        else
+        {
+            return "Invalid datetime structure";
+        }
+        return toe;
+    }
 
 }
