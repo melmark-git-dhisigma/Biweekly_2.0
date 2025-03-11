@@ -2591,7 +2591,29 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         {
                             try
                             {
-                                iCrntStep = Convert.ToInt32(dt.Rows[0]["SortOrder"].ToString());
+                                string sqlchaintype = "";
+                                string ChaintypeMain = "";
+                                if (SkillType == "Chained")
+                                {
+                                    sqlchaintype = "SELECT ChainType FROM DSTempHdr WHERE DSTempHdrId=" + oTemp.TemplateId;
+                                    ChaintypeMain = oData.FetchValue(sqlchaintype).ToString();
+
+                                    if (ChaintypeMain == "Forward chain")
+                                    {
+                                        int iCrntStepcnt = dt.Rows.Count - 1;
+                                        iCrntStep = Convert.ToInt32(dt.Rows[iCrntStepcnt]["SortOrder"].ToString());
+                                    }
+                                    else
+                                    {
+                                        iCrntStep = Convert.ToInt32(dt.Rows[0]["SortOrder"].ToString());
+                                    }
+
+                                }
+                                else
+                                {
+                                    iCrntStep = Convert.ToInt32(dt.Rows[0]["SortOrder"].ToString());
+                                }
+
                             }
                             catch
                             {
@@ -2632,7 +2654,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     if (ViewState["IsHistory"] != null && Convert.ToBoolean(ViewState["IsHistory"]) != false)
                     {
                         object Stepid = oData.FetchValue("SELECT CurrentStepId FROM StdtSessionHdr WHERE StdtSessionHdrId=" + Convert.ToInt32(ViewState["StdtSessHdr"]));
-                        if (Stepid != null)
+                        if (Stepid != null && Convert.ToBoolean(hdn_isMaintainance.Value) != true)
                         {
                             iCrntStep = Convert.ToInt32(Stepid);
                         }
@@ -5514,7 +5536,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 Response.Redirect("Datasheet.aspx?pageid=" + oTemp.TemplateId + "&studid=" + oSession.StudentId, false);
                             }
                         }
-                   }
+                    }
                     if(transCheck1 && transCheck2)
                     {
                         string updQry = "update StdtSessionHdr SET SessionStatusCd='S' WHERE StdtSessionHdrId=" + Convert.ToInt32(ViewState["StdtSessHdr"]) + "";
