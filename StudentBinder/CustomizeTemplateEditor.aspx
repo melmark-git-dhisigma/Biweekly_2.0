@@ -3112,7 +3112,7 @@
                                                     </tr>
                                                      <tr>
                                                         <td colspan="3" style="text-align: left;">
-                                                            <asp:Button ID="btUpdateMeasurement" runat="server" class="rbtn" Text="Update" OnClick="btUpdateMeasurement_Click" OnClientClick="scrollToTop();" ToolTip="Press to Save your work on this tab"/>
+                                                            <asp:Button ID="btUpdateMeasurement" runat="server" class="rbtn" Text="Update Approval Note" style="margin-right: 20px; width: 140px" OnClick="btUpdateMeasurement_Click" OnClientClick="scrollToTop();" ToolTip="Press to Save Approval Note"/>
 
                                                         </td>
                                                     </tr>
@@ -3412,7 +3412,7 @@
                                                     </tr>
                                                                                                          <tr>
                                                         <td colspan="3" style="text-align: left;">
-                                                            <asp:Button ID="btnUpdateset" runat="server" class="rbtn" Text="Update" OnClick="btnUpdateset_Click" OnClientClick="scrollToTop();" ToolTip="Press to Save your work on this tab"/>
+                                                            <asp:Button ID="btnUpdateset" runat="server" class="rbtn" Text="Update Approval Note" style="margin-right: 20px; width: 140px" OnClick="btnUpdateset_Click" OnClientClick="scrollToTop();" ToolTip="Press to Save Approval Note"/>
 
                                                         </td>
                                                     </tr>
@@ -3793,7 +3793,7 @@
                                                     </tr>
                                                      <tr>
                                                         <td colspan="3" style="text-align: left;">
-                                                            <asp:Button ID="btnUpdatesteps" runat="server" class="rbtn" Text="Update" OnClick="btnUpdatesteps_Click" OnClientClick="scrollToTop();" ToolTip="Press to Save your work on this tab"/>
+                                                            <asp:Button ID="btnUpdatesteps" runat="server" class="rbtn" Text="Update Approval Note" style="margin-right: 20px; width: 140px" OnClick="btnUpdatesteps_Click" OnClientClick="scrollToTop();" ToolTip="Press to Save Approval Note"/>
 
                                                         </td>
                                                     </tr>
@@ -3987,7 +3987,7 @@
                                                         </tr>
                                                         <tr>
                                                         <td colspan="3" style="text-align: left;">
-                                                            <asp:Button ID="btnupdateprompts" runat="server" class="rbtn" Text="Update" OnClick="btnupdateprompts_Click" OnClientClick="scrollToTop();" ToolTip="Press to Save your work on this tab"/>
+                                                            <asp:Button ID="btnupdateprompts" runat="server" class="rbtn" Text="Update Approval Note" style="margin-right: 20px; width: 140px" OnClick="btnupdateprompts_Click" OnClientClick="scrollToTop();" ToolTip="Press to Save Approval Note"/>
 
                                                         </td>
                                                     </tr>
