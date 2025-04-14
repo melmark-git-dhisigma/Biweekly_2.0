@@ -1725,8 +1725,15 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
     {
         ObjData = new clsData();
         Dt = new DataTable();
-        string strQry = "SELECT DSTempSetId AS Id,SetCd AS Name FROM DSTempSet DS INNER JOIN StdtDSStat DST ON DS.DSTempHdrId=DST.DSTempHdrId " +
-            " WHERE DS.ActiveInd='A' AND DS.DSTempHdrId=" + templateId + " AND DST.StudentId=" + sess.StudentId + " AND DS.SortOrder < DST.NextSetNmbr";
+       //int LessonPlanId = Convert.ToInt32(ObjData.FetchValue("SELECT LessonPlanId FROM DSTempHdr WHERE DSTempHdrId=" + templateId));
+       // string strQry = "SELECT DSTempSetId AS Id,SetCd AS Name FROM DSTempSet DS INNER JOIN StdtDSStat DST ON DS.DSTempHdrId=DST.DSTempHdrId " +
+       //     " WHERE DS.ActiveInd='A' AND DS.DSTempHdrId in (Select DSTempHdrId from dstemphdr where studentId=" + sess.StudentId + " AND LessonPlanId = " + LessonPlanId + ") AND DST.StudentId=" + sess.StudentId + " AND DS.SortOrder < DST.NextSetNmbr";
+
+       int LessonPlanId = Convert.ToInt32(ObjData.FetchValue("SELECT LessonPlanId FROM DSTempHdr WHERE DSTempHdrId=" + templateId));
+        string strQry = "SELECT distinct DSTempSetId AS Id,SetCd AS Name FROM DSTempSet DS INNER JOIN StdtsessionHdr hdr On DS.DSTempHdrId=hdr.DSTempHdrId" +
+            " WHERE DS.ActiveInd='A' AND DS.DSTempHdrId in (Select DSTempHdrId from dstemphdr where studentId=" + sess.StudentId + " AND LessonPlanId = " + LessonPlanId + ") AND hdr.StudentId=" + sess.StudentId + " AND hdr.IsMaintanace=1 AND SessionStatusCd='S' AND DS.DstempsetId=hdr.CurrentSetId";
+       
+
         Dt = ObjData.ReturnDataTable(strQry, false);
         DataRow row = Dt.NewRow();
         row["Name"] = "Current Progress";
@@ -1973,7 +1980,8 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
     {
         RV_LPReport.Visible = false;
         string SetId = drpSetname.SelectedValue;
-        if (Convert.ToInt32(SetId) == -1)
+        //if (Convert.ToInt32(SetId) == -1)
+        if (SetId == "-1")
         {
             chkioa.Visible = true;
         }
