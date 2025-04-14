@@ -19507,34 +19507,82 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         objData = new clsData();
         sess = (clsSession)Session["UserSession"];
         string query = "";
+        string LPNameOrder = "";
+        string QueryLplist = "";
 
         if (sess != null)
         {
+            LPNameOrder = "SELECT distinct LP.LessonPlanId AS Id,DTmp.DSTemplateName AS Name,ISNULL(DTmp.LessonOrder, 0 ) AS lessonorder " +
+                                "FROM StdtLessonPlan StdtLP " +
+                                "INNER JOIN DSTempHdr DTmp ON DTmp.LessonPlanId = StdtLP.LessonPlanId AND DTmp.StudentId = StdtLP.StudentId " +
+                                "INNER JOIN LookUp LU ON LU.LookupId = DTmp.StatusId " +
+                                "INNER JOIN LessonPlan LP ON StdtLP.LessonPlanId = LP.LessonPlanId " +
+                                "WHERE StdtLP.StudentId= " + sess.StudentId + " AND StdtLP.ActiveInd='A'  AND LookupType='TemplateStatus' AND LU.LookupName<>'Expired' " +
+                                "AND (LU.LookupName='Approved' OR LU.LookupName='Maintenance')  ORDER BY  LessonOrder ";
+            
+           DataTable DTLPNameOrder = objData.ReturnDataTable(LPNameOrder, false);
 
-            FillLessonPlanName();
-            FillLessonorder();
+            DataTable dtLPN = new DataTable();
+            dtLPN.Columns.Add("Id", typeof(string));
+            dtLPN.Columns.Add("Name", typeof(string));
+            DataRow drN0 = dtLPN.NewRow();
+            drN0["Id"] = 0;
+            drN0["Name"] = "--Select Lesson Plan--";
+            dtLPN.Rows.Add(drN0);
 
+            DataTable dtLPO = new DataTable();
+            dtLPO.Columns.Add("Id", typeof(string));
+            dtLPO.Columns.Add("Order", typeof(string));
+            DataRow drO0 = dtLPO.NewRow();
+            drO0["Id"] = 0;
+            drO0["Order"] = "--Select order--";
+            dtLPO.Rows.Add(drO0);
+            int count = 1;
+
+            if (DTLPNameOrder != null)
+            {
+                if (DTLPNameOrder.Rows.Count > 0)
+                {
+                    foreach (DataRow drLessn in DTLPNameOrder.Rows)
+                    {
+                        DataRow drrN = dtLPN.NewRow();
+                        drrN["Id"] = drLessn.ItemArray[0];
+                        drrN["Name"] = drLessn.ItemArray[1];
+                        dtLPN.Rows.Add(drrN);
+                        DataRow drrO = dtLPO.NewRow();
+                        drrO["Id"] = drLessn.ItemArray[0];
+                        drrO["Order"] = count;
+                        dtLPO.Rows.Add(drrO);
+                        count++;
+                    }
+
+                }
+            }
+            ddlLessonname.DataSource = dtLPN;
+            ddlLessonname.DataTextField = "Name";
+            ddlLessonname.DataValueField = "Id";
+            ddlLessonname.DataBind();   
+        
+            ddlLessonorder.DataSource = dtLPO;
+            ddlLessonorder.DataTextField = "Order";
+            ddlLessonorder.DataValueField = "Id";
+            ddlLessonorder.DataBind(); 
            
-
-            //query = "select distinct LessonPlanId," +
-            //      "(select top 1 DSTempHdrId from DSTempHdr hdr where StudentId=" + sess.StudentId + " and hdr.LessonPlanId=hdr2.LessonPlanId and StatusId in (select LookupId from LookUp where LookUpName <> 'Deleted' and LookupType='TemplateStatus' and LookUpName<>'Maintenance' and LookUpName<>'In Progress' and LookUpName<>'Inactive' and LookUpName='Approved') order by hdr.DSTempHdrId desc) DSTempHdrId," +
-            //      "(select top 1 DSTemplateName from DSTempHdr hdr where StudentId=" + sess.StudentId + " and hdr.LessonPlanId=hdr2.LessonPlanId and StatusId in (select LookupId from LookUp where LookUpName <> 'Deleted' and LookupType='TemplateStatus' and LookUpName<>'Maintenance' and LookUpName<>'In Progress' and LookUpName<>'Inactive' and LookUpName='Approved') order by hdr.DSTempHdrId desc) DSTemplateName," +
-            //      "(select top 1 LessonOrder from DSTempHdr hdr where StudentId=" + sess.StudentId + " and hdr.LessonPlanId=hdr2.LessonPlanId and StatusId in (select LookupId from LookUp where LookUpName <> 'Deleted' and LookupType='TemplateStatus' and LookUpName<>'Maintenance' and LookUpName<>'In Progress' and LookUpName<>'Inactive' and LookUpName='Approved') order by hdr.DSTempHdrId desc) LessonOrder," +
-            //      "null as SNo" +
-            //      " from DSTempHdr hdr2 left join LookUp lu on lu.LookupId=hdr2.StatusId" +
-            //      " where StudentId=" + sess.StudentId + " and lu.LookupName <> 'Deleted' and LookUpName<>'Maintenance' and LookUpName<>'In Progress' and LookUpName<>'Inactive' and LookUpName='Approved'" +
-            //      " order by LessonOrder";
-            query = "select distinct LessonPlanId,DSTempHdrId,DSTemplateName ,LessonOrder,StatusId,null as SNo " +
-                   "from DSTempHdr where StudentId=" + sess.StudentId + " and StatusId in " +
-                   "(select LookupId from LookUp where LookupType='TemplateStatus' and LookUpName <> 'Deleted' and " +
-                   "LookUpName<>'In Progress' and LookUpName<>'Inactive' and " +
-                   "(LookUpName='Approved' or LookupName='Maintenance')) order by LessonOrder ";
-
             int MaintainId = Convert.ToInt32(objData.FetchValue("select LookupId from LookUp where LookUpName='Maintenance' and LookupType='TemplateStatus'"));
             
-            DataTable dtLPforSorting = objData.ReturnDataTable(query, false);
+            QueryLplist = "select distinct LP.LessonPlanId,DTmp.DSTempHdrId,DTmp.DSTemplateName, ISNULL(DTmp.LessonOrder, 0 ) AS LessonOrder ,DTmp.StatusId,null as SNo " +
+                                "FROM  StdtLessonPlan StdtLP " +
+                                "INNER JOIN DSTempHdr DTmp ON DTmp.LessonPlanId = StdtLP.LessonPlanId AND DTmp.StudentId = StdtLP.StudentId " +
+                                "INNER JOIN LookUp LU ON LU.LookupId = DTmp.StatusId " +
+                                "INNER JOIN LessonPlan LP ON StdtLP.LessonPlanId = LP.LessonPlanId " +
+                                "WHERE  StdtLP.StudentId= " + sess.StudentId + " AND StdtLP.ActiveInd='A' AND LookupType='TemplateStatus' AND LU.LookupName<>'Expired' " +
+                                "AND (LU.LookupName='Approved' OR LU.LookupName='Maintenance') ORDER BY  LessonOrder ";
+
+            DataTable dtLPforSorting = objData.ReturnDataTable(QueryLplist, false);
+
             int i = 1;
             dtLPforSorting.Columns.Add("checkmaint", typeof(System.String));
+
             foreach (DataRow dr in dtLPforSorting.Rows)
             {
                 if (Convert.ToInt16(dr["StatusId"]) == MaintainId)
@@ -19553,71 +19601,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             dlLPforSorting.DataBind();
         }
     }
-
-    private void FillLessonPlanName()
-    {
-        DataTable dtLP = new DataTable();
-        dtLP.Columns.Add("Id", typeof(string));
-        dtLP.Columns.Add("Name", typeof(string));
-        DataRow dr0 = dtLP.NewRow();
-        dr0["Id"] = 0;
-        dr0["Name"] = "--Select Lesson Plan--";
-        dtLP.Rows.Add(dr0);
-        clsLessons oLessons = new clsLessons();
-        DataTable DTLesson = oLessons.getDSLessonPlans(sess.StudentId.ToString(), "LP.LessonPlanId AS Id, DTmp.DSTemplateName AS Name", "(LU.LookupName='Approved' OR LU.LookupName='Maintenance') AND (DTmp.DSMode IS NULL OR DTmp.DSMode='MAINTENANCE' OR DTmp.DSMode='')");
-        if (DTLesson != null)
-        {
-            if (DTLesson.Rows.Count > 0)
-            {
-
-                foreach (DataRow drLessn in DTLesson.Rows)
-                {
-                    DataRow drr = dtLP.NewRow();
-                    drr["Id"] = drLessn.ItemArray[0];
-                    drr["Name"] = drLessn.ItemArray[1];
-                    dtLP.Rows.Add(drr);
-                }
-
-            }
-        }
-        ddlLessonname.DataSource = dtLP;
-        ddlLessonname.DataTextField = "Name";
-        ddlLessonname.DataValueField = "Id";
-        ddlLessonname.DataBind();
-    }
-    private void FillLessonorder()
-    {
-        DataTable dtLP = new DataTable();
-        dtLP.Columns.Add("Id", typeof(string));
-        dtLP.Columns.Add("Order", typeof(string));
-        DataRow dr0 = dtLP.NewRow();
-        dr0["Id"] = 0;
-        dr0["Order"] = "--Select order--";
-        dtLP.Rows.Add(dr0);
-        clsLessons oLessons = new clsLessons();
-        int count = 1;
-        DataTable DTLesson = oLessons.getDSLessonPlans(sess.StudentId.ToString(), "LP.LessonPlanId AS Id, DTmp.DSTemplateName AS Name", "(LU.LookupName='Approved' OR LU.LookupName='Maintenance') AND (DTmp.DSMode IS NULL OR DTmp.DSMode='MAINTENANCE' OR DTmp.DSMode='')");
-        if (DTLesson != null)
-        {
-            if (DTLesson.Rows.Count > 0)
-            {
-                
-                foreach (DataRow drLessn in DTLesson.Rows)
-                {
-                    DataRow drr = dtLP.NewRow();
-                    drr["Id"] = drLessn.ItemArray[0];
-                    drr["Order"] = count;
-                    dtLP.Rows.Add(drr);
-                    count++;
-                }
-
-            }
-        }
-        ddlLessonorder.DataSource = dtLP;
-        ddlLessonorder.DataTextField = "Order";
-        ddlLessonorder.DataValueField = "Id";
-        ddlLessonorder.DataBind();
-    }    
+       
     protected void btnSaveOrder_Click(object sender, EventArgs e)
     {
         objData = new clsData();
@@ -19649,13 +19633,13 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         if (ddlLessonname.SelectedIndex != 0 && ddlLessonorder.SelectedIndex != 0)
         {
             int lpid = Convert.ToInt32(ddlLessonname.SelectedValue);
-            int lporo = Convert.ToInt32(objData.FetchValue("select LessonOrder from DSTempHdr where  statusId in(SELECT  LookupId FROM LookUp WHERE LookupType='TemplateStatus' And LookupName='Approved') and LessonPlanId=" + Convert.ToInt32(ddlLessonname.SelectedValue)));
+            int lporo = Convert.ToInt32(objData.FetchValue("select LessonOrder from DSTempHdr where  statusId in(SELECT  LookupId FROM LookUp WHERE LookupType='TemplateStatus' And (LookUpName='Approved' or LookupName='Maintenance')) and LessonPlanId=" + Convert.ToInt32(ddlLessonname.SelectedValue)));
             int lporon=(Convert.ToInt32(ddlLessonorder.SelectedItem.Text))-1;
-            int count = Convert.ToInt32(objData.FetchValue("select max(LessonOrder) from DSTempHdr where StudentId=" + sess.StudentId + " and statusId in(SELECT  LookupId FROM LookUp WHERE LookupType='TemplateStatus' And LookupName='Approved')"));
+            int count = Convert.ToInt32(objData.FetchValue("select max(LessonOrder) from DSTempHdr where StudentId=" + sess.StudentId + " and statusId in(SELECT  LookupId FROM LookUp WHERE LookupType='TemplateStatus' And (LookUpName='Approved' or LookupName='Maintenance'))"));
             string queryorder="";
             if(lporo>lporon)
             {
-                queryorder = "update DSTempHdr set LessonOrder=LessonOrder+1 where LessonOrder >=" + lporon + " and LessonOrder <" + lporo + "  and StudentId=" + sess.StudentId;
+                queryorder = "update DSTempHdr set LessonOrder=LessonOrder+1 where LessonOrder >=" + lporon + " and LessonOrder <" + lporo + "  and StudentId=" + sess.StudentId; 
                 objData.Execute(queryorder);
 
                 queryorder = "update DSTempHdr set LessonOrder=" + lporon + " where LessonPlanId=" +lpid + " and StudentId=" + sess.StudentId;
