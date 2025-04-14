@@ -203,7 +203,7 @@ public partial class StudentBinder_ChainedBarGraphReport : System.Web.UI.Page
             int studid = Convert.ToInt32(Request.QueryString["studid"].ToString());
             int templateId = Convert.ToInt32(Request.QueryString["pageid"].ToString());
             string StudName = "";
-            string strQuery = "SELECT StudentLname+','+StudentFname AS StudentName FROM Student WHERE StudentId=" + studid;
+            string strQuery = "SELECT LastName+','+FirstName AS StudentName FROM StudentPersonal WHERE StudentPersonalId=" + studid;
             StudName = Convert.ToString(ObjData.FetchValue(strQuery));
             ObjTempSess = (ClsTemplateSession)Session["BiweeklySession"];
             DateTime dtst = new DateTime();
@@ -281,7 +281,7 @@ public partial class StudentBinder_ChainedBarGraphReport : System.Web.UI.Page
                 int studid = Convert.ToInt32(Request.QueryString["studid"].ToString());
                 int templateId = Convert.ToInt32(Request.QueryString["pageid"].ToString());
                 string StudName = "";
-                string strQuery = "SELECT StudentLname+','+StudentFname AS StudentName FROM Student WHERE StudentId=" + studid;
+                string strQuery = "SELECT LastName+','+FirstName AS StudentName FROM StudentPersonal WHERE StudentPersonalId=" + studid;
                 StudName = Convert.ToString(ObjData.FetchValue(strQuery));
 
                 //string ReportXML = "SELECT [Name],CAST(CAST([Content] AS VARBINARY(MAX)) AS XML) AS reportXML FROM [Catalog] WHERE type = 2";

@@ -2210,7 +2210,7 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
         objData = new clsData();
         List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
         Dictionary<string, object> row;
-        string sqlStr = "SELECT S.StudentLname + ', ' + S.StudentFname AS StudentName,(SELECT TOP 1 ('Tx: ' + (SELECT LookupName FROM LookUp WHERE LookupId= [TeachingProcId]) + ';' + (SELECT LookupName FROM LookUp WHERE LookupId= [PromptTypeId])))Treatment,(SELECT TOP 1 'Correct Response: ' + DS.StudCorrRespDef WHERE DS.StudCorrRespDef <>'')Deftn,DSTemplateName as LessonPlanName FROM Student S JOIN DSTempHdr DS ON S.StudentId=DS.StudentId WHERE S.StudentId=" + studid + " AND DSTempHdrId=" + lessid;
+        string sqlStr = "SELECT S.LastName + ', ' + S.FirstName AS StudentName,(SELECT TOP 1 ('Tx: ' + (SELECT LookupName FROM LookUp WHERE LookupId= [TeachingProcId]) + ';' + (SELECT LookupName FROM LookUp WHERE LookupId= [PromptTypeId])))Treatment,(SELECT TOP 1 'Correct Response: ' + DS.StudCorrRespDef WHERE DS.StudCorrRespDef <>'')Deftn,DSTemplateName as LessonPlanName FROM StudentPersonal S JOIN DSTempHdr DS ON S.StudentPersonalId=DS.StudentId WHERE S.StudentPersonalId=" + studid + " AND DSTempHdrId=" + lessid;
         DataTable dt = objData.ReturnDataTable(sqlStr, false);
         foreach (DataRow dr in dt.Rows)
         {
