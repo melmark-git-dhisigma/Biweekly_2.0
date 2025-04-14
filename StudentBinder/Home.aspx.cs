@@ -3325,16 +3325,17 @@ public partial class Home : System.Web.UI.Page
         objData = new clsData();
         if (txtSnameDsch.Text.Trim() == "Choose Discharged Client")
         {
-            studentDetail = "SELECT Distinct StudentPersonalId AS Id, FirstName+' ' +LastName AS Name FROM StudentPersonal WHERE StudentType='client' and clientid>0 and StudentPersonalId not in" +
-                             "(SELECT Distinct ST.StudentPersonalId FROM StudentPersonal ST join Placement PLC on PLC.StudentPersonalId=ST.StudentPersonalId WHERE (PLC.EndDate is null or PLC.EndDate>=cast (GETDATE() as DATE)) and PLC.Status=1 )";
+            studentDetail = "SELECT Distinct StudentPersonalId AS Id, FirstName+' ' +LastName AS Name FROM StudentPersonal WHERE StudentType='client' and clientid>0 "+//and StudentPersonalId not in" +
+                             //"(SELECT Distinct ST.StudentPersonalId FROM StudentPersonal ST join Placement PLC on PLC.StudentPersonalId=ST.StudentPersonalId WHERE (PLC.EndDate is null or PLC.EndDate>=cast (GETDATE() as DATE)) and PLC.Status=1 )"+
+                             "AND PlacementStatus='D'";
         }
         else
         {
-            studentDetail = "SELECT Id, Name FROM (SELECT distinct StudentPersonalId AS Id, FirstName+' ' +LastName AS Name FROM StudentPersonal WHERE StudentType='client' and clientid>0 and StudentPersonalId not in" +
-                             "(SELECT Distinct ST.StudentPersonalId FROM StudentPersonal ST join Placement PLC on PLC.StudentPersonalId=ST.StudentPersonalId WHERE (PLC.EndDate is null or PLC.EndDate>=cast (GETDATE() as DATE)) and PLC.Status=1 )"+
+            studentDetail = "SELECT Id, Name FROM (SELECT distinct StudentPersonalId AS Id, FirstName+' ' +LastName AS Name FROM StudentPersonal WHERE StudentType='client' and clientid>0 "+//and StudentPersonalId not in" +
+                             //"(SELECT Distinct ST.StudentPersonalId FROM StudentPersonal ST join Placement PLC on PLC.StudentPersonalId=ST.StudentPersonalId WHERE (PLC.EndDate is null or PLC.EndDate>=cast (GETDATE() as DATE)) and PLC.Status=1 )"+
                             "AND (FirstName='" + clsGeneral.convertQuotes(txtSnameDsch.Text.Trim()) + "' " +
                             "OR LastName='" + clsGeneral.convertQuotes(txtSnameDsch.Text.Trim()) + "' OR FirstName+LastName='" + clsGeneral.convertQuotes(txtSnameDsch.Text.Trim()) + "' OR LastName+FirstName='" + clsGeneral.convertQuotes(txtSnameDsch.Text.Trim()) + "' " +
-                            "OR LastName LIKE '%" + clsGeneral.convertQuotes(txtSnameDsch.Text.Trim()) + "%' OR FirstName LIKE '%" + clsGeneral.convertQuotes(txtSnameDsch.Text.Trim()) + "%')) AS STDTCLASS";
+                            "OR LastName LIKE '%" + clsGeneral.convertQuotes(txtSnameDsch.Text.Trim()) + "%' OR FirstName LIKE '%" + clsGeneral.convertQuotes(txtSnameDsch.Text.Trim()) + "%') AND PlacementStatus='D') AS STDTCLASS";
         }
         DataTable dt = objData.ReturnDataTable(studentDetail, false);
         if (dt == null) return;
