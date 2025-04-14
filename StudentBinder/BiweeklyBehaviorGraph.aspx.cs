@@ -478,7 +478,7 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
             ddlLessonplan.Visible = true;
             btnNext.Visible = true;
             string StudentName = "";
-            string strQuery = "SELECT StudentLname+','+StudentFname AS StudentName FROM Student WHERE StudentId=" + studid;
+            string strQuery = "SELECT LastName+','+FirstName AS StudentName FROM StudentPersonal WHERE StudentPersonalId=" + studid;
             DataTable dt = objData.ReturnDataTable(strQuery, false);
             if (dt != null)
             {
@@ -621,7 +621,7 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
             ddlLessonplan.Visible = true;
             btnNext.Visible = true;
             string StudentName = "";
-            string strQuery = "SELECT StudentLname+','+StudentFname AS StudentName FROM Student WHERE StudentId=" + studid;
+            string strQuery = "SELECT LastName+','+FirstName AS StudentName FROM StudentPersonal WHERE StudentPersonalId=" + studid;
             DataTable dt = objData.ReturnDataTable(strQuery, false);
             if (dt != null)
             {
@@ -987,7 +987,7 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
                 objData = new clsData();
                 int studid = Convert.ToInt32(Request.QueryString["studid"].ToString());
                 string StudentName = "";
-                string strQuery = "SELECT StudentLname+','+StudentFname AS StudentName FROM Student WHERE StudentId=" + studid;
+                string strQuery = "SELECT LastName+','+FirstName AS StudentName FROM StudentPersonal WHERE StudentPersonalId=" + studid;
                 DataTable dt = objData.ReturnDataTable(strQuery, false);
                 if (dt != null)
                 {
@@ -1289,9 +1289,9 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
                 response.AddHeader("Content-Disposition", "attachment;filename=\"" + outputPath + "\"");
                 byte[] data = req.DownloadData(outputPath);
                 response.BinaryWrite(data);
+                response.End();
+                //HttpContext.Current.ApplicationInstance.CompleteRequest();
                 btnsubmit_Click(sender, e);
-               // response.End();
-                HttpContext.Current.ApplicationInstance.CompleteRequest();
 
             }
             else
@@ -1307,8 +1307,8 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
             byte[] data = req.DownloadData(FileName);
             response.BinaryWrite(data);
             ClientScript.RegisterStartupScript(GetType(), "", "HideWait();", true);
-           // response.End();
-            HttpContext.Current.ApplicationInstance.CompleteRequest();
+            response.End(); //Code reviewed- used because there is an issue when opening the file in Adobe reader
+            //HttpContext.Current.ApplicationInstance.CompleteRequest();
         }
         }
         catch (Exception ex)
