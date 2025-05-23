@@ -235,6 +235,28 @@
     </style>
 
     <script type="text/javascript">
+        window.addEventListener('storage', function(event) {
+            if (event.key === 'studentId') {
+                //alert("Tab Switch");
+                //location.reload(); // Refresh page when session data changes
+            }
+        });
+        // Check session data when the tab is focused
+        window.onfocus = function() {
+            // Retrieve the studentId from localStorage (now shared between tabs)
+    var selectedStudentId = localStorage.getItem('studentId');
+
+            // Here, we assume that you want to compare the current selected student with what is stored in localStorage
+            // If the studentId has changed, refresh the page or do some UI updates
+    var currentStudentId = $('#hidCureentStudent').val();//document.getElementById('hidCureentStudent').value(); // This could be checked with your backend session data if necessary
+
+            // If the selected studentId doesn't match the current studentId, refresh the page
+    if(currentStudentId!=0)
+    if (selectedStudentId !== currentStudentId) {
+        alert("This tab is no longer active. Please switch to the previous tab.");
+                //location.reload();  // Refresh the page to sync the session and the UI
+            }
+        };
 
         $(document).ready(function () {
             var isiPad = navigator.userAgent.match(/iPad/i);
@@ -1394,6 +1416,7 @@
 
             selStdId = div.id;
             document.getElementById('hidCureentStudent').value = selStdId
+            localStorage.setItem('studentId', selStdId);
             
             
             PageMethods.SetStudentID(div.id, OnSuccessStdAssign, OnFailure);
@@ -3742,7 +3765,7 @@
         var noOfAlarms = 0;
         var myVar = setInterval(function () { myTimer() }, 1000);
         //var myGeTime = setInterval(function () { getAlarm() }, 300000);
-        var myGeTime = setInterval(function () { getAlarm() }, 58000);
+        //var myGeTime = setInterval(function () { getAlarm() }, 58000);
         var timalrm = '';
         var alartimecheck;
         var noOfRows;
@@ -3986,7 +4009,7 @@
                     if (contents.indexOf("System.IndexOutOfRangeException") == -1) {
                         snoozMsg = 0;
                         $('#AlAllDiv' + indexVal + '').hide();
-                        getAlarm();
+                        //getAlarm();
 
                     }
 
@@ -4144,7 +4167,7 @@
                               succesMsg("Timer On");
                               $('#TIMERS').trigger('click');
                               document.getElementById("play").src="../Administration/images/icons8-bell-on.png";
-                              getAlarm();
+                              //getAlarm();
                           }
 
                       },
@@ -4271,7 +4294,7 @@
 
     <script>
         // Define a variable for idle time in milliseconds
-        var idleTimeInMilliseconds = 180000; // 3 minutes in milliseconds
+        var idleTimeInMilliseconds = 1800000; // 30 minutes in milliseconds
         var idleStartTime; // Timestamp when the user became idle
         var countdownTimerInterval;
         var idleTimer;
