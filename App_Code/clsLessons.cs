@@ -47,7 +47,7 @@ public class clsLessons
         if (str == "DatasheetTab")
         {
             qry = " SELECT  distinct top(51) " + columns + ",ISNULL(DTmp.LessonOrder, 0 ) AS lessonorder, " +
-                "(SELECT ISNULL((SELECT COUNT(SessionNbr) FROM StdtSessionHdr WHERE LessonPlanId = StdtLP.lessonplanid AND StudentId = StdtLP.studentid AND SessionStatusCd = 'S' AND SessMissTrailStus <> 'Y' AND IOAInd <> 'Y' AND CONVERT(char(10),ModifiedOn,101) = CONVERT(char(10),GETDATE(),101)),0))AS Counter" +
+                "(SELECT ISNULL((SELECT COUNT(SessionNbr) FROM StdtSessionHdr WHERE LessonPlanId = StdtLP.lessonplanid AND StudentId = StdtLP.studentid AND SessionStatusCd = 'S' AND SessMissTrailStus <> 'Y' AND IOAInd <> 'Y' AND CONVERT(char(10),EndTs,101) = CONVERT(char(10),GETDATE(),101)),0))AS Counter" +
                          " FROM (StdtLessonPlan StdtLP INNER JOIN (DSTempHdr DTmp  INNER JOIN LookUp LU ON LU.LookupId=DTmp.StatusId)  " +
                            " ON DTmp.LessonPlanId=StdtLP.LessonPlanId AND DTmp.StudentId=StdtLP.StudentId) " +
                                "   INNER JOIN LessonPlan LP ON StdtLP.LessonPlanId=LP.LessonPlanId WHERE (StdtLP.LessonPlanTypeDay IS NOT NULL OR StdtLP.LessonPlanTypeResi IS NOT NULL) AND StdtLP.StudentId=" + studId + " AND " +
@@ -57,7 +57,7 @@ public class clsLessons
         {
             qry = " SELECT distinct top(51) " + columns + ",ISNULL(DTmp.LessonOrder, 0 ) AS lessonorder,FORMAT(CAST(st.starttime AS DATETIME),'hh:mmtt') starttime ,convert(VARCHAR(4),st.starttime,108) as starttime1,CONVERT(varchar(15),  CAST(st.EndTime AS TIME), 100)  as EndTime," +
                 "(SELECT ISNULL((SELECT COUNT(SessionNbr) FROM StdtSessionHdr WHERE	LessonPlanId = StdtLP.lessonplanid AND StudentId = StdtLP.studentid AND SessionStatusCd = 'D' AND IOAInd <> 'Y' AND CONVERT(char(10),ModifiedOn,101) = CONVERT(char(10),GETDATE(),101)),0))AS Draft, " +
-                "(SELECT ISNULL((SELECT COUNT(SessionNbr) FROM StdtSessionHdr WHERE LessonPlanId = StdtLP.lessonplanid AND StudentId = StdtLP.studentid AND SessionStatusCd = 'S' AND IOAInd <> 'Y' AND CONVERT(char(10),ModifiedOn,101) = CONVERT(char(10),GETDATE(),101)),0))AS Counter," +
+                "(SELECT ISNULL((SELECT COUNT(SessionNbr) FROM StdtSessionHdr WHERE LessonPlanId = StdtLP.lessonplanid AND StudentId = StdtLP.studentid AND SessionStatusCd = 'S' AND IOAInd <> 'Y' AND CONVERT(char(10),EndTs,101) = CONVERT(char(10),GETDATE(),101)),0))AS Counter," +
                 "(SELECT ISNULL((SELECT COUNT(SessionNbr) FROM StdtSessionHdr WHERE	LessonPlanId = StdtLP.lessonplanid AND StudentId = StdtLP.studentid AND SessionStatusCd = 's' AND IOAInd <> 'Y' AND CONVERT(char(10),ModifiedOn,101) = CONVERT(char(10),GETDATE(),101) AND CONVERT(time,ModifiedOn)>=convert(time,st.starttime) and CONVERT(time,ModifiedOn)<=convert(time,st.EndTime)),0))AS modi," +
                 //"(select ISNULL((select top 1 IOAPerc from StdtSessionHdr where LessonPlanId = StdtLP.lessonplanid AND StudentId = StdtLP.studentid and convert(date,ModifiedOn)= convert(date,GETDATE()) order by 1 desc ),0)) as ioastatus," +
                 "('IOA '+(select ISNULL((select top 1 IOAPerc from StdtSessionHdr where LessonPlanId = StdtLP.lessonplanid AND StudentId = StdtLP.studentid order by 1 desc ),0)) +" +
