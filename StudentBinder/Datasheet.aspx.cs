@@ -32135,7 +32135,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         clsData oDta = new clsData();
         String sqlqry = "select LessonPlanId from StdtSessionHdr where StdtSessionHdrId= " + sessionId;
         int Lpid = Convert.ToInt32(oData.FetchValue(sqlqry));
-        String sqlqry3 = "select MAX(SessionNbr) from StdtSessionHdr where LessonPlanId= " + Lpid;
+        String sqlqry3 = "select MAX(SessionNbr) from StdtSessionHdr where LessonPlanId= " + Lpid + " AND StudentId=" + sess.StudentId + " AND SchoolId=" + sess.SchoolId;
         int MaxSessNum = Convert.ToInt32(oData.FetchValue(sqlqry3));
         DataTable tempid = oDta.ReturnDataTable("SELECT SessionNbr, DSTempHdrId,CurrentSetId,IsMaintanace FROM StdtSessionHdr WHERE StdtSessionHdrId=" + sessionId, false);
         SessionNum = Convert.ToInt32(tempid.Rows[0]["SessionNbr"]);
@@ -32149,7 +32149,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             if (tempid.Rows.Count > 0)
             {
 
-                    string SessionNbrAct = "SELECT SessionNbr, StdtSessionHdrId,CurrentSetId,IsMaintanace FROM StdtSessionHdr where DSTempHdrId>0 AND LessonPlanId= " + Lpid + " order by SessionNbr asc";
+                    string SessionNbrAct = "SELECT SessionNbr, StdtSessionHdrId,CurrentSetId,IsMaintanace FROM StdtSessionHdr where DSTempHdrId>0 AND LessonPlanId= " + Lpid + " AND StudentId="+sess.StudentId +" AND SchoolId="+sess.SchoolId +" order by SessionNbr asc";
                     DataTable dtSessionNbrAct = oData.ReturnDataTable(SessionNbrAct, false);
 
                     if (dtSessionNbrAct != null && dtSessionNbrAct.Rows.Count > 0)
@@ -32223,7 +32223,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         DataTable tempid = oDta.ReturnDataTable("SELECT SessionNbr, DSTempHdrId,CurrentSetId,IsMaintanace FROM StdtSessionHdr WHERE StdtSessionHdrId=" + sessionId, false);
         SessionNum = Convert.ToInt32(tempid.Rows[0]["SessionNbr"]);
 
-        String sqlqryMin = "select Min(SessionNbr) from StdtSessionHdr where LessonPlanId= " + Lpid;
+        String sqlqryMin = "select Min(SessionNbr) from StdtSessionHdr where LessonPlanId= " + Lpid + " AND StudentId=" + sess.StudentId + " AND SchoolId=" + sess.SchoolId; ;
         int MinSessNum = Convert.ToInt32(oData.FetchValue(sqlqryMin));
 
         if (SessionNum > MinSessNum)
@@ -32234,7 +32234,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             if (tempid.Rows.Count > 0)
             {
 
-                    string SessionNbrAct = "SELECT SessionNbr, StdtSessionHdrId,CurrentSetId,IsMaintanace FROM StdtSessionHdr where DSTempHdrId>0 AND LessonPlanId= " + Lpid + " order by SessionNbr asc";
+                string SessionNbrAct = "SELECT SessionNbr, StdtSessionHdrId,CurrentSetId,IsMaintanace FROM StdtSessionHdr where DSTempHdrId>0 AND LessonPlanId= " + Lpid + " AND StudentId=" + sess.StudentId + " AND SchoolId=" + sess.SchoolId + " order by SessionNbr asc";
                     DataTable dtSessionNbrAct = oData.ReturnDataTable(SessionNbrAct, false);
 
                     if (dtSessionNbrAct != null && dtSessionNbrAct.Rows.Count > 0)
