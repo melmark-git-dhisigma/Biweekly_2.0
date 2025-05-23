@@ -7,16 +7,16 @@ using System.Web;
 using System.Configuration;
 
 /// <summary>
-/// Summary description for ClsScoreErrorlog
+/// Summary description for ClsSessionErrorlog
 /// </summary>
-public class ClsScoreErrorlog
+public class ClsTestDataLog
 {
-    public ClsScoreErrorlog()
+    public ClsTestDataLog()
     {
     }
 
-    public static string strLogPath = AppDomain.CurrentDomain.BaseDirectory;
-    public static string strScoreLogFilePath = strLogPath + @"ErrorLog\Scorelog.csv";
+    public static string strPath = AppDomain.CurrentDomain.BaseDirectory;
+    public static string strLogFilePath = strPath + @"ErrorLog\DataLog.txt";
 
 
     public void WriteToLog(string msg)
@@ -25,21 +25,24 @@ public class ClsScoreErrorlog
         {
             try
             {
-                if (!File.Exists(strScoreLogFilePath))
+                if (!File.Exists(strLogFilePath))
                 {
-                    File.Create(strScoreLogFilePath).Close();
+                    File.Create(strLogFilePath).Close();
                 }
-                using (StreamWriter w = File.AppendText(strScoreLogFilePath))
+                using (StreamWriter w = File.AppendText(strLogFilePath))
                 {
                     // w.WriteLine("\r<div classLog: ");
-                    //w.WriteLine(DateTime.Now.ToString(CultureInfo.InvariantCulture));
+                    w.WriteLine(DateTime.Now.ToString(CultureInfo.InvariantCulture));
                     string err = msg;
                     w.WriteLine(err);
                     w.Flush();
                     w.Close();
                 }
             }
-            catch { }
+            catch (Exception Ex)
+            {
+                //throw Ex;
+            }
         }
 
     }
@@ -48,7 +51,7 @@ public class ClsScoreErrorlog
     {
         try
         {
-            string filePath = strScoreLogFilePath;//string.Concat(Path.Combine(_templateDirectory, templateName), ".txt");
+            string filePath = strLogFilePath;//string.Concat(Path.Combine(_templateDirectory, templateName), ".txt");
 
             StreamReader sr = new StreamReader(filePath);
             string body = sr.ReadToEnd();
@@ -57,8 +60,7 @@ public class ClsScoreErrorlog
         }
         catch (Exception exp)
         {
-            ClsTestDataLog errlog = new ClsTestDataLog();
-            errlog.WriteToLog(exp.ToString());
+            WriteToLog(exp.ToString());
             return "Error";
             //throw exp;
         }
@@ -68,12 +70,12 @@ public class ClsScoreErrorlog
     {
         try
         {
-            string strLogPath = AppDomain.CurrentDomain.BaseDirectory;
-            DirectoryInfo dinfo = new DirectoryInfo(strLogPath + @"ErrorLog");
+            string strPath = AppDomain.CurrentDomain.BaseDirectory;
+            DirectoryInfo dinfo = new DirectoryInfo(strPath + @"ErrorLog");
             // What type of file do we want?...
             string logList = "";
 
-            System.IO.FileInfo[] Files = dinfo.GetFiles("*.csv");
+            System.IO.FileInfo[] Files = dinfo.GetFiles("*.txt");
             // Iterate through each file, displaying only the name inside the listbox...
 
 
@@ -88,7 +90,7 @@ public class ClsScoreErrorlog
         }
         catch (Exception exp)
         {
-            ClsTestDataLog errlog = new ClsTestDataLog();
+            ClsErrorLog errlog = new ClsErrorLog();
             errlog.WriteToLog(exp.ToString());
             return "error";
             //throw exp;
@@ -100,51 +102,54 @@ public class ClsScoreErrorlog
     {
         try
         {
-            string strLogPath = AppDomain.CurrentDomain.BaseDirectory;
+            string strPath = AppDomain.CurrentDomain.BaseDirectory;
             // System.IO.File.Move(
-            //System.IO.FileInfo fi = new System.IO.FileInfo(strLogPath + @"log\log.txt");
+            //System.IO.FileInfo fi = new System.IO.FileInfo(strPath + @"log\log.txt");
 
             //fi.MoveTo("log[" + DateTime.Now.ToString() + @"].txt");
 
 
 
-            System.IO.File.Move(strScoreLogFilePath, strLogPath + @"ErrorLog\Scorelog(" + DateTime.Now.ToString().Replace('/', '-').Replace(':', '-') + ").csv");
-            createNewScoreLog();
+            System.IO.File.Move(strPath + @"ErrorLog\log.txt", strPath + @"ErrorLog\log(" + DateTime.Now.ToString().Replace('/', '-').Replace(':', '-') + ").txt");
+            createNewLog();
             return "success";
         }
         catch (Exception exp)
         {
-            ClsTestDataLog errlog = new ClsTestDataLog();
+            ClsErrorLog errlog = new ClsErrorLog();
             errlog.WriteToLog(exp.ToString());
             return "failed";
             //throw exp;
         }
 
     }
-    public void createNewScoreLog()
+    public void createNewLog()
     {
         try
         {
-            string strLogPath = AppDomain.CurrentDomain.BaseDirectory;
+            string strPath = AppDomain.CurrentDomain.BaseDirectory;
 
-            if (System.IO.File.Exists(strScoreLogFilePath))
+            if (System.IO.File.Exists(strPath + @"ErrorLog/log.txt"))
             {
 
             }
             else
             {
 
-                System.IO.File.Create(strScoreLogFilePath);
+                System.IO.File.Create(strPath + @"ErrorLog/log.txt");
             }
 
         }
         catch (Exception exp)
         {
-            ClsTestDataLog errlog = new ClsTestDataLog();
+            ClsErrorLog errlog = new ClsErrorLog();
             errlog.WriteToLog(exp.ToString());
             //throw exp;
         }
 
     }
+
+
+
 
 }
