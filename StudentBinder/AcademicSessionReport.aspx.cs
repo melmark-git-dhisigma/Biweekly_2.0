@@ -1561,7 +1561,8 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
             mel.Visible = true;
             deftxt.Visible = true;
             HighchartGraph.Visible = true;
-            string script = @"setTimeout(function() {loadchart('" + sDate + "', '" + eDate + "','" + sid + "','" + lid + "','" + scid + "','" + evnt + "','" + trend + "','" + ioa + "','" + cls + "','" + med + "','" + lpstatus + "','" + medno + "','" + reptype + "','" + inctype + "','" + lname + "');}, 500);";
+            lname = lname.Replace("'", "**");
+            string script = @"setTimeout(function() {loadchart('" + sDate + "', '" + eDate + "','" + sid + "','" + lid + "','" + scid + "','" + evnt + "','" + trend + "','" + ioa + "','" + cls + "','" + med + "','" + lpstatus + "','" + medno + "','" + reptype + "','" + inctype + "','" + clsGeneral.convertQuotes(lname) + "');}, 500);";
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ShowMessageWithParamsScript", script, true);
         
 

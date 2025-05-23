@@ -5537,6 +5537,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             }
                         }
                     }
+                    if (oDS.ChainType == "Forward chain" || oDS.ChainType == "Backward chain")
+                    {
+                        string sessnm = "SELECT SessionNbr FROM StdtSessionHdr WHERE StdtSessionHdrId=" + Convert.ToInt32(ViewState["StdtSessHdr"]);
+                        object sessnmr = oData.FetchValue(sessnm);
+                        string upddate = "update StdtsessEvent SET ModifiedOn=GETDATE() WHERE SessionNbr=" + Convert.ToInt32(sessnmr) + " and  DstempHdrId=" + oTemp.TemplateId + " and StudentId=" + oSession.StudentId + " and SchoolId=" +oSession.SchoolId + " and EventName='ProbeMode' and StdtSessEventType ='Minor' and EventType='EV' and discardstatus is NULL ";
+                        oData.Execute(upddate);
+                    }
                     if(transCheck1 && transCheck2)
                     {
                         string updQry = "update StdtSessionHdr SET SessionStatusCd='S' WHERE StdtSessionHdrId=" + Convert.ToInt32(ViewState["StdtSessHdr"]) + "";
@@ -30872,7 +30879,9 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 }
             }
 
-            string disupdate = "select DSTempHdrId,LessonPlanId,StudentId from StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
+          
+
+            string disupdate = "select DSTempHdrId,LessonPlanId,StudentId,SessionNbr from StdtSessionHdr WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"];
             DataTable dis = new DataTable();
             dis = oData.ReturnDataTable(disupdate, false);
             if (dis != null)
@@ -30881,6 +30890,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 {
                     foreach (DataRow dr in dis.Rows)
                     {
+                        oData.ExecuteWithTrans("Update   StdtSessEvent set discardstatus=1 where DSTempHdrId=" + (Convert.ToInt32(dr["DSTempHdrId"])) + " and LessonPlanId=" + (Convert.ToInt32(dr["LessonPlanId"])) + " and StudentId=" + (Convert.ToInt32(dr["StudentId"])) + " and SessionNbr=" + (Convert.ToInt32(dr["SessionNbr"])), con, trans);
 
                         queryStat = oData.ExecuteWithTrans("Update   StdtSessionHdr set DSTempHdrId=" + (Convert.ToInt32(dr["DSTempHdrId"]) * (-1)) + ",LessonPlanId=" + (Convert.ToInt32(dr["LessonPlanId"]) * (-1)) + ",StudentId=" + (Convert.ToInt32(dr["StudentId"]) * (-1)) + "WHERE StdtSessionHdrId=" + ViewState["StdtSessHdr"], con, trans);
                     }

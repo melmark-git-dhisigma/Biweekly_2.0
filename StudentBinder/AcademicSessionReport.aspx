@@ -738,7 +738,8 @@
                      button2.style.display = 'none';
                  }
              }
-            function loadchart( sDate , eDate , sid , lid , scid , evnt , trend , ioa , cls ,med,lpstatus, medno ,reptype, inctype,lname){
+            function loadchart(sDate, eDate, sid, lid, scid, evnt, trend, ioa, cls, med, lpstatus, medno, reptype, inctype, lname) {
+                lname = lname.replace(/\*\*/g, "'");
                 var treatment = '';
                 //medication report size start
                 if (medno == "false" || medno == "False") {
@@ -1285,6 +1286,7 @@
                                 var ser = newData.map(function (name) {
                                     return {
                                         name: name,
+                                        connectNulls: true,
                                         yAxis: yAxis[name],
                                         color: color[name],
                                         marker: symbol[name],
@@ -1466,8 +1468,8 @@
                                 var plotarr = new Object;
                                 var plotNew
                                 plotarr['type'] = 'scatter';
-                                plotarr['name'] = ser[0].name;
-                                plotarr['showInLegend'] = true;
+                                plotarr['name'] = 'Arrownote';
+                                plotarr['showInLegend'] = false;
                                 if (inctype== "True" || inctype == "true") {
                                     plotarr['color'] = 'black',
                                     plotarr['marker'] = {
@@ -1506,17 +1508,70 @@
                                         }
                                     }
                                 }
-                                if (secstatus) {
-                                    plotarr['yAxis'] = 1;
-                                }
-                                else {
-                                    plotarr['yAxis'] = 0;
-                                }
+
+                                plotarr['yAxis'] = 0
                                 plotarr['index'] = 1;
                                 plotarr['data'] = mergedarr;
                                 if (plotarr['data'].length != 0) {
                                     ser.push(plotarr);
                                 }
+
+                            // secondary arrow start 
+
+                                var arrows1 = [];
+                                var plotarr1 = new Object;
+                                var plotNew1
+                                plotarr1['type'] = 'scatter';
+                                plotarr1['name'] = 'Arrownote';
+                                plotarr1['showInLegend'] = false;
+                                if (inctype == "True" || inctype == "true") {
+                                    plotarr1['color'] = 'black',
+                                    plotarr1['marker'] = {
+                                        symbol: 'square',
+                                        radius: 4,
+                                    }
+                                }
+                                else {
+                                    plotarr1['marker'] = {
+                                        symbol: 'url(../Scripts/arrownote.png)',
+                                        width: 6,
+                                        height: 8,
+                                    }
+                                }
+                                $.map(res, function (item, index) {
+                                    if (item['ArrowNote'] != null) {
+
+                                        arrows1.push({ x: (item['NewRow'] - 1), y: item['DummyScore'], arrowval: item['ArrowNote'] });
+
+                                    }
+                                });
+                                var mergedarr1 = [];
+                                var mergedKeys1 = {};
+
+                                for (var i = 0; i < arrows1.length; i++) {
+                                    var key = arrows1[i].x + '-' + arrows1[i].y;
+                                    if (!mergedKeys1[key]) {
+                                        mergedarr1.push(arrows1[i]);
+                                        mergedKeys1[key] = true;
+                                    } else {
+                                        for (var j = 0; j < mergedarr1.length; j++) {
+                                            if (mergedarr1[j].x === arrows1[i].x && mergedarr1[j].y === arrows1[i].y) {
+                                                mergedarr1[j].arrowval += ',' + arrows1[i].arrowval;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                         
+                                plotarr1['yAxis'] = 1
+                                plotarr1['index'] = 1;
+                                plotarr1['data'] = mergedarr1;
+                                if (plotarr1['data'].length != 0) {
+                                    ser.push(plotarr1);
+                                }
+                            // end
+
+
                                 var rownum = JSON.parse(JSON.stringify(finalsort));
                                 var minxvalue = minx(res)-1;
                                 var maxxvalue = maxx(res)-1;
@@ -2651,6 +2706,7 @@ year
                             var ser = newData.map(function (name) {
                                 return {
                                     name: name,
+                                    connectNulls: true,
                                     yAxis: yAxis[name],
                                     color: color[name],
                                     marker: symbol[name],
@@ -2831,8 +2887,8 @@ year
                                 var plotarr = new Object;
                                 var plotNew
                                 plotarr['type'] = 'scatter';
-                                plotarr['name'] = ser[0].name;
-                                plotarr['showInLegend'] = true;
+                                plotarr['name'] = 'Arrownote';
+                                plotarr['showInLegend'] = false;
                                 if ("<%=inctype%>" == "True" || "<%=inctype%>" == "true") {
                                     plotarr['color'] = 'black',
                                     plotarr['marker'] = {
@@ -2871,17 +2927,68 @@ year
                                         }
                                     }
                                 }
-                                if (secstatus) {
-                                    plotarr['yAxis'] = 1;
-                                }
-                                else {
-                                    plotarr['yAxis'] = 0;
-                                }
+
+                                plotarr['yAxis'] = 0
                                 plotarr['index'] = 1;
                                 plotarr['data'] = mergedarr;
                                 if (plotarr['data'].length != 0) {
                                     ser.push(plotarr);
                                 }
+
+                            // secondary arrow start 
+
+                                var arrows1 = [];
+                                var plotarr1 = new Object;
+                                var plotNew1
+                                plotarr1['type'] = 'scatter';
+                                plotarr1['name'] = 'Arrownote';
+                                plotarr1['showInLegend'] = false;
+                                if ("<%=inctype%>" == "True" || "<%=inctype%>" == "true") {
+                                    plotarr1['color'] = 'black',
+                                    plotarr1['marker'] = {
+                                        symbol: 'square',
+                                        radius: 4,
+                                    }
+                                }
+                                else {
+                                    plotarr1['marker'] = {
+                                        symbol: 'url(../Scripts/arrownote.png)',
+                                        width: 6,
+                                        height: 8,
+                                    }
+                                }
+                                $.map(res, function (item, index) {
+                                    if (item['ArrowNote'] != null) {
+
+                                        arrows1.push({ x: (item['NewRow'] - 1), y: item['DummyScore'], arrowval: item['ArrowNote'] });
+
+                                    }
+                                });
+                                var mergedarr1 = [];
+                                var mergedKeys1 = {};
+
+                                for (var i = 0; i < arrows1.length; i++) {
+                                    var key = arrows1[i].x + '-' + arrows1[i].y;
+                                    if (!mergedKeys1[key]) {
+                                        mergedarr1.push(arrows1[i]);
+                                        mergedKeys1[key] = true;
+                                    } else {
+                                        for (var j = 0; j < mergedarr1.length; j++) {
+                                            if (mergedarr1[j].x === arrows1[i].x && mergedarr1[j].y === arrows1[i].y) {
+                                                mergedarr1[j].arrowval += ',' + arrows1[i].arrowval;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                plotarr1['yAxis'] = 1
+                                plotarr1['index'] = 1;
+                                plotarr1['data'] = mergedarr1;
+                                if (plotarr1['data'].length != 0) {
+                                    ser.push(plotarr1);
+                                }
+                            // end
                                 var rownum = JSON.parse(JSON.stringify(finalsort));
                                 var minxvalue = minx(res) - 1;
                                 var maxxvalue = maxx(res) - 1;
@@ -2945,7 +3052,7 @@ year
         </script>
         <script>
             //Start maint report
-            function loadMchart(startdate,enddate,studid,lessid,schoolid,events,trend,checkioa,classtype,setid,reporttype,incidtype,callback)
+            function loadMchart(startdate, enddate, studid, lessid, schoolid, events, trend, checkioa, classtype, setid, reporttype, incidtype, callback)
             {
                 var treatment = '';
                 // set cont size start
@@ -3418,17 +3525,67 @@ year
                                     }
                                 }
                             }
-                            if (secstatus) {
-                                plotarr['yAxis'] = 1;
-                            }
-                            else {
-                                plotarr['yAxis'] = 0;
-                            }
+
+                            plotarr['yAxis'] = 0
                             plotarr['index'] = 1;
                             plotarr['data'] = mergedarr;
                             if (plotarr['data'].length != 0) {
                                 ser.push(plotarr);
                             }
+                            // secondary arrow start 
+
+                            var arrows1 = [];
+                            var plotarr1 = new Object;
+                            var plotNew1
+                            plotarr1['type'] = 'scatter';
+                            plotarr1['name'] = 'Arrownote';
+                            plotarr1['showInLegend'] = false;
+                            if (incidtype == "True" || incidtype == "true") {
+                                plotarr1['color'] = 'black',
+                                plotarr1['marker'] = {
+                                    symbol: 'square',
+                                    radius: 4,
+                                }
+                            }
+                            else {
+                                plotarr1['marker'] = {
+                                    symbol: 'url(../Scripts/arrownote.png)',
+                                    width: 6,
+                                    height: 8,
+                                }
+                            }
+                            $.map(res, function (item, index) {
+                                if (item['ArrowNote'] != null) {
+
+                                    arrows1.push({ x: (item['NewRow'] - 1), y: item['DummyScore'], arrowval: item['ArrowNote'] });
+
+                                }
+                            });
+                            var mergedarr1 = [];
+                            var mergedKeys1 = {};
+
+                            for (var i = 0; i < arrows1.length; i++) {
+                                var key = arrows1[i].x + '-' + arrows1[i].y;
+                                if (!mergedKeys1[key]) {
+                                    mergedarr1.push(arrows1[i]);
+                                    mergedKeys1[key] = true;
+                                } else {
+                                    for (var j = 0; j < mergedarr1.length; j++) {
+                                        if (mergedarr1[j].x === arrows1[i].x && mergedarr1[j].y === arrows1[i].y) {
+                                            mergedarr1[j].arrowval += ',' + arrows1[i].arrowval;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            plotarr1['yAxis'] = 1
+                            plotarr1['index'] = 1;
+                            plotarr1['data'] = mergedarr1;
+                            if (plotarr1['data'].length != 0) {
+                                ser.push(plotarr1);
+                            }
+                            // end
                             var rownum = JSON.parse(JSON.stringify(finalsort));
                             var minxvalue = minx(res) - 1;
                             var maxxvalue = maxx(res) - 1;
