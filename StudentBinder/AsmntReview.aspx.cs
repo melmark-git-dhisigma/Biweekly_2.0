@@ -301,7 +301,7 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
                             //ul_Goals.InnerHtml += "<a href='#' id='" + drLP["LessonPlanId"].ToString() + "' class='grmb' onclick='AssignGoalAndLPs(this.id,this.firstChild.textContent," + goalid + "," + glname + "," + LPdesc + ");'>" +
                             //    "<div style='height: 20px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; width:56%;' title='" + drLP["LessonPlanName"].ToString() + "'>" + drLP["LessonPlanName"].ToString() +
                             //    "</div><div class='grapgContainer'><span style='background-position:-" + pos + "px;'></span><p>" + drLP["Percentage"].ToString() + "%</p></div></a>";
-
+                            string lpName = "&apos;" + HttpUtility.JavaScriptStringEncode(drLP["LessonPlanName"].ToString()) + "&apos;";
                             ul_Goals.InnerHtml += "<div class='grmb'><a style='width:100px;' href='#' id='" + drLP["LessonPlanId"].ToString() + "'  onclick='AssignGoalAndLPs(this.id,this.firstChild.textContent," + goalid + "," + glname + "," + LPdesc + ");'>" +
                                "<div style='height: 20px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;' title='" + drLP["LessonPlanName"].ToString() + "'>" + drLP["LessonPlanName"].ToString() +
                                "</div></a><img id='" + drLP["LessonPlanId"].ToString() + "' onclick='LoadLessonView(this.id," + goalid + ");' src='images/transbtn.png' height='15px' width='15px' style='float:right;margin:0 10px 0 0;' /><div class='grapgContainer'>" +
@@ -903,8 +903,8 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
                         //        "<div style='height: 20px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; width:56%;' title='" + drLP["LessonPlanName"].ToString() + "'>" + drLP["LessonPlanName"].ToString() +
                         //        "</div></a>";
 
-
-                        ul_Goals.InnerHtml += "<div class='grmb'><a style='width:137px;' href='#' id='" + drLP["LessonPlanId"].ToString() + "'  onclick='AssignGoalAndLPs(this.id,this.firstChild.textContent," + goalid + ",&apos;" + goalname + "&apos;,&apos;" + drLP["LessonPlanDesc"].ToString() + "&apos;);'>" +
+                        string lpName = HttpUtility.JavaScriptStringEncode(drLP["LessonPlanName"].ToString());
+                        ul_Goals.InnerHtml += "<div class='grmb'><a style='width:137px;' href='#' id='" + drLP["LessonPlanId"].ToString() + "'  onclick='AssignGoalAndLPs(this.id,this.firstChild.textContent," + goalid + ",&apos;" + goalname + "&apos;,&apos;" + drLP["LessonPlanDesc"].ToString() + "&apos;,&apos;" + lpName + "&apos;);'>" +
                                "<div style='height: 20px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; width:110%;' title='" + drLP["LessonPlanName"].ToString() + "'>" + drLP["LessonPlanName"].ToString() +
                                "</div></a><img id='" + drLP["LessonPlanId"].ToString() + "' onclick='LoadLessonView(this.id," + goalid + ");' src='images/transbtn.png' height='15px' width='15px' style='float:right;margin:0 10px 0 0;' /></div>";
 
@@ -1067,7 +1067,51 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
     }
 
     [WebMethod]
+    public static string CheckLpName(string LPid,string LPName)
+    {        
+        
+            clsData oData = new clsData();
+            clsSession oSession = (clsSession)HttpContext.Current.Session["UserSession"];
 
+            int StudentLpCount = 0;
+            int StdtLPCount = 0;
+
+            string QueryLPCount = "SELECT COUNT(*) FROM DSTempHdr DH INNER JOIN [lookup] LK ON DH.statusid = LK.lookupid WHERE  DH.DSTemplateName= RTRIM(LTRIM(LOWER('" + clsGeneral.convertQuotes(LPName) + "'))) AND lookupname NOT IN ('Deleted','SoftDelete') AND DH.StudentId=" + oSession.StudentId;
+            StudentLpCount = Convert.ToInt32(oData.FetchValue(QueryLPCount));
+
+            string QueryGoal = "SELECT STUFF((SELECT DISTINCT ', ' + GL.GoalName " +
+                             "FROM Goal GL INNER JOIN StdtLessonPlan SP ON GL.GoalId = SP.GoalId " +
+                             "INNER JOIN DSTempHdr DTH ON SP.LessonPlanId = DTH.LessonPlanId " +
+                             "WHERE SP.ActiveInd='A' AND DTH.StudentId=" + oSession.StudentId + " " +
+                             "AND DTH.DSTemplateName= RTRIM(LTRIM(LOWER('" + clsGeneral.convertQuotes(LPName) + "'))) " +
+                             "FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS GoalNames";
+
+            object objLPGoal = oData.FetchValue(QueryGoal);
+            string Goalname = Convert.ToString(objLPGoal);
+            
+            if (LPid != "CheckGoalLp")
+            {
+                string QueryStdtLPCount = "SELECT COUNT(StdtLessonPlanId) FROM stdtlessonplan WHERE StudentId=" + oSession.StudentId + " AND ActiveInd='A' AND LessonPlanId=" + Convert.ToInt32(LPid);
+                object objStdtLPCount = oData.FetchValue(QueryStdtLPCount);
+                StdtLPCount = Convert.ToInt32(objStdtLPCount);
+            }
+            if (StdtLPCount > 0)
+            {
+                return "AdmTemplate*" + Goalname;
+            }
+
+            else if (StudentLpCount > 0)
+            {
+                return "multipleLP*" + Goalname;
+            }
+            else
+                return "Nil";
+        
+    }
+    
+
+
+    [WebMethod]
     public static string SaveLessons(string LPid, string goalid)
     {
         SqlTransaction Trans = null;
@@ -1082,7 +1126,14 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
             clsSession oSession = (clsSession)HttpContext.Current.Session["UserSession"];
             if (oSession != null)
             {
-                if (oSession.SchoolId == 2)
+
+
+                string QueryStdtLPCount = "SELECT COUNT(StdtLessonPlanId) FROM stdtlessonplan WHERE StudentId=" + oSession.StudentId + "  AND ActiveInd='A' AND LessonPlanId=" + Convert.ToInt32(LPid);
+                object objStdtLPCount = oData.FetchValueTrans(QueryStdtLPCount, Trans, Con);
+
+                    if (Convert.ToInt32(objStdtLPCount) == 0)
+                    {
+                        if (oSession.SchoolId == 2)
                 {
                     string selQry = "select isnull(StdtIEP_PEId,0) StdtIEP_PEId from StdtIEP_PE I inner join AsmntYear yr on I.AsmntYearId=yr.AsmntYearId "
                         + " where StatusId=(select LookUpId from [LookUp] where LookupName='In Progress' and LookupType='IEP Status')"
@@ -1255,7 +1306,37 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
                     //returns 'exists' if already exists....
                     return "exists";
                 }
-            }
+
+                    }
+                    else
+                    {
+                        string LPGoalChk = "SELECT COUNT(*) FROM StdtLessonPlan WHERE StudentId=" + oSession.StudentId + " AND LessonPlanId=" + LPid + " AND ActiveInd='A' AND GoalId=" + goalid;
+                        //bool LPGoalChk = oData.IFExistsWithTranss("SELECT * FROM StdtLessonPlan WHERE StudentId=" + oSession.StudentId + " AND LessonPlanId=" + LPid + " AND ActiveInd='A' AND GoalId=" + goalid + " ", Trans, Con);
+                        object objLPGoalChk = oData.FetchValueTrans(LPGoalChk, Trans, Con);
+
+                        
+
+                      if (Convert.ToInt32(objLPGoalChk) > 0)
+                        {
+                            string QueryLPGoalName = "SELECT STUFF((SELECT DISTINCT ', ' + GL.GoalName FROM goal GL WHERE GoalId=" + goalid + " FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS GoalNames";
+
+                            object objLPGoalName = oData.FetchValueTrans(QueryLPGoalName, Trans, Con);
+                            string GoalnameTemp = Convert.ToString(objLPGoalName);
+
+                            return "multipleLPSGoal*" + GoalnameTemp;
+                        }
+                        string QueryLPGoal = "SELECT STUFF((SELECT DISTINCT ', ' + GL.GoalName FROM goal GL INNER JOIN StdtLessonPlan SP ON GL.GoalId = SP.GoalId " +
+                                             "WHERE SP.ActiveInd='A' AND SP.StudentId=" + oSession.StudentId + " AND SP.LessonPlanId =" + LPid + " " +
+                                             "FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS GoalNames";
+                        
+                        object objLPGoal = oData.FetchValueTrans(QueryLPGoal, Trans, Con);
+                        string Goalname = Convert.ToString(objLPGoal);
+
+                        return "multipleLP*" + Goalname;
+                    }
+                }
+
+            
             else
             {
                 return "0";
@@ -1739,10 +1820,12 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
             int StudentLp = 0;
 
             //Template = Convert.ToInt32(oData.FetchValue("SELECT COUNT(*) FROM DSTempHdr WHERE  RTRIM(LTRIM(LOWER(DSTemplateName)))= RTRIM(LTRIM(LOWER('" + txtLPname.Text.Trim() + "'))) AND StudentId IS NULL AND isDynamic=0 "));
-            StudentLp = Convert.ToInt32(oData.FetchValue("SELECT COUNT(*) FROM DSTempHdr WHERE  RTRIM(LTRIM(LOWER(DSTemplateName)))= RTRIM(LTRIM(LOWER('" + clsGeneral.convertQuotes(txtLPname.Text.Trim()) + "'))) AND StudentId='" + oSession.StudentId + "' AND (SELECT GoalId FROM StdtLessonPlan WHERE StdtLessonPlanId=DSTempHdr.StdtLessonplanId)='" + ddlGoals.SelectedItem.Value + "'"));
+            string qryStudentLp = "SELECT COUNT(*) FROM DSTempHdr INNER JOIN lookup ON statusid = lookup.lookupid WHERE  RTRIM(LTRIM(LOWER(DSTemplateName)))= RTRIM(LTRIM(LOWER('" + clsGeneral.convertQuotes(txtLPname.Text.Trim()) + "'))) AND  lookupname not in('Deleted','SoftDelete') AND StudentId='" + oSession.StudentId + "' AND (SELECT GoalId FROM StdtLessonPlan WHERE StdtLessonPlanId=DSTempHdr.StdtLessonplanId)='" + ddlGoals.SelectedItem.Value + "'";
+            StudentLp =Convert.ToInt32(oData.FetchValue(qryStudentLp));
+            //StudentLp = Convert.ToInt32(oData.FetchValue("SELECT COUNT(*) FROM DSTempHdr INNER JOIN lookup ON HDR.statusid = lookup.lookupid WHERE  RTRIM(LTRIM(LOWER(DSTemplateName)))= RTRIM(LTRIM(LOWER('" + clsGeneral.convertQuotes(txtLPname.Text.Trim()) + "'))) AND  lookupname not in('Deleted','SoftDelete')) AND StudentId='" + oSession.StudentId + "' AND (SELECT GoalId FROM StdtLessonPlan WHERE StdtLessonPlanId=DSTempHdr.StdtLessonplanId)='" + ddlGoals.SelectedItem.Value + "'"));
             if (StudentLp > 0)
             {
-                ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "alert('Lesson plan name already exist. Please enter another name...');", true);
+                ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "alert('Lesson plan name already exist under this goal. Please enter another name...');", true);
                 ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "showAddLp();", true);
 
             }

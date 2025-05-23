@@ -709,8 +709,8 @@ public partial class StudentBinder_LessonPlanNew : System.Web.UI.Page
                 //strQuery = "Select CONVERT(VARCHAR, StDtIEP.EffStartDate, 103) +' to '+   CONVERT(VARCHAR,  StDtIEP.EffEndDate, 103)   from StDtLessonPlan inner join StDtIEP on StDtLessonPlan.StDtIEPId=StDtIEP.StDtIEPId where StDtLessonPlan.LessonPlanId = " + LessonId + " and StDtLessonPlan.StudentId = " + sess.StudentId + " order by StDtIEP.StdtIEPId Desc ";
 
 
-                strQuery = "SELECT GoalName FROM GoalLPRel glLpRel LEFT JOIN Goal gol ON glLpRel.GoalId = gol.GoalId WHERE  " +
-                                                        " glLpRel.LessonPlanId = " + LessonPlanId + " AND glLpRel.ActiveInd = 'A' AND glLpRel.GoalId=" + GoalID;
+                strQuery = "SELECT distinct(GoalName) FROM StdtLessonPlan Stlp LEFT JOIN Goal gol ON Stlp.GoalId = gol.GoalId WHERE  " +
+                                                        " Stlp.LessonPlanId = " + LessonPlanId + " AND StudentId =" + sess.StudentId + " AND Stlp.ActiveInd = 'A' AND Stlp.GoalId=" + GoalID;
 
                 Dt = objData.ReturnDataTable(strQuery, false);
                 if (Dt != null)
@@ -1641,8 +1641,8 @@ public partial class StudentBinder_LessonPlanNew : System.Web.UI.Page
             //}
             //else columns[2] = "";
 
-            strQuery = "SELECT GoalName FROM GoalLPRel glLpRel LEFT JOIN Goal gol ON glLpRel.GoalId = gol.GoalId WHERE  " +
-                                                       " glLpRel.LessonPlanId = " + LessonPlanId + " AND glLpRel.ActiveInd = 'A'";
+            strQuery = "SELECT distinct(GoalName) FROM StdtLessonPlan Stlp LEFT JOIN Goal gol ON Stlp.GoalId = gol.GoalId WHERE  " +
+                                                       " Stlp.LessonPlanId = " + LessonPlanId + " AND StudentId =" + sess.StudentId + " AND Stlp.ActiveInd = 'A'";
             strBinder = "";
             Dt = objData.ReturnDataTable(strQuery, false);
             if (Dt != null)

@@ -3973,8 +3973,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             }
 
             string goalNames = "";
-            strQuery2 = "select Goal.GoalCode from Goal inner join GoalLPRel on Goal.GoalId=GoalLPRel.GoalId inner join LessonPlan on LessonPlan.LessonPlanId=GoalLPRel.LessonPlanId where LessonPlan.LessonPlanId=" + lessonPlanId;
-
+            //strQuery2 = "select Goal.GoalCode from Goal inner join GoalLPRel on Goal.GoalId=GoalLPRel.GoalId inner join LessonPlan on LessonPlan.LessonPlanId=GoalLPRel.LessonPlanId where LessonPlan.LessonPlanId=" + lessonPlanId;
+            strQuery2 = "select distinct(GL.GoalName) from Goal GL INNER JOIN StdtLessonPlan SP ON GL.GoalId = SP.GoalId WHERE SP.ActiveInd='A' AND SP.LessonPlanId=" + lessonPlanId + " AND SP.StudentId= " + sess.StudentId;
             DataTable Dt2 = objData.ReturnDataTable(strQuery2, false);
             if (Dt2 != null)
             {
@@ -3982,7 +3982,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 {
                     for (int i = 0; i < Dt2.Rows.Count; i++)
                     {
-                        goalNames += Dt2.Rows[i]["GoalCode"].ToString() + ",";
+                        goalNames += Dt2.Rows[i]["GoalName"].ToString() + ",";
                     }
                     lblGoalName.Text = goalNames.TrimEnd(',');
                 }
@@ -4101,8 +4101,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             }
 
             string goalNames = "";
-            strQuery2 = "select Goal.GoalCode from Goal inner join GoalLPRel on Goal.GoalId=GoalLPRel.GoalId inner join LessonPlan on LessonPlan.LessonPlanId=GoalLPRel.LessonPlanId where LessonPlan.LessonPlanId=" + lessonPlanId;
-
+            //strQuery2 = "select Goal.GoalCode from Goal inner join GoalLPRel on Goal.GoalId=GoalLPRel.GoalId inner join LessonPlan on LessonPlan.LessonPlanId=GoalLPRel.LessonPlanId where LessonPlan.LessonPlanId=" + lessonPlanId;
+            strQuery2 = "select distinct(GL.GoalName) from Goal GL INNER JOIN StdtLessonPlan SP ON GL.GoalId = SP.GoalId WHERE SP.ActiveInd='A' AND SP.LessonPlanId==" + lessonPlanId + " AND SP.StudentId= " + sess.StudentId;
             DataTable Dt2 = objData.ReturnDataTable(strQuery2, false);
             if (Dt2 != null)
             {
@@ -4110,7 +4110,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 {
                     for (int i = 0; i < Dt2.Rows.Count; i++)
                     {
-                        goalNames += Dt2.Rows[i]["GoalCode"].ToString() + ",";
+                        goalNames += Dt2.Rows[i]["GoalName"].ToString() + ",";
                     }
                     lblGoalName.Text = goalNames.TrimEnd(',');
                 }
