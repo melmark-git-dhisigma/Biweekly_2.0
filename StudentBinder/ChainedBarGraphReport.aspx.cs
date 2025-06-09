@@ -593,4 +593,33 @@ public partial class StudentBinder_ChainedBarGraphReport : System.Web.UI.Page
         }
 
     }
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public static string getNodataavail(string lplan, int studid)
+    {
+        objData = new clsData();
+        string str = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
+        SqlConnection cn = new SqlConnection(str);
+        cn.Open();
+
+        List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+        Dictionary<string, object> row;
+        String proc = "[dbo].[SessionGraphReport]";
+
+        DataTable dt = objData.ReturnSessTableNext(proc, lplan, studid);
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            row = new Dictionary<string, object>();
+            foreach (DataColumn dc in dt.Columns)
+            {
+                row.Add(dc.ColumnName, dr[dc]);
+            }
+            rows.Add(row);
+
+        }
+
+        JavaScriptSerializer json = new JavaScriptSerializer();
+        return json.Serialize(rows);
+    }
 }
