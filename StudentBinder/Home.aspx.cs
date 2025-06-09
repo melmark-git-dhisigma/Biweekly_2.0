@@ -242,11 +242,11 @@ public partial class Home : System.Web.UI.Page
         
         if (sess != null)
         {
-            object obj = objData.FetchValue("Select SchoolDesc from School Where SchoolId=" + sess.SchoolId + "");
-            if (obj != null)
-            {
-                TitleName.Text = obj.ToString();
-            }
+            //object obj = objData.FetchValue("Select SchoolDesc from School Where SchoolId=" + sess.SchoolId + "");
+            //if (obj != null)
+            //{
+                TitleName.Text = "EnvisionSmart";//obj.ToString();
+            //}
         }
     }
     private void Loadfillclass()
@@ -1439,7 +1439,7 @@ public partial class Home : System.Web.UI.Page
  "AND  DSTempHdr.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND (LookupName='Approved' OR " +
  " LookupName='Maintenance'))) DATA ORDER BY  DATA.LessonOrder";
             dtSubmenu = objData.ReturnDataTable(strQuery, false);
-            dtSubmenu = objData.ReturnDataTable(strQuery, false);
+            //dtSubmenu = objData.ReturnDataTable(strQuery, false);
             int count1 = dtSubmenu.Rows.Count;
             if (count1 == 1)
             {
@@ -1471,7 +1471,7 @@ public partial class Home : System.Web.UI.Page
  " AND  DSTempHdr.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND (LookupName='Approved' OR LookupName='Inactive' OR " +
  " LookupName='Maintenance')) " + optString + ")LP) DATA ORDER BY  DATA.LessonOrder";
             dtSubmenu = objData.ReturnDataTable(strQuery, false);
-            dtSubmenu = objData.ReturnDataTable(strQuery, false);
+            //dtSubmenu = objData.ReturnDataTable(strQuery, false);
             int count1 = dtSubmenu.Rows.Count;
             if (count1 == 1)
             {
@@ -1502,7 +1502,7 @@ public partial class Home : System.Web.UI.Page
  " )) " + optString + ") DATA ORDER BY  DATA.LessonOrder";
             //string strQuery = "SELECT DISTINCT top(50) StdtLP.LessonPlanTypeDay as DayFlag,hdr.LessonOrder,StdtLP.LessonPlanTypeResi as ResFlag, hdr.StatusId as StatusID,hdr.DSTemplateName as Name,hdr.DSTempHdrId As ID FROM DSTempHdr hdr INNER JOIN StdtLessonPlan StdtLP ON hdr.LessonPlanId=StdtLP.LessonPlanId AND hdr.studentid=StdtLP.studentid Inner Join LessonPlan LP On LP.LessonPlanId=hdr.LessonPlanId WHERE hdr.StudentId=" + sess.StudentId + " and (hdr.StatusId =" + StatusIdIna + ")" + optString + " AND hdr.DSTemplateName like +'%'+'" + SearchCondition + "'+'%' AND hdr.SkillType='Chained' AND hdr.ChainType<>'Total Task' ORDER BY hdr.LessonOrder ";
             dtSubmenu = objData.ReturnDataTable(strQuery, false);
-            dtSubmenu = objData.ReturnDataTable(strQuery, false);
+            //dtSubmenu = objData.ReturnDataTable(strQuery, false);
             int count1 = dtSubmenu.Rows.Count;
             if (count1 == 1)
             {
@@ -1531,7 +1531,7 @@ public partial class Home : System.Web.UI.Page
 " AND  DSTempHdr.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND (LookupName='Approved' " +
 " )) " + optString + ") DATA ORDER BY  DATA.LessonOrder";
             dtSubmenu = objData.ReturnDataTable(strQuery, false);
-            dtSubmenu = objData.ReturnDataTable(strQuery, false);
+            //dtSubmenu = objData.ReturnDataTable(strQuery, false);
             int count1 = dtSubmenu.Rows.Count;
             if (count1 == 1)
             {
@@ -1560,7 +1560,7 @@ public partial class Home : System.Web.UI.Page
  " AND  DSTempHdr.StatusId IN (SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' AND ( " +
  " LookupName='Maintenance')) " + optString + ") DATA ORDER BY  DATA.LessonOrder";
             dtSubmenu = objData.ReturnDataTable(strQuery, false);
-            dtSubmenu = objData.ReturnDataTable(strQuery, false);
+            //dtSubmenu = objData.ReturnDataTable(strQuery, false);
             int count1 = dtSubmenu.Rows.Count;
             if (count1 == 1)
             {
