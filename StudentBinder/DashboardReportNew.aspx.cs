@@ -47,12 +47,12 @@ public partial class Graph : System.Web.UI.Page
         BtnStaffClinical.Attributes.CssStyle.Add("outline", "none");
         tdMsg.InnerHtml = "";
         tdMsg.Visible = false;
-        if (!IsPostBack)
-        {
-            PlotGraphload();
-            tdMsg.Visible = true;
-            tdMsg.InnerHtml = clsGeneral.sucessMsg("Please choose a Location(s) and/or Client(s) above to begin.");
-        }
+        //if (!IsPostBack)
+        //{
+        //    PlotGraphload();
+        //    tdMsg.Visible = true;
+        //    tdMsg.InnerHtml = clsGeneral.sucessMsg("Please choose a Location(s) and/or Client(s) above to begin.");
+        //}
 
 
         if (Label_location.Text == "" && Txt_All.Text == "2")
@@ -71,7 +71,56 @@ public partial class Graph : System.Web.UI.Page
         else if (Label_Client.Text == "")
         {
             Label_Client.Text = "No Client Selected";
-        }        
+        }
+        
+        if (!IsPostBack)
+        {
+            PlotGraphload();
+            sess = (clsSession)Session["UserSession"];
+            int userId = sess.LoginId;
+            string classId = sess.Classid.ToString();
+            string getStudidlistquery = "SELECT STUFF((SELECT distinct ','+Convert(varchar(200),StudentId)" +
+                                            " FROM StdtClass SC left Join Student STD ON STD.StudentId = SC.StdtId left join Placement PLC on STD.StudentId = PLC.StudentPersonalId" +
+                                            " WHERE SC.ClassId IN (" + classId + ") AND STD.ActiveInd='A' AND SC.ActiveInd='A' AND PLC.Location IN(" + classId + ") AND (PLC.EndDate is null or convert(DATE,PLC.EndDate) >= convert(DATE,getdate()))FOR XML PATH('')), 1, 1, '')";
+            DataTable dtLP = new DataTable();
+            dtLP.Columns.Add("LpId", typeof(string));
+            dtLP.Columns.Add("LessonName", typeof(string));
+            DataTable DTLesson = new DataTable();
+            string selLessons = "select cl.classid,cl.classname from class cl inner join userclass uc on cl.ClassId = uc.ClassId where cl.ActiveInd = 'A' AND uc.UserId = " + sess.LoginId + " order by classname";
+            DTLesson = objData.ReturnDataTable(selLessons, false);
+            if (DTLesson != null)
+            {
+                if (DTLesson.Rows.Count > 0)
+                {
+                    foreach (DataRow drLessn in DTLesson.Rows)
+                    {
+                        DataRow drr = dtLP.NewRow();
+                        drr["LpId"] = drLessn.ItemArray[0];
+                        drr["LessonName"] = drLessn.ItemArray[1];
+                        dtLP.Rows.Add(drr);
+                    }
+                }
+            }
+
+            ddlClassrooms.DataSource = dtLP;
+            ddlClassrooms.DataTextField = "LessonName";
+            ddlClassrooms.DataValueField = "LpId";
+            ddlClassrooms.DataBind();
+            ddlClassrooms.SelectedValue = classId;
+
+
+            string getStudidlist = Convert.ToString(objData.FetchValue(getStudidlistquery));
+            BtnSwitchTableChart.Text = "Table View";
+            graphContainerAcademic.Visible = true;
+            graphContainerAcademicStaff.Visible = true;
+            graphContainerClinical.Visible = true;
+            graphContainerClinicalStaff.Visible = true;
+            highcheck.Checked = true;
+            LoadDashBoardStaffAcademicGraph(classId, getStudidlist, userId);
+            LoadDashBoardClientAcademicGraph(classId, getStudidlist, userId);
+            LoadDashBoardStaffClinicalGraph(classId, getStudidlist);
+            LoadDashBoardClientClinicalGraph(classId, getStudidlist);
+        }
     }
 
     private void RefreshinitialLoad() 
@@ -726,9 +775,13 @@ public partial class Graph : System.Web.UI.Page
     {
         if (highcheck.Checked == false)
         {
-        RV_DBReport.Visible = true;
-        graphcontainer.Visible = false;
-        lblNoData.Text = "";
+        RV_DBReport.Visible = false; //Shoudld be True
+        graphContainerAcademic.Visible = false;
+        graphContainerAcademicStaff.Visible = false;
+        graphContainerClinical.Visible = false;
+        graphContainerClinicalStaff.Visible = false;
+        //graphcontainer.Visible = false;
+        //lblNoData.Text = "";
         RV_DBReport.ServerReport.ReportServerCredentials = new CustomReportCredentials(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"], ConfigurationManager.AppSettings["Domain"]);
         RV_DBReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["DashBoardClientAcademic"];        
         //Classids = Convert.ToString(objData.FetchValue("select classid from class where classid = 2011"));
@@ -746,10 +799,14 @@ public partial class Graph : System.Web.UI.Page
         else
         {
             RV_DBReport.Visible = false;
-            graphcontainer.Visible = true;
-            lblNoData.Text = "";
+            graphContainerAcademic.Visible = true;
+            graphContainerAcademicStaff.Visible = true;
+            graphContainerClinical.Visible = true;
+            graphContainerClinicalStaff.Visible = true;
+            //graphcontainer.Visible = true;
+            //lblNoData.Text = "";
             string script1 = "loadWait();";
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "show", script1, true);
+            //ScriptManager.RegisterStartupScript(this, this.GetType(), "show", script1, true);
             string script = @"setTimeout(function() {loadAcbyClient('" + CAgraphClassid + "', '" + CAgraphStudid + "','" + CAgraphMistrial + "');}, 500);";
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ShowMessageWithParamsScript", script, true);
 
@@ -761,9 +818,13 @@ public partial class Graph : System.Web.UI.Page
     {
         if (highcheck.Checked == false)
         {
-         graphcontainer.Visible = false;
-         lblNoData.Text = "";
-        RV_DBReport.Visible = true;
+            graphContainerAcademic.Visible = false;
+            graphContainerAcademicStaff.Visible = false;
+            graphContainerClinical.Visible = false;
+            graphContainerClinicalStaff.Visible = false;
+            //graphcontainer.Visible = false;
+         //lblNoData.Text = "";
+         RV_DBReport.Visible = false; //Shoudld be True
         RV_DBReport.ServerReport.ReportServerCredentials = new CustomReportCredentials(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"], ConfigurationManager.AppSettings["Domain"]);
         RV_DBReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["DashBoardClientAcademicPercentage"];
         //Classids = Convert.ToString(objData.FetchValue("select classid from class where classid = 2011"));
@@ -778,9 +839,15 @@ public partial class Graph : System.Web.UI.Page
     }
         else
         {
+            CAgraphClassid = ddlClassrooms.SelectedValue;
             RV_DBReport.Visible = false;
-            graphcontainer.Visible = true;
-            lblNoData.Text = "";
+            graphContainerAcademic.Visible = false;
+            graphContainerAcademicStaff.Visible = false;
+            graphContainerClinical.Visible = true;
+            graphContainerClinicalStaff.Visible = false;
+            //graphcontainer.Visible = true;
+            //lblNoData.Text = "";
+            
             string script1 = "loadWait();";
             ScriptManager.RegisterStartupScript(this, this.GetType(), "show3", script1, true);
             string script = @"setTimeout(function() {loadAcbyClientPerc('" + CAgraphClassid + "', '" + CAgraphStudid + "');}, 500);";
@@ -792,9 +859,13 @@ public partial class Graph : System.Web.UI.Page
     {
         if (highcheck.Checked == false)
         {
-            graphcontainer.Visible = false;
-            lblNoData.Text = "";
-            RV_DBReport.Visible = true;
+            graphContainerAcademic.Visible = false;
+            graphContainerAcademicStaff.Visible = false;
+            graphContainerClinical.Visible = false;
+            graphContainerClinicalStaff.Visible = false;
+            //graphcontainer.Visible = false;
+            //lblNoData.Text = "";
+            RV_DBReport.Visible = false; //Shoudld be True
             RV_DBReport.ServerReport.ReportServerCredentials = new CustomReportCredentials(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"], ConfigurationManager.AppSettings["Domain"]);
             RV_DBReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["DashBoardStaffAcademic"];
             String Classids = Convert.ToString(SAgraphClassid);
@@ -819,9 +890,13 @@ public partial class Graph : System.Web.UI.Page
         else
         {
             string script1 = "loadWait();";
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "showload", script1, true);
+            //ScriptManager.RegisterStartupScript(this, this.GetType(), "showload", script1, true);
             RV_DBReport.Visible = false;
-            graphcontainer.Visible = true;
+            graphContainerAcademic.Visible = true;
+            graphContainerAcademicStaff.Visible = true;
+            graphContainerClinical.Visible = true;
+            graphContainerClinicalStaff.Visible = true;
+            //graphcontainer.Visible = true;
             String Classids = Convert.ToString(SAgraphClassid);
             String Studids = Convert.ToString(SAgraphStudid);
             String Mistrial = Convert.ToString(CAgraphMistrial);
@@ -880,9 +955,13 @@ public partial class Graph : System.Web.UI.Page
     {
         if (highcheck.Checked == false)
         {
-        RV_DBReport.Visible = true;
-        graphcontainer.Visible = false;
-        lblNoData.Text = "";
+            RV_DBReport.Visible = false; //Shoudld be True
+            graphContainerAcademic.Visible = false;
+            graphContainerAcademicStaff.Visible = false;
+            graphContainerClinical.Visible = false;
+            graphContainerClinicalStaff.Visible = false;
+            //graphcontainer.Visible = false;
+        //lblNoData.Text = "";
         RV_DBReport.ServerReport.ReportServerCredentials = new CustomReportCredentials(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"], ConfigurationManager.AppSettings["Domain"]);
         RV_DBReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["DashBoardClientClinical"];        
         String Classids = Convert.ToString(CCgraphClassid);
@@ -896,10 +975,14 @@ public partial class Graph : System.Web.UI.Page
     }
         else {
             RV_DBReport.Visible = false;
-            graphcontainer.Visible = true;
-            lblNoData.Text = "";
+            graphContainerAcademic.Visible = true;
+            graphContainerAcademicStaff.Visible = true;
+            graphContainerClinical.Visible = true;
+            graphContainerClinicalStaff.Visible = true;
+            //graphcontainer.Visible = true;
+            //lblNoData.Text = "";
             string script1 = "loadWait();";
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "show1", script1, true);
+            //ScriptManager.RegisterStartupScript(this, this.GetType(), "show1", script1, true);
             string script = @"setTimeout(function() {loadClinicbyClient('" + CCgraphClassid + "', '" + CCgraphStudid + "');}, 500);";
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ShowMessageWithParamsScript2", script, true);
     }
@@ -910,7 +993,7 @@ public partial class Graph : System.Web.UI.Page
     {
         if (highcheck.Checked == false)
         {
-            RV_DBReport.Visible = true;
+            RV_DBReport.Visible = false; //Shoudld be True
             RV_DBReport.ServerReport.ReportServerCredentials = new CustomReportCredentials(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"], ConfigurationManager.AppSettings["Domain"]);
             RV_DBReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["DashBoardStaffClinical"];
             String Classids = Convert.ToString(SCgraphClassid);
@@ -933,7 +1016,11 @@ public partial class Graph : System.Web.UI.Page
         else
         {
             RV_DBReport.Visible = false;
-            graphcontainer.Visible = true;
+            graphContainerAcademic.Visible = true;
+            graphContainerAcademicStaff.Visible = true;
+            graphContainerClinical.Visible = true;
+            graphContainerClinicalStaff.Visible = true;
+            //graphcontainer.Visible = true;
             String Classids = Convert.ToString(SCgraphClassid);
             String Studids = Convert.ToString(SCgraphStudid);
             String getUseridsquery = "SELECT STUFF((SELECT Distinct ','+Convert(varchar(200),Modifiedby) from stdtsessionhdr where stdtclassid IN(" + Classids + ") and studentid IN(" + Studids + ") and CONVERT(VARCHAR(10),ModifiedOn, 120) = CONVERT(VARCHAR(10),getdate(), 120)FOR XML PATH('')), 1, 1, '')";
@@ -951,7 +1038,7 @@ public partial class Graph : System.Web.UI.Page
             try
             {
                 SqlDataAdapter da = new SqlDataAdapter();
-                cmd = new SqlCommand("DashboardStaffClinical", con);
+                cmd = new SqlCommand("DashboardStaffClinicalNew", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.CommandTimeout = 600;
                 cmd.Parameters.AddWithValue("@ParamClassid", SCgraphClassid);
@@ -959,6 +1046,64 @@ public partial class Graph : System.Web.UI.Page
                 cmd.Parameters.AddWithValue("@ParamUserid", Userids);
                 da = new SqlDataAdapter(cmd);
                 da.Fill(Dt);
+
+                var grouped = Dt.AsEnumerable()
+                    .GroupBy(row1 => new
+                    {
+                        StaffId = row1.Field<int>("StaffId"),
+                        StudentId = row1.Field<int>("StudentId"),
+                        MeasurementId = row1.Field<int>("MeasurementId"),
+                        ClassId = row1.Field<int>("ClassId")
+                    })
+                    .Select(g =>
+                    {
+                        var first = g.First();
+                        var newRow = Dt.NewRow();
+
+                        // Copy ID 
+                        newRow["StaffId"] = g.Key.StaffId;
+                        newRow["StudentId"] = g.Key.StudentId;
+                        newRow["MeasurementId"] = g.Key.MeasurementId;
+                        newRow["ClassId"] = g.Key.ClassId;
+
+                        // Sum MeasurementCount
+                        newRow["MeasurementCount"] = g.Sum(r => r.Field<int>("MeasurementCount"));
+
+                        // Copy other columns from the first row in the group
+                        foreach (DataColumn col in Dt.Columns)
+                        {
+                            if (!newRow.IsNull(col.ColumnName) ||
+                                col.ColumnName == "StaffId" ||
+                                col.ColumnName == "StudentId" ||
+                                col.ColumnName == "MeasurementId" ||
+                                col.ColumnName == "ClassId" ||
+                                col.ColumnName == "MeasurementCount")
+                                continue;
+
+                            newRow[col.ColumnName] = first[col.ColumnName];
+                        }
+
+                        return newRow;
+                    });
+
+                DataTable groupedDt = Dt.Clone(); // Clone the schema
+                foreach (var row1 in grouped)
+                    groupedDt.Rows.Add(row1.ItemArray);
+
+                Dt = groupedDt;
+                if (Dt != null && Dt.Rows.Count > 0)
+                {
+                    int maxCount = Dt.AsEnumerable()
+                                     .Max(row2 => row2.Field<int>("MeasurementCount"));
+
+                    if (!Dt.Columns.Contains("MaxCount"))
+                        Dt.Columns.Add("MaxCount", typeof(int));
+
+                    foreach (DataRow row2 in Dt.Rows)
+                    {
+                        row2["MaxCount"] = maxCount;
+                    }
+                }
 
             }
             catch (Exception ex)
@@ -992,7 +1137,7 @@ public partial class Graph : System.Web.UI.Page
 
     private void TestLoad()
     {
-        RV_DBReport.Visible = true;
+        RV_DBReport.Visible = false; //Shoudld be True
         RV_DBReport.ServerReport.ReportServerCredentials = new CustomReportCredentials(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"], ConfigurationManager.AppSettings["Domain"]);
         RV_DBReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["TESTDashBoardClientClinical"];
         RV_DBReport.ServerReport.Refresh();
@@ -1201,8 +1346,38 @@ public partial class Graph : System.Web.UI.Page
             LoadDashBoardStaffClinicalGraph(sess.Classid.ToString(), null);
         }        
     }
-
     protected void BtnRefresh_Click(object sender, EventArgs e)
+    {
+        sess = (clsSession)Session["UserSession"];
+        int userId = sess.LoginId;
+        string classId = ddlClassrooms.SelectedValue;
+        string getStudidlistquery = "SELECT STUFF((SELECT distinct ','+Convert(varchar(200),StudentId)" +
+                                        " FROM StdtClass SC left Join Student STD ON STD.StudentId = SC.StdtId left join Placement PLC on STD.StudentId = PLC.StudentPersonalId" +
+                                        " WHERE SC.ClassId IN (" + classId + ") AND STD.ActiveInd='A' AND SC.ActiveInd='A' AND PLC.Location IN(" + classId + ") AND (PLC.EndDate is null or convert(DATE,PLC.EndDate) >= convert(DATE,getdate()))FOR XML PATH('')), 1, 1, '')";
+        string getStudidlist = Convert.ToString(objData.FetchValue(getStudidlistquery));
+        if (chkbx_block_sch.Checked == true)
+        {
+            graphContainerClinical.Visible = true;
+            graphContainerAcademic.Visible = false;
+            graphContainerAcademicStaff.Visible = false;
+            graphContainerClinicalStaff.Visible = false;
+            BtnClientAcademic_Click(sender, e); 
+        }
+        else if (chkbx_leson_deliverd.Checked == true)
+        {
+            //BtnSwitchTableChart.Text = "Table View";
+            graphContainerAcademic.Visible = true;
+            graphContainerAcademicStaff.Visible = true;
+            graphContainerClinical.Visible = true;
+            graphContainerClinicalStaff.Visible = true;
+            highcheck.Checked = true;
+            LoadDashBoardStaffAcademicGraph(classId, getStudidlist, userId);
+            LoadDashBoardClientAcademicGraph(classId, getStudidlist, userId);
+            LoadDashBoardStaffClinicalGraph(classId, getStudidlist);
+            LoadDashBoardClientClinicalGraph(classId, getStudidlist);
+        }
+    }
+    protected void BtnRefreshOld_Click(object sender, EventArgs e)
     {
         tdMsg.InnerHtml = "";
         if ((chkbx_leson_deliverd.Checked == true) && (Txt_graphid.Text == "1")) {BtnClientAcademic_Click(sender, e);}
@@ -1265,6 +1440,7 @@ public partial class Graph : System.Web.UI.Page
             chkbx_leson_deliverd.Enabled = false;
             chkbx_block_sch.Checked = false;
             chkbx_block_sch.Enabled = true;
+            BtnRefresh_Click(sender, e);
         }
     }
     protected void chkbx_block_sch_CheckedChanged(object sender, EventArgs e)
@@ -1274,6 +1450,7 @@ public partial class Graph : System.Web.UI.Page
             chkbx_block_sch.Enabled = false;            
             chkbx_leson_deliverd.Checked = false;
             chkbx_leson_deliverd.Enabled = true;
+            BtnRefresh_Click(sender, e);
         }
     }
     protected void chkbx_Mistrial_CheckedChanged(object sender, EventArgs e)
@@ -1350,20 +1527,76 @@ public partial class Graph : System.Web.UI.Page
 
         List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
         Dictionary<string, object> row;
-        String proc = "[dbo].[DashboardClientClinical]";
+        String proc = "[dbo].[DashboardClientClinicalNew]";
 
         DataTable dt = objData.ReturnNewTableClinicClient(proc, cid, sid);
 
-        foreach (DataRow dr in dt.Rows)
+        if (dt != null && dt.Rows.Count > 0)
+        {
+            var grouped = dt.AsEnumerable()
+                .GroupBy(row1 => new
+                {
+                    StudentId = row1.Field<int>("StudentId"),
+                    MeasurementId = row1.Field<int>("MeasurementId"),
+                    ClassId = row1.Field<int>("ClassId")
+                })
+                .Select(g =>
+                {
+                    var first = g.First();
+                    var newRow = dt.NewRow();
+
+                    newRow["StudentId"] = g.Key.StudentId;
+                    newRow["MeasurementId"] = g.Key.MeasurementId;
+                    newRow["ClassId"] = g.Key.ClassId;
+                    newRow["BehaviourSession"] = g.Sum(r => r.Field<int>("BehaviourSession"));
+
+                    foreach (DataColumn col in dt.Columns)
+                    {
+                        if (col.ColumnName == "StudentId" ||
+                            col.ColumnName == "MeasurementId" ||
+                            col.ColumnName == "ClassId" ||
+                            col.ColumnName == "BehaviourSession")
+                            continue;
+
+                        newRow[col.ColumnName] = first[col.ColumnName];
+                    }
+
+                    return newRow;
+                });
+
+            DataTable groupedDt = dt.Clone(); // Clone the schema
+            foreach (var row1 in grouped)
+                groupedDt.Rows.Add(row1.ItemArray);
+
+            dt = groupedDt;
+
+            // Add MaxCount column
+            int maxCount = dt.AsEnumerable()
+                             .Max(row2 => row2.Field<int>("BehaviourSession"));
+
+            if (!dt.Columns.Contains("MaxCount"))
+                dt.Columns.Add("MaxCount", typeof(int));
+
+            foreach (DataRow row2 in dt.Rows)
             {
+                row2["MaxCount"] = maxCount;
+            }
+        }
+        else
+        {
+            return "[]"; // or return an error object
+        }
+
+        // Convert DataTable to JSON
+        foreach (DataRow dr in dt.Rows)
+        {
             row = new Dictionary<string, object>();
             foreach (DataColumn dc in dt.Columns)
-                {
+            {
                 row.Add(dc.ColumnName, dr[dc]);
             }
             rows.Add(row);
-
-                }
+        }
 
         JavaScriptSerializer json = new JavaScriptSerializer();
         string dat = json.Serialize(rows);
@@ -1371,6 +1604,769 @@ public partial class Graph : System.Web.UI.Page
         return json.Serialize(rows);
     }
 
+
+    protected void ButtonGo_Click(object sender, EventArgs e)
+    {
+        RV_DBReport.Visible = false;
+        String Classids = Convert.ToString(Txt_Clasid.Text);
+        String Studids = Convert.ToString(Txt_Studid.Text);
+        string startDate = txtstartDate.Text.ToString();
+        string endDate = txtendDate.Text.ToString();
+        String Mistrial = Convert.ToString(chkbx_Mistrial.Checked ? 1 : 0);
+        String getUserIdAcademic = "SELECT STUFF((SELECT Distinct ','+Convert(varchar(200),Modifiedby) from stdtsessionhdr where stdtclassid IN(" + Classids + ") and studentid IN(" + Studids + ") and Convert(DATE,ModifiedOn) BETWEEN CONVERT(DATE,'" + startDate + "') AND CONVERT(DATE,'" + endDate + "')FOR XML PATH('')), 1, 1, '')";
+        String getUserIdClinical = "SELECT STUFF((SELECT Distinct ','+Convert(varchar(200),Modifiedby) from Behaviour where ClassId IN(" + Classids + ") and studentid IN(" + Studids + ") and Convert(DATE,CreatedOn) BETWEEN CONVERT(DATE,'" + startDate + "') AND CONVERT(DATE,'" + endDate + "')FOR XML PATH('')), 1, 1, '')";
+        
+        String UserIdsAcademic = Convert.ToString(objData.FetchValue(getUserIdAcademic));
+        String UserIdClinical = Convert.ToString(objData.FetchValue(getUserIdClinical));
+        String Userids = string.IsNullOrEmpty(UserIdsAcademic)
+                 ? UserIdClinical
+                 : string.IsNullOrEmpty(UserIdClinical)
+                   ? UserIdsAcademic
+                   : UserIdsAcademic + "," + UserIdClinical;
+        List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+        DataTable Dt = new DataTable();
+        clsData ObjData = new clsData();
+        SqlConnection con = ObjData.Open();
+        
+        try
+        {
+            gvProgramsByClient.Columns.Clear();
+            gvProgramsByClient.DataSource = null;
+            gvProgramsByClient.DataBind();
+
+            gvProgramsByStaff.Columns.Clear();
+            gvProgramsByStaff.DataSource = null;
+            gvProgramsByStaff.DataBind();
+
+            gvClinicalByClient.Columns.Clear();
+            gvClinicalByClient.DataSource = null;
+            gvClinicalByClient.DataBind();
+
+            gvClinicalByStaff.Columns.Clear();
+            gvClinicalByStaff.DataSource = null;
+            gvClinicalByStaff.DataBind();
+
+
+            DataTable DtAcademic = new DataTable();
+            SqlCommand cmdAcademic = new SqlCommand("DashboardAcademicTable", con);
+            cmdAcademic.CommandType = CommandType.StoredProcedure;
+            cmdAcademic.CommandTimeout = 600;
+            cmdAcademic.Parameters.AddWithValue("@ParamStartDate", startDate);
+            cmdAcademic.Parameters.AddWithValue("@ParamEndDate", endDate);
+            cmdAcademic.Parameters.AddWithValue("@StudentIds", Studids);
+            cmdAcademic.Parameters.AddWithValue("@UserIds", Userids);
+            cmdAcademic.Parameters.AddWithValue("@ParamMistrial", Mistrial);
+            cmdAcademic.Parameters.AddWithValue("@ClassIds", Classids);
+            SqlDataAdapter daAcademic = new SqlDataAdapter(cmdAcademic);
+            daAcademic.Fill(DtAcademic);
+            
+            DataTable dtAcademicStaff = PivotDataTableStaff(DtAcademic);
+            DtAcademic = PivotDataTableClient(DtAcademic);
+
+            DtAcademic = fillDates(DtAcademic, startDate, endDate);
+            dtAcademicStaff = fillDates(dtAcademicStaff, startDate, endDate);
+
+            AddDynamicColumnsClientAcademic(DtAcademic);
+            AddDynamicColumnsStaffAcademic(dtAcademicStaff);
+            
+            gvProgramsByClient.DataSource = DtAcademic;
+            gvProgramsByClient.DataBind();
+
+            gvProgramsByStaff.DataSource = dtAcademicStaff;
+            gvProgramsByStaff.DataBind();
+
+            DataTable DtClinical = new DataTable();
+            SqlCommand cmdClinical = new SqlCommand("DashboardClinicalTable", con);
+            cmdClinical.CommandType = CommandType.StoredProcedure;
+            cmdClinical.CommandTimeout = 600;
+            cmdClinical.Parameters.AddWithValue("@ParamStartDate", startDate);
+            cmdClinical.Parameters.AddWithValue("@ParamEndDate", endDate);
+            cmdClinical.Parameters.AddWithValue("@StudentIds", Studids);
+            cmdClinical.Parameters.AddWithValue("@UserIds", Userids);
+            cmdClinical.Parameters.AddWithValue("@ClassIds", Classids);
+            SqlDataAdapter daClinical = new SqlDataAdapter(cmdClinical);
+            daClinical.Fill(DtClinical);
+            DtClinical = addCountPerDate(DtClinical);
+            DataTable dtClinicalStaff = PivotDataTableStaff(DtClinical);
+            DtClinical = PivotDataTableClient(DtClinical);
+
+            DtClinical = fillDates(DtClinical, startDate, endDate);
+            dtClinicalStaff = fillDates(dtClinicalStaff, startDate, endDate);
+
+
+            AddDynamicColumnsClientClinical(DtClinical);
+            AddDynamicColumnsStaffClinical(dtClinicalStaff);
+
+            gvClinicalByClient.DataSource = DtClinical;
+            gvClinicalByClient.DataBind();
+
+            gvClinicalByStaff.DataSource = dtClinicalStaff;
+            gvClinicalByStaff.DataBind();
+
+            //ddcb_clas.SelectedIndex = 0;
+            highcheck.Visible = false;
+            BtnRefresh.Visible = false;
+            ButtonGo.Visible = true;
+            btnExportToExcel.Visible = true;
+            //BtnChartView.Visible = true;
+            //BtnTableView.Visible = false;
+            startDate = startDate.Replace('/', '-');
+            endDate = endDate.Replace('/', '-');
+            string script2 = "setDateFields('" + startDate + "', '" + endDate + "');";
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "setDate", script2, true);
+            string script1 = "TableView();";
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "Table", script1, true);
+            
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error: " + ex);
+
+            ClsErrorLog errlog = new ClsErrorLog();
+            errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\n StudentId ID = " + Studids + "\n" + ex.ToString());
+        }
+        finally
+        {
+            ObjData.Close(con);
+            string script1 = "disableLoader();";
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "show", script1, true);
+        }
+
+    }
+    static DataTable addCountPerDate(DataTable dt)
+    {
+        var groupedData = dt.AsEnumerable()
+             .GroupBy(row => new
+             {
+                 CreatedDate = row.Field<DateTime>("CreatedDate"),
+                 StudentName = row.Field<string>("StudentName"),
+                 ClassName = row.Field<string>("ClassName"),
+                 StaffName = row.Field<string>("StaffName")
+             })
+             .Select(g => new
+             {
+                 CreatedDate = g.Key.CreatedDate,
+                 StudentName = g.Key.StudentName,
+                 ClassName = g.Key.ClassName,
+                 StaffName = g.Key.StaffName,
+                 TotalCount = g.Sum(r => r.Field<int>("Count"))
+             })
+             .ToList();
+
+        // Step 2: Clear the original DataTable and repopulate it
+        dt.Clear();
+
+        foreach (var row in groupedData)
+        {
+            dt.Rows.Add(row.StudentName, row.ClassName, row.StaffName, row.TotalCount, row.CreatedDate);
+        }
+        return dt;
+
+    }
+    static DataTable PivotDataTableClient(DataTable dt)
+    {
+        dt.DefaultView.Sort = dt.Columns["ClassName"].ColumnName + " ASC";
+        dt = dt.DefaultView.ToTable();
+        DataTable result = new DataTable();
+        result.Columns.Add("ClassName", typeof(string));
+        result.Columns.Add("StudentName", typeof(string));
+
+        // Get unique CreatedDate values as column headers
+        List<string> dateColumns = dt.AsEnumerable()
+            .Select(row => Convert.ToDateTime(row["CreatedDate"]).ToString("MM-dd-yyyy"))
+            .Distinct()
+            .OrderBy(date => date)
+            .ToList();
+
+        foreach (string date in dateColumns)
+        {
+            result.Columns.Add(date, typeof(int));
+        }
+
+        result.Columns.Add("Grand Total", typeof(int)); // Add Grand Total column
+
+        Dictionary<string, DataRow> classAggregates = new Dictionary<string, DataRow>();
+        Dictionary<string, Dictionary<string, int>> classSums = new Dictionary<string, Dictionary<string, int>>();
+        Dictionary<string, DataRow> rowLookup = new Dictionary<string, DataRow>();
+
+        Dictionary<string, int> grandTotalValues = new Dictionary<string, int>(); // Store grand total for dates
+        int overallGrandTotal = 0;
+
+        foreach (DataRow row in dt.Rows)
+        {
+            string className = row["ClassName"].ToString();
+            string studentName = row["StudentName"].ToString();
+            string createdDate = Convert.ToDateTime(row["CreatedDate"]).ToString("MM-dd-yyyy");
+            int countValue = Convert.ToInt32(row["Count"]);
+
+            string studentKey = className + "_" + studentName;
+
+            // Handle class-level aggregation
+            if (!classAggregates.ContainsKey(className))
+            {
+                DataRow classRow = result.NewRow();
+                classRow["ClassName"] = className;
+                classRow["StudentName"] = "Total";
+                classAggregates[className] = classRow;
+                result.Rows.Add(classRow);
+                classSums[className] = new Dictionary<string, int>();
+            }
+
+            if (!classSums[className].ContainsKey(createdDate))
+            {
+                classSums[className][createdDate] = 0;
+            }
+            classSums[className][createdDate] += countValue;
+
+            // Handle individual student rows
+            if (!rowLookup.ContainsKey(studentKey))
+            {
+                DataRow studentRow = result.NewRow();
+                studentRow["ClassName"] = className;
+                studentRow["StudentName"] = studentName;
+                rowLookup[studentKey] = studentRow;
+                result.Rows.Add(studentRow);
+            }
+
+            rowLookup[studentKey][createdDate] = countValue;
+
+            // Track grand total values per date (excluding class summary rows)
+            if (!grandTotalValues.ContainsKey(createdDate))
+            {
+                grandTotalValues[createdDate] = 0;
+            }
+            grandTotalValues[createdDate] += countValue;
+            overallGrandTotal += countValue; // Overall sum
+        }
+
+        // Populate class summary rows
+        foreach (var classEntry in classSums)
+        {
+            string className = classEntry.Key;
+            DataRow classRow = classAggregates[className];
+            int classGrandTotal = 0;
+
+            foreach (var dateEntry in classEntry.Value)
+            {
+                classRow[dateEntry.Key] = dateEntry.Value;
+                classGrandTotal += dateEntry.Value;
+            }
+
+            classRow["Grand Total"] = classGrandTotal;
+        }
+
+        // Compute row-wise Grand Total for each student
+        foreach (var studentRow in rowLookup.Values)
+        {
+            int studentGrandTotal = 0;
+            foreach (string date in dateColumns)
+            {
+                if (studentRow[date] != DBNull.Value)
+                {
+                    studentGrandTotal += Convert.ToInt32(studentRow[date]);
+                }
+            }
+            studentRow["Grand Total"] = studentGrandTotal;
+        }
+
+        // Add final Grand Total row
+        DataRow grandTotalRow = result.NewRow();
+        grandTotalRow["ClassName"] = "";
+        grandTotalRow["StudentName"] = "Grand Total";
+
+        foreach (string date in dateColumns)
+        {
+            grandTotalRow[date] = grandTotalValues.ContainsKey(date) ? grandTotalValues[date] : 0;
+        }
+
+        grandTotalRow["Grand Total"] = overallGrandTotal;
+        result.Rows.Add(grandTotalRow);
+
+        return result;
+    }
+
+
+
+
+    static DataTable PivotDataTableStaff(DataTable dt)
+    {
+        dt.DefaultView.Sort = dt.Columns["ClassName"].ColumnName + " ASC";
+        dt = dt.DefaultView.ToTable();
+        DataTable result = new DataTable();
+        result.Columns.Add("ClassName", typeof(string));
+        result.Columns.Add("StaffName", typeof(string));
+
+        // Get unique CreatedDate values as column headers
+        List<string> dateColumns = dt.AsEnumerable()
+            .Select(row => Convert.ToDateTime(row["CreatedDate"]).ToString("MM-dd-yyyy"))
+            .Distinct()
+            .OrderBy(date => date)
+            .ToList();
+
+        foreach (string date in dateColumns)
+        {
+            result.Columns.Add(date, typeof(int));
+        }
+
+        result.Columns.Add("Grand Total", typeof(int)); // Add Grand Total column
+
+        Dictionary<string, DataRow> classAggregates = new Dictionary<string, DataRow>();
+        Dictionary<string, Dictionary<string, int>> classSums = new Dictionary<string, Dictionary<string, int>>();
+        Dictionary<string, DataRow> rowLookup = new Dictionary<string, DataRow>();
+
+        Dictionary<string, int> grandTotalValues = new Dictionary<string, int>(); // Store grand total for dates
+        int overallGrandTotal = 0;
+
+        foreach (DataRow row in dt.Rows)
+        {
+            string className = row["ClassName"].ToString();
+            string staffName = row["StaffName"].ToString();
+            string createdDate = Convert.ToDateTime(row["CreatedDate"]).ToString("MM-dd-yyyy");
+            int countValue = Convert.ToInt32(row["Count"]);
+
+            string staffKey = className + "_" + staffName;
+
+            // Handle class-level aggregation
+            if (!classAggregates.ContainsKey(className))
+            {
+                DataRow classRow = result.NewRow();
+                classRow["ClassName"] = className;
+                classRow["StaffName"] = "Total";
+                classAggregates[className] = classRow;
+                result.Rows.Add(classRow);
+                classSums[className] = new Dictionary<string, int>();
+            }
+
+            if (!classSums[className].ContainsKey(createdDate))
+            {
+                classSums[className][createdDate] = 0;
+            }
+            classSums[className][createdDate] += countValue;
+
+            // Handle individual staff rows
+            if (!rowLookup.ContainsKey(staffKey))
+            {
+                DataRow staffRow = result.NewRow();
+                staffRow["ClassName"] = className;
+                staffRow["StaffName"] = staffName;
+                rowLookup[staffKey] = staffRow;
+                result.Rows.Add(staffRow);
+            }
+
+            rowLookup[staffKey][createdDate] = countValue;
+
+            // Track grand total values per date (excluding class summary rows)
+            if (!grandTotalValues.ContainsKey(createdDate))
+            {
+                grandTotalValues[createdDate] = 0;
+            }
+            grandTotalValues[createdDate] += countValue;
+            overallGrandTotal += countValue; // Overall sum
+        }
+
+        // Populate class summary rows
+        foreach (var classEntry in classSums)
+        {
+            string className = classEntry.Key;
+            DataRow classRow = classAggregates[className];
+            int classGrandTotal = 0;
+
+            foreach (var dateEntry in classEntry.Value)
+            {
+                classRow[dateEntry.Key] = dateEntry.Value;
+                classGrandTotal += dateEntry.Value;
+            }
+
+            classRow["Grand Total"] = classGrandTotal;
+        }
+
+        // Compute row-wise Grand Total for each staff member
+        foreach (var staffRow in rowLookup.Values)
+        {
+            int staffGrandTotal = 0;
+            foreach (string date in dateColumns)
+            {
+                if (staffRow[date] != DBNull.Value)
+                {
+                    staffGrandTotal += Convert.ToInt32(staffRow[date]);
+                }
+            }
+            staffRow["Grand Total"] = staffGrandTotal;
+        }
+
+        // Add final Grand Total row
+        DataRow grandTotalRow = result.NewRow();
+        grandTotalRow["ClassName"] = "";
+        grandTotalRow["StaffName"] = "Grand Total";
+
+        foreach (string date in dateColumns)
+        {
+            grandTotalRow[date] = grandTotalValues.ContainsKey(date) ? grandTotalValues[date] : 0;
+        }
+
+        grandTotalRow["Grand Total"] = overallGrandTotal;
+        result.Rows.Add(grandTotalRow);
+
+        return result;
+    }
+    protected void gvProgramsByClient_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowType == DataControlRowType.DataRow)
+        {
+            string rawClassName = Convert.ToString(DataBinder.Eval(e.Row.DataItem, "ClassName"));
+            string className = rawClassName.Replace(" ", "_");
+            string studentName = Convert.ToString(DataBinder.Eval(e.Row.DataItem, "StudentName"));
+
+            e.Row.Attributes["class"] = "class-" + className;
+            e.Row.Attributes["data-class"] = className;
+            e.Row.Attributes["data-raw-class"] = rawClassName;
+
+            bool isSummaryRow = studentName == "Total";
+
+            if (isSummaryRow)
+            {
+                e.Row.Attributes["class"] += " summary-row";
+                string buttonHtml = "<a href='javascript:void(0);' class='collapse-button' onclick=\"toggleRows('" + className + "')\" style='font-weight:bold; text-decoration:none; color:black;'>&#9660; " + className.Replace("_", " ") + "</a>";
+                e.Row.Cells[0].Text = buttonHtml;
+                e.Row.Font.Bold = true;
+            }
+            else
+            {
+                if (studentName == "Grand Total")
+                    e.Row.Font.Bold = true;
+                e.Row.Cells[0].Text = "";
+            }
+        }
+    }
+
+    protected void gvProgramsByStaff_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowType == DataControlRowType.DataRow)
+        {
+            string rawClassName = Convert.ToString(DataBinder.Eval(e.Row.DataItem, "ClassName"));
+            string className = rawClassName.Replace(" ", "_");
+            string staffName = Convert.ToString(DataBinder.Eval(e.Row.DataItem, "StaffName"));
+
+            e.Row.Attributes["class"] = "class-" + className;
+            e.Row.Attributes["data-class"] = className;
+            e.Row.Attributes["data-raw-class"] = rawClassName;
+
+            bool isSummaryRow = staffName == "Total";
+
+            if (isSummaryRow)
+            {
+                e.Row.Attributes["class"] += " summary-row";
+                string buttonHtml = "<a href='javascript:void(0);' class='collapse-button' onclick=\"toggleRows('" + className + "')\" style='font-weight:bold; text-decoration:none; color:black;'>&#9660; " + className.Replace("_", " ") + "</a>";
+                e.Row.Cells[0].Text = buttonHtml;
+                e.Row.Font.Bold = true;
+            }
+            else
+            {
+                if (staffName == "Grand Total")
+                    e.Row.Font.Bold = true;
+                e.Row.Cells[0].Text = "";
+            }
+        }
+    }
+
+    protected void gvClinicalByClient_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowType == DataControlRowType.DataRow)
+        {
+            string rawClassName = Convert.ToString(DataBinder.Eval(e.Row.DataItem, "ClassName"));
+            string className = rawClassName.Replace(" ", "_");
+            string studentName = Convert.ToString(DataBinder.Eval(e.Row.DataItem, "StudentName"));
+
+            e.Row.Attributes["class"] = "class-" + className;
+            e.Row.Attributes["data-class"] = className;
+            e.Row.Attributes["data-raw-class"] = rawClassName;
+
+            bool isSummaryRow = studentName == "Total";
+
+            if (isSummaryRow)
+            {
+                e.Row.Attributes["class"] += " summary-row";
+                string buttonHtml = "<a href='javascript:void(0);' class='collapse-button' onclick=\"toggleRows('" + className + "')\" style='font-weight:bold; text-decoration:none; color:black;'>&#9660; " + className.Replace("_", " ") + "</a>";
+                e.Row.Cells[0].Text = buttonHtml;
+                e.Row.Font.Bold = true;
+            }
+            else
+            {
+                if (studentName == "Grand Total")
+                    e.Row.Font.Bold = true;
+                e.Row.Cells[0].Text = "";
+            }
+        }
+    }
+
+    protected void gvClinicalByStaff_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowType == DataControlRowType.DataRow)
+        {
+            string rawClassName = Convert.ToString(DataBinder.Eval(e.Row.DataItem, "ClassName"));
+            string className = rawClassName.Replace(" ", "_");
+            string staffName = Convert.ToString(DataBinder.Eval(e.Row.DataItem, "StaffName"));
+
+            e.Row.Attributes["class"] = "class-" + className;
+            e.Row.Attributes["data-class"] = className;
+            e.Row.Attributes["data-raw-class"] = rawClassName;
+
+            bool isSummaryRow = staffName == "Total";
+
+            if (isSummaryRow)
+            {
+                e.Row.Attributes["class"] += " summary-row";
+                string buttonHtml = "<a href='javascript:void(0);' class='collapse-button' onclick=\"toggleRows('" + className + "')\" style='font-weight:bold; text-decoration:none; color:black;'>&#9660; " + className.Replace("_", " ") + "</a>";
+                e.Row.Cells[0].Text = buttonHtml;
+                e.Row.Font.Bold = true;
+            }
+            else
+            {
+                if (staffName == "Grand Total")
+                    e.Row.Font.Bold = true;
+                e.Row.Cells[0].Text = "";
+            }
+        }
+    }
+
+
+
+    private void AddDynamicColumnsClientAcademic(DataTable dt)
+    {
+        foreach (DataColumn col in dt.Columns)
+        {
+            if (col.ColumnName == "StudentName")
+            {
+                BoundField StudentName = new BoundField();
+                StudentName.DataField = col.ColumnName;
+                StudentName.HeaderText = "Student Name";
+                gvProgramsByClient.Columns.Add(StudentName);
+            }
+            else if (col.ColumnName == "ClassName")
+            {
+                BoundField ClassName = new BoundField();
+                ClassName.DataField = col.ColumnName;
+                ClassName.HeaderText = "Class Name";
+                gvProgramsByClient.Columns.Add(ClassName);
+            }
+            else
+            {
+                BoundField dateColumn = new BoundField();
+                dateColumn.DataField = col.ColumnName;
+                dateColumn.HeaderText = col.ColumnName;
+                dateColumn.HeaderStyle.CssClass = "rotated-header";
+                gvProgramsByClient.Columns.Add(dateColumn);
+            }
+        }
+    }
+    private void AddDynamicColumnsClientClinical(DataTable dt)
+    {
+        foreach (DataColumn col in dt.Columns)
+        {
+            if (col.ColumnName == "StudentName")
+            {
+                BoundField StudentName = new BoundField();
+                StudentName.DataField = col.ColumnName;
+                StudentName.HeaderText = "Student Name";
+                gvClinicalByClient.Columns.Add(StudentName);
+            }
+            else if (col.ColumnName == "ClassName")
+            {
+                BoundField ClassName = new BoundField();
+                ClassName.DataField = col.ColumnName;
+                ClassName.HeaderText = "Class Name";
+                gvClinicalByClient.Columns.Add(ClassName);
+            }
+            else
+            {
+                BoundField dateColumn = new BoundField();
+                dateColumn.DataField = col.ColumnName;
+                dateColumn.HeaderText = col.ColumnName;
+                dateColumn.HeaderStyle.CssClass = "rotated-header";
+                gvClinicalByClient.Columns.Add(dateColumn);
+            }
+        }
+    }
+    private void AddDynamicColumnsStaffAcademic(DataTable dt)
+    {
+        foreach (DataColumn col in dt.Columns)
+        {
+            if (col.ColumnName == "StaffName")
+            {
+                BoundField StaffName = new BoundField();
+                StaffName.DataField = col.ColumnName;
+                StaffName.HeaderText = "Staff Name";
+                gvProgramsByStaff.Columns.Add(StaffName);
+            }
+            else if (col.ColumnName == "ClassName")
+            {
+                BoundField ClassName = new BoundField();
+                ClassName.DataField = col.ColumnName;
+                ClassName.HeaderText = "Class Name";
+                gvProgramsByStaff.Columns.Add(ClassName);
+            }
+            else
+            {
+                BoundField dateColumn = new BoundField();
+                dateColumn.DataField = col.ColumnName;
+                dateColumn.HeaderText = col.ColumnName;
+                dateColumn.HeaderStyle.CssClass = "rotated-header";
+                gvProgramsByStaff.Columns.Add(dateColumn);
+            }
+        }
+    }
+    private void AddDynamicColumnsStaffClinical(DataTable dt)
+    {
+        foreach (DataColumn col in dt.Columns)
+        {
+            if (col.ColumnName == "StaffName")
+            {
+                BoundField StaffName = new BoundField();
+                StaffName.DataField = col.ColumnName;
+                StaffName.HeaderText = "Staff Name";
+                gvClinicalByStaff.Columns.Add(StaffName);
+            }
+            else if (col.ColumnName == "ClassName")
+            {
+                BoundField ClassName = new BoundField();
+                ClassName.DataField = col.ColumnName;
+                ClassName.HeaderText = "Class Name";
+                gvClinicalByStaff.Columns.Add(ClassName);
+            }
+            else
+            {
+                BoundField dateColumn = new BoundField();
+                dateColumn.DataField = col.ColumnName;
+                dateColumn.HeaderText = col.ColumnName;
+                dateColumn.HeaderStyle.CssClass = "rotated-header";
+                gvClinicalByStaff.Columns.Add(dateColumn);
+            }
+        }
+    }
+    //protected void BtnSwitchTableChart_Click(object sender, EventArgs e)
+    //{
+    //    highcheck.Visible = true;
+    //    BtnRefresh.Visible = true;
+    //    ButtonGo.Visible = false;
+    //    BtnChartView.Visible = false;
+    //    BtnTableView.Visible = true;
+    //    string script1 = "ChartView();";
+    //    ScriptManager.RegisterStartupScript(this, this.GetType(), "chart", script1, true);
+    //}
+    protected void BtnSwitchTableChart_Click(object sender, EventArgs e)
+    {
+        if (BtnSwitchTableChart.Text == "Table View")
+        {
+            sess = (clsSession)Session["UserSession"];
+            string selectedClasses = sess.Classid.ToString();
+
+            foreach (System.Web.UI.WebControls.ListItem item in ddcb_clas.Items)
+            {
+                if (selectedClasses.Contains(item.Value))
+                {
+                    item.Selected = true;
+                }
+            }
+            Txt_Clasid.Text = selectedClasses;
+            BtnSwitchTableChart.Text = "Chart View";
+
+            txtstartDate.Text = DateTime.Now.AddDays(-7).ToString("MM/dd/yyyy");
+            txtendDate.Text = DateTime.Now.ToString("MM/dd/yyyy");
+
+
+            ButtonGo_Click(sender, e);
+        }
+        else
+        {
+            BtnRefresh.Visible = true;
+            ButtonGo.Visible = false;
+            btnExportToExcel.Visible = false;
+            BtnSwitchTableChart.Text = "Table View";
+            string script1 = "ChartView();";
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "chart", script1, true);
+            BtnRefresh_Click(sender, e);
+        }
+    }
+    protected void btnExportToExcel_Click(object sender, EventArgs e)
+    {
+        Response.Clear();
+        Response.Buffer = true;
+        Response.AddHeader("content-disposition", "attachment;filename=DashboardExport.xls");
+        Response.Charset = "";
+        Response.ContentType = "application/vnd.ms-excel";
+        Response.ContentEncoding = System.Text.Encoding.UTF8;
+
+        using (StringWriter sw = new StringWriter())
+        {
+            using (HtmlTextWriter hw = new HtmlTextWriter(sw))
+            {
+                sw.WriteLine("<b>Programs by Client</b><br/>");
+                gvProgramsByClient.RenderControl(hw);
+
+                sw.WriteLine("<br/><b>Programs by Staff</b><br/>");
+                gvProgramsByStaff.RenderControl(hw);
+
+                sw.WriteLine("<br/><b>Clinical by Client</b><br/>");
+                gvClinicalByClient.RenderControl(hw);
+
+                sw.WriteLine("<br/><b>Clinical by Staff</b><br/>");
+                gvClinicalByStaff.RenderControl(hw);
+
+                Response.Output.Write(sw.ToString());
+                Response.Flush();
+                Response.End();
+            }
+        }
+    }
+
+    static DataTable fillDates(DataTable originalDt, string startDateStr, string endDateStr)
+    {
+        DateTime startDate = DateTime.ParseExact(startDateStr.Replace("/","-"), "MM-dd-yyyy", CultureInfo.InvariantCulture);
+        DateTime endDate = DateTime.ParseExact(endDateStr.Replace("/", "-"), "MM-dd-yyyy", CultureInfo.InvariantCulture);
+        
+        DataTable dtFullDates = new DataTable();
+        dtFullDates.Columns.Add(originalDt.Columns[0].ColumnName, originalDt.Columns[0].DataType);
+        dtFullDates.Columns.Add(originalDt.Columns[1].ColumnName, originalDt.Columns[1].DataType);
+
+        for (DateTime date = startDate; date <= endDate; date = date.AddDays(1))
+        {
+            dtFullDates.Columns.Add(date.ToString("MM-dd-yyyy"), typeof(string));
+        }
+
+        int lastColIndex = originalDt.Columns.Count - 1;
+        dtFullDates.Columns.Add(originalDt.Columns[lastColIndex].ColumnName, originalDt.Columns[lastColIndex].DataType);
+        foreach (DataRow row in originalDt.Rows)
+        {
+            DataRow newRow = dtFullDates.NewRow();
+
+            newRow[0] = row[0];
+            newRow[1] = row[1];
+
+            foreach (DataColumn dateColumn in dtFullDates.Columns)
+            {
+                string dateColumnName = dateColumn.ColumnName;
+
+                if (originalDt.Columns.Contains(dateColumnName))
+                {
+                    newRow[dateColumnName] = row[dateColumnName];
+                }
+                else
+                {
+                    newRow[dateColumnName] = ""; 
+                }
+            }
+
+            newRow[dtFullDates.Columns.Count - 1] = row[lastColIndex];
+
+            dtFullDates.Rows.Add(newRow);
+        }
+
+        return dtFullDates;
+ 
+    }
+    public override void VerifyRenderingInServerForm(Control control)
+    {
+    }
 
 }
 
