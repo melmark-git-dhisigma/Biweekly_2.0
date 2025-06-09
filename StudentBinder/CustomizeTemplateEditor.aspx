@@ -6487,6 +6487,12 @@
                 document.getElementById("<%=txtStepName.ClientID%>").focus();
                 return false;
             }
+            var endchk = document.getElementById('<%= chkEnd.ClientID %>');
+            var sel = document.getElementById('<%= ddlSortOrder.ClientID %>');
+            if (!endchk.checked && sel.value == "") {
+                document.getElementById("<%=tdMsgStep.ClientID%>").innerHTML = "<div class='warning_box'>Please select step position</div> ";
+                 return false;
+             }
             multiClickStep = true;
             btn.style.opacity = '0.5';
             return true;
