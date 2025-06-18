@@ -1,6 +1,7 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="DashboardReportNew.aspx.cs" Inherits="Graph" %>
 <%@ Register Assembly="DropDownCheckBoxes" Namespace="Saplin.Controls" TagPrefix="asp" %>
 <%@ Register Assembly="Microsoft.ReportViewer.WebForms, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91" Namespace="Microsoft.Reporting.WebForms" TagPrefix="rsweb" %>
+<%@ Import Namespace="System.Web.UI.WebControls" %>
 
 
 <!DOCTYPE html>
@@ -34,14 +35,22 @@
         }
     </script>
 
-    <script src="js/jquery-2.1.0.js"></script>
+    <%--<script src="js/jquery-2.1.0.js"></script>--%>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
      <script src="../Scripts/highcharts/7.1.2/highcharts.js"></script>
    <script src="../Scripts/highcharts/7.1.2/modules/accessibility.js"></script>
     <script src="js/d3.v3.js"></script>
     <script src="js/nv.d3.js"></script>
     <link href="../Administration/CSS/GraphStyle.css" rel="stylesheet" />
+    <link href="../Administration/CSS/jsDatePickforGraph.css" rel="stylesheet" />
+    <script src="../Administration/JS/jsDatePick.min.1.3.js"></script>
     <link href="CSS/nv.d3.css" rel="stylesheet" />
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"/>
+    
+   
     <style type="text/css">
 
         .loading {
@@ -102,11 +111,238 @@
         .divchkbox label {
           vertical-align: text-bottom;
         }
+
+  .graph-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    width: 100%;
+    max-width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  .graph-container {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 16 / 9; 
+    background-color: #f4f4f4; 
+    border: 1px solid #ccc;
+  }
     </style>
+    <style>
+        /*Date Range Filter Styling*/
+        .date-range-container {
+    display: block;
+    flex-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: #00549f;
+}
+
+.date-label {
+    margin-right: 5px;
+}
+
+.date-input {
+    width: 100px;
+    padding: 5px;
+    border: 1px solid #00549f;
+    border-radius: 3px;
+    text-align: center;
+    font-weight: bold;
+    color: #00549f;
+}
+
+        /*Button Styling*/
+        .btnGo {
+    background-color: #007bff;
+    color: white; 
+    padding: 15px 20px; 
+    border: none;
+    border-radius: 10px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    font-weight: bold; 
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+/* Hover Effect */
+.btnGo:hover {
+    background-color: #0056b3;
+}
+
+/* Active (Click) Effect */
+.btnGo:active {
+    background-color: #004494;
+}
+
+/* GridView Styling */
+        .tab-content{
+            max-height:550px;
+            overflow-y:auto;
+        }
+.gridview {
+    max-height:550px;
+    overflow-y:auto;
+    width: auto;
+    border-collapse: collapse;
+}
+        .gridview td {
+    border: 1px solid black;
+
+        }
+.gridview th{
+    text-align: center;
+    border: 1px solid black;
+    font-weight: bold;
+}
+
+.gridview th:nth-child(1), 
+.gridview th:nth-child(2){
+    writing-mode:horizontal-lr;
+
+    padding:5px;
+    white-space:nowrap;
+}
+.gridview td{
+        text-align: center;
+        }
+/* Rotated Headers for Date Columns */
+.gridview th:nth-child(n+3) {
+    writing-mode:vertical-lr;
+    -webkit-writing-mode: vertical-lr;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+.summary-row {
+border-top: 2px solid blue;
+border-bottom: 2px solid blue;
+        }
+/* Sticky last row */
+/*.gridview tbody tr:last-child {
+    position: sticky;
+    bottom: 0;
+    background-color: white;
+    z-index: 2;
+}*/
+/* Sticky last column */
+/*.gridview th:last-child, 
+.gridview td:last-child {
+    position: sticky;
+    right: 0;
+    background-color: white;
+    z-index: 2;
+}*/
 
 
+/*Dropdown Styling*/
+.class-dropdown {
+    width: 200px;
+    padding: 5px; 
+    font-size: 14px;
+    border: 1px solid #ccc; 
+    border-radius: 4px; 
+    background-color: #fff;
+    background-position: right 10px center; 
+    background-repeat: no-repeat; 
+}
+    </style>
+    <script>
+        function toggleRows(className) {
+            var safeClassName = className.replace(/ /g, "_");
+
+            var rows = document.querySelectorAll("tr.class-" + CSS.escape(safeClassName));
+
+            if (rows.length === 0) {
+                return;
+            }
+
+            // Find the button inside the summary row
+            var button = document.querySelector("tr.class-" + CSS.escape(safeClassName) + ".summary-row .collapse-button");
+
+            // Check if rows are currently visible
+            var isVisible = false;
+            for (var i = 0; i < rows.length; i++) {
+                if (!rows[i].classList.contains("summary-row") && rows[i].style.display !== "none") {
+                    isVisible = true;
+                    break;
+                }
+            }
+
+            // Toggle visibility for all rows except the summary row
+            for (var i = 0; i < rows.length; i++) {
+                if (!rows[i].classList.contains("summary-row")) {
+                    rows[i].style.display = isVisible ? "none" : "table-row";
+                }
+            }
+
+            // Update the collapse button arrow
+            if (button) {
+                var rawClassName = button.textContent.replace(/^▼|►/, "").trim();
+                button.innerHTML = isVisible ? "&#9658; " + rawClassName : "&#9660; " + rawClassName;
+                //button.innerHTML = isVisible ? "► " + rawClassName : "▼ " + rawClassName;
+            }
+        }
+        //$(function () {
+        //    // Get current date
+        //    var endDate = new Date();
+        //    // Get date 7 days prior
+        //    var startDate = new Date();
+        //    startDate.setDate(endDate.getDate() - 7);
+
+        //    // Format date as MM/DD/YYYY
+        //    var formatDate = function (date) {
+        //        var dd = String(date.getDate()).padStart(2, '0');
+        //        var mm = String(date.getMonth() + 1).padStart(2, '0');
+        //        var yyyy = date.getFullYear();
+        //        return mm + '/' + dd + '/' + yyyy;
+        //    };
+
+        //    // Set default values
+        //    $('#txtstartDate').val(formatDate(startDate));
+        //    $('#txtendDate').val(formatDate(endDate));
+
+        //});
+
+        function setDateFields(startDate, endDate) {
+            function parseDate(dateStr) {
+                if (typeof dateStr === 'string') {
+                    var parts = dateStr.split("-");
+                    // Proceed with processing
+                } else {
+                    console.error("Expected a string but received:", typeof dateStr);
+                }
+                var month = parseInt(parts[0], 10) - 1; // Months are zero-based
+                var day = parseInt(parts[1], 10);
+                var year = parseInt(parts[2], 10);
+                return new Date(year, month, day);
+            }
+
+            // Helper function to format a Date object as "MM/DD/YYYY"
+            function formatDateToMMDDYYYY(date) {
+                var month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+                var day = String(date.getDate()).padStart(2, '0');
+                var year = date.getFullYear();
+                return month + '/' + day + '/' + year;
+            }
+
+            // Parse the input date strings
+            var startDateObject = parseDate(startDate);
+            var endDateObject = parseDate(endDate);
+
+            // Format the Date objects to "MM/DD/YYYY"
+            var formattedStartDate = formatDateToMMDDYYYY(startDateObject);
+            var formattedEndDate = formatDateToMMDDYYYY(endDateObject);
+
+            // Set the formatted dates as values of the input fields
+            $('#txtstartDate').val(formattedStartDate);
+            $('#txtendDate').val(formattedEndDate);
+        }
+
+</script>
     <script type="text/javascript">
-
         window.onload = function () {
 
 
@@ -114,21 +350,80 @@
             var strDate = (d.getMonth() + 1) + "/" + d.getDate() + "/" + d.getFullYear();
             $('#lblDates').html(strDate);
             $('#lblDate').html(strDate);
+            new JsDatePick({
+                useMode: 2,
+                target: "<%=txtstartDate.ClientID%>",
+                dateFormat: "%m/%d/%Y",
+            });
+            new JsDatePick({
+                useMode: 2,
+                target: "<%=txtendDate.ClientID%>",
+                dateFormat: "%m/%d/%Y",
+            });
 
         };
+        
         function loadWait() {
             var checkbox = document.getElementById('<%= highcheck.ClientID %>');
-            if (checkbox.checked) {
-                $('.loading').fadeIn('fast');//, function () { });
+           if (checkbox && checkbox.checked) {
+               $('.loading').fadeIn('fast');
+           }
+       }
+        function enableLoader() {
+            var startDate = new Date(document.getElementById('<%= txtstartDate.ClientID %>').value);
+            var endDate = new Date(document.getElementById('<%= txtendDate.ClientID %>').value);
+            var errorLabel = document.getElementById("dateError");
+            if (startDate > endDate) {
+                errorLabel.innerText = "Start date must be before end date.";
+                errorLabel.style.display = "block";
+                return false;
             }
+            var maxEndDate = new Date(startDate);
+            maxEndDate.setMonth(maxEndDate.getMonth() + 3);
+            if (endDate > maxEndDate) {
+                errorLabel.innerText = "Date range cannot exceed 3 months.";
+                errorLabel.style.display = "block";
+                return false;
+            }
+            errorLabel.style.display = "none";
+            $('.loading').fadeIn('fast');
+            return true
+
         }
         function HideWait() {
+            $('.loading').fadeOut('fast');
+        }
+        function HideWaitOG() {
             var checkbox = document.getElementById('<%= highcheck.ClientID %>');
             if (checkbox.checked) {
                 $('.loading').fadeOut('fast');//, function () { });
             }
         }
-        
+        function disableLoader() {
+                $('.loading').fadeOut('fast');
+        }
+        function ChartView() {
+            document.querySelector('.divchkbox').style.display = 'block';
+            document.getElementById('chkbox-selection').style.display = 'block';
+            document.getElementById('selection-label').style.display = 'block';
+            document.querySelector('.graph-grid').style.display = 'grid';
+            
+            document.querySelector('.gvDivClass').style.display = 'none';
+            document.querySelector('.date-range-container').style.display = 'none';
+            document.querySelector('.divbtns').style.display = 'none';
+
+        }
+        function TableView() {
+            document.querySelector('.divchkbox').style.display = 'none';
+            document.querySelector('.divbtns').style.display = 'block';
+            document.getElementById('chkbox-selection').style.display = 'none';
+            document.getElementById('selection-label').style.display = 'none';
+            document.querySelector('.graph-grid').style.display = 'none';
+
+
+            document.querySelector('.gvDivClass').style.display = 'block';
+            document.querySelector('.date-range-container').style.display = 'block';
+        }
         $(function () {
 
             //drawGraph();
@@ -200,7 +495,7 @@
                 <h3 style="font-family:Tahoma">Dashboard - Today's <!--(<label id="lblDate"></label>)--> Progress</h3>
             </div>
             <div style="width:100%">
-                <div class="divdrop" style="margin-top:-30px">
+               <%-- <div class="divdrop" style="margin-top:-30px">
                     <table>
                         <tr>
                             <td style="text-align:center;width:25%">
@@ -230,43 +525,82 @@
                             </td>
                         </tr>
                     </table>
-                </div>
-                <div class="divbtns" style="padding-top:60px;padding-right: 140px;margin-top:-50px">
+                </div>--%>
+                <asp:Button ID="BtnSwitchTableChart" cssclass="btnGo" style="width:100px; position: absolute; top:20px; right:80px; height:45px;" runat="server" OnClick="BtnSwitchTableChart_Click" Text="" />
+                    <asp:button id="BtnRefresh" runat="server" text="Refresh" cssclass="NFButton" style="border-radius:10px; height:45px; background-color:#34b233; position: absolute; top:20px; right:190px;" tooltip="Refresh the Dashboard" OnClick="BtnRefresh_Click"      />
+                <div class="divbtns" style="padding-top:60px;padding-right: 140px;margin-top:-50px; padding-left:65px; display:none;">
                     <table>
                         <tr>
-                            <td colspan="3" style="text-align:center;padding-left: 200px;width:15%">
-                                 <span style="text-align:center;font-weight:bolder;font-size:15px;color: #00549f;margin-left:-150px">Choose Reports:</span>
+                            <%--<td colspan="3" style="text-align:center;padding-left: 200px;width:15%">
+                                 <span style="display:none; text-align:center;font-weight:bolder;font-size:15px;color: #00549f;margin-left:-150px">Choose Reports:</span>
+                            </td>--%>
+                            <td colspan="2" style="text-align:left;width: 20%;">
+                                 <asp:button id="BtnClientAcademic" runat="server" text="" visible="false" cssclass="NFButton" tooltip="Academic by Client" OnClick="BtnClientAcademic_Click" BackColor="#00549F"  />
+                                 <asp:button id="BtnStaffAcademic" runat="server" text="" visible="false" cssclass="NFButton" tooltip="Academic by Staff" OnClick="BtnStaffAcademic_Click" BackColor="#00549F"   />
+                                 <asp:button id="BtnClientClinical" runat="server" text="" visible="false" cssclass="NFButton" tooltip="Clinical by Client" OnClick="BtnClientClinical_Click" BackColor="#00549F"   />
+                                 <asp:Button id="BtnStaffClinical" runat="server" text="" visible="false" cssclass="NFButton" style="width:102px" tooltip="Clinical by Staff" OnClick="BtnStaffClinical_Click" OnClientClick="loadWait();" BackColor="#00549F"  />
+                                <asp:UpdatePanel runat="server">
+                                <ContentTemplate>
+                                    <span style="text-align:right;font-weight:bolder;font-size:15px;color: #00549f;padding-right: 50px;">Choose Clients:</span>
+                                    <span style="text-align:right;font-weight:bolder;font-size:12px;color: #00549f;">Location(s) :</span> 
+		                            <asp:DropDownCheckBoxes ID="ddcb_clas" runat="server" TabIndex="1" AddJQueryReference="True" UseButtons="true" UseSelectAllNode="false" style="color: #00549f; height: 13px;" AutoPostBack="False" OnSelectedIndexChanged="ddcb_clas_SelectedIndexChanged">
+			                            <Style SelectBoxWidth="200px" DropDownBoxBoxWidth="200px" DropDownBoxBoxHeight="400" DropDownBoxCssClass="ddchkLesson"/>
+			                            <Texts SelectBoxCaption="Select Location"/>
+		                            </asp:DropDownCheckBoxes>		      
+		                            <span style="text-align:right;font-weight:bolder;font-size:12px;padding-left:15px;margin-right:15px;color: #00549f;">or</span>
+                                    <span style="text-align:right;font-weight:bolder;font-size:12px;color: #00549f;">Client Name(s) :</span> 
+		                            <asp:DropDownCheckBoxes ID="ddcb_stud" runat="server" TabIndex="1" AddJQueryReference="True" UseButtons="true" UseSelectAllNode="false" style="color: #00549f; height: 13px;" AutoPostBack="False" OnSelectedIndexChanged="ddcb_stud_SelectedIndexChanged" OnDataBound="ddcb_stud_DataBound">
+			                            <Style SelectBoxWidth="200px" DropDownBoxBoxWidth="200px" DropDownBoxBoxHeight="400" DropDownBoxCssClass="ddchkLesson"/>
+			                            <Texts SelectBoxCaption="Select Client"/>
+		                            </asp:DropDownCheckBoxes> 
+                                </ContentTemplate>
+                                </asp:UpdatePanel>  
                             </td>
-                            <td colspan="3" style="text-align:left;width: 20%;">
-                                 <asp:button id="BtnClientAcademic" runat="server" text="" cssclass="NFButton" tooltip="Academic by Client" OnClick="BtnClientAcademic_Click" BackColor="#00549F"  />
-                                 <asp:button id="BtnStaffAcademic" runat="server" text="" cssclass="NFButton" tooltip="Academic by Staff" OnClick="BtnStaffAcademic_Click" BackColor="#00549F"   />
-                                 <asp:button id="BtnClientClinical" runat="server" text="" cssclass="NFButton" tooltip="Clinical by Client" OnClick="BtnClientClinical_Click" BackColor="#00549F"   />
-                                 <asp:Button id="BtnStaffClinical" runat="server" text="" cssclass="NFButton" style="width:102px" tooltip="Clinical by Staff" OnClick="BtnStaffClinical_Click" OnClientClick="loadWait();" BackColor="#00549F"  />
+                            <td>
+                                <asp:RadioButtonList ID="rbtnClassType" runat="server" RepeatDirection="Horizontal" BorderColor="#00549f" BorderStyle="None" BorderWidth="1px" style="margin-left:0px; margin-top:10px; vertical-align: bottom; display: inline-table" RepeatLayout="Flow" OnSelectedIndexChanged="rbtnClassType_SelectedIndexChanged" AutoPostBack="True">
+                                    <asp:ListItem Value="DAY" style="text-align:right;font-weight:bolder;font-size:12px;color: #00549f;padding-right:10px">Day</asp:ListItem>
+                                    <asp:ListItem Value="RES" style="text-align:right;font-weight:bolder;font-size:12px;color: #00549f;padding-right:10px">Residence</asp:ListItem>                                
+                                    <asp:ListItem Value="BOTH" Selected="True" style="text-align:right;font-weight:bolder;font-size:12px;color: #00549f;padding-right:10px">Both</asp:ListItem>                                
+                                </asp:RadioButtonList>    
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="date-range-container" style="display:none">
+                                    <label class="date-label">Date Range:</label>
+                                    <asp:TextBox ID="txtstartDate" runat="server" class="date-input"></asp:TextBox>
+                                    <span>to</span>
+                                    <asp:TextBox ID="txtendDate" runat="server" class="date-input"></asp:TextBox>
+                                    <br />
+                                    <span id="dateError" style="color: red; display: none;"></span>
+                                </div>
                             </td>
                             <td>
                                 <asp:CheckBox ID="chkbx_Mistrial" runat="server" style=" color: #00549f;font-size:12px" Checked="True" OnCheckedChanged="chkbx_Mistrial_CheckedChanged"/>
                                 <span style="text-align:right; font-size:12px;color: #00549f;vertical-align: text-bottom;">Count Mistrial</span>
                             </td>
                             <td>
-                                        <asp:CheckBox id="highcheck" runat="server"  Text=""></asp:CheckBox>
+                                        <asp:CheckBox id="highcheck" checked="true" visible = "false" runat="server"  Text=""></asp:CheckBox>
+                                        <asp:Button ID="ButtonGo" cssclass="btnGo" visible ="false"  runat="server" OnClick="ButtonGo_Click" onclientclick="return enableLoader()" Text="Go" />
+                                <asp:ImageButton id="btnExportToExcel" runat="server" visible ="false" style="vertical-align:bottom;" ImageUrl="~/Administration/images/Excelexp.png"  onclick="btnExportToExcel_Click" />
                             </td>
                         </tr>
                     </table>
                 </div>
-                <div class="divchkbox" style="padding-top:20px;margin-top:-30px">
+                <div class="divchkbox" style=" padding-top:20px;margin-top:-30px">
                     <table>
                         <tr>
-                            <td>
-                                 <asp:button id="BtnRefresh" runat="server" text="Refresh" cssclass="NFButton" style="background-color:#34b233" tooltip="Refresh the Dashboard" OnClick="BtnRefresh_Click"      />
-                            </td>
+                                
                             <td style="text-align:center;width:70%">
-                                <div id="chkbox-selection" style="padding-top:10px">
+                                <div id="chkbox-selection" style=" padding-top:10px;">
                                 <span style="text-align:right; font-size:12px;color: #00549f;vertical-align: text-bottom;">Show progress as: </span>
                                 <asp:CheckBox ID="chkbx_leson_deliverd" runat="server" Text="total lessons delivered today or" style=" color: #00549f;font-size:12px" AutoPostBack="True" Checked="True" Enabled="False" OnCheckedChanged="chkbx_leson_deliverd_CheckedChanged"/>
                                 <asp:CheckBox ID="chkbx_block_sch" runat="server" Text="percentage of block-scheduled lessons" style=" color: #00549f;font-size:12px" AutoPostBack="True" OnCheckedChanged="chkbx_block_sch_CheckedChanged"/>
+                                    <asp:dropdownlist id="ddlClassrooms" cssclass="class-dropdown" runat="server"></asp:dropdownlist>
+
                                 </div>
                                 <div id="selection-label" style="margin-top:0px;max-width:1100px;word-wrap: break-word;" >
-                                <p><span style="text-align:right; font-size:12px;color: #00549f;vertical-align: text-bottom">
+                                <p id="selectionP" style="display:none;>"><span style="text-align:right; font-size:12px;color: #00549f;vertical-align: text-bottom">
                                     <asp:Label ID="Label1_CrntSelctn" runat="server" style="font-weight:100">Current Selections:</asp:Label>
                                     <span style="text-align:right; font-size:12px;color: #00549f;vertical-align: text-bottom;font-weight:bold;padding-left:10px">Location :
                                     <asp:Label ID="Label_location" runat="server" style="font-weight:100"></asp:Label>
@@ -280,7 +614,7 @@
                         <tr>
                             <td>
                                 
-                                </td><td id="tdMsg" runat="server" style="width: 97%;font-size: 15px;color:green;text-align:center;font-weight:bold"></td>
+                                </td><td id="tdMsg" runat="server" style="width: 97%;font-size: 15px;color:green;text-align:center;font-weight:bold; display: none"></td>
                             <td style="text-align:center;width:70%">
                                 <div id="valdisplay" style="visibility: visible;display:none;">
                                 <asp:TextBox ID="Txt_StudSelcted" runat="server" BackColor="#FF9966" Width="70px"></asp:TextBox>
@@ -303,9 +637,58 @@
                         <a class="user" href="#" onclick="setUGraph();">Teaching Sessions</a>
                     <!--</div>-->
                 </div>
+                <div class="container mt-3 gvDivClass" style="display:none">
+                    <!-- Tab Navigation -->
+                    <ul class="nav nav-tabs" id="gridTabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="tab1-tab" data-bs-toggle="tab" href="#tab1" role="tab">Programs by Client</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="tab2-tab" data-bs-toggle="tab" href="#tab2" role="tab">Programs by Staff</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="tab3-tab" data-bs-toggle="tab" href="#tab3" role="tab">Clinical by Client</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="tab4-tab" data-bs-toggle="tab" href="#tab4" role="tab">Clinical by Staff</a>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content mt-3">
+                        <!-- Tab 1 -->
+                        <div class="tab-pane fade show active" id="tab1" role="tabpanel">
+                            <asp:gridview id="gvProgramsByClient" runat="server" autogeneratecolumns="false" cssclass="gridview"
+                                showheader="true" datakeynames="ClassName" onrowdatabound="gvProgramsByClient_RowDataBound">
+            </asp:gridview>
+                        </div>
+
+                        <!-- Tab 2 -->
+                        <div class="tab-pane fade" id="tab2" role="tabpanel">
+                            <asp:gridview id="gvProgramsByStaff" runat="server" autogeneratecolumns="false" cssclass="gridview"
+                                showheader="true" datakeynames="ClassName" onrowdatabound="gvProgramsByStaff_RowDataBound">
+            </asp:gridview>
+                        </div>
+
+                        <!-- Tab 3 -->
+                        <div class="tab-pane fade" id="tab3" role="tabpanel">
+                            <asp:gridview id="gvClinicalByClient" runat="server" autogeneratecolumns="false" cssclass="gridview"
+                                showheader="true" datakeynames="ClassName" onrowdatabound="gvClinicalByClient_RowDataBound">
+            </asp:gridview>
+                        </div>
+
+                        <!-- Tab 4 -->
+                        <div class="tab-pane fade" id="tab4" role="tabpanel">
+                            <asp:gridview id="gvClinicalByStaff" runat="server" autogeneratecolumns="false" cssclass="gridview"
+                                showheader="true" datakeynames="ClassName" onrowdatabound="gvClinicalByStaff_RowDataBound">
+            </asp:gridview>
+                        </div>
+                    </div>
+                </div>
+
                 <!--olddashboard-view--end-->
             </div>
-            <hr style="color:#1f497d;font-size:smaller;margin-top:-20px"/>
+            <hr style="display:none; color:#1f497d;font-size:smaller;margin-top:-20px"/>
           
             <div class="main-dashboard" >
                  <div>
@@ -372,8 +755,13 @@
             </div>
         </div> 
         <div>
-             <asp:Label ID="lblNoData" runat="server" Text=""></asp:Label>
-     <div id = "graphcontainer" style = "width: 1116.899603148px; height: 578.268px; margin: 0 auto" runat="server"></div>
+             <%--<asp:Label ID="lblNoData" runat="server" Text=""></asp:Label>--%>
+            <div class="graph-grid">
+                <div id="graphContainerAcademic" class="graph-container" runat="server"></div>
+                <div id="graphContainerClinical" class="graph-container" runat="server"></div>
+                <div id="graphContainerAcademicStaff" class="graph-container" runat="server"></div>
+                <div id="graphContainerClinicalStaff" class="graph-container" runat="server"></div>
+            </div>
         </div>
         <!--olddashboard-teacher--end-->
         <script>
@@ -446,14 +834,15 @@
                 var cat = JSON.parse(JSON.stringify(result));
                 var dat = JSON.parse(JSON.stringify(seriesdata));
                 var beh = JSON.parse(JSON.stringify(behav));
-                var titletext='Clinical by client';
+                var titletext = 'Clinical by Client';
+                document.querySelector('.graph-grid').style.display = 'grid';
                 drawChartClinic(cat, dat, beh,titletext);
                 HideWait();
             }
             else {
                 HideWait();
-                var nodata = document.getElementById('lblNoData');
-                nodata.innerHTML = "No Data Available";
+                //var nodata = document.getElementById('lblNoData');
+                graphContainerClinical.innerHTML = "No Data Available";
             }
         },
         error: OnErrorCall_
@@ -502,7 +891,7 @@
                                     while (i < len) {
                                         if (i == index) {
 
-                                            dt.push({ y: item['SessionCount'], name: item['LessonName'] });
+                                            dt.push({ y: item['SessionCount'], name: item['LessonName'], ToolTip: item['LessonNameToolTip']});
                                         }
                                         else {
                                             dt.push({ y: 0, name: '' });
@@ -525,8 +914,8 @@
                             HideWait();
                         }
                         else {
-                            var nodata = document.getElementById('lblNoData');
-                            nodata.innerHTML = "No Data Available";
+                            //var nodata = document.getElementById('lblNoData');
+                            graphContainerAcademic.innerHTML = "No Data Available";
                             HideWait();
                         }
                         },
@@ -542,14 +931,14 @@
                 var intrvl = 1;
                 var maxy = null;
                 var ytext = '';
-                if (titletext != 'Clinical by client') {
+                if (titletext != 'Clinical by Client') {
                     intrvl = 10;
                     maxy = 100;
                 }
                 else {
-                    ytext = 'Total Behavior Count';
+                    ytext = 'Total Behaviors submitted';
                 }
-                Highcharts.chart('graphcontainer', {
+                Highcharts.chart('graphContainerClinical', {
                     chart: {
                         type: 'bar'
                     },
@@ -625,10 +1014,18 @@
                             dataLabels: {
                                 enabled: true,
                                 formatter: function () {
-                                    if (titletext != 'Clinical by client') {
+                                    if (titletext != 'Clinical by Client') {
                                         return this.point.y + "%";
                                     } else {
-                                        return this.point.name;
+                                        var pointWidth = this.point.shapeArgs.height;
+                                        var serieI = this.series.index;
+                                        var maxLabelLength = Math.floor(pointWidth / 8);
+                                        if (pointWidth > (be[serieI].length*8)) {
+                                            return be[serieI];
+                                        }
+                                        else {
+                                            return be[serieI].substring(0, maxLabelLength);
+                                        }
                                     }
                                 },
                                 style: {
@@ -641,8 +1038,9 @@
                         },
                     },
                     tooltip: {
+                        enabled: titletext != 'Clinical by Client' ? false : true,
                         formatter: function () {
-                            if (titletext != 'Clinical by client') {
+                            if (titletext != 'Clinical by Client') {
                                 return this.point.ToolTip;
                             }
                             else {
@@ -660,12 +1058,12 @@
             }
             function drawChartAc(cat, da) {
 
-                Highcharts.chart('graphcontainer', {
+                Highcharts.chart('graphContainerAcademic', {
                     chart: {
                         type: 'bar'
                     },
                     title: {
-                        text: 'Academic by client'
+                        text: 'Programs by Client'
                     },
                     credits: {
                         enabled: false
@@ -732,7 +1130,16 @@
                             dataLabels: {
                                 enabled: true,
                                 formatter: function () {
-                                    return this.point.name;
+                                    //return this.point.name;
+                                    var label = this.point.ToolTip || '';
+                                    var pointHeight = (this.point.shapeArgs && this.point.shapeArgs.height) ? this.point.shapeArgs.height : 20;
+                                    var maxLabelLength = Math.floor(pointHeight / 8);
+
+                                    if (label.length * 8 < pointHeight) {
+                                        return label;
+                                    } else {
+                                        return label.substring(0, maxLabelLength);
+                                    }
                                 },
                                 style: {
                                     fontWeight: 'bold',
@@ -746,6 +1153,12 @@
                             stacking: 'normal'
                         }
 
+                    },
+                    tooltip: {
+                        enabled: true,
+                        formatter: function () {
+                            return this.point.ToolTip;
+                        }
                     },
                     series: da
                 });
@@ -800,13 +1213,14 @@
                             percData.push(seriesdict);
                             var cat = JSON.parse(JSON.stringify(result));
                             var dat = JSON.parse(JSON.stringify(percData));
-                            var titletext='Percentage of Block Scheduled Lessons';
+                            //document.querySelector('.graph-grid').style.display = 'block';
+                            var titletext = 'Percentage of Block Scheduled Lessons';
                             drawChartClinic(cat, dat, tooltiparr,titletext);
                             HideWait();
                         }
                         else {
-                            var nodata = document.getElementById('lblNoData');
-                            nodata.innerHTML = "No Data Available";
+                            //var nodata = document.getElementById('lblNoData');
+                            graphContainerClinical.innerHTML = "No Data Available";
                             HideWait();
                         }
                     },
@@ -886,18 +1300,18 @@
                 }
                 else {
                     HideWait();
-                    var nodata = document.getElementById('lblNoData');
-                    nodata.innerHTML = "No Data Available";
+                    //var nodata = document.getElementById('lblNoData');
+                    graphContainerAcademicStaff.innerHTML = "No Data Available";
                 }
             }
             function DrawAcStaff(cat, da) {
 
-                Highcharts.chart('graphcontainer', {
+                Highcharts.chart('graphContainerAcademicStaff', {
                     chart: {
                         type: 'bar'
                     },
                     title: {
-                        text: 'Academic by Staff'
+                        text: 'Programs by Staff'
                     },
                     credits: {
                         enabled: false
@@ -968,7 +1382,15 @@
                             dataLabels: {
                                 enabled: true,
                                 formatter: function () {
-                                    return this.point.name;
+                                    var label = this.point.ToolTip || '';
+                                    var pointHeight = (this.point.shapeArgs && this.point.shapeArgs.height) ? this.point.shapeArgs.height : 20;
+                                    var maxLabelLength = Math.floor(pointHeight / 8);
+
+                                    if (label.length * 8 < pointHeight) {
+                                        return label;
+                                    } else {
+                                        return label.substring(0, maxLabelLength);
+                                    }
                                 },
                                 style: {
                                     fontWeight: 'bold',
@@ -1064,13 +1486,13 @@
                 }
                 else {
                     HideWait();
-                    var nodata = document.getElementById('lblNoData');
-                    nodata.innerHTML = "No Data Available";
+                    //var nodata = document.getElementById('lblNoData');
+                    graphContainerClinicalStaff.innerHTML = "No Data Available";
                 }
             }
             function DrawClStaff(cat, da) {
 
-                Highcharts.chart('graphcontainer', {
+                Highcharts.chart('graphContainerClinicalStaff', {
                     chart: {
                         type: 'bar'
                     },
@@ -1110,7 +1532,7 @@
                         tickInterval: 1,
                         opposite: true,
                         title: {
-                            text: 'Total Sessions',
+                            text: 'Total Behaviors submitted',
                             useHTML: true,
                             style: {
                                 fontWeight: 'bold',
@@ -1146,7 +1568,16 @@
                             dataLabels: {
                                 enabled: true,
                                 formatter: function () {
-                                    return this.point.name;
+                                    var label = this.point.ToolTip || '';
+                                    var pointHeight = (this.point.shapeArgs && this.point.shapeArgs.height) ? this.point.shapeArgs.height : 20;
+                                    var maxLabelLength = Math.floor(pointHeight / 8);
+
+                                    if (label.length * 8 < pointHeight) {
+                                        return label;
+                                    } else {
+                                        return label.substring(0, maxLabelLength);
+                                    }
+                                    //return this.point.name;
                                 },
                                 style: {
                                     fontWeight: 'bold',
