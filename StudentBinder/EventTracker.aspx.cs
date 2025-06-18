@@ -301,7 +301,7 @@ public partial class StudentBinder_Event : System.Web.UI.Page
                 "ORDER BY DH.DSTempHdrId DESC) ELSE (SELECT TOP 1 DSTemplateName FROM  DSTempHdr WHERE LessonPlanId=SE.LessonPlanId AND  StudentId=SE.StudentId ORDER BY DSTempHdrId " +
                 "DESC) END LessonPlanName, SE.StdtSessEventType, SE.Comment, CONVERT(CHAR(10), SE.EvntTs,101) AS EvntTs, CASE WHEN SE.CreatedOn IS NULL THEN SE.EvntTs ELSE " +
                 "SE.CreatedOn END AS CreatedOn, SE.ModifiedOn, NULL AS BehaviorIOAId, B.Behaviour FROM  [StdtSessEvent] SE LEFT JOIN LessonPlan L ON SE.LessonPlanId = L.LessonPlanId " +
-                "LEFT JOIN BehaviourDetails B ON B.MeasurementId=SE.MeasurementId WHERE EventType='EV' AND SE.StudentId=" + sess.StudentId + " AND SE.StdtSessEventType<>'Medication') " +
+                "LEFT JOIN BehaviourDetails B ON B.MeasurementId=SE.MeasurementId WHERE EventType='EV' AND SE.StudentId=" + sess.StudentId + " AND SE.StdtSessEventType<>'Medication' AND SE.discardstatus is null) " +
                 "UNION ALL (SELECT SH.LessonPlanId, NULL AS MeasurementId, NULL AS StdtSessEventId, StdtSessionHdrId, 'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" + query1 + " AS EventName, " +
                 "CASE WHEN (SELECT COUNT(DSTempHdrId) FROM  DSTempHdr DH LEFT JOIN LookUp LU ON DH.StatusId=LU.LookupId WHERE LessonPlanId=SH.LessonPlanId AND StudentId=SH.StudentId " +
                 "AND LookupName IN ('Approved','Maintenance') AND LookupType='TemplateStatus') >0 THEN (SELECT TOP 1 DSTemplateName FROM  DSTempHdr DH LEFT JOIN LookUp LU ON " +
@@ -327,7 +327,7 @@ public partial class StudentBinder_Event : System.Web.UI.Page
                "ORDER BY DH.DSTempHdrId DESC) ELSE (SELECT TOP 1 DSTemplateName FROM  DSTempHdr WHERE LessonPlanId=SE.LessonPlanId AND StudentId=SE.StudentId ORDER BY DSTempHdrId " +
                "DESC) END LessonPlanName, SE.StdtSessEventType, SE.Comment, CONVERT(CHAR(10), SE.EvntTs,101) AS EvntTs, CASE WHEN SE.CreatedOn IS NULL THEN SE.EvntTs ELSE " +
                "SE.CreatedOn END AS CreatedOn, SE.ModifiedOn, NULL AS BehaviorIOAId, B.Behaviour FROM  [StdtSessEvent] SE LEFT JOIN LessonPlan L ON SE.LessonPlanId = L.LessonPlanId " +
-               "LEFT JOIN BehaviourDetails B ON B.MeasurementId=SE.MeasurementId WHERE EventType='EV' AND SE.StudentId=" + sess.StudentId + " AND SE.StdtSessEventType<>'Medication') " +
+               "LEFT JOIN BehaviourDetails B ON B.MeasurementId=SE.MeasurementId WHERE EventType='EV' AND SE.StudentId=" + sess.StudentId + " AND SE.StdtSessEventType<>'Medication' AND SE.discardstatus is null ) " +
                "UNION ALL (SELECT SH.LessonPlanId, NULL AS MeasurementId, NULL AS StdtSessEventId, StdtSessionHdrId, 'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" + query1 + " AS EventName, " +
                "CASE WHEN (SELECT COUNT(DSTempHdrId) FROM  DSTempHdr DH LEFT JOIN LookUp LU ON DH.StatusId=LU.LookupId WHERE LessonPlanId=SH.LessonPlanId AND StudentId=SH.StudentId " +
                "AND LookupName IN ('Approved','Maintenance') AND LookupType='TemplateStatus') >0 THEN (SELECT TOP 1 DSTemplateName FROM  DSTempHdr DH LEFT JOIN LookUp LU ON " +
