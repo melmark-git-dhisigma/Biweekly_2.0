@@ -375,6 +375,7 @@
                 </center>
             <br />
             <center>
+              <asp:Label ID="trtmnt" runat="server" Text="" Font-Bold="true" visibility="false" style="font-family: Arial; font-size: 12px; color: #000000;"></asp:Label>
             <asp:label runat="server" text="" id="lbgraph"  Font-Bold="true" font-size="15px"></asp:label>
                 <span id="lbgraphSpan"></span>
                 <br />
@@ -427,15 +428,69 @@
                         if (res.length === 0) {
                             var span = document.getElementById('lbgraphSpan');
                             span.innerHTML = "No Data Available";
-                            $('#sname').css("display", "none");
+                            $('#sname').css("display", "block");
+                            $('#trtmnt').css("display", "block");
                             $('#cont').css("display", "none");
-                            $('#lnam').css("display", "none");
-                            $('#daterang').css("display", "none");
-                            $('#mel').css("display", "none");
-                            $('#deftxt').css("display", "none");
+                            $('#lnam').css("display", "block");
+                            $('#daterang').css("display", "block");
+                            $('#mel').css("display", "block");
+                            $('#deftxt').css("display", "block");
+                            document.getElementById('daterang').innerHTML = convertDateFormat(inputsDate) + "-" + convertDateFormat(inputeDate);
+                            $.ajax({
+                                type: "POST",
+                                url: "ChainedBarGraphReport.aspx/getNodataavail",
+                                data: JSON.stringify({ lplan: lid, studid: sid }),
+                                contentType: "application/json; charset=utf-8",
+                                async: false,
+                                dataType: "json",
+                                success: function (resp) {
+                                    var resu = JSON.parse(resp.d);
+                                    $.map(resu, function (items, index) {
+                                        var trtmnt = document.getElementById('trtmnt');
+                                        trtmnt.style.fontSize = '12px';
+                                        if (items['Treatment'] != null) {
+                                            document.getElementById('trtmnt').innerHTML = items['Treatment'];
+                                        } else {
+                                            document.getElementById('trtmnt').innerHTML = 'Tx: ';
+                                        }
+                                        document.getElementById('lnam').innerHTML = items['LessonPlanName'];
+                                        var bname = document.getElementById('lnam');
+                                        bname.style.fontSize = '12px';
+
+                                        var deftxt = document.getElementById('deftxt');
+                                        deftxt.style.fontSize = '12px';
+                                        if (items['Deftn'] != null) {
+                                            document.getElementById('deftxt').innerHTML = 'Definition:    ' + items['Deftn'];
 
                         }
                         else {
+                                            document.getElementById('deftxt').innerHTML = 'Definition:    ';
+                                        }
+                                        document.getElementById('sname').innerHTML = items['StudentName'];
+                                        var studname = document.getElementById('sname');
+                                        studname.style.fontSize = '12px';
+                                    });
+
+                                },
+                                error: function (xhr, status, error) {
+
+                                    console.error("AJAX request failed:", error);
+                                }
+                            });
+                            if (scid == 1) {
+                                document.getElementById('mel').innerHTML = 'Melmark New England';
+                                document.getElementById('mel').style.fontSize = '12px';
+                            }
+                            else {
+                                document.getElementById('mel').innerHTML = 'Melmark Pennsylvania';
+                                document.getElementById('mel').style.fontSize = '12px';
+                            }
+                            var drange = document.getElementById('daterang');
+                            drange.style.fontSize = '12px';
+
+                        }
+                        else {
+                            $('#trtmnt').css("display", "none");
                             $.map(res, function (item, index) {
                                 document.getElementById('sname').innerHTML = res[0].StudentName;
                                 document.getElementById('lnam').innerHTML = res[0].LessonPlanName;
@@ -730,15 +785,70 @@ year
                             if (res.length === 0) {
                                 var span = document.getElementById('lbgraphSpan');
                                 span.innerHTML = "No Data Available";
-                                $('#sname').css("display", "none");
+                                $('#sname').css("display", "block");
+                                $('#trtmnt').css("display", "block");
                                 $('#cont').css("display", "none");
-                                $('#lnam').css("display", "none");
-                                $('#daterang').css("display", "none");
-                                $('#mel').css("display", "none");
-                                $('#deftxt').css("display", "none");
+                                $('#lnam').css("display", "block");
+                                $('#daterang').css("display", "block");
+                                $('#mel').css("display", "block");
+                                $('#deftxt').css("display", "block");
+                                document.getElementById('daterang').innerHTML = convertDateFormat(inputsDate) + "-" + convertDateFormat(inputeDate);
+                                $.ajax({
+                                    type: "POST",
+                                    url: "ChainedBarGraphReport.aspx/getNodataavail",
+                                    data: JSON.stringify({ lplan: lid, studid: sid }),
+                                    contentType: "application/json; charset=utf-8",
+                                    async: false,
+                                    dataType: "json",
+                                    success: function (resp) {
+                                        var resu = JSON.parse(resp.d);
+                                        $.map(resu, function (items, index) {
+                                            var trtmnt = document.getElementById('trtmnt');
+                                            trtmnt.style.fontSize = '12px';
+                                            if (items['Treatment'] != null) {
+                                                document.getElementById('trtmnt').innerHTML = items['Treatment'];
+                                            } else {
+                                                document.getElementById('trtmnt').innerHTML = 'Tx: ';
+                                            }
+                                            document.getElementById('lnam').innerHTML = items['LessonPlanName'];
+                                            var bname = document.getElementById('lnam');
+                                            bname.style.fontSize = '12px';
+
+                                            var deftxt = document.getElementById('deftxt');
+                                            deftxt.style.fontSize = '12px';
+                                            if (items['Deftn'] != null) {
+                                                document.getElementById('deftxt').innerHTML = 'Definition:    ' + items['Deftn'];
 
                             }
                             else {
+                                                document.getElementById('deftxt').innerHTML = 'Definition:    ';
+                                            }
+                                            document.getElementById('sname').innerHTML = items['StudentName'];
+                                            var studname = document.getElementById('sname');
+                                            studname.style.fontSize = '12px';
+                                        });
+
+                                    },
+                                    error: function (xhr, status, error) {
+
+                                        console.error("AJAX request failed:", error);
+                                    }
+                                });
+                                if (scid == 1) {
+                                    document.getElementById('mel').innerHTML = 'Melmark New England';
+                                    document.getElementById('mel').style.fontSize = '12px';
+                                }
+                                else {
+                                    document.getElementById('mel').innerHTML = 'Melmark Pennsylvania';
+                                    document.getElementById('mel').style.fontSize = '12px';
+                                }
+                                var drange = document.getElementById('daterang');
+                                drange.style.fontSize = '12px';
+
+
+                            }
+                            else {
+                                $('#trtmnt').css("display", "none");
                                 $.map(res, function (item, index) {
                                     document.getElementById('sname').innerHTML = res[0].StudentName;
                                     var studname = document.getElementById('sname');
