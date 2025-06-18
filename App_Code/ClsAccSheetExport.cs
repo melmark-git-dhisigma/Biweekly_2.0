@@ -109,26 +109,26 @@ public class ClsAccSheetExport
                 string Phaseline = "SELECT (SELECT STUFF((SELECT ', '+ EventName + ' (' + CONVERT(VARCHAR(50), EvntTs,101)+')' FROM StdtSessEvent WHERE CONVERT(DATE, EvntTs) BETWEEN cast('" + strtDate + "' as date) AND cast('" + endDate + "' as date) AND " +
                                 " (StdtSessEventType='Major') AND StudentId=" + StudentId + " and LessonPlanId in(" + Lessonplanid + ",0)  FOR XML PATH('')),1,1,'')) Eventdata";
                 string dtNew1 = Convert.ToString(objData.FetchValue(Phaseline));
-                dtRow[61] = dtNew1;
+                dtRow[68] = dtNew1;
                 if (dtNew1 == "")
                 {
-                    dtRow[61] = "No Results";
+                    dtRow[68] = "No Results";
                 }
                 string Conditionline = "SELECT (SELECT STUFF((SELECT ', '+ EventName + ' (' + CONVERT(VARCHAR(50), EvntTs,101)+')' FROM StdtSessEvent WHERE CONVERT(DATE, EvntTs) BETWEEN cast('" + strtDate + "' as date) AND cast('" + endDate + "' as date) AND " +
                                     " (StdtSessEventType='Minor') AND StudentId=" + StudentId + "and LessonPlanId in(" + Lessonplanid + ",0)  FOR XML PATH('')),1,1,'')) Eventdata";
                 string dtNew2 = Convert.ToString(objData.FetchValue(Conditionline));
-                dtRow[62] = dtNew2;
+                dtRow[69] = dtNew2;
                 if (dtNew2 == "")
                 {
-                    dtRow[62] = "No Results";
+                    dtRow[69] = "No Results";
                 }
                 string Arrownotes = "SELECT (SELECT STUFF((SELECT ', '+ EventName + ' (' + CONVERT(VARCHAR(50), EvntTs,101)+')' FROM StdtSessEvent WHERE CONVERT(DATE, EvntTs) BETWEEN cast('" + strtDate + "' as date) AND cast('" + endDate + "' as date) AND " +
                                     " (StdtSessEventType='Arrow notes') AND StudentId=" + StudentId + " and LessonPlanId in(" + Lessonplanid + ",0) FOR XML PATH('')),1,1,'')) Eventdata";
                 string dtNew3 = Convert.ToString(objData.FetchValue(Arrownotes));
-                dtRow[63] = dtNew3;
+                dtRow[70] = dtNew3;
                 if (dtNew3 == "")
                 {
-                    dtRow[63] = "No Results";
+                    dtRow[70] = "No Results";
                 }
                
             }
@@ -139,12 +139,12 @@ public class ClsAccSheetExport
                 string followup = "SELECT (SELECT STUFF((SELECT CHAR(10)+  'Follow Up: ' + CASE WHEN PropAndDisc != ''  THEN PropAndDisc ELSE 'Nil' END    + '        Person Responsible: ' + CASE  WHEN (SELECT UserFName + ' ' + UserLName A FROM [User] WHERE UserId = PersonResp) IS NOT NULL THEN (SELECT UserFName +' '+ UserLName A FROM [User] WHERE UserId = PersonResp) ELSE 'Nil' END +'       Deadlines:'+  case when convert(varchar,Deadlines)  is null then 'Nil' else convert(varchar,convert(date,Deadlines)) end   from AcdSheetMtng where NOT (Deadlines IS NULL AND PersonResp=0 AND PropAndDisc='') and lessonplanid=" + Lessonplanid + " and followstatus = 'P' and ActiveInd='A'  and AccSheetId in (select AccSheetId from StdtAcdSheet where  EndDate = '" + endDate + "' and LessonPlanId='" + Lessonplanid + "') FOR XML PATH('')),1,1,''))";
                 string dtNewP = Convert.ToString(objData.FetchValue(followup));
                 string resultP = dtNewP.Replace("Follow Up:", "<w:br/>Follow Up:");
-                dtRow[64] = resultP;
+                dtRow[71] = resultP;
 
                 string followuc = "SELECT (SELECT STUFF((SELECT CHAR(10)+  'Follow Up: ' + CASE WHEN PropAndDisc != ''  THEN PropAndDisc ELSE 'Nil' END    + '        Person Responsible: ' + CASE  WHEN (SELECT UserFName + ' ' + UserLName A FROM [User] WHERE UserId = PersonResp) IS NOT NULL THEN (SELECT UserFName +' '+ UserLName A FROM [User] WHERE UserId = PersonResp) ELSE 'Nil' END +'       Deadlines:'+  case when convert(varchar,Deadlines)  is null then 'Nil' else convert(varchar,convert(date,Deadlines)) end   from AcdSheetMtng where NOT (Deadlines IS NULL AND PersonResp=0 AND PropAndDisc='') and lessonplanid=" + Lessonplanid + " and followstatus = 'C' and ActiveInd='A'  and AccSheetId in (select AccSheetId from StdtAcdSheet where  EndDate = '" + endDate + "' and LessonPlanId='" + Lessonplanid + "') FOR XML PATH('')),1,1,''))";
                 string dtNewC = Convert.ToString(objData.FetchValue(followuc));
                 string resultC = dtNewC.Replace("Follow Up:", "<w:br/>Follow Up:");
-                dtRow[65] = resultC;
+                dtRow[72] = resultC;
                 
             }
 
