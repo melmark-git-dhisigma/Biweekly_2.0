@@ -1353,8 +1353,9 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
                 response.AddHeader("Content-Disposition", "attachment;filename=\"" + outputPath + "\"");
                 byte[] data = req.DownloadData(outputPath);
                 response.BinaryWrite(data);
-               // response.End();
-                HttpContext.Current.ApplicationInstance.CompleteRequest();
+                response.End();
+                //HttpContext.Current.ApplicationInstance.CompleteRequest();
+                btnsubmit_Click(sender, e);
             }
         else{
             string FileName = Session["PdfPath"].ToString();
@@ -1368,8 +1369,8 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
             byte[] data = req.DownloadData(FileName);
             response.BinaryWrite(data);
             ClientScript.RegisterStartupScript(GetType(), "", "HideWait();", true);
-           // response.End();
-            HttpContext.Current.ApplicationInstance.CompleteRequest();
+            response.End(); //Code reviewed- used because there is an issue when opening the file in Adobe reader
+           // HttpContext.Current.ApplicationInstance.CompleteRequest();
         }
         }
         catch (Exception ex)
@@ -2122,5 +2123,8 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
         JavaScriptSerializer json = new JavaScriptSerializer();
         return json.Serialize(rows);
     }
-   
+    protected void EvntCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+        ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "showEvents();", true);
+    }
 }
