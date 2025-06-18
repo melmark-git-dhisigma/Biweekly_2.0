@@ -8,7 +8,7 @@
     <%--<link rel="icon" type="image/x-icon" href="images/metaIcon.ico" />--%>
     <link rel="shortcut icon" type="image/x-icon" href="#" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Melmark Pennsylvania</title>
+    <title>EnvisionSmart</title>
     <link href="CSS/style.css" rel="stylesheet" type="text/css" />
     <link href="CSS/popupStyle1.css" rel="stylesheet" type="text/css" />
 

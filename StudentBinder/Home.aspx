@@ -7,7 +7,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=10,9" />
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title runat="server" id="TitleName">Melmark Pennsylvania</title>
+    <title runat="server" id="TitleName">EnvisionSmart</title>
     <link href="../Administration/CSS/homestyle.css" rel="stylesheet" id="sized" />
     <link href="../Administration/CSS/MenuStyle.css" rel="stylesheet" />
     <link href="../Administration/CSS/buttonshome.css" rel="stylesheet" type="text/css" />

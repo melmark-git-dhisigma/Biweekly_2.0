@@ -154,11 +154,11 @@ public partial class AdminMaster1 : System.Web.UI.MasterPage
 
         if (sess != null)
         {
-            object obj = objData.FetchValue("Select SchoolDesc from School Where SchoolId='" + sess.SchoolId + "'");
-            if (obj != null)
-            {
-                TitleName.Text = obj.ToString();
-            }
+            //object obj = objData.FetchValue("Select SchoolDesc from School Where SchoolId='" + sess.SchoolId + "'");
+            //if (obj != null)
+            //{
+            TitleName.Text = "EnvisionSmart";//obj.ToString();
+            //}
         }
     }
     public void fillclass()
