@@ -2109,7 +2109,9 @@ year
                 return formattedDate;
             }
             var charts1, charts2;
-            var lessnamegroup = "<%=lname%>";
+
+            var lessnamegroup = "<%=lname%>".replace(/\$/g, '"');
+            ;
             var lessnm = [];
             var currentItem = '';
             var insideQuotes = false;

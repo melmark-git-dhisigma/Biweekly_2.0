@@ -1021,6 +1021,7 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
                         mel.Visible = true;
                         deftxt.Visible = true;
                         Session["StudName"] = StudName;
+                        lname = lname.Replace("\"", "$");
                         ClientScript.RegisterStartupScript(GetType(), "", @"setTimeout(function() {exportChart();}, 500);", true);
                         tdMsgExport.InnerHtml = clsGeneral.sucessMsg("Export Successfully Created...");
                         hdnExport.Value = "true";
