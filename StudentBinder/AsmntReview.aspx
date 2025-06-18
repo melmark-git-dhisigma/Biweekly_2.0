@@ -97,6 +97,43 @@
         function showAddLp() {
             $('#AddLPDiv').fadeIn();
         }
+        function CheckGoalLp() {
+            var LPName = document.getElementById("txtLPname").value;
+            var flag;
+            PageMethods.CheckLpName('CheckGoalLp', LPName, function (data) {
+                var status = data.split("*")[0]
+                if (status == 'multipleLP') {
+                    $("#hdchkbtnAdd").val("Lpbtnadd");
+                    var GoalName = data.split("*")[1]
+                    flag = confirm("The lesson Plan Name is already added in " + GoalName + " Goals.Do You still want to continue?");
+                    if (flag == true) {
+                        $('.fullOverlay').fadeIn('slow', function () {
+                        $('#AddLPDiv').fadeOut();
+                        $('.innerLoading').fadeIn();
+                        });
+                        __doPostBack('btnAddLP', '');
+                        return true;
+                    }
+                    else {
+                        $('#ul_selGoals').find(golid + ' .wrapper #LP_Loading').remove();
+                        $('#AddLPDiv').fadeOut();
+                        $('.innerLoading').fadeOut();
+                        return false;
+                        
+                    }                    
+                }
+                else {
+                    $('.fullOverlay').fadeIn('slow', function () {
+                    $('#AddLPDiv').fadeOut();
+                    $('.innerLoading').fadeIn();
+                    });
+                    __doPostBack('btnAddLP', '');
+                    return true;                  
+                }          
+                
+            });
+        }
+
         function Hideloading() {
             $('.innerLoading').fadeOut();
         }
@@ -136,73 +173,118 @@
                         '<span></span>' +
                         '<img width="100px" height="12px" src="images/load.gif" style="padding: 28px 41% 0;"><br clear="all" /><p></p></div>';
         //function to add stdtLPs.....
-        function AssignGoalAndLPs(LP, LPname, goalid, goalname, LPdesc) {
+        function AssignGoalAndLPs(LP, LPname, goalid, goalname, LPdesc, LPName) {
             goalid = 'a_' + goalid;
             AssignGoal(goalid, goalname, null);
             var ind = 0;
-            goalid = goalid.split("_")[1];
+            var chkLP=0;
+            goalid = goalid.split("_")[1]; 
             var golid = '#li_' + goalid;
             var id; var chkIEP; var chkStat; var chkday; var chkdaystring;
             window.setTimeout(function () {     //delay 4 secnds 
-                PageMethods.SaveLessons(LP, goalid, function (data) {
-                    // alert("yes");
-                    $('#ul_selGoals').find(golid + ' .wrapper #LP_Loading').remove();   //removes the loading div....
-                    if (data == 'exists') {
-                        ind = 1;
-                    }
-                    else if (data == "0") { ind = 1; }
+                var flag;
+                PageMethods.CheckLpName(LP,LPName, function (data) {
+                    $('#ul_selGoals').find(golid + ' .wrapper #LP_Loading').remove();
+                    var status = data.split("*")[0]
+                    if (status == 'multipleLP') {
+                        var lessonchk = document.getElementById("hdchkbtnAdd").value;
+                        var GoalName = data.split("*")[1]
+                        if (lessonchk != 'Lpbtnadd') {
+                            flag = confirm("The lesson Plan Name is already added in " + GoalName + " Goals.Do You still want to continue?");
+                            if (flag == true) {                                
+                                chkLP = 1;
+                            }
+                            else {
+                                $('#ul_selGoals').find(golid + ' .wrapper #LP_Loading').remove();
+                                $('.innerLoading').fadeOut();
+
+                                chkLP = 0;
+                            }
+                        }
+                        else {
+                            chkLP = 1;
+                        }
+                    }                    
                     else {
-                        var datas = data.split('*');
-                        id = datas[0];
-                        chkIEP = datas[1];
-                        chkday = datas[2];
-                        if (chkIEP == "0") { chkStat = ""; }
-                        else { chkStat = "checked=true"; }
-                        if (chkday == "1") {
-                            chkdaystring = "<input name='Day' class='rdoDay' checked='true' type='checkbox' value='' onclick='updateLessonPlan(this,this.parentNode.parentNode.id," + LP + ",&apos;LP&apos;,event);' />Day</span>"
-                                + "<span style='float:left;'><img width='15px' height='7px' style='position: absolute; float: left ! important; padding-right: 0px; margin: 4px -15px 0px; display: none;' src='images/load.gif'>"
-                                + "<input name='Resi' class='rdoResi' type='checkbox' value='' onclick='updateLessonPlan(this,this.parentNode.parentNode.id," + LP + ",&apos;LP&apos;,event);' />Residential</span>";
+                        chkLP = 1;
+                    }                    
 
-                        }
-                        if (chkday == "0") {
-                            chkdaystring = "<input name='Day' class='rdoDay'  type='checkbox' value='' onclick='updateLessonPlan(this,this.parentNode.parentNode.id," + LP + ",&apos;LP&apos;,event);' />Day</span>"
-                            +"<span style='float:left;'><img width='15px' height='7px' style='position: absolute; float: left ! important; padding-right: 0px; margin: 4px -15px 0px; display: none;' src='images/load.gif'>"
-                            + "<input name='Resi' class='rdoResi' checked='true' type='checkbox' value='' onclick='updateLessonPlan(this,this.parentNode.parentNode.id," + LP + ",&apos;LP&apos;,event);' />Residential</span>";
+                    if (chkLP == 1)
+                    {
+                        PageMethods.SaveLessons(LP, goalid, function (data) {
+                            $('#ul_selGoals').find(golid + ' .wrapper #LP_Loading').remove();   //removes the loading div....
+                            var status = data.split("*")[0];
+                            if (data == 'exists') {
+                                ind = 1;
+                            }
+                            else if (data == "0") { ind = 1; }                    
+                            else if (status == 'multipleLP') { ind = 1; }
+                            else if (status == 'multipleLPSGoal') { ind = 1; }
+                            else {
+                                var datas = data.split('*');
+                                id = datas[0];
+                                chkIEP = datas[1];
+                                chkday = datas[2];
+                                if (chkIEP == "0") { chkStat = ""; }
+                                else { chkStat = "checked=true"; }
+                                if (chkday == "1") {
+                                    chkdaystring = "<input name='Day' class='rdoDay' checked='true' type='checkbox' value='' onclick='updateLessonPlan(this,this.parentNode.parentNode.id," + LP + ",&apos;LP&apos;,event);' />Day</span>"
+                                        + "<span style='float:left;'><img width='15px' height='7px' style='position: absolute; float: left ! important; padding-right: 0px; margin: 4px -15px 0px; display: none;' src='images/load.gif'>"
+                                        + "<input name='Resi' class='rdoResi' type='checkbox' value='' onclick='updateLessonPlan(this,this.parentNode.parentNode.id," + LP + ",&apos;LP&apos;,event);' />Residential</span>";
 
-                        }
-                    }
+                                }
+                                if (chkday == "0") {
+                                    chkdaystring = "<input name='Day' class='rdoDay'  type='checkbox' value='' onclick='updateLessonPlan(this,this.parentNode.parentNode.id," + LP + ",&apos;LP&apos;,event);' />Day</span>"
+                                    +"<span style='float:left;'><img width='15px' height='7px' style='position: absolute; float: left ! important; padding-right: 0px; margin: 4px -15px 0px; display: none;' src='images/load.gif'>"
+                                    + "<input name='Resi' class='rdoResi' checked='true' type='checkbox' value='' onclick='updateLessonPlan(this,this.parentNode.parentNode.id," + LP + ",&apos;LP&apos;,event);' />Residential</span>";
 
-                    if (ind == 0) {
-                        var temp = 'div_' + LP;
-                        var LPs = '<div id=' + temp + ' class="ingrContainer">' +
-                            '<h3>' + LPname + '</h3><div id="' + id + '" class="container">' +
-                            '<span style="float:left;"><img width="15px" height="7px" style="position: absolute; float: left ! important; padding-right: 0px; margin: 4px -15px 0px; display: none;" src="images/load.gif">'+chkdaystring+
-                            '<span><img width="15px" height="7px" style="position: absolute; float: left ! important; padding-right: 0px; margin: 4px -15px 0px; display: none;" src="images/load.gif">' +
-                            '<input name="" class="rdo" ' + chkStat + ' type="checkbox" value="" onclick="updateIEP(this,this.parentNode.parentNode.id,' + goalid + ',&apos;LP&apos;,event);" />Included in IEP</span>' +
+                                }
+                            }
+
+                            if (ind == 0) {
+                                var temp = 'div_' + LP;
+                                var LPs = '<div id=' + temp + ' class="ingrContainer">' +
+                                    '<h3>' + LPname + '</h3><div id="' + id + '" class="container">' +
+                                    '<span style="float:left;"><img width="15px" height="7px" style="position: absolute; float: left ! important; padding-right: 0px; margin: 4px -15px 0px; display: none;" src="images/load.gif">'+chkdaystring+
+                                    '<span><img width="15px" height="7px" style="position: absolute; float: left ! important; padding-right: 0px; margin: 4px -15px 0px; display: none;" src="images/load.gif">' +
+                                    '<input name="" class="rdo" ' + chkStat + ' type="checkbox" value="" onclick="updateIEP(this,this.parentNode.parentNode.id,' + goalid + ',&apos;LP&apos;,event);" />Included in IEP</span>' +
                             
-                          //  '<a href="#" class="dlt" onclick="deleteLPandGoal(this,this.parentNode.id,&apos;LP&apos;,event);"></a></div><br clear="all" />' +
-                            '<p>' + LPdesc + ' </p></div>';
-                        var li3 = $('#ul_selGoals').find(golid);
-                        $(li3).find('.wrapper').append(LPs);
+                                  //  '<a href="#" class="dlt" onclick="deleteLPandGoal(this,this.parentNode.id,&apos;LP&apos;,event);"></a></div><br clear="all" />' +
+                                    '<p>' + LPdesc + ' </p></div>';
+                                var li3 = $('#ul_selGoals').find(golid);
+                                $(li3).find('.wrapper').append(LPs);
                         
-                    }
-                    if (data == 'exists') {
-                        $('#HdrExportTemplate').show();    // to show the warning popup 
-                        $("#divWarning").show();
-                        $("#divMessage").hide();
-                        $("#divCopyTempAdmin").hide();
-                        $("#hdLessonId").val(LP);
-                        $("#hdGoalId").val(goalid);
-                    }
+                            }
+                            if (data == 'exists') {
+                                $('#HdrExportTemplate').show();    // to show the warning popup 
+                                $("#divWarning").show();
+                                $("#divMessage").hide();
+                                $("#divCopyTempAdmin").hide();
+                                $("#hdLessonId").val(LP);
+                                $("#hdGoalId").val(goalid);
+                            }
                     
-                    __doPostBack('lbLPBank', '');
-                });
-               
-                
-                
-            }, 4000);
-            
+                            var GoalName = data.split("*")[1];
+                            if (status == 'multipleLP') {
+                                $('#ul_selGoals').find(golid + ' .wrapper #LP_Loading').remove();
+                                $('.innerLoading').fadeOut();
+                                alert("Lesson already belongs to " + GoalName + " Goal.As it was added via the administrator module, assigning it to multiple goals is not allowed.");
+                            }
+                            else if (status == 'multipleLPSGoal') {
+                                $('#ul_selGoals').find(golid + ' .wrapper #LP_Loading').remove();
+                                $('.innerLoading').fadeOut();
+                                alert("Lesson already belongs to " + GoalName + " Goal.You cannot add the same lesson to the same goal again. ");
 
+                            }
+                            $("#hdchkbtnAdd").val("Lptemplate");
+                            __doPostBack('lbLPBank', '');
+                        });
+                    }
+               
+            });
+                
+            }, 4000);            
+            
         }
 
         function showdivCopyTempAdmin() {
@@ -1087,6 +1169,7 @@
                                 <asp:HiddenField ID="hdLessonName" runat="server" />
                                 <asp:HiddenField ID="hdLessonId" runat="server" />
                                 <asp:HiddenField ID="hdGoalId" runat="server" />
+                                <asp:HiddenField ID="hdchkbtnAdd" runat="server" value="Lptemplate" />
                             </div>     
                             
                             <div id="divMessage" style="display: none" runat="server" >
@@ -1187,7 +1270,7 @@
                                         <tr>
                                             <td class="auto-style1"></td>
                                             <td class="auto-style1">
-                                                <asp:Button ID="btnAddLP" runat="server" CssClass="NFButtonWithNoImage" Width="100px" Text="Submit"  OnClick="btnAddLP_Click" onClientClick="HideButton();"/></td> 
+                                                <asp:Button ID="btnAddLP" runat="server" CssClass="NFButtonWithNoImage" Width="100px" Text="Submit" UseSubmitBehavior="false"  OnClick="btnAddLP_Click" onClientClick="return CheckGoalLp()"/>
                                            <%-- OnClientClick="disableButton();"--%>
                                         </tr>
                                         <tr>

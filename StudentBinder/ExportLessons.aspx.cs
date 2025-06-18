@@ -947,8 +947,8 @@ public partial class StudentBinder_ExportLessons : System.Web.UI.Page
                     columns[2] = "";
                 }
             }
-            strQuery = "SELECT GoalName FROM GoalLPRel glLpRel LEFT JOIN Goal gol ON glLpRel.GoalId = gol.GoalId WHERE  " +
-                                                       " glLpRel.LessonPlanId = " + LessonPlanId + " AND glLpRel.ActiveInd = 'A'";
+            strQuery = "SELECT distinct(GoalName) FROM StdtLessonPlan Stlp LEFT JOIN Goal gol ON Stlp.GoalId = gol.GoalId WHERE  " +
+                                                       " Stlp.LessonPlanId = " + LessonPlanId + " AND StudentId =" + sess.StudentId + " AND Stlp.ActiveInd = 'A'";
             strBinder = "";
             Dt = objData.ReturnDataTable(strQuery, false);
             if (Dt != null)
