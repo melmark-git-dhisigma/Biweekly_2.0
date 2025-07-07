@@ -93,6 +93,13 @@
                 $('#PSRLoadingImage').show();
             }
         }
+        function showMessage3() {
+            var checkbox = document.getElementById('<%= highcheck.ClientID %>');
+            var dlBehavior = document.getElementById('<%= dlBehavior.ClientID %>');
+            if (checkbox.checked && !dlBehavior) {
+                $('#PSRLoadingImage').show();
+            }
+        }
        
         function hideOverlay() {
             document.getElementById("downloadPopup").style.display = "block";
@@ -154,7 +161,7 @@
                 
             </td>
                 <td style="width:275px">
-                     <asp:ImageButton ID="btnExport" runat="server" style="float: left" ImageUrl="~/Administration/images/Excelexp.png" OnClick="btnExport_Click" ToolTip="Export" OnClientClick="showMessage2()" />
+                     <asp:ImageButton ID="btnExport" runat="server" style="float: left" ImageUrl="~/Administration/images/Excelexp.png" OnClick="btnExport_Click" ToolTip="Export" OnClientClick="showMessage3()" />
                     <asp:ImageButton ID="btnRefresh" runat="server" style="float: right" Text="Refresh" ImageUrl="~/Administration/images/RefreshStudentBinder.png" OnClick="btnRefresh_Click" />
                 </td>
 
