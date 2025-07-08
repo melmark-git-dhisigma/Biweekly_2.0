@@ -81,7 +81,7 @@ public partial class Graph : System.Web.UI.Page
             string classId = sess.Classid.ToString();
             string getStudidlistquery = "SELECT STUFF((SELECT distinct ','+Convert(varchar(200),StudentId)" +
                                             " FROM StdtClass SC left Join Student STD ON STD.StudentId = SC.StdtId left join Placement PLC on STD.StudentId = PLC.StudentPersonalId" +
-                                            " WHERE SC.ClassId IN (" + classId + ") AND STD.ActiveInd='A' AND SC.ActiveInd='A' AND PLC.Location IN(" + classId + ") AND (PLC.EndDate is null or convert(DATE,PLC.EndDate) >= convert(DATE,getdate()))FOR XML PATH('')), 1, 1, '')";
+                                            " WHERE SC.ClassId IN (" + classId + ") AND STD.ActiveInd='A' AND SC.ActiveInd='A' AND PLC.Location IN(" + classId + ") AND PLC.Status = 1 AND (PLC.EndDate is null or convert(DATE,PLC.EndDate) >= convert(DATE,getdate()))FOR XML PATH('')), 1, 1, '')";
             DataTable dtLP = new DataTable();
             dtLP.Columns.Add("LpId", typeof(string));
             dtLP.Columns.Add("LessonName", typeof(string));
@@ -121,6 +121,19 @@ public partial class Graph : System.Web.UI.Page
             LoadDashBoardStaffClinicalGraph(classId, getStudidlist);
             LoadDashBoardClientClinicalGraph(classId, getStudidlist);
         }
+        else
+        {
+            if (BtnSwitchTableChart.Text == "Chart View")
+            {
+                RV_DBReport.Visible = false;
+                highcheck.Visible = false;
+                BtnRefresh.Visible = false;
+                ButtonGo.Visible = true;
+                btnExportToExcel.Visible = true;
+                string script1 = "TableView();";
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "Table", script1, true);
+            }
+        }
     }
 
     private void RefreshinitialLoad() 
@@ -155,14 +168,17 @@ public partial class Graph : System.Web.UI.Page
         string getStudidDaylist = Convert.ToString(objData.FetchValue(getallDayClasses));
         Txt_Clasid.Text = getStudidDaylist;        
         FillAllStudentDropdown();
-        if ((chkbx_leson_deliverd.Checked == true) && (Txt_graphid.Text == "1")) { LoadDashBoardClientAcademicGraph(Txt_Clasid.Text, Txt_Studid.Text,chkbx_Mistrial.Checked ? 1 : 0); }
-        else if ((chkbx_leson_deliverd.Checked == true) && (Txt_graphid.Text == "2")) { LoadDashBoardStaffAcademicGraph(Txt_Clasid.Text, Txt_Studid.Text, chkbx_Mistrial.Checked ? 1 : 0); }
-        else if ((chkbx_leson_deliverd.Checked == true) && (Txt_graphid.Text == "3")) { LoadDashBoardClientClinicalGraph(Txt_Clasid.Text, Txt_Studid.Text); }
-        else if ((chkbx_leson_deliverd.Checked == true) && (Txt_graphid.Text == "4")) { LoadDashBoardStaffClinicalGraph(Txt_Clasid.Text, Txt_Studid.Text); }
-        else if ((chkbx_block_sch.Checked == true) && (Txt_graphid.Text == "1")) { LoadDashBoardClientAcademicPercentage(Txt_Clasid.Text, Txt_Studid.Text); }
-        else if ((chkbx_block_sch.Checked == true) && (Txt_graphid.Text == "2")) { LoadDashBoardClientAcademicPercentage(Txt_Clasid.Text, Txt_Studid.Text); }
-        else if ((chkbx_block_sch.Checked == true) && (Txt_graphid.Text == "3")) { LoadDashBoardClientAcademicPercentage(Txt_Clasid.Text, Txt_Studid.Text); }
-        else if ((chkbx_block_sch.Checked == true) && (Txt_graphid.Text == "4")) { LoadDashBoardClientAcademicPercentage(Txt_Clasid.Text, Txt_Studid.Text); }
+        if (BtnSwitchTableChart.Text == "Table View")
+        {
+            if ((chkbx_leson_deliverd.Checked == true) && (Txt_graphid.Text == "1")) { LoadDashBoardClientAcademicGraph(Txt_Clasid.Text, Txt_Studid.Text, chkbx_Mistrial.Checked ? 1 : 0); }
+            else if ((chkbx_leson_deliverd.Checked == true) && (Txt_graphid.Text == "2")) { LoadDashBoardStaffAcademicGraph(Txt_Clasid.Text, Txt_Studid.Text, chkbx_Mistrial.Checked ? 1 : 0); }
+            else if ((chkbx_leson_deliverd.Checked == true) && (Txt_graphid.Text == "3")) { LoadDashBoardClientClinicalGraph(Txt_Clasid.Text, Txt_Studid.Text); }
+            else if ((chkbx_leson_deliverd.Checked == true) && (Txt_graphid.Text == "4")) { LoadDashBoardStaffClinicalGraph(Txt_Clasid.Text, Txt_Studid.Text); }
+            else if ((chkbx_block_sch.Checked == true) && (Txt_graphid.Text == "1")) { LoadDashBoardClientAcademicPercentage(Txt_Clasid.Text, Txt_Studid.Text); }
+            else if ((chkbx_block_sch.Checked == true) && (Txt_graphid.Text == "2")) { LoadDashBoardClientAcademicPercentage(Txt_Clasid.Text, Txt_Studid.Text); }
+            else if ((chkbx_block_sch.Checked == true) && (Txt_graphid.Text == "3")) { LoadDashBoardClientAcademicPercentage(Txt_Clasid.Text, Txt_Studid.Text); }
+            else if ((chkbx_block_sch.Checked == true) && (Txt_graphid.Text == "4")) { LoadDashBoardClientAcademicPercentage(Txt_Clasid.Text, Txt_Studid.Text); }
+        }
     }
 
     private void getAllDayResStudents(string clastype)
@@ -183,16 +199,18 @@ public partial class Graph : System.Web.UI.Page
             Txt_Clasid.Text = getClassidReslist;
             FillStudentDayResDropdown("1");
         }
-        
-        
-        if ((chkbx_leson_deliverd.Checked == true) && (Txt_graphid.Text == "1")) { LoadDashBoardClientAcademicGraph(Txt_Clasid.Text, Txt_Studid.Text,chkbx_Mistrial.Checked ? 1 : 0); }
-        else if ((chkbx_leson_deliverd.Checked == true) && (Txt_graphid.Text == "2")) { LoadDashBoardStaffAcademicGraph(Txt_Clasid.Text, Txt_Studid.Text, chkbx_Mistrial.Checked ? 1 : 0); }
-        else if ((chkbx_leson_deliverd.Checked == true) && (Txt_graphid.Text == "3")) { LoadDashBoardClientClinicalGraph(Txt_Clasid.Text, Txt_Studid.Text); }
-        else if ((chkbx_leson_deliverd.Checked == true) && (Txt_graphid.Text == "4")) { LoadDashBoardStaffClinicalGraph(Txt_Clasid.Text, Txt_Studid.Text); }
-        else if ((chkbx_block_sch.Checked == true) && (Txt_graphid.Text == "1")) { LoadDashBoardClientAcademicPercentage(Txt_Clasid.Text, Txt_Studid.Text); }
-        else if ((chkbx_block_sch.Checked == true) && (Txt_graphid.Text == "2")) { LoadDashBoardClientAcademicPercentage(Txt_Clasid.Text, Txt_Studid.Text); }
-        else if ((chkbx_block_sch.Checked == true) && (Txt_graphid.Text == "3")) { LoadDashBoardClientAcademicPercentage(Txt_Clasid.Text, Txt_Studid.Text); }
-        else if ((chkbx_block_sch.Checked == true) && (Txt_graphid.Text == "4")) { LoadDashBoardClientAcademicPercentage(Txt_Clasid.Text, Txt_Studid.Text); }
+
+        if (BtnSwitchTableChart.Text == "Table View")
+        {
+            if ((chkbx_leson_deliverd.Checked == true) && (Txt_graphid.Text == "1")) { LoadDashBoardClientAcademicGraph(Txt_Clasid.Text, Txt_Studid.Text, chkbx_Mistrial.Checked ? 1 : 0); }
+            else if ((chkbx_leson_deliverd.Checked == true) && (Txt_graphid.Text == "2")) { LoadDashBoardStaffAcademicGraph(Txt_Clasid.Text, Txt_Studid.Text, chkbx_Mistrial.Checked ? 1 : 0); }
+            else if ((chkbx_leson_deliverd.Checked == true) && (Txt_graphid.Text == "3")) { LoadDashBoardClientClinicalGraph(Txt_Clasid.Text, Txt_Studid.Text); }
+            else if ((chkbx_leson_deliverd.Checked == true) && (Txt_graphid.Text == "4")) { LoadDashBoardStaffClinicalGraph(Txt_Clasid.Text, Txt_Studid.Text); }
+            else if ((chkbx_block_sch.Checked == true) && (Txt_graphid.Text == "1")) { LoadDashBoardClientAcademicPercentage(Txt_Clasid.Text, Txt_Studid.Text); }
+            else if ((chkbx_block_sch.Checked == true) && (Txt_graphid.Text == "2")) { LoadDashBoardClientAcademicPercentage(Txt_Clasid.Text, Txt_Studid.Text); }
+            else if ((chkbx_block_sch.Checked == true) && (Txt_graphid.Text == "3")) { LoadDashBoardClientAcademicPercentage(Txt_Clasid.Text, Txt_Studid.Text); }
+            else if ((chkbx_block_sch.Checked == true) && (Txt_graphid.Text == "4")) { LoadDashBoardClientAcademicPercentage(Txt_Clasid.Text, Txt_Studid.Text); }
+        }
     }
     private void PlotGraphload()
     {
@@ -480,13 +498,13 @@ public partial class Graph : System.Web.UI.Page
                 //string selQuery = "select distinct sp.StudentPersonalId,sp.LastName,sp.FirstName,sp.Middlename,sc.ClassId from studentpersonal sp inner join stdtclass sc on sp.StudentPersonalId = sc.StdtId  where sc.ClassId IN(" + getClassid + ") and sc.ActiveInd = 'A' order by sc.ClassId,sp.Lastname";
                 string selQuery = "SELECT distinct StudentId,(SELECT CONCAT(lastname,+', '+FirstName) FROM StudentPersonal WHERE StudentPersonalID = SC.stdtid) AS StudentName" +
                                   " FROM StdtClass SC left Join Student STD ON STD.StudentId = SC.StdtId left join Placement PLC on STD.StudentId = PLC.StudentPersonalId" +
-                                  " WHERE SC.ClassId IN(" + getClassid + ") AND STD.ActiveInd='A' AND SC.ActiveInd='A' AND PLC.Location IN(" + getClassid + ") AND (PLC.EndDate is null or convert(DATE,PLC.EndDate) >= convert(DATE,getdate())) ORDER BY StudentName";
+                                  " WHERE SC.ClassId IN(" + getClassid + ") AND STD.ActiveInd='A' AND SC.ActiveInd='A' AND PLC.Location IN(" + getClassid + ") AND PLC.Status = '1' AND (PLC.EndDate is null or convert(DATE,PLC.EndDate) >= convert(DATE,getdate())) ORDER BY StudentName";
                 //STD.SchoolId=1 AND
 
                 //string getStudidlistquery = "SELECT STUFF((select distinct ','+Convert(varchar(200),sp.StudentPersonalId) from studentpersonal sp inner join stdtclass sc on sp.StudentPersonalId = sc.StdtId  where sc.ClassId IN(" + getClassid + ") and sc.ActiveInd = 'A' FOR XML PATH('')), 1, 1, '')  ";
                 string getStudidlistquery = "SELECT STUFF((SELECT distinct ','+Convert(varchar(200),StudentId)" +
                                             " FROM StdtClass SC left Join Student STD ON STD.StudentId = SC.StdtId left join Placement PLC on STD.StudentId = PLC.StudentPersonalId" +
-                                            " WHERE SC.ClassId IN (" + getClassid + ") AND STD.ActiveInd='A' AND SC.ActiveInd='A' AND PLC.Location IN(" + getClassid + ") AND (PLC.EndDate is null or convert(DATE,PLC.EndDate) >= convert(DATE,getdate()))FOR XML PATH('')), 1, 1, '')";
+                                            " WHERE SC.ClassId IN (" + getClassid + ") AND STD.ActiveInd='A' AND SC.ActiveInd='A' AND PLC.Location IN(" + getClassid + ") AND PLC.Status = '1' AND (PLC.EndDate is null or convert(DATE,PLC.EndDate) >= convert(DATE,getdate()))FOR XML PATH('')), 1, 1, '')";
                  //STD.SchoolId=1 AND
 
                 string getStudidlist = Convert.ToString(objData.FetchValue(getStudidlistquery));
@@ -908,6 +926,8 @@ public partial class Graph : System.Web.UI.Page
             DataTable Dt = new DataTable();
             clsData ObjData = new clsData();
             SqlConnection con = ObjData.Open();
+            if (Userids == "")
+                Userids = null;
             try
             {
                 SqlDataAdapter da = new SqlDataAdapter();
@@ -945,8 +965,9 @@ public partial class Graph : System.Web.UI.Page
             }
 
             JavaScriptSerializer json = new JavaScriptSerializer();
-            string dat = json.Serialize(rows);
-            string script = @"setTimeout(function() {loadAcademicbyStaff('" + json.Serialize(rows) + "');}, 300);";
+            //string script = @"setTimeout(function() {loadAcademicbyStaff('" + json.Serialize(rows) + "');}, 300);";
+            string jsonString = HttpUtility.JavaScriptStringEncode(json.Serialize(rows));
+            string script = string.Format("setTimeout(function() {{ loadAcademicbyStaff('{0}'); }}, 300);", jsonString);
             ScriptManager.RegisterStartupScript(this, this.GetType(), "loadAcademicbyStaff", script, true);
         }
     }
@@ -998,7 +1019,7 @@ public partial class Graph : System.Web.UI.Page
             RV_DBReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["DashBoardStaffClinical"];
             String Classids = Convert.ToString(SCgraphClassid);
             String Studids = Convert.ToString(SCgraphStudid);
-            String getUseridsquery = "SELECT STUFF((SELECT Distinct ','+Convert(varchar(200),CreatedBy) from behaviour where Classid IN(" + Classids + ")  and Studentid IN(" + Studids + ") and CONVERT(VARCHAR(10),ModifiedOn, 120) = CONVERT(VARCHAR(10),getdate(), 120)FOR XML PATH('')), 1, 1, '') ";
+            String getUseridsquery = "SELECT STUFF((SELECT Distinct ','+Convert(varchar(200),CreatedBy) from Behaviour where Classid IN(" + Classids + ")  and Studentid IN(" + Studids + ") and CONVERT(VARCHAR(10),ModifiedOn, 120) = CONVERT(VARCHAR(10),getdate(), 120)FOR XML PATH('')), 1, 1, '') ";
             String Userids = Convert.ToString(objData.FetchValue(getUseridsquery));
             if (Userids == "")
             {
@@ -1023,7 +1044,7 @@ public partial class Graph : System.Web.UI.Page
             //graphcontainer.Visible = true;
             String Classids = Convert.ToString(SCgraphClassid);
             String Studids = Convert.ToString(SCgraphStudid);
-            String getUseridsquery = "SELECT STUFF((SELECT Distinct ','+Convert(varchar(200),Modifiedby) from stdtsessionhdr where stdtclassid IN(" + Classids + ") and studentid IN(" + Studids + ") and CONVERT(VARCHAR(10),ModifiedOn, 120) = CONVERT(VARCHAR(10),getdate(), 120)FOR XML PATH('')), 1, 1, '')";
+            String getUseridsquery = "SELECT STUFF((SELECT Distinct ','+Convert(varchar(200),CreatedBy) from Behaviour where Classid IN(" + Classids + ")  and Studentid IN(" + Studids + ") and CONVERT(VARCHAR(10),ModifiedOn, 120) = CONVERT(VARCHAR(10),getdate(), 120)FOR XML PATH('')), 1, 1, '') ";
             String Userids = Convert.ToString(objData.FetchValue(getUseridsquery));
             if (Userids == "")
             {
@@ -1129,7 +1150,9 @@ public partial class Graph : System.Web.UI.Page
             }
 
             JavaScriptSerializer json = new JavaScriptSerializer();
-            string script = @"setTimeout(function() {loadClinicalbyStaff('" + json.Serialize(rows) + "');}, 300);";
+            //string script = @"setTimeout(function() {loadClinicalbyStaff('" + json.Serialize(rows) + "');}, 300);";
+            string jsonString = HttpUtility.JavaScriptStringEncode(json.Serialize(rows));
+            string script = string.Format("setTimeout(function() {{ loadClinicalbyStaff('{0}'); }}, 300);", jsonString);
             ScriptManager.RegisterStartupScript(this, this.GetType(), "loadClinicalbyStaff", script, true);
          
         }
@@ -1431,6 +1454,8 @@ public partial class Graph : System.Web.UI.Page
             getAllStudents();
             grphstudid = null;
         }
+        string script1 = "disableLoader();";
+        ScriptManager.RegisterStartupScript(this, this.GetType(), "hide", script1, true);
     }
 
     protected void chkbx_leson_deliverd_CheckedChanged(object sender, EventArgs e)
@@ -1470,9 +1495,23 @@ public partial class Graph : System.Web.UI.Page
         clsData objdata = new clsData();
         List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
         Dictionary<string, object> row;
-        String proc = "[dbo].[DashboardClientAcademic]";
+        //String proc = "[dbo].[DashboardClientAcademic]";
 
-        DataTable dt = objdata.ReturnNewAcademicTable(proc, classid, studentid, mistrial);
+        //DataTable dt = objdata.ReturnNewAcademicTable(proc, classid, studentid, mistrial);
+
+        SqlCommand cmd = null;
+        DataTable dt = new DataTable();
+        SqlConnection con = objdata.Open();
+        SqlDataAdapter da = new SqlDataAdapter();
+        cmd = new SqlCommand("DashboardClientAcademic", con);
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.CommandTimeout = 600;
+        cmd.Parameters.AddWithValue("@ParamClassid", classid);
+        cmd.Parameters.AddWithValue("@ParamStudid", studentid);
+        cmd.Parameters.AddWithValue("@ParamMistrial", mistrial);
+        da = new SqlDataAdapter(cmd);
+        da.Fill(dt);
+
 
         foreach (DataRow dr in dt.Rows)
             {
@@ -1496,9 +1535,21 @@ public partial class Graph : System.Web.UI.Page
         clsData objdata = new clsData();
         List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
         Dictionary<string, object> row;
-        String proc = "[dbo].[DashboardClientAcademicPercentage]";
+        //String proc = "[dbo].[DashboardClientAcademicPercentage]";
 
-        DataTable dt = objdata.ReturnNewAcademicTablePerc(proc, classid, studentid);
+        //DataTable dt = objdata.ReturnNewAcademicTablePerc(proc, classid, studentid);
+
+        SqlCommand cmd = null;
+        DataTable dt = new DataTable();
+        SqlConnection con = objdata.Open();
+        SqlDataAdapter da = new SqlDataAdapter();
+        cmd = new SqlCommand("DashboardClientAcademicPercentage", con);
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.CommandTimeout = 600;
+        cmd.Parameters.AddWithValue("@ParamClassid", classid);
+        cmd.Parameters.AddWithValue("@ParamStudid", studentid);
+        da = new SqlDataAdapter(cmd);
+        da.Fill(dt);
 
         foreach (DataRow dr in dt.Rows)
             {
@@ -1527,9 +1578,21 @@ public partial class Graph : System.Web.UI.Page
 
         List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
         Dictionary<string, object> row;
-        String proc = "[dbo].[DashboardClientClinicalNew]";
+        //String proc = "[dbo].[DashboardClientClinicalNew]";
 
-        DataTable dt = objData.ReturnNewTableClinicClient(proc, cid, sid);
+        //DataTable dt = objData.ReturnNewTableClinicClient(proc, cid, sid);
+
+        SqlCommand cmd = null;
+        DataTable dt = new DataTable();
+        SqlConnection con = objData.Open();
+        SqlDataAdapter da = new SqlDataAdapter();
+        cmd = new SqlCommand("DashboardClientClinicalNew", con);
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.CommandTimeout = 600;
+        cmd.Parameters.AddWithValue("@ParamClassid", cid);
+        cmd.Parameters.AddWithValue("@ParamStudid", sid);
+        da = new SqlDataAdapter(cmd);
+        da.Fill(dt);
 
         if (dt != null && dt.Rows.Count > 0)
         {
@@ -1729,7 +1792,7 @@ public partial class Graph : System.Web.UI.Page
         {
             ObjData.Close(con);
             string script1 = "disableLoader();";
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "show", script1, true);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "hide", script1, true);
         }
 
     }
@@ -1828,7 +1891,15 @@ public partial class Graph : System.Web.UI.Page
                 result.Rows.Add(studentRow);
             }
 
-            rowLookup[studentKey][createdDate] = countValue;
+
+            if (rowLookup[studentKey][createdDate] == DBNull.Value)
+            {
+                rowLookup[studentKey][createdDate] = countValue;
+            }
+            else
+            {
+                rowLookup[studentKey][createdDate] = Convert.ToInt32(rowLookup[studentKey][createdDate]) + countValue;
+            }
 
             // Track grand total values per date (excluding class summary rows)
             if (!grandTotalValues.ContainsKey(createdDate))
@@ -1953,7 +2024,14 @@ public partial class Graph : System.Web.UI.Page
                 result.Rows.Add(staffRow);
             }
 
-            rowLookup[staffKey][createdDate] = countValue;
+            if (rowLookup[staffKey][createdDate] == DBNull.Value)
+            {
+                rowLookup[staffKey][createdDate] = countValue;
+            }
+            else
+            {
+                rowLookup[staffKey][createdDate] = Convert.ToInt32(rowLookup[staffKey][createdDate]) + countValue;
+            }
 
             // Track grand total values per date (excluding class summary rows)
             if (!grandTotalValues.ContainsKey(createdDate))
@@ -2268,6 +2346,7 @@ public partial class Graph : System.Web.UI.Page
                 }
             }
             Txt_Clasid.Text = selectedClasses;
+            FillStudentDropdown(selectedClasses);
             BtnSwitchTableChart.Text = "Chart View";
 
             txtstartDate.Text = DateTime.Now.AddDays(-7).ToString("MM/dd/yyyy");
