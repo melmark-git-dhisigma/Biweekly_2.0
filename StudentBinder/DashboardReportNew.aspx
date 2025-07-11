@@ -368,7 +368,10 @@ border-bottom: 2px solid blue;
            if (checkbox && checkbox.checked) {
                $('.loading').fadeIn('fast');
            }
-       }
+        }
+        function showLoader() {
+            $('.loading').fadeIn('fast');
+        }
         function enableLoader() {
             var startDate = new Date(document.getElementById('<%= txtstartDate.ClientID %>').value);
             var endDate = new Date(document.getElementById('<%= txtendDate.ClientID %>').value);
@@ -402,6 +405,32 @@ border-bottom: 2px solid blue;
         function disableLoader() {
                 $('.loading').fadeOut('fast');
         }
+        document.addEventListener('DOMContentLoaded', function () {
+            var activeTabId = document.getElementById('hdnActiveTab').value;
+            if (activeTabId) {
+                var tabElement = document.querySelector('a[href="' + activeTabId + '"]');
+                if (tabElement) {
+                    var tabTrigger = new bootstrap.Tab(tabElement);
+                    tabTrigger.show();
+                }
+            }
+
+            var tabs = document.querySelectorAll('#gridTabs a[data-bs-toggle="tab"]');
+            tabs.forEach(function (tab) {
+                tab.addEventListener('shown.bs.tab', function (e) {
+                    var selectedTab = e.target.getAttribute('href');
+                    document.getElementById('hdnActiveTab').value = selectedTab;
+                });
+            });
+        });
+
+        window.onbeforeunload = function () {
+            var active = document.querySelector('#gridTabs a.nav-link.active');
+            if (active) {
+                document.getElementById('hdnActiveTab').value = active.getAttribute('href');
+            }
+        };
+
         function ChartView() {
             document.querySelector('.divchkbox').style.display = 'block';
             document.getElementById('chkbox-selection').style.display = 'block';
@@ -557,7 +586,8 @@ border-bottom: 2px solid blue;
                                 </asp:UpdatePanel>  
                             </td>
                             <td>
-                                <asp:RadioButtonList ID="rbtnClassType" runat="server" RepeatDirection="Horizontal" BorderColor="#00549f" BorderStyle="None" BorderWidth="1px" style="margin-left:0px; margin-top:10px; vertical-align: bottom; display: inline-table" RepeatLayout="Flow" OnSelectedIndexChanged="rbtnClassType_SelectedIndexChanged" AutoPostBack="True">
+                                <div style="color:#00549f">Filter the Location Dropdown List by:</div>
+                                    <asp:radiobuttonlist id="rbtnClassType" runat="server" repeatdirection="Horizontal" bordercolor="#00549f" borderstyle="None" borderwidth="1px" style="margin-left: 0px; margin-top: 0px; vertical-align: bottom; display: inline-table" repeatlayout="Flow" onselectedindexchanged="rbtnClassType_SelectedIndexChanged" autopostback="True" onchange="showLoader();">
                                     <asp:ListItem Value="DAY" style="text-align:right;font-weight:bolder;font-size:12px;color: #00549f;padding-right:10px">Day</asp:ListItem>
                                     <asp:ListItem Value="RES" style="text-align:right;font-weight:bolder;font-size:12px;color: #00549f;padding-right:10px">Residence</asp:ListItem>                                
                                     <asp:ListItem Value="BOTH" Selected="True" style="text-align:right;font-weight:bolder;font-size:12px;color: #00549f;padding-right:10px">Both</asp:ListItem>                                
@@ -638,6 +668,7 @@ border-bottom: 2px solid blue;
                     <!--</div>-->
                 </div>
                 <div class="container mt-3 gvDivClass" style="display:none">
+                    <asp:HiddenField ID="hdnActiveTab" runat="server" ClientIDMode="Static" />
                     <!-- Tab Navigation -->
                     <ul class="nav nav-tabs" id="gridTabs" role="tablist">
                         <li class="nav-item">
@@ -1568,6 +1599,7 @@ border-bottom: 2px solid blue;
                             dataLabels: {
                                 enabled: true,
                                 formatter: function () {
+                                    if (this.point.y === 0) return null;
                                     var label = this.point.ToolTip || '';
                                     var pointHeight = (this.point.shapeArgs && this.point.shapeArgs.height) ? this.point.shapeArgs.height : 20;
                                     var maxLabelLength = Math.floor(pointHeight / 8);
