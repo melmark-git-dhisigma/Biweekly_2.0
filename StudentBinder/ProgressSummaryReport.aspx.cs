@@ -636,7 +636,7 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
     }
     protected void btnExport_Click1(object sender, ImageClickEventArgs e)
     {
-        if (highcheck.Checked == false)
+        if (highcheck.Checked == false || dlLesson.Visible == true) //Highcharts Session View & SSRS
         {
             sess = (clsSession)Session["UserSession"];
             Response.Clear();
@@ -652,7 +652,7 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
             Response.Write(sw.ToString());
             Response.End();
         }
-        else
+        else // Highcharts Classic View
         {
             ObjData = new clsData();
             tdMsg.InnerHtml = "";

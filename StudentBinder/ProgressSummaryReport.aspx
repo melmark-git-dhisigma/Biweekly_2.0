@@ -158,6 +158,13 @@
                 $('#overlay').show();
             }
         }
+        function showMessage3() {
+            var checkbox = document.getElementById('<%= highcheck.ClientID %>');
+            var dlBehavior = document.getElementById('<%= dlLesson.ClientID %>');
+            if (checkbox.checked && !dlBehavior) {
+                $('#overlay').show();
+            }
+        }
         function hideOverlay() {
             document.getElementById("downloadPopup").style.display = "block";
             $('#overlay').hide();
@@ -266,7 +273,7 @@
 
             
             <td>
-                        <asp:ImageButton ID="btnExport" runat="server" ImageUrl="~/Administration/images/Excelexp.png" OnClick="btnExport_Click1" ToolTip="Export" OnClientClick="showMessage2()"/>
+                        <asp:ImageButton ID="btnExport" runat="server" ImageUrl="~/Administration/images/Excelexp.png" OnClick="btnExport_Click1" ToolTip="Export" OnClientClick="showMessage3()"/>
 
                     <td class="auto-style4" colspan="2"></td>
                 </tr>
