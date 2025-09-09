@@ -3244,47 +3244,78 @@ public partial class Home : System.Web.UI.Page
                 //                     "Class Cls ON Cls.ClassId=SCLS.ClassId INNER JOIN Placement plc on ST.StudentId=plc.StudentPersonalId AND plc.Location=SCLS.ClassId WHERE ST.ActiveInd='A' AND (plc.EndDate is null or convert(DATE,plc.EndDate) >= convert(DATE,getdate())) AND (ST.StudentFname='" + txtSname.Text.Trim() + "' OR ST.StudentLname='" + txtSname.Text.Trim() + "' OR ST.StudentFname+' '+ST.StudentLname='" + txtSname.Text.Trim() + "' OR ST.StudentLname+' '+ST.StudentFname='" + txtSname.Text.Trim() + "' OR ST.StudentLname LIKE +'%'+'" + txtSname.Text.Trim() + "'+'%'  OR ST.StudentFname LIKE +'%'+'" + txtSname.Text.Trim() + "'+'%') AND Cls.ActiveInd='A' " +
                 //                     "AND SCLS.ActiveInd='A' ) AS STDTCLASS LEFT JOIN UserClass UCLS ON Id=UCLS.ClassId WHERE UCLS.ActiveInd='A'";
 
-                string classdetail = "SELECT DISTINCT Id,Name FROM (SELECT SCLS.ClassId AS Id,Cls.ClassName AS Name FROM StdtClass SCLS INNER JOIN Student ST ON ST.StudentId=SCLS.StdtId INNER JOIN " +
-                                     "Class Cls ON Cls.ClassId=SCLS.ClassId INNER JOIN Placement plc on ST.StudentId=plc.StudentPersonalId AND plc.Location=SCLS.ClassId WHERE ST.ActiveInd='A' AND (plc.EndDate is null or convert(DATE,plc.EndDate) >= convert(DATE,getdate())) AND (ST.StudentFname='" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "' OR ST.StudentLname='" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "' OR ST.StudentFname+' '+ST.StudentLname='" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "' OR ST.StudentLname+' '+ST.StudentFname='" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "' OR ST.StudentLname LIKE +'%'+'" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "'+'%'  OR ST.StudentFname LIKE +'%'+'" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "'+'%') AND Cls.ActiveInd='A' " + 
-                                     "AND SCLS.ActiveInd='A' ) AS STDTCLASS LEFT JOIN UserClass UCLS ON Id=UCLS.ClassId WHERE UCLS.ActiveInd='A'";
+                string name = clsGeneral.convertQuotes(txtSname.Text.Trim());
 
-                string classactivedetail = "SELECT DISTINCT Id,Name FROM (SELECT SCLS.ClassId AS Id,Cls.ClassName AS Name FROM StdtClass SCLS INNER JOIN Student ST ON ST.StudentId=SCLS.StdtId INNER JOIN " +
-                                     "Class Cls ON Cls.ClassId=SCLS.ClassId INNER JOIN Placement plc on ST.StudentId=plc.StudentPersonalId AND plc.Location=SCLS.ClassId AND plc.status=1 WHERE ST.ActiveInd='A' AND (plc.EndDate is null or convert(DATE,plc.EndDate) >= convert(DATE,getdate())) AND (ST.StudentFname='" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "' OR ST.StudentLname='" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "' OR ST.StudentFname+' '+ST.StudentLname='" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "' OR ST.StudentLname+' '+ST.StudentFname='" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "' OR ST.StudentLname LIKE +'%'+'" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "'+'%'  OR ST.StudentFname LIKE +'%'+'" + clsGeneral.convertQuotes(txtSname.Text.Trim()) + "'+'%') AND Cls.ActiveInd='A' " +
-                                     "AND SCLS.ActiveInd='A' ) AS STDTCLASS LEFT JOIN UserClass UCLS ON Id=UCLS.ClassId WHERE UCLS.ActiveInd='A'";
+                // One query that returns classes for BOTH currently active and discharged placements
+                string classActivePlusDischarged =
+                "SELECT DISTINCT t.Id, t.Name " +
+                "FROM (" +
 
-                DataTable dt = objData.ReturnDataTable(classdetail, false);
-                DataTable activedt = objData.ReturnDataTable(classactivedetail, false);
+                "  /* ACTIVE (current placement) */ " +
+                "  SELECT SCLS.ClassId AS Id, Cls.ClassName AS Name " +
+                "  FROM StdtClass SCLS " +
+                "  INNER JOIN Student ST ON ST.StudentId = SCLS.StdtId " +
+                "  INNER JOIN Class Cls ON Cls.ClassId = SCLS.ClassId " +
+                "  INNER JOIN Placement plc ON ST.StudentId = plc.StudentPersonalId AND plc.Location = SCLS.ClassId " +
+                "  WHERE ST.ActiveInd = 'A' " +
+                "    AND (plc.EndDate IS NULL OR CONVERT(DATE, plc.EndDate) >= CONVERT(DATE, GETDATE())) " +
+                "    AND (ST.StudentFname = '" + name + "' " +
+                "         OR ST.StudentLname = '" + name + "' " +
+                "         OR ST.StudentFname + ' ' + ST.StudentLname = '" + name + "' " +
+                "         OR ST.StudentLname + ' ' + ST.StudentFname = '" + name + "' " +
+                "         OR ST.StudentLname LIKE '%" + name + "%' " +
+                "         OR ST.StudentFname LIKE '%" + name + "%') " +
+                "    AND Cls.ActiveInd = 'A' " +
+                "    AND SCLS.ActiveInd = 'A' " +
+
+                "  UNION ALL " +
+
+                "  /* DISCHARGED (ONLY the discharge class via last ended/inactive placement) */ " +
+                "  SELECT LP.ClassId AS Id, Cls2.ClassName AS Name " +
+                "  FROM ( " +
+                "      SELECT DISTINCT StudentPersonalId AS Id, FirstName + ' ' + LastName AS Name " +
+                "      FROM StudentPersonal " +
+                "      WHERE StudentType = 'client' AND clientid > 0 " +
+                "        AND (FirstName = '" + name + "' OR LastName = '" + name + "' " +
+                "             OR FirstName + LastName = '" + name + "' OR LastName + FirstName = '" + name + "' " +
+                "             OR LastName LIKE '%" + name + "%' OR FirstName LIKE '%" + name + "%') " +
+                "        AND PlacementStatus = 'D' " +
+                "  ) SP " +
+                "  CROSS APPLY ( " +
+                "      SELECT TOP (1) PLC.Location AS ClassId " +
+                "      FROM Placement PLC " +
+                "      WHERE PLC.StudentPersonalId = SP.Id " +
+                "        AND ( (PLC.EndDate IS NOT NULL AND CONVERT(date, PLC.EndDate) < CONVERT(date, GETDATE())) " +
+                "              OR PLC.Status = 0 ) " +        // treat ended or inactive as discharge placement
+                "      ORDER BY " +
+                "        CASE WHEN PLC.EndDate IS NULL THEN 1 ELSE 0 END, " +
+                "        PLC.EndDate DESC, PLC.StartDate DESC " +
+                "  ) LP " +
+                "  JOIN Class Cls2 ON Cls2.ClassId = LP.ClassId AND Cls2.ActiveInd = 'A' " +
+
+                ") AS t " +
+                "LEFT JOIN UserClass UCLS ON UCLS.ClassId = t.Id " +
+                "WHERE UCLS.ActiveInd = 'A'";
+
+                // just run the combined query; no separate IFExists gate needed
+                DataTable dt = objData.ReturnDataTable(classActivePlusDischarged, false);
                 if (dt == null) return;
                 if (dt.Rows.Count > 0)
                 {
-                    if (activedt != null)
-                        if (activedt.Rows.Count > 0)
-                        {
-                            ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "$('#DlClass').empty();", true);
-                            foreach (DataRow row in activedt.Rows)
-                            {
-                                string functn = "ChangeClassId(" + row["Id"] + ");";
-                                DlClass += "<div class=\"grmb\" id=" + row["Id"] + " onclick=" + functn + " >" + row["Name"] + "</div>";
-                            }
-                            ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "$('#DlClass').append('" + DlClass + "');", true);
-                        }
-                        else
-                        {
-                            ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "$('#DlClass').empty();", true);
-                            LBLClassnotfound.Text = "Student not found";
-                        }
-
-                }
-                else if (dt.Rows.Count == 0)
-                {
-                    ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "$('#DlClass').empty();", true);
-                    LBLClassnotfound.ForeColor = System.Drawing.Color.Red;
-                    LBLClassnotfound.Text = "You are not autherized to Access this Student's Class";
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        // EXACT SAME HANDLER, no label changes
+                        string functn = "ChangeClassId(" + row["Id"] + ");";
+                        DlClass += "<div class=\"grmb\" id=" + row["Id"] + " onclick=" + functn + " >" + row["Name"] + "</div>";
+                    }
+                    // keep your escaping behavior
+                    DlClass = DlClass.Replace('\'', ' ');
+                    ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "$('#DlClass').append('" + DlClass + "');", true);
                 }
                 else
                 {
-                    ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "$('#DlClass').empty();", true);
-
+                    LBLClassnotfound.ForeColor = System.Drawing.Color.Red;
+                    LBLClassnotfound.Text = "Student not found";
                 }
             }
             else
