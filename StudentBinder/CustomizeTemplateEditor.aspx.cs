@@ -18303,7 +18303,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     {
                         ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "$('#DlStudent').empty();", true);
                         LBLClassnotfound.ForeColor = System.Drawing.Color.Red;
-                        LBLClassnotfound.Text = "You are not autherized to Access this Student";
+                        LBLClassnotfound.Text = "You are not authorized to access this student";
+                        //LBLClassnotfound.Text = "Student not found";
                     }
                     else
                     {
