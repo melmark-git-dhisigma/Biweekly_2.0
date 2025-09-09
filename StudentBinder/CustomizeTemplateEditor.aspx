@@ -252,7 +252,23 @@
              });
          } 
         
-      </script>
+         $(document).ready(function () {
+             var tabToActivate = $("#<%= hiddenActiveTab.ClientID %>").val();
+
+             if (tabToActivate && tabToActivate === "Steps") {
+                 var tab = $('.navigationTabs a').filter(function () {
+                     return $(this).text().trim() === "Steps";
+                 });
+
+                 if (tab.length) {
+                     tab.prop("onclick", null);    
+                     tab[0].click();               
+
+                     $("#<%= hiddenActiveTab.ClientID %>").val('');
+        }
+    }
+         });
+</script>
     <script type="text/javascript">
         
   <%--      $(document).ready(function () {
@@ -3516,7 +3532,8 @@
 
                                                 </ItemTemplate>
                                             </asp:DataList>
-
+                                            <asp:HiddenField ID="hiddenStepId" runat="server"  />
+                                            <asp:HiddenField ID="hiddenActiveTab" runat="server" />
                                             <div runat="server" id="stepPanel">
                                                 <div id="AddStepDiv1" class="" style="top: 6%; left: 6%;">
                                                     <div id="SignUp_Step">
@@ -6700,7 +6717,10 @@
         //status will be false only for BtnSubmit click
         if (status) {
             multiClickSubmit = false;
-            document.getElementById("<%=BtnSubmit.ClientID%>").style.opacity = 1;
+            var btnSubmit = document.getElementById("<%=BtnSubmit.ClientID%>");
+            if (btnSubmit) {
+                btnSubmit.style.opacity = 1;
+            }
         }
 
         if (!multiClickSubmit) {
@@ -6786,7 +6806,10 @@
             }
             if (!status) {
                 multiClickSubmit = true;
-                document.getElementById("<%=BtnSubmit.ClientID%>").style.opacity = '0.5';
+                var btnSubmit = document.getElementById("<%=BtnSubmit.ClientID%>");
+                if (btnSubmit) {
+                    btnSubmit.style.opacity = 0.5;
+                }
             }
             return true;
         }
