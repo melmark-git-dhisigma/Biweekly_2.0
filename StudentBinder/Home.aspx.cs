@@ -147,6 +147,11 @@ public partial class Home : System.Web.UI.Page
             if (sess.Classid == classIdCheck())
             {
                 btnDischarge.Visible = true;
+                if (txtSnameDsch.Text.Trim() == "" && sess.StudentId <= 0 && hdnClassDivVisible.Value != "true")
+                {
+                    DlClassDsch.InnerHtml = GetDischargedStudents();
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "open", "openDischargeDivLoad();", true);
+                }
             }
             else
             {
@@ -3390,6 +3395,38 @@ public partial class Home : System.Web.UI.Page
             ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "$('#DlClassDsch').empty();", true);
             LblStudentNotFound.Text = "Student not found";
         }
+    }
+    private string GetDischargedStudents()
+    {
+        objData = new clsData();
+        string DlClass = "";
+        if (txtSnameDsch.Text.Trim() == "Choose Discharged Client")
+        {
+            DlClass = "";
+        }
+        else
+            DlClass = txtSnameDsch.Text;
+        string studentDetail = "SELECT Distinct StudentPersonalId AS Id, FirstName+' ' +LastName AS Name FROM StudentPersonal WHERE StudentType='client' and clientid>0 " +//and StudentPersonalId not in" +
+                //"(SELECT Distinct ST.StudentPersonalId FROM StudentPersonal ST join Placement PLC on PLC.StudentPersonalId=ST.StudentPersonalId WHERE (PLC.EndDate is null or PLC.EndDate>=cast (GETDATE() as DATE)) and PLC.Status=1 )"+
+                             "AND PlacementStatus='D'";
+
+        DataTable dt = objData.ReturnDataTable(studentDetail, false);
+        if (dt != null && dt.Rows.Count > 0)
+        {
+            foreach (DataRow row in dt.Rows)
+            {
+                int stdId = Convert.ToInt32(row["Id"]);
+                string functn = "FillDischargedStudents(" + stdId + ");";
+                DlClass += "<div class=\"grmb\" id=" + row["Id"] + " onclick=" + functn + " >" + row["Name"] + "</div>";
+            }
+            DlClass = DlClass.Replace('\'', ' ');
+        }
+        else
+        {
+            LblStudentNotFound.Text = "No Students in this class";
+        }
+
+        return DlClass;
     }
     protected void btnOpenDischargeDiv(object sender, EventArgs e)
     {

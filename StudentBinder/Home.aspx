@@ -393,7 +393,7 @@
 
             var currHref_splitted = currHref.split('/');
 
-            var redirectUrl = "http://" + currHref_splitted[0] + '/';
+            var redirectUrl =  currHref_splitted[0] + '/';
 
             for (var i = 0; i < currHref_splitted.length; i++) {
                 if (currHref_splitted[i].substring(0, 2) == '(S') {
@@ -1017,8 +1017,14 @@
         }
         function openDischargeDiv() {
             $(".classDiv").hide();
+            $("#<%= hdnClassDivVisible.ClientID %>").val("false");
             $(".classDivNew").show();
             $("#imgSearchDsch").click()
+        }
+        function openDischargeDivLoad() {
+            $(".classDiv").hide();
+            $("#<%= hdnClassDivVisible.ClientID %>").val("false");
+            $(".classDivNew").show();
         }
         function ConfirmChange() {
             $(".classDivNew").hide();
@@ -1026,9 +1032,11 @@
             if (confirmResult.toString() == "true") {
                 classBind();
                 $(".classDiv").show();
+                $("#<%= hdnClassDivVisible.ClientID %>").val("true");
             }
             else {
                 $(".classDiv").hide();
+                $("#<%= hdnClassDivVisible.ClientID %>").val("false");
             }
             $('.alertsPopUp').slideUp('fast');
             $('.checkPopUp').slideUp('fast');
@@ -4473,12 +4481,15 @@
                         <li class="box1">
                             <a href="#" onclick="ConfirmChange();">
                                     <asp:Label ID="LblClass" runat="server" Text=""></asp:Label>
-                                <asp:linkbutton ID="btnDischarge" onclick="btnOpenDischargeDiv" ForeColor="white" width="76px" height="15px" style="padding-left: 1px; padding-bottom: -2px" runat="server" BackColor="#1cae41">Dis-Students</asp:linkbutton>
+                                <%--<asp:linkbutton ID="btnDischarge" onclick="btnOpenDischargeDiv" 
+                                    ForeColor="red" width="80px" height="15px" style="padding-left: 1px; padding-bottom: -2px; font-size: 7px; font-weight: bold; vertical-align: middle; line-height: 0px;" 
+                                    runat="server">SELECT STUDENT</asp:linkbutton>--%>
+                                
 
                             
                             </a>
 
-
+                            <asp:HiddenField ID="hdnClassDivVisible" runat="server" Value="false" />
                             <div class="classDiv">
                                 <a id="A2" class="close sprited" href="#" style="margin-top: -13px; margin-right: -14px;">
                                     <img onclick="javascript:studclsSearch();" src="../Administration/images/closebtn.png" style="border: 0px;" width="24px" />
@@ -4498,7 +4509,7 @@
                                 </asp:UpdatePanel>
 
                             </div>
-                            <div class="classDivNew" style="overflow-wrap:break-word; overflow-y: scroll; height: 240px !important; width: 255px; overflow-y: scroll;">
+                            <div class="classDivNew" style="overflow-wrap:break-word; overflow-y: scroll; height: 240px !important; width: 255px; overflow-y: scroll; margin-top: 12px;">
                                 <a id="A5" class="close sprited" href="#" style="margin-top: -13px; margin-right: -14px;">
                                     <img onclick="javascript:closeDivDsch();" src="../Administration/images/closebtn.png" style="border: 0px; padding-top: 13px" width="24px;" />
                                 </a>
@@ -4511,7 +4522,7 @@
                                         <asp:Label ID="LblStudentNotFound" runat="server" ForeColor="Black"></asp:Label>
                                         <div style="height: auto;" id="Div5">
 
-                                            <div style="width: 100%; margin-top: 10px;" id="DlClassDsch"></div>
+                                            <div style="width: 100%; margin-top: 10px;" id="DlClassDsch" runat ="server"></div>
                                         </div>
                                     </ContentTemplate>
                                 </asp:UpdatePanel>
@@ -4583,11 +4594,13 @@
                             <img id="play" style="margin: 0px 0px 0px 0px!important;width: 20px; height: 20px;" src="../Administration/images/icons8-bell-off.png" />
                                 <img id="audioPlay" style="display:none"/>
                             </div>
-                    </div>
                         </li>
 
 
                     </ul>
+                <asp:LinkButton ID="btnDischarge" OnClick="btnOpenDischargeDiv" ForeColor="red" runat="server" 
+                                    Style="display:inline-block; width:106px; height:15px;line-height:6px; font-size:9px; font-weight:bold; padding-left:531.5px;vertical-align:middle;text-align:left; font-weight:800;"
+                                    >SELECT STUDENT</asp:LinkButton>
 
 
 
