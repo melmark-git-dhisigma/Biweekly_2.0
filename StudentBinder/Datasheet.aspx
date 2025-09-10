@@ -4208,7 +4208,7 @@
                             <asp:Button ID="btnSubmitBottomConfirm" runat="server" Text="Submit Scores" Style="font-size: 12px;display: none;" CssClass="NFButtonNew" OnClick="ConfirmSubmission" OnClientClick="scrollToTop();" />
                             <asp:Button ID="btnSubmitAndRepeat2" runat="server" Style="font-size: 12px" Text="Submit & Repeat" CssClass="NFButtonNew" OnClick="ConfirmSubmissionCheck" OnClientClick="saveHiddenFields(this);scrollToTop();" />
                             <asp:Button ID="btnSubmitAndRepeatBottomConfirm" runat="server" Style="font-size: 12px;display: none;" Text="Submit & Repeat" CssClass="NFButtonNew" OnClick="ConfirmSubmission" OnClientClick="scrollToTop();"/>
-                            <asp:Button ID="btnAddTrial" runat="server" Text="Add Trials" CssClass="NFButtonNew" OnClick="btnAddTrial_Click" Style="float: right; font-size: 12px" OnClientClick="loadBeforeSave('Save'); scrollToTop();" />
+                            <asp:Button ID="btnAddTrial" runat="server" Text="Add Trials" CssClass="NFButtonNew" OnClick="btnAddTrial_Click" Style="float: right; font-size: 12px" OnClientClick="loadBeforeSave('Save'); scrollToTop();" Visible="false"/>
                             <asp:Label ID="LabelvisualToolEdit" runat="server" Text="Label" Visible="false" Style="color: red; font-size: 17px; padding: 5px;"></asp:Label>
 
 
