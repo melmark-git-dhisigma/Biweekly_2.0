@@ -252,7 +252,7 @@
              });
          } 
         
-         $(document).ready(function () {
+         <%--   $(document).ready(function () {
              var tabToActivate = $("#<%= hiddenActiveTab.ClientID %>").val();
 
              if (tabToActivate && tabToActivate === "Steps") {
@@ -267,7 +267,7 @@
                      $("#<%= hiddenActiveTab.ClientID %>").val('');
         }
     }
-         });
+         });--%>
 </script>
     <script type="text/javascript">
         
@@ -2564,7 +2564,6 @@
                                                         <td>* Mandatory Fields</td>
                                                         <td></td>
                                                     </tr>
-
                                                 </table>
 
                                             </div>
@@ -3533,7 +3532,7 @@
                                                 </ItemTemplate>
                                             </asp:DataList>
                                             <asp:HiddenField ID="hiddenStepId" runat="server"  />
-                                            <asp:HiddenField ID="hiddenActiveTab" runat="server" />
+                                            <%--<asp:HiddenField ID="hiddenActiveTab" runat="server" />--%>
                                             <div runat="server" id="stepPanel">
                                                 <div id="AddStepDiv1" class="" style="top: 6%; left: 6%;">
                                                     <div id="SignUp_Step">
@@ -6401,6 +6400,7 @@
     function NoDate() {
         alertMessage('Please enter Lesson Date ...', 'red');
     }
+
     function deleteSystem() {
         var flag;
         flag = confirm("Are you sure you want to delete this Column ?");
@@ -6577,7 +6577,7 @@
                     //break;
                 }
                 if (radio[li].checked && radio[li - 1].defaultValue === "") {
-                    emailMissing = emailMissing + persons[li - 1].textContent + ",";;
+                    emailMissing = emailMissing + persons[li - 1].textContent + ",";
                 }
             }
             if (emailMissing != null && emailMissing.length > 1) {

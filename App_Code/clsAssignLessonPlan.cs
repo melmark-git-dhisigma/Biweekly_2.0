@@ -526,6 +526,14 @@ public class clsAssignLessonPlan
 
                 }
             }
+            
+            string strQry = " SELECT NextSetId FROM StdtDSStat WHERE DSTempHdrId = " + templateid;
+            int prevSetId = Convert.ToInt32(objData.FetchValue(strQry));
+            strQry = " UPDATE S SET S.PrevSetId = " + prevSetId + " FROM DSTempSet S INNER JOIN DSTempSet ref     ON ref.DSTempSetId = " + prevSetId +
+                     " WHERE S.DSTempHdrId = " + TId + " AND S.SetName   = ref.SetName   AND S.SetCd     = ref.SetCd   " + 
+                     " AND S.SortOrder = ref.SortOrder AND S.CreatedBy = " + loginid;
+            int prevIdSet = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQry, Con, Trans));
+            
             objData.CommitTransation(Trans, Con);
             return TId;
         }

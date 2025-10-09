@@ -173,20 +173,20 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             hideAllOptions();
         }
 
-        if (IsPostBack && Request["__EVENTTARGET"] == "ForceDeleteStep")
-        {
-            Session["StepDeleteFlag"] = "true";
-            btnRemoveStep_Click(null, EventArgs.Empty); // simulate original call
-            string tabToRestore = hiddenActiveTab.Value;
-            hiddenActiveTab.Value = "Steps";
-        }
-        if (IsPostBack && Request["__EVENTTARGET"] == "ForceAddStep")
-        {
-            Session["StepAdditionFlag"] = "true";
-            btnAddStepDetails_Click(null, EventArgs.Empty); // simulate original call
-            string tabToRestore = hiddenActiveTab.Value;
-            hiddenActiveTab.Value = "Steps";
-        }
+        //if (IsPostBack && Request["__EVENTTARGET"] == "ForceDeleteStep")
+        //{
+        //    Session["StepDeleteFlag"] = "true";
+        //    btnRemoveStep_Click(null, EventArgs.Empty); // simulate original call
+        //    string tabToRestore = hiddenActiveTab.Value;
+        //    hiddenActiveTab.Value = "Steps";
+        //}
+        //if (IsPostBack && Request["__EVENTTARGET"] == "ForceAddStep")
+        //{
+        //    Session["StepAdditionFlag"] = "true";
+        //    btnAddStepDetails_Click(null, EventArgs.Empty); // simulate original call
+        //    string tabToRestore = hiddenActiveTab.Value;
+        //    hiddenActiveTab.Value = "Steps";
+        //}
         if (CopyCheck())//Enable/Disable copy checkbox
         {
             chkCpyStdtTemplate.Enabled = true;
@@ -207,6 +207,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         Pagepath = "CustomizeTemplateEditor:Page_LoadEnd";        
         sess = clsGeneralSchk.sessioncheck(curesesid, preid, ip, preuser, sess, Prevsess, SessStudentid, PreClassid, Sessstname, Pagepath);
 
+        
     }
 
     public bool DeletePermission()
@@ -886,7 +887,10 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             {
 
                 iCurrentSetId = Convert.ToInt32(Session["iCurrentSetId"]);
-                //hdnRadBtnSet.Value = iCurrentSetId.ToString();
+            }
+            else
+            {
+ 
             }
             oTemp = (ClsTemplateSession)Session["BiweeklySession"];
             if (oTemp != null)
@@ -905,7 +909,10 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     // Approval Popup Issue New Lesson Creation [18 - jun -2020] - Dev 1 -- Start
                     if (RadioButtonListSets.Items.Count != 0)
                     {
-                        if (prevTempId != NewTempId)
+                        DataTable dtCrntVer = objData.ReturnDataTable("SELECT CrntStep, CrntSet FROM DSTempHdr WHERE DSTempHdrId = " + NewTempId, false);
+                         if (dtCrntVer == null || dtCrntVer.Rows.Count == 0 || dtCrntVer.Rows[0]["CrntStep"] == DBNull.Value || dtCrntVer.Rows[0]["CrntSet"] == DBNull.Value)
+                         {
+                             if (prevTempId != NewTempId)
                         {
                             for (int i = 0; i < n; i++)
                             {
@@ -923,6 +930,12 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             loadStepOverrid(Convert.ToInt32(RadioButtonListSets.SelectedValue.ToString()));
                         }
                     }
+                         else
+                        {
+                            RadioButtonListSets.Items[0].Selected = true;
+                            loadStepOverrid(Convert.ToInt32(RadioButtonListSets.SelectedValue.ToString()));
+                        }
+                    }
                     // Approval Popup Issue New Lesson Creation [18 - jun -2020] - Dev 1 -- End
                     RadioButtonListSets_tt.DataSource = ds;
                     RadioButtonListSets_tt.DataTextField = "SetCd";
@@ -931,7 +944,10 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     // Approval Popup Issue New Lesson Creation [18 - jun -2020] - Dev 1 -- Start
                     if (RadioButtonListSets.Items.Count != 0)
                     {
-                        if (prevTempId != NewTempId)
+                        DataTable dtCrntVer = objData.ReturnDataTable("SELECT CrntStep, CrntSet FROM DSTempHdr WHERE DSTempHdrId = " + NewTempId, false);
+                        if (dtCrntVer == null || dtCrntVer.Rows.Count == 0 || dtCrntVer.Rows[0]["CrntStep"] == DBNull.Value || dtCrntVer.Rows[0]["CrntSet"] == DBNull.Value)
+                        {
+                            if (prevTempId != NewTempId)
                         {
                             for (int i = 0; i < n; i++)
                             {
@@ -944,6 +960,12 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             RadioButtonListSets.Items[0].Selected = true;
 
                         if (RadioButtonListSets.SelectedValue.ToString() == "")
+                        {
+                            RadioButtonListSets.Items[0].Selected = true;
+                            loadStepOverrid(Convert.ToInt32(RadioButtonListSets.SelectedValue.ToString()));
+                        }
+                    }
+                        else
                         {
                             RadioButtonListSets.Items[0].Selected = true;
                             loadStepOverrid(Convert.ToInt32(RadioButtonListSets.SelectedValue.ToString()));
@@ -1202,7 +1224,10 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             RadioButtonListSteps.DataValueField = "DSTempStepId";
                             RadioButtonListSteps.DataBind();
                             // Approval Popup Issue New Lesson Creation [18 - jun -2020] - Dev 1  
-							if (dt.Rows.Count > 0)
+                            DataTable dtCrntVer = objData.ReturnDataTable("SELECT CrntStep, CrntSet FROM DSTempHdr WHERE DSTempHdrId = " + oTemp.TemplateId, false);
+                            if (dtCrntVer == null || dtCrntVer.Rows.Count == 0 || dtCrntVer.Rows[0]["CrntStep"] == DBNull.Value || dtCrntVer.Rows[0]["CrntSet"] == DBNull.Value)
+                            {
+                                if (dt.Rows.Count > 0)
                                 if (Session["Selection"] == "1")
                                 {
                                     for (int i = 0; i < dt.Rows.Count; i++)
@@ -1219,7 +1244,13 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             {
                                 RadioButtonListSteps.Items[0].Selected = true;
                             }
-                            // Approval Popup Issue New Lesson Creation [18 - jun -2020] - Dev 1  r
+                                // Approval Popup Issue New Lesson Creation [18 - jun -2020] - Dev 1  r
+
+                            }
+                            else
+                            {
+                                RadioButtonListSteps.Items[0].Selected = true;
+                            }
                         }
                         else
                         {
@@ -3967,7 +3998,6 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     {
                         cbx_deletesess.Checked = Convert.ToBoolean("false");
                     }
-
                 }
                 else
                 {
@@ -5967,15 +5997,18 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                 objData.ExecuteWithTrans(updateQuerry, con, Transs);
                     }
                 }
-                
-                DataTable dtCrntVer = objData.ReturnDataTable("SELECT CrntStep, CrntSet FROM DSTempHdr WHERE DSTempHdrId = " + headerId, false);
-                string prevVerSet = "";
+
                 int prevVerStep = 0;
-                int stepCount = 0;
-                string sqlStr = "SELECT ChainType FROM DSTempHdr where DSTempHdrId=" + headerId;
-                string type = objData.FetchValue(sqlStr).ToString();
                 int sortOrderCheck = 0;
 
+                string sqlStr = "SELECT ChainType FROM DSTempHdr where DSTempHdrId=" + headerId;
+                string type = objData.FetchValue(sqlStr).ToString();
+                if (type == "Forward chain" || type == "Backward chain")
+                {
+                    DataTable dtCrntVer = objData.ReturnDataTable("SELECT CrntStep, CrntSet FROM DSTempHdr WHERE DSTempHdrId = " + headerId, false);
+                    string prevVerSet = "";
+                    int stepCount = 0;
+                Session["StepAdditionFlag"] = "false";
                 if (dtCrntVer == null || dtCrntVer.Rows.Count == 0 || dtCrntVer.Rows[0]["CrntStep"] == DBNull.Value || dtCrntVer.Rows[0]["CrntSet"] == DBNull.Value)
                 {
                     int prevTempId = getPrevVersion();
@@ -6000,6 +6033,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             if (result != null && result != DBNull.Value)
                             {
                                 Session["iCurrentSetId"] = result;
+                                    if (Session["iCurrentSetId"] != null)
                                 prevVerSet = Session["iCurrentSetId"].ToString();
                             }
                             else
@@ -6011,7 +6045,40 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                     " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ")";
 
                                 Session["iCurrentSetId"] = oData_ov.FetchValue(query2);
-                                prevVerSet = Session["iCurrentSetId"].ToString();
+
+                                if (Session["iCurrentSetId"] != null)
+                                    prevVerSet = Session["iCurrentSetId"].ToString();
+                                else
+                                {
+                                    string setIdsQry = setIds;
+                                    if (setIds.EndsWith(","))
+                                    {
+                                        setIdsQry = setIds.Substring(0, setIds.Length - 1);
+                                    }
+                                    string strQurry = "SELECT TOP 1 PrevSetId FROM DSTempSet WHERE DSTempSetId IN (" + setIdsQry + ") ORDER BY 1 DESC";
+                                    object result2 = objData.FetchValue(strQurry);
+                                    int prevVerSetId = (result2 == null || result2 == DBNull.Value) ? 0 : Convert.ToInt32(result2);
+                                    if (prevVerSetId > 0)
+                                    {
+                                        strQurry = "UPDATE DSTempHdr SET crntstep = 0 WHERE DSTempHdrId = " + headerId;
+                                        int indx = objData.ExecuteWithTrans(strQurry, con, Transs);
+                                        Session["StepAdditionFlag"] = "true";
+                                    }
+                                    //if (Session["StepAdditionFlag"] != "true")
+                                    //{
+                                    //    Session["StepAdditionFlag"] = "true";
+                                    //    string msg = "Adding this step will alter the active step of the lesson. Do you want to proceed?";
+                                    //    msg = System.Web.HttpUtility.JavaScriptStringEncode(msg);
+
+                                    //    string script = string.Format(
+                                    //        "if (confirm('{0}')) {{__doPostBack('ForceAddStep', ''); }}",
+                                    //        msg
+                                    //    );
+
+                                    //    ScriptManager.RegisterStartupScript(this, this.GetType(), "stepremovescript", script, true);
+                                    //    return;
+                                    //}
+                                }
                             }
                         }
                         else
@@ -6021,14 +6088,14 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             Session["StepAdditionFlag"] = "true";
                         }
 
-                        if (setIds.Contains(prevVerSet))
+                            if (prevVerSet != "" && setIds.Contains(prevVerSet))
                         {
                             prevVerStep = Convert.ToInt32(objData.FetchValue("SELECT NextStepId from StdtDSStat  where DSTempHdrId =" + prevTempId));
                             strQuery = "SELECT  COUNT(*) FROM DSTempStep WHERE DSTempHdrId = " + headerId + "  AND DSTempSetId= " + prevVerSet + " AND ActiveInd = 'A' GROUP BY DSTempSetid ORDER BY 1 DESC";
                             stepCount = Convert.ToInt32(objData.FetchValue(strQuery));
                             if (chkEnd.Checked == true)
                                 sortOrderCheck = stepCount + 1;
-                            else
+                            else if (prevVerSet != "")
                             {
                                 strQuery = "SELECT COUNT(*) FROM DSTempStep WHERE DSTempSetId = " + prevVerSet + " and DSTempHdrId = " + headerId + " AND SortOrder < " + selectedText + " AND ActiveInd = 'A'";
                                 sortOrderCheck = Convert.ToInt32(objData.FetchValue(strQuery)) + 1;
@@ -6045,14 +6112,14 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 else
                 {
                     prevVerSet = dtCrntVer.Rows[0]["CrntSet"].ToString();
-                    if(setIds.Contains(prevVerSet))
+                        if (prevVerSet != "" && setIds.Contains(prevVerSet))
                     {
                         prevVerStep = Convert.ToInt32(dtCrntVer.Rows[0]["CrntStep"]);
                         strQuery = "SELECT  COUNT(*) FROM DSTempStep WHERE DSTempHdrId = " + headerId + "  AND DSTempSetId= " + prevVerSet + " AND ActiveInd = 'A' GROUP BY DSTempSetid ORDER BY 1 DESC";
                         stepCount = Convert.ToInt32(objData.FetchValue(strQuery));
                         if (chkEnd.Checked == true)
                             sortOrderCheck = stepCount + 1;
-                        else
+                        else if (prevVerSet != "")
                         {
                             strQuery = "SELECT COUNT(*) FROM DSTempStep WHERE DSTempSetId = " + prevVerSet + " and DSTempHdrId = " + headerId + " AND SortOrder < " + selectedText + " AND ActiveInd = 'A'";
                             sortOrderCheck = Convert.ToInt32(objData.FetchValue(strQuery)) + 1;
@@ -6066,28 +6133,29 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
                 if ((type == "Forward chain" || type == "Backward chain") && sortOrderCheck <= prevVerStep && Session["StepAdditionFlag"] != "true")
                 {
+                    strQuery = "UPDATE DSTempHdr SET crntstep = 0 WHERE DSTempHdrId = " + headerId;
+                    int indx = objData.ExecuteWithTrans(strQuery, con, Transs);
                     Session["StepAdditionFlag"] = "true";
-                    string msg = "Adding this step will alter the active step of the lesson. Do you want to proceed?";
-                    msg = System.Web.HttpUtility.JavaScriptStringEncode(msg);
+                    //string msg = "Adding this step will alter the active step of the lesson. Do you want to proceed?";
+                    //msg = System.Web.HttpUtility.JavaScriptStringEncode(msg);
+                    ////Reset Steps
+                    //string script = string.Format(
+                    //    "if (confirm('{0}')) {{__doPostBack('ForceAddStep', ''); }}",
+                    //    msg
+                    //);
 
-                    string script = string.Format(
-                        "if (confirm('{0}')) {{__doPostBack('ForceAddStep', ''); }}",
-                        msg
-                    );
-
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "stepremovescript", script, true);
-                    return;
+                    //ScriptManager.RegisterStartupScript(this, this.GetType(), "stepremovescript", script, true);
+                    //return;
                 }
-                else
-                {
-                    //string selQuery1 = "SELECT DSTempParentSetId FROM DSTempParentStep WHERE DSTempHdrId = " + headerId + " AND ActiveInd = 'A'";
-                    //objCount = objData.FetchValue(selQuery1);
+                }
+                //string selQuery1 = "SELECT DSTempParentSetId FROM DSTempParentStep WHERE DSTempHdrId = " + headerId + " AND ActiveInd = 'A'";
+                //objCount = objData.FetchValue(selQuery1);
                 //UpdateCompleteSteponParentSet(Convert.ToInt32(objCount), headerId);
 
 
                 strQuery = "INSERT INTO DSTempParentStep(SchoolId,DSTempHdrId,StepCd,StepName,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn)";
                 strQuery += " Values(" + sess.SchoolId + "," + headerId + ",'" + clsGeneral.convertQuotes(txtStepName.Text.Trim()) + "',";
-                strQuery += "'" + clsGeneral.convertQuotes(txtStepDesc.Text.Trim()) + "'," + selectedText + ",'" + setIds + "','" +clsGeneral.convertQuotes(setNames) + "','A',";
+                strQuery += "'" + clsGeneral.convertQuotes(txtStepDesc.Text.Trim()) + "'," + selectedText + ",'" + setIds + "','" + clsGeneral.convertQuotes(setNames) + "','A',";
                 strQuery += "" + sess.LoginId + ",getdate())";
 
 
@@ -6139,7 +6207,12 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             strQuery += " Values(" + sess.SchoolId + "," + headerId + ",'" + clsGeneral.convertQuotes(txtStepName.Text.Trim()) + "','"
                                 + clsGeneral.convertQuotes(txtStepDesc.Text.Trim()) + "'," + Convert.ToInt32(CountryID_list[index]) + "," + parentStepId + ","
                                 + selectedText + ",'A'," + sess.LoginId + ",getdate())";
-                                stepId = objData.ExecuteWithScopeandConnection(strQuery, con, Transs);
+                            stepId = objData.ExecuteWithScopeandConnection(strQuery, con, Transs);
+                            if ((type == "Forward chain" || type == "Backward chain") && sortOrderCheck <= prevVerStep && Session["StepAdditionFlag"] != "true")
+                            {
+                                string strQurry = "UPDATE DSTempHdr SET crntstep = 0 WHERE DSTempHdrId = " + headerId;
+                                index = objData.ExecuteWithTrans(strQurry, con, Transs);
+                            }
                         }
 
                         catch (Exception Ex)
@@ -6206,8 +6279,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
                     }
                     ClearStepData();
-                    Session["StepAdditionFlag"] = "";
-                }
+                Session["StepAdditionFlag"] = "";
             }
             showMatchToSampleDrop();
             ddchkCountry.Focus();
@@ -8114,6 +8186,88 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         {
             headerId = Convert.ToInt32(ViewState["HeaderId"]);
         }
+        SqlTransaction Transs = null;
+        SqlConnection con = objData.Open();
+        string sqlStr = "SELECT ChainType FROM DSTempHdr where DSTempHdrId=" + headerId;
+        string type = objData.FetchValue(sqlStr).ToString();
+        if (type == "Forward chain" || type == "Backward chain")
+        {
+            DataTable dtCrntVer = objData.ReturnDataTable("SELECT CrntStep, CrntSet FROM DSTempHdr WHERE DSTempHdrId = " + headerId, false);
+            string prevVerSet = "";
+            int stepCount = 0;
+            int sortOrderCheck = 0;
+            string strQuery = "";
+            int resetSetId = Convert.ToInt32(objData.FetchValue(" SELECT DSTempSetId FROM DSTempSet WHERE DSTempHdrId = " + headerId + " AND SortOrder = 1 "));
+            if (dtCrntVer == null || dtCrntVer.Rows.Count == 0 || dtCrntVer.Rows[0]["CrntStep"] == DBNull.Value || dtCrntVer.Rows[0]["CrntSet"] == DBNull.Value)
+            {
+                int prevTempId = getPrevVersion();
+                if (prevTempId > 0)
+                {
+                    SqlDataReader reader = null;
+                    string strQry = " SELECT Hdr.SkillType, ISNULL(MAX(NextSetId),0) NextSetId,ISNULL(MAX(NextSetNmbr),0) NextSetNmbr " +
+                        " ,ISNULL(MAX(NextStepId),0)NextStepId,ISNULL(MAX(NextPromptId),0)NextPromptId" +
+                        " FROM DSTempHdr Hdr LEFT JOIN StdtDSStat Stat  ON Hdr.DSTempHdrId = Stat.DSTempHdrId " +
+                        " WHERE Hdr.DSTempHdrId= " + prevTempId + " GROUP BY Hdr.SkillType ";
+                    reader = oData_ov.ReturnDataReader(strQry, false);
+                    if (reader.Read())
+                    {
+                        //Session["iCurrentSetId"] = oData_ov.FetchValue("SELECT DSTempSetId FROM DSTempSet WHERE DSTempHdrId=" + NewTempId + " AND SetCd=(SELECT SetCd FROM DSTempSet WHERE DSTempHdrId=" + prevTempId + " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ") AND SetName=(SELECT SetName FROM DSTempSet WHERE DSTempHdrId=" + prevTempId + " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ")");
+                        string query1 = "SELECT DSTempSetId FROM DSTempSet " +
+                            "WHERE DSTempHdrId=" + headerId +
+                            " AND SetCd=(SELECT SetCd FROM DSTempSet WHERE DSTempHdrId=" + prevTempId +
+                            " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ") " +
+                            "AND SetName=(SELECT SetName FROM DSTempSet WHERE DSTempHdrId=" + prevTempId +
+                            " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ")";
+                        object result = oData_ov.FetchValue(query1);
+                        if (result != null && result != DBNull.Value)
+                        {
+                            Session["iCurrentSetId"] = result;
+                            if (Session["iCurrentSetId"] != null)
+                            prevVerSet = Session["iCurrentSetId"].ToString();
+                        }
+                        else
+                        {
+                            // If the first query returns no result, run the second query without SetName condition
+                            string query2 = "SELECT DSTempSetId FROM DSTempSet " +
+                                "WHERE DSTempHdrId=" + headerId +
+                                " AND SetCd=(SELECT SetCd FROM DSTempSet WHERE DSTempHdrId=" + prevTempId +
+                                " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ")";
+
+                            Session["iCurrentSetId"] = oData_ov.FetchValue(query2);
+
+                            if (Session["iCurrentSetId"] != null)
+                                prevVerSet = Session["iCurrentSetId"].ToString();
+                            else
+                            {
+                                string strQurry = "SELECT TOP 1 PrevSetId FROM DSTempSet WHERE DSTempSetId IN (" + editSetId + ") ORDER BY 1 DESC";
+                                object result2 = objData.FetchValue(strQurry);
+                                int prevVerSetId = (result2 == null || result2 == DBNull.Value) ? 0 : Convert.ToInt32(result2);
+                                if (prevVerSetId > 0)
+                                {
+                                    strQurry = "UPDATE DSTempHdr SET CrntSet = " + resetSetId + ", crntstep = 0 WHERE DSTempHdrId = " + headerId;
+                                    int indx = objData.ExecuteWithTrans(strQurry, con, Transs);
+                                }
+                            }
+                        }
+                    }
+
+                    if (prevVerSet !="" && editSetId == Convert.ToInt32(prevVerSet))
+                    {
+                        strQuery = "UPDATE DSTempHdr SET CrntSet = " + resetSetId + ", crntstep = 0 WHERE DSTempHdrId = " + headerId;
+                        int indx = objData.ExecuteWithTrans(strQuery, con, Transs);
+                    }
+                }
+            }
+            else
+            {
+                prevVerSet = dtCrntVer.Rows[0]["CrntSet"].ToString();
+                if (prevVerSet !="" && editSetId == Convert.ToInt32(prevVerSet))
+                {
+                    strQuery = "UPDATE DSTempHdr SET CrntSet = " + resetSetId + ", crntstep = 0 WHERE DSTempHdrId = " + headerId;
+                    int indx = objData.ExecuteWithTrans(strQuery, con, Transs);
+                }
+            }
+        }
 
         if (sess != null)
         {
@@ -8122,7 +8276,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             {
                 string[] arryMatchValue = new string[lstMatchSamples.Items.Count];
                 updateQuerry = "UPDATE DSTempSet SET Samples = '' WHERE DSTempSetId = " + editSetId;
-                int index = objData.Execute(updateQuerry);
+                int index = objData.ExecuteWithTrans(updateQuerry, con, Transs);
 
                 for (int i = 0; i < lstMatchSamples.Items.Count; i++)
                 {
@@ -8157,7 +8311,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             try
             {
                 updateQuerry = "UPDATE DSTempSet SET SetCd = '" + clsGeneral.convertQuotes(txtBoxAddSet.Text.Trim()) + "', SetName = '" + clsGeneral.convertQuotes(txtSetDescription.Text.Trim()) + "',Samples='" + clsGeneral.convertQuotes(setMatch.Trim()) + "',DistractorSamples='" + clsGeneral.convertQuotes(DistractorsetMatch.Trim()) + "', DistractorSamplesCount=" + DistractCount + ",ModifiedBy = " + sess.LoginId + ",ModifiedOn = GetDate()  WHERE DSTempSetId = " + editSetId;
-                int index = objData.Execute(updateQuerry);
+                int index = objData.ExecuteWithTrans(updateQuerry, con, Transs);
 
                 if (IsMatchToSample(headerId) == true)
                 {
@@ -8190,6 +8344,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 tdMsgSet.InnerHtml = clsGeneral.failedMsg("Insertion Failed! <br> '" + error + "' ");
                 postBackDetailsLogging(Ex, -1, -1);throw Ex;
             }
+            objData.CommitTransation(Transs, con);
         }
 
     }
@@ -8275,7 +8430,144 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 //    if (item != "")
                 // {
 
+                
+                int selectedText = 0;
+                if (chkEnd.Checked == true)
+                {
 
+                    string selQuery = "SELECT ISNULL(MAX(SortOrder),0) FROM DSTempParentStep WHERE DSTempHdrId = " + headerId + " AND ActiveInd = 'A'";
+                    objCount = objData.FetchValue(selQuery);
+                    selectedText = Convert.ToInt32(objCount) + 1;
+                }
+                else
+                {
+                    selectedText = Convert.ToInt32(ddlSortOrder.SelectedValue);
+                }
+                string sqlStr = "SELECT ChainType FROM DSTempHdr where DSTempHdrId=" + headerId;
+                string type = objData.FetchValue(sqlStr).ToString();
+                if (type == "Forward chain" || type == "Backward chain")
+                {
+                    DataTable dtCrntVer = objData.ReturnDataTable("SELECT CrntStep, CrntSet FROM DSTempHdr WHERE DSTempHdrId = " + headerId, false);
+                    string prevVerSet = "";
+                    int prevVerStep = 0;
+                    int stepCount = 0;
+                    int sortOrderCheck = 0;
+                if (dtCrntVer == null || dtCrntVer.Rows.Count == 0 || dtCrntVer.Rows[0]["CrntStep"] == DBNull.Value || dtCrntVer.Rows[0]["CrntSet"] == DBNull.Value)
+                {
+                    int prevTempId = getPrevVersion();
+                    if (prevTempId > 0)
+                    {
+                        SqlDataReader reader = null;
+                        string strQry = " SELECT Hdr.SkillType, ISNULL(MAX(NextSetId),0) NextSetId,ISNULL(MAX(NextSetNmbr),0) NextSetNmbr " +
+                            " ,ISNULL(MAX(NextStepId),0)NextStepId,ISNULL(MAX(NextPromptId),0)NextPromptId" +
+                            " FROM DSTempHdr Hdr LEFT JOIN StdtDSStat Stat  ON Hdr.DSTempHdrId = Stat.DSTempHdrId " +
+                            " WHERE Hdr.DSTempHdrId= " + prevTempId + " GROUP BY Hdr.SkillType ";
+                        reader = oData_ov.ReturnDataReader(strQry, false);
+                        if (reader.Read())
+                        {
+                            //Session["iCurrentSetId"] = oData_ov.FetchValue("SELECT DSTempSetId FROM DSTempSet WHERE DSTempHdrId=" + NewTempId + " AND SetCd=(SELECT SetCd FROM DSTempSet WHERE DSTempHdrId=" + prevTempId + " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ") AND SetName=(SELECT SetName FROM DSTempSet WHERE DSTempHdrId=" + prevTempId + " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ")");
+                            string query1 = "SELECT DSTempSetId FROM DSTempSet " +
+                                "WHERE DSTempHdrId=" + headerId +
+                                " AND SetCd=(SELECT SetCd FROM DSTempSet WHERE DSTempHdrId=" + prevTempId +
+                                " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ") " +
+                                "AND SetName=(SELECT SetName FROM DSTempSet WHERE DSTempHdrId=" + prevTempId +
+                                " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ")";
+                            object result = oData_ov.FetchValue(query1);
+                            if (result != null && result != DBNull.Value)
+                            {
+                                Session["iCurrentSetId"] = result;
+                                    if (Session["iCurrentSetId"] != null)
+                                prevVerSet = Session["iCurrentSetId"].ToString();
+                            }
+                            else
+                            {
+                                // If the first query returns no result, run the second query without SetName condition
+                                string query2 = "SELECT DSTempSetId FROM DSTempSet " +
+                                    "WHERE DSTempHdrId=" + headerId +
+                                    " AND SetCd=(SELECT SetCd FROM DSTempSet WHERE DSTempHdrId=" + prevTempId +
+                                    " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ")";
+
+                                Session["iCurrentSetId"] = oData_ov.FetchValue(query2);
+
+                                if (Session["iCurrentSetId"] != null)
+                                    prevVerSet = Session["iCurrentSetId"].ToString();
+                                else
+                                {
+                                    string setIdsQry = setIds;
+                                    if (setIds.EndsWith(","))
+                                    {
+                                        setIdsQry = setIds.Substring(0, setIds.Length - 1);
+                                    }
+                                    strQurry = "SELECT TOP 1 PrevSetId FROM DSTempSet WHERE DSTempSetId IN (" + setIdsQry + ") ORDER BY 1 DESC";
+                                    object result2 = objData.FetchValue(strQurry);
+                                    int prevVerSetId = (result2 == null || result2 == DBNull.Value) ? 0 : Convert.ToInt32(result2);
+                                    if (prevVerSetId > 0)
+                                    {
+                                        strQurry = "UPDATE DSTempHdr SET crntstep = 0 WHERE DSTempHdrId = " + headerId;
+                                        int indx = objData.ExecuteWithTrans(strQurry, con, Transs);
+                                        Session["StepAdditionFlag"] = "true";
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            prevVerSet = "-1";
+                            prevVerStep = -1;
+                            Session["StepAdditionFlag"] = "true";
+                        }
+
+                            if (prevVerSet != "" && setIds.Contains(prevVerSet))
+                        {
+                            prevVerStep = Convert.ToInt32(objData.FetchValue("SELECT NextStepId from StdtDSStat  where DSTempHdrId =" + prevTempId));
+                            strQurry = "SELECT  COUNT(*) FROM DSTempStep WHERE DSTempHdrId = " + headerId + "  AND DSTempSetId= " + prevVerSet + " AND ActiveInd = 'A' GROUP BY DSTempSetid ORDER BY 1 DESC";
+                            stepCount = Convert.ToInt32(objData.FetchValue(strQurry));
+                            if (chkEnd.Checked == true)
+                                sortOrderCheck = stepCount + 1;
+                            else if (prevVerSet != "")
+                            {
+                                strQurry = "SELECT COUNT(*) FROM DSTempStep WHERE DSTempSetId = " + prevVerSet + " and DSTempHdrId = " + headerId + " AND SortOrder < " + selectedText + " AND ActiveInd = 'A'";
+                                sortOrderCheck = Convert.ToInt32(objData.FetchValue(strQurry)) + 1;
+                            }
+                            if (type == "Backward chain")
+                                sortOrderCheck = stepCount - sortOrderCheck + 2;
+                        }
+                        else
+                            Session["StepAdditionFlag"] = "true";
+                    }
+                    else
+                        Session["StepAdditionFlag"] = "true";
+                }
+                else
+                {
+                    prevVerSet = dtCrntVer.Rows[0]["CrntSet"].ToString();
+                        if (prevVerSet != "" && setIds.Contains(prevVerSet))
+                    {
+                        prevVerStep = Convert.ToInt32(dtCrntVer.Rows[0]["CrntStep"]);
+                        strQurry = "SELECT  COUNT(*) FROM DSTempStep WHERE DSTempHdrId = " + headerId + "  AND DSTempSetId= " + prevVerSet + " AND ActiveInd = 'A' GROUP BY DSTempSetid ORDER BY 1 DESC";
+                        stepCount = Convert.ToInt32(objData.FetchValue(strQurry));
+                        if (chkEnd.Checked == true)
+                            sortOrderCheck = stepCount + 1;
+                        else if (prevVerSet != "")
+                        {
+                            strQurry = "SELECT COUNT(*) FROM DSTempStep WHERE DSTempSetId = " + prevVerSet + " and DSTempHdrId = " + headerId + " AND SortOrder < " + selectedText + " AND ActiveInd = 'A'";
+                            sortOrderCheck = Convert.ToInt32(objData.FetchValue(strQurry)) + 1;
+                        }
+                        if (type == "Backward chain")
+                            sortOrderCheck = stepCount - sortOrderCheck + 2;
+                    }
+                    else
+                        Session["StepAdditionFlag"] = "true";
+                }
+
+                if ((type == "Forward chain" || type == "Backward chain") && sortOrderCheck <= prevVerStep && Session["StepAdditionFlag"] != "true")
+                {
+                    strQurry = "UPDATE DSTempHdr SET crntstep = 0 WHERE DSTempHdrId = " + headerId;
+                    int indx = objData.ExecuteWithTrans(strQurry, con, Transs);
+                    Session["StepAdditionFlag"] = "true";
+                }
+                }
+                
                 /// SELECT THE CURRENT AND NEW SORTORDER
                 /// 
                 strQurry = "SELECT SortOrder FROM DSTempParentStep WHERE DSTempParentStepId=" + editStepId + "AND ActiveInd = 'A'";
@@ -8952,7 +9244,90 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
             //    }
             //}
+            SqlTransaction Transs = null;
+            SqlConnection con = objData.Open();
+            string sqlStr = "SELECT ChainType FROM DSTempHdr where DSTempHdrId=" + headerId;
+            string type = objData.FetchValue(sqlStr).ToString();
+            if (type == "Forward chain" || type == "Backward chain")
+            {
+                DataTable dtCrntVer = objData.ReturnDataTable("SELECT CrntStep, CrntSet FROM DSTempHdr WHERE DSTempHdrId = " + headerId, false);
+                string prevVerSet = "";
+                int stepCount = 0;
+                int sortOrderCheck = 0;
+                string strQuery = "";
+                int resetSetId = Convert.ToInt32(objData.FetchValue(" SELECT DSTempSetId FROM DSTempSet WHERE DSTempHdrId = " + headerId + " AND SortOrder = 1 "));
+                if (dtCrntVer == null || dtCrntVer.Rows.Count == 0 || dtCrntVer.Rows[0]["CrntStep"] == DBNull.Value || dtCrntVer.Rows[0]["CrntSet"] == DBNull.Value)
+                {
+                    int prevTempId = getPrevVersion();
+                    if (prevTempId > 0)
+                    {
+                        SqlDataReader reader = null;
+                        string strQry = " SELECT Hdr.SkillType, ISNULL(MAX(NextSetId),0) NextSetId,ISNULL(MAX(NextSetNmbr),0) NextSetNmbr " +
+                            " ,ISNULL(MAX(NextStepId),0)NextStepId,ISNULL(MAX(NextPromptId),0)NextPromptId" +
+                            " FROM DSTempHdr Hdr LEFT JOIN StdtDSStat Stat  ON Hdr.DSTempHdrId = Stat.DSTempHdrId " +
+                            " WHERE Hdr.DSTempHdrId= " + prevTempId + " GROUP BY Hdr.SkillType ";
+                        reader = oData_ov.ReturnDataReader(strQry, false);
+                        if (reader.Read())
+                        {
+                            //Session["iCurrentSetId"] = oData_ov.FetchValue("SELECT DSTempSetId FROM DSTempSet WHERE DSTempHdrId=" + NewTempId + " AND SetCd=(SELECT SetCd FROM DSTempSet WHERE DSTempHdrId=" + prevTempId + " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ") AND SetName=(SELECT SetName FROM DSTempSet WHERE DSTempHdrId=" + prevTempId + " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ")");
+                            string query1 = "SELECT DSTempSetId FROM DSTempSet " +
+                                "WHERE DSTempHdrId=" + headerId +
+                                " AND SetCd=(SELECT SetCd FROM DSTempSet WHERE DSTempHdrId=" + prevTempId +
+                                " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ") " +
+                                "AND SetName=(SELECT SetName FROM DSTempSet WHERE DSTempHdrId=" + prevTempId +
+                                " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ")";
+                            object result = oData_ov.FetchValue(query1);
+                            if (result != null && result != DBNull.Value)
+                            {
+                                Session["iCurrentSetId"] = result;
+                                if (Session["iCurrentSetId"] != null)
+                                prevVerSet = Session["iCurrentSetId"].ToString();
+                            }
+                            else
+                            {
+                                // If the first query returns no result, run the second query without SetName condition
+                                string query2 = "SELECT DSTempSetId FROM DSTempSet " +
+                                    "WHERE DSTempHdrId=" + headerId +
+                                    " AND SetCd=(SELECT SetCd FROM DSTempSet WHERE DSTempHdrId=" + prevTempId +
+                                    " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ")";
 
+                                Session["iCurrentSetId"] = oData_ov.FetchValue(query2);
+
+                                if (Session["iCurrentSetId"] != null)
+                                    prevVerSet = Session["iCurrentSetId"].ToString();
+                                else
+                                {
+                                    string strQurry = "SELECT TOP 1 PrevSetId FROM DSTempSet WHERE DSTempSetId IN (" + setId + ") ORDER BY 1 DESC";
+                                    object result2 = objData.FetchValue(strQurry);
+                                    int prevVerSetId = (result2 == null || result2 == DBNull.Value) ? 0 : Convert.ToInt32(result2);
+                                    if (prevVerSetId > 0)
+                                    {
+                                        strQurry = "UPDATE DSTempHdr SET CrntSet = " + resetSetId + ", crntstep = 0 WHERE DSTempHdrId = " + headerId;
+                                        int indx = objData.ExecuteWithTrans(strQurry, con, Transs);
+                                    }
+                                }
+                            }
+                        }
+
+                        if (prevVerSet != "" && setId == Convert.ToInt32(prevVerSet))
+                        {
+                            strQuery = "UPDATE DSTempHdr SET CrntSet = " + resetSetId + ", crntstep = 0 WHERE DSTempHdrId = " + headerId;
+                            int indx = objData.ExecuteWithTrans(strQuery, con, Transs);
+                        }
+                    }
+                }
+                else
+                {
+                    prevVerSet = dtCrntVer.Rows[0]["CrntSet"].ToString();
+                    if (prevVerSet !="" && setId == Convert.ToInt32(prevVerSet))
+                    {
+                        strQuery = "UPDATE DSTempHdr SET CrntSet = " + resetSetId + ", crntstep = 0 WHERE DSTempHdrId = " + headerId;
+                        int indx = objData.ExecuteWithTrans(strQuery, con, Transs);
+                    }
+                }
+            }
+            objData.CommitTransation(Transs, con);
+            
             clsAssignLessonPlan ObjDeleteLP = new clsAssignLessonPlan();
             ObjDeleteLP.Delete_Reorder_setStep(setId, "set");
             fillParentSetData();
@@ -9006,14 +9381,19 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 currentSortOrder = Convert.ToInt32(dtCurrVer.Rows[0]["SortOrder"]);
                 setIds = dtCurrVer.Rows[0]["setIds"].ToString();
             }
+            string sqlStr = "SELECT ChainType FROM DSTempHdr where DSTempHdrId=" + headerId;
+                string type = objData.FetchValue(sqlStr).ToString();
+                if (type == "Forward chain" || type == "Backward chain")
+                {
             DataTable dtCrntVer = objData.ReturnDataTable("SELECT CrntStep, CrntSet FROM DSTempHdr WHERE DSTempHdrId = " + headerId, false);
             int prevVerStep = 0;
             string prevVerSet = "";
             int stepCount = 0;
-            string sqlStr = "SELECT ChainType FROM DSTempHdr where DSTempHdrId=" + headerId;
-            string type = objData.FetchValue(sqlStr).ToString();
             int sortOrderCheck = 0;
-
+            clsData.blnTrans = true;
+            Transs = con.BeginTransaction();
+            Session["StepDeleteFlag"] = "false";
+                    int resetSetId = Convert.ToInt32(objData.FetchValue(" SELECT DSTempSetId FROM DSTempSet WHERE DSTempHdrId = " + headerId + " AND SortOrder = 1 "));
             if (dtCrntVer == null || dtCrntVer.Rows.Count == 0 || dtCrntVer.Rows[0]["CrntStep"] == DBNull.Value || dtCrntVer.Rows[0]["CrntSet"] == DBNull.Value)
             {
                 int prevTempId = getPrevVersion();
@@ -9048,9 +9428,26 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                 " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ")";
 
                             Session["iCurrentSetId"] = oData_ov.FetchValue(query2);
+                                    if (Session["iCurrentSetId"] != null)
+                                        prevVerSet = Session["iCurrentSetId"].ToString();
+                                    else
+                            {
+                                        string setIdsQry = setIds;
+                                        if (setIds.EndsWith(","))
+                                        {
+                                            setIdsQry = setIds.Substring(0, setIds.Length - 1);
+                                        }
+                                        strQurry = "SELECT TOP 1 PrevSetId FROM DSTempSet WHERE DSTempSetId IN (" + setIdsQry + ") ORDER BY 1 DESC";
+                                        object result2 = objData.FetchValue(strQurry);
+                                        int prevVerSetId = (result2 == null || result2 == DBNull.Value) ? 0 : Convert.ToInt32(result2);
+                                        if (prevVerSetId > 0)
+                                        {
+                                            strQurry = "UPDATE DSTempHdr SET CrntSet = " + resetSetId + ", crntstep = 0 WHERE DSTempHdrId = " + headerId;
+                                int indx = objData.ExecuteWithTrans(strQurry, con, Transs);
+                            }
                         }
-                        prevVerSet = Session["iCurrentSetId"].ToString();
                     }
+                            }
                     else
                     {
                         prevVerSet = "-1";
@@ -9058,7 +9455,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         Session["StepDeleteFlag"] = "true";
                     }
 
-                    if (setIds.Contains(prevVerSet))
+                            if (prevVerSet != "" && setIds.Contains(prevVerSet))
                     {
                         prevVerStep = Convert.ToInt32(objData.FetchValue("SELECT NextStepId from StdtDSStat  where DSTempHdrId =" + prevTempId));
                         strQurry = "SELECT  COUNT(*) FROM DSTempStep WHERE DSTempHdrId = " + headerId + "  AND DSTempSetId= " + prevVerSet + " AND ActiveInd = 'A' GROUP BY DSTempSetid ORDER BY 1 DESC";
@@ -9077,7 +9474,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             else
             {
                 prevVerSet = dtCrntVer.Rows[0]["CrntSet"].ToString();
-                if (setIds.Contains(prevVerSet))
+                        if (prevVerSet != "" && setIds.Contains(prevVerSet))
                 {
                     prevVerStep = Convert.ToInt32(dtCrntVer.Rows[0]["CrntStep"]);
                     strQurry = "SELECT  COUNT(*) FROM DSTempStep WHERE DSTempHdrId = " + headerId + "  AND DSTempSetId= " + prevVerSet + " AND ActiveInd = 'A' GROUP BY DSTempSetid ORDER BY 1 DESC";
@@ -9091,78 +9488,82 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     Session["StepDeleteFlag"] = "true";
 
             }
-            if ((type == "Forward chain" || type == "Backward chain") && sortOrderCheck == prevVerStep && Session["StepDeleteFlag"] != "true")
+            if ((type == "Forward chain" || type == "Backward chain") && sortOrderCheck <= prevVerStep && Session["StepDeleteFlag"] != "true")
             {
+                strQurry = "UPDATE DSTempHdr SET crntstep = 0 WHERE DSTempHdrId = " + headerId;
+                int indx = objData.ExecuteWithTrans(strQurry, con, Transs);
                 Session["StepDeleteFlag"] = "true";
-                string msg = "You are deleting the active step of the previous version. The next available step will be selected automatically. Do you want to proceed?";
-                msg = System.Web.HttpUtility.JavaScriptStringEncode(msg);
+                //string msg = "You are deleting the active step of the previous version. The next available step will be selected automatically. Do you want to proceed?";
+                //msg = System.Web.HttpUtility.JavaScriptStringEncode(msg);
 
-                string script = string.Format(
-                    "if (confirm('{0}')) {{ $('.loading').css('display', 'block'); __doPostBack('ForceDeleteStep', ''); }}",
-                    msg
-                );
+                //string script = string.Format(
+                //    "if (confirm('{0}')) {{ $('.loading').css('display', 'block'); __doPostBack('ForceDeleteStep', ''); }}",
+                //    msg
+                //);
 
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "stepremovescript", script, true);
-                return;
+                //ScriptManager.RegisterStartupScript(this, this.GetType(), "stepremovescript", script, true);
+                //return;
             }
-            else if ((type == "Forward chain" || type == "Backward chain") && sortOrderCheck < prevVerStep && Session["StepDeleteFlag"] != "true")
-            {
-                Session["StepDeleteFlag"] = "true";
-                string msg = "Deleting this step will alter the active step of the lesson. Do you want to proceed?";
-                msg = System.Web.HttpUtility.JavaScriptStringEncode(msg);
-
-                string script = string.Format(
-                    "if (confirm('{0}')) {{ $('.loading').css('display', 'block'); __doPostBack('ForceDeleteStep', ''); }}",
-                    msg
-                );
-
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "stepremovescript", script, true);
-                return; 
-            }
-            else
-            {
-                BtnAddStep_Click(sender, e); // To Hide Update Button on Edit - Update is in Progress -- Dev 2 [10-Jul-2020]
-
-                strQurry = "SELECT  DSTempParentStepId,SortOrder FROM DSTempParentStep"
-                          + " WHERE DSTempHdrId = " + headerId + " And ActiveInd = 'A' AND SortOrder >" + currentSortOrder;
-                DataTable dtList = objData.ReturnDataTable(strQurry, false);
-
-                clsData.blnTrans = true;
-                Transs = con.BeginTransaction();
-
-                /// DELETE STEPS FROM ALL SETS IN DSTEMPSTEP TABLE
-                /// 
-                strQurry = "DELETE FROM DSTempStep WHERE DSTempParentStepId= " + stepId;
-                int index = objData.ExecuteWithTrans(strQurry, con, Transs);
-
-                /// DELETE STEP FROM THE PARENT TABLE IE. DSTEMPPARENTSTEP
-                /// 
-                strQurry = "UPDATE DSTempParentStep SET ActiveInd = 'D' WHERE DSTempParentStepId = " + stepId;
-                index = objData.ExecuteWithTrans(strQurry, con, Transs);
-
-                /// REORDER PARENTSTEP TABLE
-                /// 
-                if ((type == "Forward chain" || type == "Backward chain") && Session["StepDeleteFlag"] != null && Session["StepDeleteFlag"].ToString() == "true")
-                {
-                    strQurry = "SELECT top 1 COUNT(*) FROM DSTempStep WHERE DSTempHdrId = " + headerId + "  AND ActiveInd = 'A' GROUP BY DSTempSetid ORDER BY 1 DESC";
-                    int updatedStepCount = Convert.ToInt32(objData.FetchValueTrans(strQurry, Transs, con));
-                    int crntstepVal = prevVerStep > updatedStepCount ? updatedStepCount : prevVerStep;
-                    if(prevVerSet == "")
-                        strQurry = "UPDATE DSTempHdr SET CrntStep = " + crntstepVal + " WHERE DSTempHdrId = " + headerId;
-                    else if (setIds.Contains(prevVerSet))
-                    {
-                        strQurry = "UPDATE DSTempHdr SET CrntStep = " + crntstepVal + " , CrntSet = " + prevVerSet + " WHERE DSTempHdrId = " + headerId;
-                        index = objData.ExecuteWithTrans(strQurry, con, Transs);
-                    }
                 }
-                if ((type == "Forward chain" || type == "Backward chain") && stepCount == 1 && setIds.Contains(prevVerSet))
-                {
-                    strQurry = "UPDATE DSTempHdr SET crntstep = 0 WHERE DSTempHdrId = " + headerId;
-                    index = objData.ExecuteWithTrans(strQurry, con, Transs);
-                }
-                Session["StepDeleteFlag"] = "";
+            //else if ((type == "Forward chain" || type == "Backward chain") && sortOrderCheck < prevVerStep && Session["StepDeleteFlag"] != "true")
+            //{
+            //    strQurry = "UPDATE DSTempHdr SET crntstep = 0 WHERE DSTempHdrId = " + headerId;
+            //    int indx = objData.ExecuteWithTrans(strQurry, con, Transs);
+            //    Session["StepDeleteFlag"] = "true";
+            //    //string msg = "Deleting this step will alter the active step of the lesson. Do you want to proceed?";
+            //    //msg = System.Web.HttpUtility.JavaScriptStringEncode(msg);
 
-                for (int i = 0; i < dtList.Rows.Count; i++)
+            //    //string script = string.Format(
+            //    //    "if (confirm('{0}')) {{ $('.loading').css('display', 'block'); __doPostBack('ForceDeleteStep', ''); }}",
+            //    //    msg
+            //    //);
+
+            //    //ScriptManager.RegisterStartupScript(this, this.GetType(), "stepremovescript", script, true);
+            //    //return;
+            //}
+
+
+            BtnAddStep_Click(sender, e); // To Hide Update Button on Edit - Update is in Progress -- Dev 2 [10-Jul-2020]
+
+            strQurry = "SELECT  DSTempParentStepId,SortOrder FROM DSTempParentStep"
+                      + " WHERE DSTempHdrId = " + headerId + " And ActiveInd = 'A' AND SortOrder >" + currentSortOrder;
+            DataTable dtList = objData.ReturnDataTable(strQurry, false);
+
+
+
+            /// DELETE STEPS FROM ALL SETS IN DSTEMPSTEP TABLE
+            /// 
+            strQurry = "DELETE FROM DSTempStep WHERE DSTempParentStepId= " + stepId;
+            int index = objData.ExecuteWithTrans(strQurry, con, Transs);
+
+            /// DELETE STEP FROM THE PARENT TABLE IE. DSTEMPPARENTSTEP
+            /// 
+            strQurry = "UPDATE DSTempParentStep SET ActiveInd = 'D' WHERE DSTempParentStepId = " + stepId;
+            index = objData.ExecuteWithTrans(strQurry, con, Transs);
+
+            /// REORDER PARENTSTEP TABLE
+            /// 
+            //if ((type == "Forward chain" || type == "Backward chain") && Session["StepDeleteFlag"] != null && Session["StepDeleteFlag"].ToString() == "true")
+            //{
+            //    strQurry = "SELECT top 1 COUNT(*) FROM DSTempStep WHERE DSTempHdrId = " + headerId + "  AND ActiveInd = 'A' GROUP BY DSTempSetid ORDER BY 1 DESC";
+            //    int updatedStepCount = Convert.ToInt32(objData.FetchValueTrans(strQurry, Transs, con));
+            //    int crntstepVal = prevVerStep > updatedStepCount ? updatedStepCount : prevVerStep;
+            //    if (prevVerSet == "")
+            //        strQurry = "UPDATE DSTempHdr SET CrntStep = " + crntstepVal + " WHERE DSTempHdrId = " + headerId;
+            //    else if (prevVerSet != "" && setIds.Contains(prevVerSet))
+            //    {
+            //        strQurry = "UPDATE DSTempHdr SET CrntStep = " + crntstepVal + " , CrntSet = " + prevVerSet + " WHERE DSTempHdrId = " + headerId;
+            //        index = objData.ExecuteWithTrans(strQurry, con, Transs);
+            //    }
+            //}
+            //if ((type == "Forward chain" || type == "Backward chain") && stepCount == 1 && prevVerSet != "" && setIds.Contains(prevVerSet))
+            //{
+            //    strQurry = "UPDATE DSTempHdr SET crntstep = 0 WHERE DSTempHdrId = " + headerId;
+            //    index = objData.ExecuteWithTrans(strQurry, con, Transs);
+            //}
+            //Session["StepDeleteFlag"] = "";
+
+            for (int i = 0; i < dtList.Rows.Count; i++)
                 {
                 int sortOderToChange = Convert.ToInt32(dtList.Rows[i]["SortOrder"].ToString()) - 1;
                 strQurry = "UPDATE DSTempParentStep SET SortOrder = " + sortOderToChange + " WHERE ActiveInd='A' AND DSTempParentStepId = " + Convert.ToInt32(dtList.Rows[i]["DSTempParentStepId"].ToString());
@@ -9235,8 +9636,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
 
             GetStepData(headerId);
-                ddchkCountry.Focus();
-            }
+            ddchkCountry.Focus();
         }
         catch (Exception Ex)
         {
@@ -13493,6 +13893,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         bool validSet = false;
         bool flag1 = true;
         bool validStep = false;
+        bool validallStep = false;
         int setCriteria = 0;
         int stepCriteria = 0;
         object objTeach = null;
@@ -13887,6 +14288,16 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
                     if (skilltype == "Chained")
                     {
+
+                        validallStep = StepallValidation(TemplateId);
+                        if (validallStep == false)
+                        {
+                            tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting..Steps are missing.");
+                            alertmsg = "Please complete template details before submitting..Steps are missing.";
+                            FillTypeOfInstruction(TemplateId);
+                            ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
+                            return;
+                        }
 
                         string strQrystepTot = "SELECT Count(DSTempParentStepId) from DSTempParentStep where DSTempHdrId=" + TemplateId + "  and ActiveInd='A'";
                         int dtCheckstepTot = Convert.ToInt32(objData.FetchValue(strQrystepTot));
@@ -14317,7 +14728,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     else
                     {
                         validSet = SetValidation(TemplateId);
-                        validStep = StepValidation(TemplateId);
+                        validStep = StepallValidation(TemplateId);
 
                         if (skilltype == "Chained")
                         {
@@ -14397,6 +14808,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         int length = 0;
         bool validSet = false;
         bool validStep = false;
+        bool validallStep = false;
         int setCriteria = 0;
         int stepCriteria = 0;
         object objTeach = null;
@@ -14688,6 +15100,16 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
                 if (skilltype == "Chained")
                     {
+
+                        validallStep = StepallValidation(TemplateId);
+                        if (validallStep == false)
+                        {
+                            previewSuccess = false;
+                            tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting..Steps are missing.");
+                            FillTypeOfInstruction(TemplateId);
+                            return;
+                        }
+
                         string strQrystepTot = "SELECT Count(DSTempParentStepId) from DSTempParentStep where DSTempHdrId=" + TemplateId + "  and ActiveInd='A'";
                         int dtCheckstepTot = Convert.ToInt32(objData.FetchValue(strQrystepTot));
                         if (dtCheckstepTot > 0)
@@ -15118,7 +15540,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 else
                 {
                     validSet = SetValidation(TemplateId);
-                    validStep = StepValidation(TemplateId);
+                    validStep = StepallValidation(TemplateId);
 
                     if (skilltype == "Chained")
                     {
@@ -15269,6 +15691,48 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
 
 
+    }
+
+    private bool StepallValidation(int templateId)
+    {
+        int countStep = 0;
+        object objVal = null;
+        string selQuerry = "";
+        string checkstep = "true";
+        int setid=0;
+        selQuerry = "SELECT Dstempsetid From Dstempset WHERE DSTempHdrId = " + templateId + " AND ActiveInd = 'A'";
+        DataTable dtList = objData.ReturnDataTable(selQuerry, false);
+        if (dtList != null)
+        {
+            if (dtList.Rows.Count > 0)
+            {
+                foreach (DataRow dr in dtList.Rows)
+                {
+                    setid = Convert.ToInt32(dr["Dstempsetid"]);
+                    selQuerry = "SELECT COUNT(DSTempStepId) FROM DSTempStep WHERE DSTempHdrId = " + templateId + " AND Dstempsetid = " + setid + " AND  ActiveInd = 'A' AND IsDynamic=0 AND DSTempParentStepId IS NOT NULL";
+                    objVal = objData.FetchValue(selQuerry);
+                    if (objVal != null)
+                    {
+                        countStep = Convert.ToInt32(objVal);
+                    }
+                    if (countStep <= 0)
+                    {
+                        checkstep = "false";
+                    }                   
+
+                }
+            }
+            
+        }
+        if (checkstep == "false")
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+        
     }
 
     private bool StepValidation(int templateId)
@@ -15628,7 +16092,6 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     VisibleApprovalNote();
                     ResetIOAStatus(TemplateId);
                     tdReadMsg.InnerHtml = clsGeneral.sucessMsg("Template Editor Successfully Go To Maintenance Mode...");
-
                 }
                 catch (Exception Ex)
                 {
@@ -15727,8 +16190,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         FillInactiveLessonData();
                         VisibleApprovalNotes(false);
                         VisibleApprovalNote();
-                        tdReadMsg.InnerHtml = clsGeneral.sucessMsg("Template Editor Successfully Approved....");
 
+                        tdReadMsg.InnerHtml = clsGeneral.sucessMsg("Template Editor Successfully Approved....");
                     }
                     catch (Exception Ex)
                     {
@@ -16369,8 +16832,99 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             int setId = Convert.ToInt32(btnUp.CommandArgument);
             string Query = "SELECT SortOrder FROM DSTempSet WHERE DSTempSetId='" + setId + "'";
             int SortOrder = Convert.ToInt32(objData.FetchValue(Query));
+            int headerId = 0;
+            if (ViewState["HeaderId"] != null)
+            {
+                headerId = Convert.ToInt32(ViewState["HeaderId"]);
+            }
+            
             if (SortOrder != 1)
             {
+                Query = "SELECT DSTempSetId FROM DSTempSet WHERE DSTempHdrId=" + headerId + " AND SortOrder = " + (SortOrder - 1).ToString();
+                object resultSO = objData.FetchValue(Query);
+                int upperSetId = (resultSO == null || resultSO == DBNull.Value) ? 0 : Convert.ToInt32(resultSO);
+                SqlTransaction Transs = null;
+                SqlConnection con = objData.Open();
+
+                string sqlStr = "SELECT ChainType FROM DSTempHdr where DSTempHdrId=" + headerId;
+                string type = objData.FetchValue(sqlStr).ToString();
+                if (type == "Forward chain" || type == "Backward chain")
+                {
+                    string prevVerSet = "";
+                    int stepCount = 0;
+                    int sortOrderCheck = 0;
+                    string strQuery = "";
+                    DataTable dtCrntVer = objData.ReturnDataTable("SELECT CrntStep, CrntSet FROM DSTempHdr WHERE DSTempHdrId = " + headerId, false);
+                    int resetSortOrder = SortOrder == 2 ? 2 : 1;
+                    int resetSetId = Convert.ToInt32(objData.FetchValue(" SELECT DSTempSetId FROM DSTempSet WHERE DSTempHdrId = " + headerId + " AND SortOrder = " + resetSortOrder));
+                    if (dtCrntVer == null || dtCrntVer.Rows.Count == 0 || dtCrntVer.Rows[0]["CrntStep"] == DBNull.Value || dtCrntVer.Rows[0]["CrntSet"] == DBNull.Value)
+                    {
+                        int prevTempId = getPrevVersion();
+                        if (prevTempId > 0)
+                        {
+                            SqlDataReader reader = null;
+                            string strQry = " SELECT Hdr.SkillType, ISNULL(MAX(NextSetId),0) NextSetId,ISNULL(MAX(NextSetNmbr),0) NextSetNmbr " +
+                                " ,ISNULL(MAX(NextStepId),0)NextStepId,ISNULL(MAX(NextPromptId),0)NextPromptId" +
+                                " FROM DSTempHdr Hdr LEFT JOIN StdtDSStat Stat  ON Hdr.DSTempHdrId = Stat.DSTempHdrId " +
+                                " WHERE Hdr.DSTempHdrId= " + prevTempId + " GROUP BY Hdr.SkillType ";
+                            reader = oData_ov.ReturnDataReader(strQry, false);
+                            if (reader.Read())
+                            {
+                                //Session["iCurrentSetId"] = oData_ov.FetchValue("SELECT DSTempSetId FROM DSTempSet WHERE DSTempHdrId=" + NewTempId + " AND SetCd=(SELECT SetCd FROM DSTempSet WHERE DSTempHdrId=" + prevTempId + " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ") AND SetName=(SELECT SetName FROM DSTempSet WHERE DSTempHdrId=" + prevTempId + " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ")");
+                                string query1 = "SELECT DSTempSetId FROM DSTempSet " +
+                                    "WHERE DSTempHdrId=" + headerId +
+                                    " AND SetCd=(SELECT SetCd FROM DSTempSet WHERE DSTempHdrId=" + prevTempId +
+                                    " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ") " +
+                                    "AND SetName=(SELECT SetName FROM DSTempSet WHERE DSTempHdrId=" + prevTempId +
+                                    " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ")";
+                                object result = oData_ov.FetchValue(query1);
+                                if (result != null && result != DBNull.Value)
+                                {
+                                    Session["iCurrentSetId"] = result;
+                                    prevVerSet = Session["iCurrentSetId"].ToString();
+                                }
+                                else
+                                {
+                                    // If the first query returns no result, run the second query without SetName condition
+                                    string query2 = "SELECT DSTempSetId FROM DSTempSet " +
+                                        "WHERE DSTempHdrId=" + headerId +
+                                        " AND SetCd=(SELECT SetCd FROM DSTempSet WHERE DSTempHdrId=" + prevTempId +
+                                        " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ")";
+
+                                    Session["iCurrentSetId"] = oData_ov.FetchValue(query2);
+
+                                    if (Session["iCurrentSetId"] != null)
+                                        prevVerSet = Session["iCurrentSetId"].ToString();
+                                    else
+                                    {
+                                        string strQurry = "SELECT TOP 1 PrevSetId FROM DSTempSet WHERE DSTempSetId IN (" + setId + ") ORDER BY 1 DESC";
+                                        object result2 = objData.FetchValue(strQurry);
+                                        int prevVerSetId = (result2 == null || result2 == DBNull.Value) ? 0 : Convert.ToInt32(result2);
+                                        if (prevVerSetId > 0)
+                                        {
+                                            strQurry = "UPDATE DSTempHdr SET CrntSet = " + resetSetId + ", crntstep = 0 WHERE DSTempHdrId = " + headerId;
+                                            int indx = objData.ExecuteWithTrans(strQurry, con, Transs);
+                                        }
+                                    }
+                                }
+                            }
+                            if (prevVerSet != "" && (setId == Convert.ToInt32(prevVerSet) || upperSetId == Convert.ToInt32(prevVerSet)))
+                            {
+                                strQuery = "UPDATE DSTempHdr SET CrntSet = " + resetSetId + ", crntstep = 0 WHERE DSTempHdrId = " + headerId;
+                                int indx = objData.ExecuteWithTrans(strQuery, con, Transs);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        prevVerSet = dtCrntVer.Rows[0]["CrntSet"].ToString();
+                        if (prevVerSet != "" && (setId == Convert.ToInt32(prevVerSet) || upperSetId == Convert.ToInt32(prevVerSet)))
+                        {
+                            strQuery = "UPDATE DSTempHdr SET CrntSet = " + resetSetId + ", crntstep = 0 WHERE DSTempHdrId = " + headerId;
+                            int indx = objData.ExecuteWithTrans(strQuery, con, Transs);
+                        }
+                    }
+                }
                 DataTable OldSortOrder = objData.ReturnDataTable("SELECT DSTempSetId,SortOrder FROM DSTempSet WHERE [DSTempHdrId]=(SELECT DSTempHdrId FROM DSTempSet WHERE DSTempSetId='" + setId + "') AND [ActiveInd]='A' ORDER BY SortOrder DESC ", false);
                 if (OldSortOrder != null)
                 {
@@ -16381,9 +16935,9 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             if (i == Convert.ToInt32(row["SortOrder"].ToString()))
                             {
                                 string Update = "UPDATE DSTempSet SET SortOrder='" + i + "' WHERE DSTempSetId='" + setId + "'";
-                                objData.Execute(Update);
+                                objData.ExecuteWithTrans(Update, con, Transs);
                                 string Update1 = "UPDATE DSTempSet SET SortOrder='" + SortOrder + "' WHERE DSTempSetId='" + row["DSTempSetId"] + "'";
-                                objData.Execute(Update1);
+                                objData.ExecuteWithTrans(Update1, con, Transs);
                                 //Query = "SELECT DSTempSetId FROM DSTempStep WHERE DSTempSetId='" + stepId + "'";
                                 //int step_Id = Convert.ToInt32(objData.FetchValue(Query));
                                 //UpdateCompleteSteponParentSet(setId, Convert.ToInt32(ViewState["HeaderId"]));
@@ -16393,6 +16947,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         }
                     }
                 }
+                objData.CommitTransation(Transs, con);
             }
             else
             {
@@ -16413,8 +16968,103 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             int setId = Convert.ToInt32(btnUp.CommandArgument);
             string Query = "SELECT SortOrder FROM DSTempSet WHERE DSTempSetId='" + setId + "'";
             int SortOrder = Convert.ToInt32(objData.FetchValue(Query));
+            int headerId = 0;
+            if (ViewState["HeaderId"] != null)
+            {
+                headerId = Convert.ToInt32(ViewState["HeaderId"]);
+            }
+            
+            
             if (Convert.ToInt32(objData.FetchValue("SELECT MAX(SortOrder) FROM DSTempSet WHERE [DSTempHdrId]=(SELECT DSTempHdrId FROM DSTempSet WHERE DSTempSetId='" + setId + "') AND [ActiveInd]='A'")) > SortOrder)
             {
+                Query = "SELECT DSTempSetId FROM DSTempSet WHERE DSTempHdrId=" + headerId + " AND SortOrder = " + (SortOrder + 1).ToString();
+                object resultSO = objData.FetchValue(Query);
+                int lowerSetId = (resultSO == null || resultSO == DBNull.Value) ? 0 : Convert.ToInt32(resultSO);
+
+                SqlTransaction Transs = null;
+                SqlConnection con = objData.Open();
+
+                string sqlStr = "SELECT ChainType FROM DSTempHdr where DSTempHdrId=" + headerId;
+                string type = objData.FetchValue(sqlStr).ToString();
+                if (type == "Forward chain" || type == "Backward chain")
+                {
+                    DataTable dtCrntVer = objData.ReturnDataTable("SELECT CrntStep, CrntSet FROM DSTempHdr WHERE DSTempHdrId = " + headerId, false);
+                    string prevVerSet = "";
+                    int stepCount = 0;
+                    int sortOrderCheck = 0;
+                    string strQuery = "";
+                    int resetSortOrder = SortOrder == 1 ? 2 : 1;
+                    int resetSetId = Convert.ToInt32(objData.FetchValue(" SELECT DSTempSetId FROM DSTempSet WHERE DSTempHdrId = " + headerId + " AND SortOrder = " + resetSortOrder));
+                    if (dtCrntVer == null || dtCrntVer.Rows.Count == 0 || dtCrntVer.Rows[0]["CrntStep"] == DBNull.Value || dtCrntVer.Rows[0]["CrntSet"] == DBNull.Value)
+                    {
+                        int prevTempId = getPrevVersion();
+                        if (prevTempId > 0)
+                        {
+                            SqlDataReader reader = null;
+                            string strQry = " SELECT Hdr.SkillType, ISNULL(MAX(NextSetId),0) NextSetId,ISNULL(MAX(NextSetNmbr),0) NextSetNmbr " +
+                                " ,ISNULL(MAX(NextStepId),0)NextStepId,ISNULL(MAX(NextPromptId),0)NextPromptId" +
+                                " FROM DSTempHdr Hdr LEFT JOIN StdtDSStat Stat  ON Hdr.DSTempHdrId = Stat.DSTempHdrId " +
+                                " WHERE Hdr.DSTempHdrId= " + prevTempId + " GROUP BY Hdr.SkillType ";
+                            reader = oData_ov.ReturnDataReader(strQry, false);
+                            if (reader.Read())
+                            {
+                                //Session["iCurrentSetId"] = oData_ov.FetchValue("SELECT DSTempSetId FROM DSTempSet WHERE DSTempHdrId=" + NewTempId + " AND SetCd=(SELECT SetCd FROM DSTempSet WHERE DSTempHdrId=" + prevTempId + " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ") AND SetName=(SELECT SetName FROM DSTempSet WHERE DSTempHdrId=" + prevTempId + " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ")");
+                                string query1 = "SELECT DSTempSetId FROM DSTempSet " +
+                                    "WHERE DSTempHdrId=" + headerId +
+                                    " AND SetCd=(SELECT SetCd FROM DSTempSet WHERE DSTempHdrId=" + prevTempId +
+                                    " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ") " +
+                                    "AND SetName=(SELECT SetName FROM DSTempSet WHERE DSTempHdrId=" + prevTempId +
+                                    " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ")";
+                                object result = oData_ov.FetchValue(query1);
+                                if (result != null && result != DBNull.Value)
+                                {
+                                    Session["iCurrentSetId"] = result;
+                                    prevVerSet = Session["iCurrentSetId"].ToString();
+                                }
+                                else
+                                {
+                                    // If the first query returns no result, run the second query without SetName condition
+                                    string query2 = "SELECT DSTempSetId FROM DSTempSet " +
+                                        "WHERE DSTempHdrId=" + headerId +
+                                        " AND SetCd=(SELECT SetCd FROM DSTempSet WHERE DSTempHdrId=" + prevTempId +
+                                        " AND DSTempSetId=" + Convert.ToInt32(reader["NextSetId"]) + ")";
+
+                                    Session["iCurrentSetId"] = oData_ov.FetchValue(query2);
+
+                                    if (Session["iCurrentSetId"] != null)
+                                        prevVerSet = Session["iCurrentSetId"].ToString();
+                                    else
+                                    {
+                                        string strQurry = "SELECT TOP 1 PrevSetId FROM DSTempSet WHERE DSTempSetId IN (" + setId + ") ORDER BY 1 DESC";
+                                        object result2 = objData.FetchValue(strQurry);
+                                        int prevVerSetId = (result2 == null || result2 == DBNull.Value) ? 0 : Convert.ToInt32(result2);
+                                        if (prevVerSetId > 0)
+                                        {
+                                            strQurry = "UPDATE DSTempHdr SET CrntSet = " + resetSetId + ", crntstep = 0 WHERE DSTempHdrId = " + headerId;
+                                            int indx = objData.ExecuteWithTrans(strQurry, con, Transs);
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (prevVerSet != "" && (setId == Convert.ToInt32(prevVerSet) || lowerSetId == Convert.ToInt32(prevVerSet)))
+                            {
+                                strQuery = "UPDATE DSTempHdr SET CrntSet = " + resetSetId + ", crntstep = 0 WHERE DSTempHdrId = " + headerId;
+                                int indx = objData.ExecuteWithTrans(strQuery, con, Transs);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        prevVerSet = dtCrntVer.Rows[0]["CrntSet"].ToString();
+                        if (prevVerSet != "" && (setId == Convert.ToInt32(prevVerSet) || lowerSetId == Convert.ToInt32(prevVerSet)))
+                        {
+                            strQuery = "UPDATE DSTempHdr SET CrntSet = " + resetSetId + ", crntstep = 0 WHERE DSTempHdrId = " + headerId;
+                            int indx = objData.ExecuteWithTrans(strQuery, con, Transs);
+                        }
+                    }
+                }
+
                 DataTable OldSortOrder = objData.ReturnDataTable("SELECT DSTempSetId,SortOrder FROM DSTempSet WHERE [DSTempHdrId]=(SELECT DSTempHdrId FROM DSTempSet WHERE DSTempSetId='" + setId + "') AND [ActiveInd]='A' ORDER BY SortOrder ", false);
                 if (OldSortOrder != null)
                 {
@@ -16426,8 +17076,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             {
                                 string Update = "UPDATE DSTempSet SET SortOrder='" + i + "' WHERE DSTempSetId='" + setId + "'";
                                 string Update1 = "UPDATE DSTempSet SET SortOrder='" + SortOrder + "' WHERE DSTempSetId='" + row["DSTempSetId"] + "'";
-                                objData.Execute(Update);
-                                objData.Execute(Update1);
+                                objData.ExecuteWithTrans(Update, con, Transs);
+                                objData.ExecuteWithTrans(Update1, con , Transs);
                                 //UpdateCompleteSteponParentSet(setId, Convert.ToInt32(ViewState["HeaderId"]));
                                 GetSetData(Convert.ToInt32(ViewState["HeaderId"]));
                                 return;
@@ -16435,6 +17085,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         }
                     }
                 }
+                objData.CommitTransation(Transs, con);
             }
             else
             {
@@ -16670,7 +17321,6 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     BtnPreview.Visible = true;
                     VisibleApprovalNotesPR();
                     tdReadMsg.InnerHtml = clsGeneral.sucessMsg("Template successfully move to in progress...");
-
                 }
                 catch (Exception Ex)
                 {
@@ -19792,9 +20442,6 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             }
         }
         ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
-
-
-
     }
     //protected void chkNACriteria_CheckedChanged(object sender, EventArgs e)
     //{
@@ -20022,7 +20669,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         int curSet = Convert.ToInt32(objData.FetchValue(qString));
 
         int TemplateId = Convert.ToInt32(ViewState["HeaderId"]);
-        string UpdateNewDetails = "UPDATE DSTempHdr SET crntset=" + hdnRadSet + ",crntstep=" + hdnRadStep + ",crntprompt=" + hdnRadPrompt + ",nextsetno=" + curSet + " WHERE DSTempHdrId=" + TemplateId;
+        string UpdateNewDetails = "UPDATE DSTempHdr SET CrntSet=" + hdnRadSet + ",crntstep=" + hdnRadStep + ",crntprompt=" + hdnRadPrompt + ",nextsetno=" + curSet + " WHERE DSTempHdrId=" + TemplateId;
         objData.Execute(UpdateNewDetails);
         Session["iCurrentSetId"] = null;
         Session["iCurrentStep"] = null;
@@ -20386,6 +21033,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             bool validSet = false;
             bool flag1 = true;
             bool validStep = false;
+            bool validallStep = false;
             int setCriteria = 0;
             int stepCriteria = 0;
             object objTeach = null;
@@ -20712,8 +21360,19 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         }
 
                    if (skilltype == "Chained")
+                       
+                    {
+                        validallStep = StepallValidation(TemplateId);
+                        if (validallStep == false)
+                        {
+                            tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please complete template details before submitting..Steps are missing.");
+                            alertmsg = "Please complete template details before submitting..Steps are missing.";
+                            FillTypeOfInstruction(TemplateId);
+                            ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
+                            return;
+                        }
 
-                    {   string strQrystepTot = "SELECT Count(DSTempParentStepId) from DSTempParentStep where DSTempHdrId=" + TemplateId + "  and ActiveInd='A'";
+                       string strQrystepTot = "SELECT Count(DSTempParentStepId) from DSTempParentStep where DSTempHdrId=" + TemplateId + "  and ActiveInd='A'";
                         int dtCheckstepTot = Convert.ToInt32(objData.FetchValue(strQrystepTot));
                         if (dtCheckstepTot > 0)
                         {
@@ -20727,8 +21386,9 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                 ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + alertmsg + "');", true);
                                 return;
                             }
+                        }                     
+                       
                         }
-                     }
 
 
                         if (hdrid != "")
@@ -21116,7 +21776,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         else
                         {
                             validSet = SetValidation(TemplateId);
-                            validStep = StepValidation(TemplateId);
+                            validStep = StepallValidation(TemplateId);
 
                             if (skilltype == "Chained")
                             {
@@ -21722,7 +22382,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 else
                 {
                     validSet = SetValidation(TemplateId);
-                    validStep = StepValidation(TemplateId);
+                    validStep = StepallValidation(TemplateId);
 
                     if (skilltype == "Chained")
                     {
