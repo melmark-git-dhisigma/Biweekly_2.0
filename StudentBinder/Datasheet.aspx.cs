@@ -2254,22 +2254,22 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         string selSteps = "SELECT DSS.StepCd,Step.DSTempStepId FROM StdtSessionStep Step INNER JOIN DSTempStep DSS ON DSS.DSTempStepId=Step.DSTempStepId WHERE StdtSessionHdrId=" + Convert.ToInt32(ViewState["StdtSessHdr"].ToString()) + "  AND IsDynamic=0 order by SortOrder";
         DataTable dtSteps = new DataTable();
         dtSteps = oData.ReturnDataTable(selSteps, false);
-        string selSessNbrQry = "SELECT SessionNbr FROM StdtSessionHdr WHERE StdtSessionHdrId = " + Convert.ToInt32(ViewState["StdtSessHdr"].ToString());
-        int sessNum = Convert.ToInt32(oData.FetchValue(selSessNbrQry));
-        if(sessNum == 1)
-        {
-            for (int i = 0; i < dtSteps.Rows.Count; i++)
-            {
-                string selqry = "SELECT ISNULL (StepByStepPrompt,-1) FROM DSTempStep WHERE DSTempStepId = " + dtSteps.Rows[i]["DSTempStepId"].ToString() + "";
-                int stepPtompId = Convert.ToInt32(oData.FetchValue(selqry));
-                if(stepPtompId>0)
-                {
-                    string updQry = "UPDATE StdtDSStepStat SET PromptId = (SELECT StepByStepPrompt FROM DSTempStep WHERE DSTempStepId = " + dtSteps.Rows[i]["DSTempStepId"].ToString() + ") WHERE DSTempStepId = " + dtSteps.Rows[i]["DSTempStepId"].ToString();
-                    oData.Execute(updQry);
-                }
+        //string selSessNbrQry = "SELECT SessionNbr FROM StdtSessionHdr WHERE StdtSessionHdrId = " + Convert.ToInt32(ViewState["StdtSessHdr"].ToString());
+        //int sessNum = Convert.ToInt32(oData.FetchValue(selSessNbrQry));
+        //if(sessNum == 1)
+        //{
+        //    for (int i = 0; i < dtSteps.Rows.Count; i++)
+        //    {
+        //        string selqry = "SELECT ISNULL (StepByStepPrompt,-1) FROM DSTempStep WHERE DSTempStepId = " + dtSteps.Rows[i]["DSTempStepId"].ToString() + "";
+        //        int stepPtompId = Convert.ToInt32(oData.FetchValue(selqry));
+        //        if(stepPtompId>0)
+        //        {
+        //            string updQry = "UPDATE StdtDSStepStat SET PromptId = (SELECT StepByStepPrompt FROM DSTempStep WHERE DSTempStepId = " + dtSteps.Rows[i]["DSTempStepId"].ToString() + ") WHERE DSTempStepId = " + dtSteps.Rows[i]["DSTempStepId"].ToString();
+        //            oData.Execute(updQry);
+        //        }
                 
-            }
-        }
+        //    }
+        //}
         string table = "<table>";
         for (int i = 0; i < dtSteps.Rows.Count + 1; i++)
         {
