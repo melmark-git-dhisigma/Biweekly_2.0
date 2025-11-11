@@ -20,6 +20,9 @@
         <script src="../Scripts/html2canvas.min.js"></script>
             <script src="../Scripts/es6-promise.auto.min.js"></script>
         <script src="../Scripts/es6-promise.min.js"></script>
+        <script src="../Scripts/jsPDF.js"></script>
+
+
             <meta http-equiv="X-UA-Compatible" content="IE=10,9" />
     <style type="text/css">
   
@@ -2034,6 +2037,7 @@
                  }
                  var charts1, charts2;
                  var lessgroup = "<%=lid%>";
+             var stname="<%=stname%>";
                  var less = lessgroup.split(",").map(Number);
                  var lessnum = less.length;
                  var i = 0;
@@ -2041,22 +2045,93 @@
                      sizeOffont = '14px';
                          processNextChart();
              }
+                 //function processNextChart() {
+             //        if (i < lessnum) {
+             //            generateHighchart(less[i], function () {
+             //                //captureAndSend(less[i], function () {
+             //                //    i++;
+             //                //    //processNextChart();
+             //                //});
+             //                html2canvas(document.getElementById("HighchartGraph")).then(function (canvas) {
+             //                    var imgData = canvas.toDataURL("image/png");
+             //                    chartImages.push(imgData); // save image
+
+             //                    i++;
+             //                    processNextChart(); // next iteration
+             //                });
+
+             //            });
+             //        }
+             //        else {
+             //            generatePDF();
+             //            DownloadPopup();
+             //            closePopup();
+             //        }
+                    
+                     //    }
+
+                       
+
+                 var doc = new window.jspdf.jsPDF('l', 'pt', 'a4'); // 'l' = landscape
+                 var margin = 10; // small border (~3.5 mm)
+                 var i = 0;
+
                  function processNextChart() {
                      if (i < lessnum) {
                          generateHighchart(less[i], function () {
-                             captureAndSend(less[i], function () {
+                             var chartElement = document.getElementById("HighchartGraph");
+
+                             // Capture chart at fixed pixel density, independent of browser zoom
+                             html2canvas(chartElement, {
+                                 scale: 2,            // high resolution
+                                 useCORS: true,
+                                 windowWidth: chartElement.scrollWidth,  // ensures full width capture
+                                 windowHeight: chartElement.scrollHeight // ensures full height capture
+                             }).then(function (canvas) {
+                                 var imgData = canvas.toDataURL("image/jpeg", 0.95);
+
+                                 // PDF page size (landscape A4)
+                                 var pageWidth = doc.internal.pageSize.getWidth();
+                                 var pageHeight = doc.internal.pageSize.getHeight();
+
+                                 // Compute image dimensions to fit nicely
+                                 var imgWidth = pageWidth - 2 * margin;
+                                 var imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                                 // Fit by height if necessary
+                                 if (imgHeight > pageHeight - 2 * margin) {
+                                     imgHeight = pageHeight - 2 * margin;
+                                     imgWidth = (canvas.width * imgHeight) / canvas.height;
+                                 }
+
+                                 // Center image
+                                 var posX = (pageWidth - imgWidth) / 2;
+                                 var posY = (pageHeight - imgHeight) / 2;
+
+                                 // Add a new page if needed
+                                 if (i > 0) doc.addPage();
+
+                                 // Add the image
+                                 doc.addImage(imgData, 'JPEG', posX, posY, imgWidth, imgHeight);
+                                 i++;
+                                 processNextChart();
+                             }).catch(function (err) {
+                                 console.error("html2canvas failed:", err);
                                  i++;
                                  processNextChart();
                              });
                          });
-                     }
-                     else {
-                         DownloadPopup();
+                     } else {
+                         var filename = stname + ".pdf";
+                         doc.save(filename);
                          closePopup();
+                         generateHighchart(less[0]);
                      }
-                    
              }
+
+
              function generateHighchart(lessid, callback) {
+
                  var hchart = document.getElementById('<%= HighchartGraph.ClientID %>');
                  hchart.style.display = 'block';
                  var span = document.getElementById('lbgraphSpan');
@@ -2158,10 +2233,10 @@
                  var cls = "<%=cls%>";
                  var xmin;
                  var xmax;
-                 var jsonData = JSON.stringify({ StartDate: sdate, enddate: edate, studid: sid, AllLesson: lid, SchoolId: scid, Events: evnt, Trendtype: trend, IncludeIOA: ioa, Clstype: cls });
+                 var jsonData = JSON.stringify({ AllLesson: lid});
                  $.ajax({
                      type: "POST",
-                     url: "LessonReportsWithPaging.aspx/getAcademicReport",
+                     url: "LessonReportsWithPaging.aspx/getAcademicReportBysid",
                      data: jsonData,
                      contentType: "application/json; charset=utf-8",
                      async: false,
@@ -2260,7 +2335,7 @@
                              }
                              var drange = document.getElementById('daterang');
                              drange.style.fontSize = '16px';
-
+                             callback();
                          }
                          else {
                              $('#sname').css("display", "none");
@@ -2725,7 +2800,42 @@
                                  spacingBottom: 20,
                                  spacingLeft: 20,
                                  marginTop: 100,
+                                 events: {
+                                     load: function () {
+                                         var chart = this;
+                                         var completed = 0;
+                                         var totalSeries = chart.series.length;
 
+                                         // If no series, call immediately
+                                         if (totalSeries === 0) {
+                                             if (typeof callback === 'function') callback();
+                                             return;
+                                         }
+
+                                         // Wait until all series animations are finished
+                                         for (var i = 0; i < chart.series.length; i++) {
+                                             (function (series) {
+                                                 Highcharts.addEvent(series, 'afterAnimate', function () {
+                                                     completed++;
+                                                     if (completed === totalSeries) {
+                                                         if (typeof callback === 'function') callback();
+                                                     }
+                                                 });
+                                             })(chart.series[i]);
+                                         }
+
+                                         // If animations are disabled, call immediately
+                                         var animationEnabled = true;
+                                         if (chart.options.plotOptions &&
+                                             chart.options.plotOptions.series &&
+                                             chart.options.plotOptions.series.animation === false) {
+                                             animationEnabled = false;
+                                         }
+                                         if (!animationEnabled) {
+                                             if (typeof callback === 'function') callback();
+                                         }
+                                     }
+                                 }
                              },
 
                              title: {
@@ -3068,7 +3178,7 @@
                      alert("Something went wrong! Error: ");
                  }
               
-                 setTimeout(callback, 1000);
+                 //setTimeout(callback, 700);
              }
              function captureAndSend(lessid, callback) {
                  //html2canvas($("#HighchartGraph")[0]).then(function (canvas) {
@@ -3107,9 +3217,16 @@
                          
                      });
                  });
-                 setTimeout(callback, 1000);
+                 setTimeout(callback, 300);
              }
             
+
+        
+
+            
+            
+           
+
         </script>
     </form>
 </body>

@@ -34,6 +34,7 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
     ArrayList arraylist2 = new ArrayList();
     DataTable Dt = null;
     DataTable Dts = null;
+  static  DataTable Dtexp = null;
     clsLessons oLessons;
     public bool reptype=false;
     public bool inctype = false;
@@ -50,6 +51,7 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
     public string lname;
     public string lpstatus;
     public bool medno=false;
+    public string stname = "";
     protected void Page_Load(object sender, EventArgs e)
     {
       //  lbgraph.Visible = false;
@@ -1156,7 +1158,16 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
                 }
                 ListBox1.Items.Remove(((ListItem)arraylist1[i]));
             }
-            ListBox2.SelectedIndex = -1;
+            
+            if (ListBox2.Items.Count == 1)
+                ListBox2.SelectedIndex = 0;
+            else
+                ListBox2.SelectedIndex = -1;
+
+            if (ListBox1.Items.Count == 1)
+                ListBox1.SelectedIndex = 0;
+            else
+                ListBox1.SelectedIndex = -1;
         }
         else
         {
@@ -1208,6 +1219,8 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
         {
             ListBox2.Rows = ListBox2.Items.Count;
         }
+        ListBox2.SelectedIndex = -1;
+
         ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "disp();", true);
     }
     protected void Button3_Click(object sender, EventArgs e)
@@ -1233,7 +1246,16 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
                 }
                 ListBox2.Items.Remove(((ListItem)arraylist2[i]));
             }
-            ListBox1.SelectedIndex = -1;
+
+            if (ListBox2.Items.Count == 1)
+                ListBox2.SelectedIndex = 0;
+            else
+                ListBox2.SelectedIndex = -1;
+
+            if (ListBox1.Items.Count == 1)
+                ListBox1.SelectedIndex = 0;
+            else
+                ListBox1.SelectedIndex = -1;
         }
         else
         {
@@ -1285,6 +1307,8 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
         {
             ListBox2.Rows = ListBox2.Items.Count;
         }
+        ListBox1.SelectedIndex = -1;
+
         ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "disp();", true);
     }
 
@@ -1576,6 +1600,7 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
                     }
                     Session["StudName"] = sess.StudentName;
                     sDate = StartDate.ToString();
+                    stname = sess.StudentName;
                     eDate = enddate.ToString();
                     sid = studid;
                     lid = AllLesson.ToString();
@@ -1612,6 +1637,8 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
                     deftxt.Visible = true;
                     //ClientScript.RegisterStartupScript(GetType(), "", "exportChart();", true);
                    // string script = "exportChart();";
+                  getAcademicReportExport(sDate, eDate, sid, lid, scid, Events, evnt, ioa, cls);
+
                     string script = @"setTimeout(function() {exportChart();}, 500);";
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "newone", script, true);
                     tdMsgExport.InnerHtml = clsGeneral.sucessMsg("Export Successfully Created...");
@@ -2127,4 +2154,57 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
     {
         ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "showEvents();", true);
     }
+
+    
+    public void  getAcademicReportExport (string StartDate, string enddate, int studid, string AllLesson, int SchoolId, string Events, string Trendtype, string IncludeIOA, string Clstype)
+    {
+        objData = new clsData();
+        List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+        Dictionary<string, object> row;
+        String proc = "[dbo].[BiweeklyReport_Trendline]";
+        Dtexp = objData.ReturnAcademicTable(proc, StartDate, enddate, studid, AllLesson, SchoolId, Events, Trendtype, IncludeIOA, Clstype);
+        
+    }
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public static string getAcademicReportBysid(string AllLesson)
+    {
+        List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+        Dictionary<string, object> row;
+
+            DataTable dt = Dtexp.Clone(); 
+        string filter = "LessonPlanId = " + AllLesson;
+
+        DataRow[] rowsToCopy = Dtexp.Select(filter);
+
+            foreach (DataRow ro in rowsToCopy)
+            {
+                dt.ImportRow(ro);
+            }
+
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            row = new Dictionary<string, object>();
+            foreach (DataColumn dc in dt.Columns)
+            {
+                object value = dr[dc];
+                if (value == DBNull.Value)
+                {
+                    row.Add(dc.ColumnName, null);
+                }
+                else
+                {
+                    row.Add(dc.ColumnName, value);
+                }
+            }
+            rows.Add(row);
+        }
+        JavaScriptSerializer json = new JavaScriptSerializer();
+        string val = json.Serialize(rows);
+        return json.Serialize(rows);
+    }
+  
+
 }
+
