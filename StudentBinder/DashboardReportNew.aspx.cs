@@ -889,6 +889,8 @@ public partial class Graph : System.Web.UI.Page
             String Classids = Convert.ToString(SAgraphClassid);
             String Studids = Convert.ToString(SAgraphStudid);
             String Mistrial = Convert.ToString(CAgraphMistrial);
+            if (string.IsNullOrWhiteSpace(Studids))
+                Studids = "0";
             String getUseridsquery = "SELECT STUFF((SELECT Distinct ','+Convert(varchar(200),Modifiedby) from stdtsessionhdr where stdtclassid IN(" + Classids + ") and studentid IN(" + Studids + ") and CONVERT(VARCHAR(10),ModifiedOn, 120) = CONVERT(VARCHAR(10),getdate(), 120)FOR XML PATH('')), 1, 1, '')";
             String Userids = Convert.ToString(objData.FetchValue(getUseridsquery));
             if (Userids == "")
@@ -918,6 +920,8 @@ public partial class Graph : System.Web.UI.Page
             String Classids = Convert.ToString(SAgraphClassid);
             String Studids = Convert.ToString(SAgraphStudid);
             String Mistrial = Convert.ToString(CAgraphMistrial);
+            if (string.IsNullOrWhiteSpace(Studids))
+                Studids = "0";
             String getUseridsquery = "SELECT STUFF((SELECT Distinct ','+Convert(varchar(200),Modifiedby) from stdtsessionhdr where stdtclassid IN(" + Classids + ") and studentid IN(" + Studids + ") and CONVERT(VARCHAR(10),ModifiedOn, 120) = CONVERT(VARCHAR(10),getdate(), 120)FOR XML PATH('')), 1, 1, '')";
             String Userids = Convert.ToString(objData.FetchValue(getUseridsquery));
             List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
@@ -1019,6 +1023,8 @@ public partial class Graph : System.Web.UI.Page
             RV_DBReport.ServerReport.ReportPath = ConfigurationManager.AppSettings["DashBoardStaffClinical"];
             String Classids = Convert.ToString(SCgraphClassid);
             String Studids = Convert.ToString(SCgraphStudid);
+            if (string.IsNullOrWhiteSpace(Studids))
+                Studids = "0";
             String getUseridsquery = "SELECT STUFF((SELECT Distinct ','+Convert(varchar(200),CreatedBy) from Behaviour where Classid IN(" + Classids + ")  and Studentid IN(" + Studids + ") and CONVERT(VARCHAR(10),ModifiedOn, 120) = CONVERT(VARCHAR(10),getdate(), 120)FOR XML PATH('')), 1, 1, '') ";
             String Userids = Convert.ToString(objData.FetchValue(getUseridsquery));
             if (Userids == "")
@@ -1044,6 +1050,8 @@ public partial class Graph : System.Web.UI.Page
             //graphcontainer.Visible = true;
             String Classids = Convert.ToString(SCgraphClassid);
             String Studids = Convert.ToString(SCgraphStudid);
+            if (string.IsNullOrWhiteSpace(Studids))
+                Studids = "0";
             String getUseridsquery = "SELECT STUFF((SELECT Distinct ','+Convert(varchar(200),CreatedBy) from Behaviour where Classid IN(" + Classids + ")  and Studentid IN(" + Studids + ") and CONVERT(VARCHAR(10),ModifiedOn, 120) = CONVERT(VARCHAR(10),getdate(), 120)FOR XML PATH('')), 1, 1, '') ";
             String Userids = Convert.ToString(objData.FetchValue(getUseridsquery));
             if (Userids == "")
@@ -1676,6 +1684,8 @@ public partial class Graph : System.Web.UI.Page
         string startDate = txtstartDate.Text.ToString();
         string endDate = txtendDate.Text.ToString();
         String Mistrial = Convert.ToString(chkbx_Mistrial.Checked ? 1 : 0);
+        if (string.IsNullOrWhiteSpace(Studids))
+            Studids = "0";
         String getUserIdAcademic = "SELECT STUFF((SELECT Distinct ','+Convert(varchar(200),Modifiedby) from stdtsessionhdr where stdtclassid IN(" + Classids + ") and studentid IN(" + Studids + ") and Convert(DATE,ModifiedOn) BETWEEN CONVERT(DATE,'" + startDate + "') AND CONVERT(DATE,'" + endDate + "')FOR XML PATH('')), 1, 1, '')";
         String getUserIdClinical = "SELECT STUFF((SELECT Distinct ','+Convert(varchar(200),Modifiedby) from Behaviour where ClassId IN(" + Classids + ") and studentid IN(" + Studids + ") and Convert(DATE,CreatedOn) BETWEEN CONVERT(DATE,'" + startDate + "') AND CONVERT(DATE,'" + endDate + "')FOR XML PATH('')), 1, 1, '')";
         
