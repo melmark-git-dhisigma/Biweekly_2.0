@@ -913,23 +913,23 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                          if (dtCrntVer == null || dtCrntVer.Rows.Count == 0 || dtCrntVer.Rows[0]["CrntStep"] == DBNull.Value || dtCrntVer.Rows[0]["CrntSet"] == DBNull.Value)
                          {
                              if (prevTempId != NewTempId)
-                             {
-                                 for (int i = 0; i < n; i++)
-                                 {
-                                     if (ds.Tables[0].Rows[i]["SetCd"].ToString() == lblsetrev.Text)
-                                         RadioButtonListSets.Items[i].Selected = true;
-                                 }
-                             }
-                             else
-                             {
-                                 RadioButtonListSets.Items[0].Selected = true;
-                             }
-                             if (RadioButtonListSets.SelectedValue.ToString() == "")
-                             {
-                                 RadioButtonListSets.Items[0].Selected = true;
-                                 loadStepOverrid(Convert.ToInt32(RadioButtonListSets.SelectedValue.ToString()));
-                             }
-                         }
+                        {
+                            for (int i = 0; i < n; i++)
+                            {
+                                if (ds.Tables[0].Rows[i]["SetCd"].ToString() == lblsetrev.Text)
+                                    RadioButtonListSets.Items[i].Selected = true;
+                            }
+                        }
+                        else
+                        {
+                            RadioButtonListSets.Items[0].Selected = true;
+                        }
+                        if (RadioButtonListSets.SelectedValue.ToString()=="")
+                        {
+                            RadioButtonListSets.Items[0].Selected = true;
+                            loadStepOverrid(Convert.ToInt32(RadioButtonListSets.SelectedValue.ToString()));
+                        }
+                    }
                          else
                         {
                             RadioButtonListSets.Items[0].Selected = true;
@@ -948,23 +948,23 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         if (dtCrntVer == null || dtCrntVer.Rows.Count == 0 || dtCrntVer.Rows[0]["CrntStep"] == DBNull.Value || dtCrntVer.Rows[0]["CrntSet"] == DBNull.Value)
                         {
                             if (prevTempId != NewTempId)
+                        {
+                            for (int i = 0; i < n; i++)
                             {
-                                for (int i = 0; i < n; i++)
-                                {
-                                    String s = ds.Tables[0].Rows[i]["SetCd"].ToString();
-                                    if (s == lblsetrev.Text)
-                                        RadioButtonListSets.Items[i].Selected = true;
-                                }
-                            }
-                            else
-                                RadioButtonListSets.Items[0].Selected = true;
-
-                            if (RadioButtonListSets.SelectedValue.ToString() == "")
-                            {
-                                RadioButtonListSets.Items[0].Selected = true;
-                                loadStepOverrid(Convert.ToInt32(RadioButtonListSets.SelectedValue.ToString()));
+                                String s = ds.Tables[0].Rows[i]["SetCd"].ToString();
+                                if (s == lblsetrev.Text)
+                                    RadioButtonListSets.Items[i].Selected = true;
                             }
                         }
+                        else
+                            RadioButtonListSets.Items[0].Selected = true;
+
+                        if (RadioButtonListSets.SelectedValue.ToString() == "")
+                        {
+                            RadioButtonListSets.Items[0].Selected = true;
+                            loadStepOverrid(Convert.ToInt32(RadioButtonListSets.SelectedValue.ToString()));
+                        }
+                    }
                         else
                         {
                             RadioButtonListSets.Items[0].Selected = true;
@@ -1228,22 +1228,22 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             if (dtCrntVer == null || dtCrntVer.Rows.Count == 0 || dtCrntVer.Rows[0]["CrntStep"] == DBNull.Value || dtCrntVer.Rows[0]["CrntSet"] == DBNull.Value)
                             {
                                 if (dt.Rows.Count > 0)
-                                    if (Session["Selection"] == "1")
-                                    {
-                                        for (int i = 0; i < dt.Rows.Count; i++)
-                                        {
-
-                                            if (dt.Rows[i]["StepCd"].ToString() == Session["PrevStep"].ToString())
-                                                RadioButtonListSteps.Items[i].Selected = true;
-                                        }
-                                    }
-                                    else
-                                        RadioButtonListSteps.Items[0].Selected = true;
-
-                                if (RadioButtonListSteps.SelectedValue.ToString() == "")
+                                if (Session["Selection"] == "1")
                                 {
-                                    RadioButtonListSteps.Items[0].Selected = true;
+                                    for (int i = 0; i < dt.Rows.Count; i++)
+                                    {
+
+                                        if (dt.Rows[i]["StepCd"].ToString() == Session["PrevStep"].ToString())
+                                            RadioButtonListSteps.Items[i].Selected = true;
+                                    }
                                 }
+                                else
+								    RadioButtonListSteps.Items[0].Selected = true;
+
+                            if (RadioButtonListSteps.SelectedValue.ToString()=="")
+                            {
+                                RadioButtonListSteps.Items[0].Selected = true;
+                            }
                                 // Approval Popup Issue New Lesson Creation [18 - jun -2020] - Dev 1  r
 
                             }
@@ -5994,7 +5994,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     foreach (var sel in SelectedSteps)
                     {
                         string updateQuerry = "UPDATE DSTempParentStep SET SortOrder = " + (Convert.ToInt32(sel["SortOrder"]) + 1) + " WHERE DSTempParentStepId= " + sel["DSTempParentStepId"].ToString();
-                        objData.ExecuteWithTrans(updateQuerry, con, Transs);
+                                objData.ExecuteWithTrans(updateQuerry, con, Transs);
                     }
                 }
 
@@ -6161,7 +6161,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
 
 
-                parentStepId = objData.ExecuteWithScopeandConnection(strQuery, con, Transs);
+                    parentStepId = objData.ExecuteWithScopeandConnection(strQuery, con, Transs);
                 if (count > 1)
                 {
                     //if(CountryID_list.Count<=0)
@@ -6200,7 +6200,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         //objCount = objData.FetchValue(selQuery2);
 
 
-                        UpdateSortOrder(Convert.ToInt32(CountryID_list[index]), headerId, selectedText, con, Transs);
+                            UpdateSortOrder(Convert.ToInt32(CountryID_list[index]), headerId, selectedText, con, Transs);
                         try
                         {
                             strQuery = "Insert Into DSTempStep(SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,DSTempParentStepId,SortOrder,ActiveInd,CreatedBy,CreatedOn) ";
@@ -6229,7 +6229,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
 
                     }
-                    objData.CommitTransation(Transs, con);
+                        objData.CommitTransation(Transs, con);
 
                     btnAddStepDetails.Visible = true;
                     BtnUpdateStep.Visible = false;
@@ -6261,9 +6261,9 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     {
                         strQuery = "Insert Into DSTempStep(SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,DSTempParentStepId,SortOrder,ActiveInd,CreatedBy,CreatedOn) ";
                         strQuery += " Values(" + sess.SchoolId + "," + headerId + ",'" + clsGeneral.convertQuotes(txtStepName.Text.Trim()) + "','" + clsGeneral.convertQuotes(txtStepDesc.Text.Trim()) + "'," + Convert.ToInt32(parentSetId) + "," + parentStepId + "," + selectedText + ",'A'," + sess.LoginId + ",getdate())";
-                        stepId = objData.ExecuteWithScopeandConnection(strQuery, con, Transs);
+                            stepId = objData.ExecuteWithScopeandConnection(strQuery, con, Transs);
                         ScriptManager.RegisterClientScriptBlock(UpdatePanel11, UpdatePanel11.GetType(), "", "CloseStepPopup();", true);
-                        objData.CommitTransation(Transs, con);
+                            objData.CommitTransation(Transs, con);
                         GetStepData(headerId);
 
                     }
@@ -6271,14 +6271,14 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
 
 
-                    catch (Exception Ex)
-                    {
-                        string error = Ex.Message;
-                        tdMsg.InnerHtml = clsGeneral.failedMsg("Insertion Failed! <br> '" + error + "' ");
-                    }
+                        catch (Exception Ex)
+                        {
+                            string error = Ex.Message;
+                            tdMsg.InnerHtml = clsGeneral.failedMsg("Insertion Failed! <br> '" + error + "' ");
+                        }
 
-                }
-                ClearStepData();
+                    }
+                    ClearStepData();
                 Session["StepAdditionFlag"] = "";
             }
             showMatchToSampleDrop();
@@ -6291,7 +6291,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 con.Close();
             ClearStepData();
             String altmsg = "Insertion Failed";
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + altmsg + "');", true);
+             ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('" + altmsg + "');", true);
             tdMsg.InnerHtml = clsGeneral.failedMsg("Insertion Failed!");
             postBackDetailsLogging(Ex, -1, -1);
 
@@ -9564,7 +9564,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             //Session["StepDeleteFlag"] = "";
 
             for (int i = 0; i < dtList.Rows.Count; i++)
-            {
+                {
                 int sortOderToChange = Convert.ToInt32(dtList.Rows[i]["SortOrder"].ToString()) - 1;
                 strQurry = "UPDATE DSTempParentStep SET SortOrder = " + sortOderToChange + " WHERE ActiveInd='A' AND DSTempParentStepId = " + Convert.ToInt32(dtList.Rows[i]["DSTempParentStepId"].ToString());
                 objData.ExecuteWithTrans(strQurry, con, Transs);
@@ -9575,7 +9575,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
             objData.CommitTransation(Transs, con);
             if (con != null)
-                con.Close();
+            con.Close();
             #region OLD CODE {COMMENTED}
             // ------------------- OLD CODE ------------------
 
@@ -20651,8 +20651,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         if (promptDDL.SelectedValue != "")
                         {
                             Session["sCurrentPrompt"] = objData.FetchValue("SELECT PromptId FROM DSTempPrompt WHERE DSTempPromptId=" + promptDDL.SelectedValue);
-                            string prmptUpdQry = "UPDATE DSTempStep SET StepByStepPrompt = " + promptDDL.SelectedValue + " WHERE DSTempStepId = " + stepId.Value;
-                            objData.Execute(prmptUpdQry);
+                            //string prmptUpdQry = "UPDATE DSTempStep SET StepByStepPrompt = " + promptDDL.SelectedValue + " WHERE DSTempStepId = " + stepId.Value;
+                            //objData.Execute(prmptUpdQry);
                         }
                     }
 
