@@ -250,7 +250,10 @@ public class clsData
         {
             object content = null;
             trans.Rollback();
-            return (content);
+            ClsErrorLog errlog = new ClsErrorLog();
+            errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\n" + ex.ToString());
+            throw ex;
+            //return (content);
         }
     }
 
