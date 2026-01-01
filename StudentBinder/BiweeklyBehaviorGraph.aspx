@@ -17,7 +17,7 @@
       <script src="../Scripts/highcharts/7.1.2/highcharts.js"></script>
    <script src="../Scripts/highcharts/7.1.2/modules/accessibility.js"></script>
     <script src="../Scripts/highcharts/7.1.2/modules/xrange.js"></script>
-    <script src="../Scripts/highcharts/7.1.2/modules/exporting.js"></script>
+<%--    <script src="../Scripts/highcharts/7.1.2/modules/exporting.js"></script>--%>
         <script src="../Scripts/html2canvas.min.js"></script>
             <script src="../Scripts/es6-promise.auto.min.js"></script>
         <script src="../Scripts/es6-promise.min.js"></script>
@@ -1454,6 +1454,9 @@
             //    //arrow end
             ////Event plot End
                 Highcharts.chart('cont', {
+                    exporting: {
+                        enabled: false
+                    },
                     chart: {
                         plotBorderWidth: 2,
                         plotBorderColor: 'black',
@@ -1672,6 +1675,9 @@
                 
                 
                     Highcharts.chart('rategraph', {
+                    exporting: {
+                        enabled: false
+                    },
                         chart: {
                             plotBorderWidth: 2,
                             plotBorderColor: 'black',
@@ -1807,6 +1813,9 @@
                          });
 
                          Highcharts.chart('medcont', {
+                             exporting: {
+                                 enabled: false
+                             },
                              chart: {
                                  type: 'xrange',
                                  plotBorderWidth: 2,
@@ -2655,6 +2664,9 @@
 
                             ////Event plot End
                 Highcharts.chart('cont', {
+                    exporting: {
+                        enabled: false
+                    },
                     chart: {
                         plotBorderWidth: 2,
                         plotBorderColor: 'black',
@@ -2871,6 +2883,9 @@
                         // alert(ratefinal);
                         // rate duplicate data start
                     Highcharts.chart('rategraph', {
+                            exporting: {
+                                enabled: false
+                            },
                         chart: {
                             plotBorderWidth: 2,
                             plotBorderColor: 'black',
@@ -3005,6 +3020,9 @@
                             });
 
                             Highcharts.chart('medcont', {
+                                exporting: {
+                                    enabled: false
+                                },
                                 chart: {
                                     type: 'xrange',
                                     plotBorderWidth: 2,

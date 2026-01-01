@@ -15,7 +15,7 @@
       <script src="../Scripts/highcharts/7.1.2/highcharts.js"></script>
    <script src="../Scripts/highcharts/7.1.2/modules/accessibility.js"></script>
      <script src="../Scripts/highcharts/7.1.2/modules/xrange.js"></script>
-    <script src="../Scripts/highcharts/7.1.2/modules/exporting.js"></script>
+<%--    <script src="../Scripts/highcharts/7.1.2/modules/exporting.js"></script>--%>
         <script src="../Scripts/html2canvas.min.js"></script>
             <script src="../Scripts/es6-promise.auto.min.js"></script>
         <script src="../Scripts/es6-promise.min.js"></script>
@@ -592,6 +592,9 @@
             }
             function DrawChart(treatment, medicData, yAxisname, plotdata, minx, maxx, maxy) {
                 Highcharts.chart('cont', {
+                    exporting: {
+                        enabled: false
+                    },
                     chart: {
                         type: 'xrange',
                         marginTop: 100,

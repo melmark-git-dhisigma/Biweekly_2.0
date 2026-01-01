@@ -16,7 +16,7 @@
  <script src="../Scripts/highcharts/7.1.2/highcharts.js"></script>
    <script src="../Scripts/highcharts/7.1.2/modules/accessibility.js"></script>
     <script src="../Scripts/highcharts/7.1.2/modules/xrange.js"></script>
-    <script src="../Scripts/highcharts/7.1.2/modules/exporting.js"></script>
+<%--    <script src="../Scripts/highcharts/7.1.2/modules/exporting.js"></script>--%>
         <script src="../Scripts/html2canvas.min.js"></script>
             <script src="../Scripts/es6-promise.auto.min.js"></script>
         <script src="../Scripts/es6-promise.min.js"></script>
@@ -1621,6 +1621,9 @@
                  //Event plot End
                              //Start Highchart
                                      chart1 = Highcharts.chart('cont', {
+                     exporting: {
+                         enabled: false
+                     },
                      chart: {
                          plotBorderWidth: 2,
                          plotBorderColor: 'black',
@@ -1847,6 +1850,9 @@
                                                  val = val + 1
                           });
                                              chart2 = Highcharts.chart('medcont', {
+                              exporting: {
+                                  enabled: false
+                              },
                               chart: {
                                   type: 'xrange',
                                   plotBorderWidth: 2,
@@ -2798,6 +2804,9 @@
                                      //Event plot End
                                      //Start Highchart
                          charts1 = Highcharts.chart('cont', {
+                             exporting: {
+                                 enabled: false
+                             },
                              chart: {
                                  plotBorderWidth: 2,
                                  plotBorderColor: 'black',
@@ -3058,6 +3067,9 @@
                                          val = val + 1
                                      });
                                      charts2 = Highcharts.chart('medcont', {
+                                         exporting: {
+                                             enabled: false
+                                         },
                                          chart: {
                                              type: 'xrange',
                                              plotBorderWidth: 2,
