@@ -882,7 +882,7 @@ public partial class StudentBinder_LessonPlanNew : System.Web.UI.Page
         if (sess != null && ObjTempSess != null)
         {
             strQuery = "SELECT  DSTempParentStepId,SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames FROM DSTempParentStep"
-                        + " WHERE DSTempHdrId = " + TempId + " And ActiveInd = 'A' ORDER BY DSTempSetId,SortOrder";
+                        + " WHERE DSTempHdrId = " + TempId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + TempId + " AND ActiveInd = 'A') And ActiveInd = 'A' ORDER BY DSTempSetId,SortOrder";
 
 
             strBinder = "<ul>";
@@ -1777,7 +1777,7 @@ public partial class StudentBinder_LessonPlanNew : System.Web.UI.Page
             strBinder = "";
             //strQuery = "select StepName,StepCd from dbo.DSTempStep where DSTempHdrId = " + TempId + " AND ActiveInd = 'A'";
             strQuery = "SELECT StepName,StepCd FROM DSTempParentStep"
-                        + " WHERE DSTempHdrId = " + TempId + " And ActiveInd = 'A' ORDER BY DSTempSetId,SortOrder";
+                        + " WHERE DSTempHdrId = " + TempId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + TempId + " AND ActiveInd = 'A') And ActiveInd = 'A' ORDER BY DSTempSetId,SortOrder";
 
             Dt = objData.ReturnDataTable(strQuery, false);
 

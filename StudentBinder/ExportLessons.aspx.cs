@@ -1112,7 +1112,7 @@ public partial class StudentBinder_ExportLessons : System.Web.UI.Page
 
             strBinder = "";
             strQuery = "SELECT StepName,StepCd FROM DSTempParentStep"
-                        + " WHERE DSTempHdrId = " + TempId + " And ActiveInd = 'A' ORDER BY DSTempSetId,SortOrder";
+                        + " WHERE DSTempHdrId = " + TempId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + TempId + " AND ActiveInd = 'A') And ActiveInd = 'A' ORDER BY DSTempSetId,SortOrder";
 
             Dt = objData.ReturnDataTable(strQuery, false);
 
