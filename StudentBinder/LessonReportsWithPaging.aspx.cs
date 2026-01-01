@@ -1978,6 +1978,14 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
         Dictionary<string, object> row;
         String proc = "[dbo].[BiweeklyReport_Trendline]";
         DataTable dt = objData.ReturnAcademicTable(proc, StartDate, enddate, studid, AllLesson, SchoolId, Events, Trendtype, IncludeIOA, Clstype);
+        foreach (DataRow row1 in dt.Rows)
+        {
+            if (row1["AggredatedDate"] != DBNull.Value)
+            {
+                DateTime dtime = Convert.ToDateTime(row1["AggredatedDate"]);
+                row1["AggredatedDate"] = dtime.ToString("MM/dd/yyyy");
+            }
+        }
         foreach (DataRow dr in dt.Rows)
         {
             row = new Dictionary<string, object>();
@@ -2163,6 +2171,14 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
         Dictionary<string, object> row;
         String proc = "[dbo].[BiweeklyReport_Trendline]";
         Dtexp = objData.ReturnAcademicTable(proc, StartDate, enddate, studid, AllLesson, SchoolId, Events, Trendtype, IncludeIOA, Clstype);
+        foreach (DataRow row1 in Dtexp.Rows)
+        {
+            if (row1["AggredatedDate"] != DBNull.Value)
+            {
+                DateTime dtime = Convert.ToDateTime(row1["AggredatedDate"]);
+                row1["AggredatedDate"] = dtime.ToString("MM/dd/yyyy");
+            }
+        }
         
     }
     [WebMethod]
