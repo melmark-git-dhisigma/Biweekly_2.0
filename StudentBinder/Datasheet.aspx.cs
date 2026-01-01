@@ -4531,6 +4531,22 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             //if (Convert.ToBoolean(ViewState["IsHistory"]) == false)
                                             //{
+                                            string curesesid = this.Session.SessionID.ToString();
+                                            string HostName = Dns.GetHostName();
+                                            userAgent = HttpContext.Current.Request.UserAgent.ToString();
+                                            ip = clsGeneral.GetIPAddress();
+                                            ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
+                                            Pagepath = "Datasheet : btnSubmit_Click";
+                                            if (Prevsess != null)
+                                            {
+                                                sesserrlog.WriteToLog(today.ToString("yyyy-MM-dd") + ',' + now.ToString("HH:mm:ss") + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + Prevsess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + Prevsess.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + Prevsess.Classid + ',' + PreClassid + ',' + oSession.StudentId + ',' + Prevsess.StudentId + ',' + SessStudentid + ',' + HostName + ',' + userAgent);
+                                            }
+                                            else
+                                            {
+                                                sesserrlog.WriteToLog(today.ToString("yyyy-MM-dd") + ',' + now.ToString("HH:mm:ss") + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + "PrevSession Null" + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + "PrevSession Null" + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + "PrevSession Null" + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + "PrevSession Null" + ',' + PreClassid + ',' + oSession.StudentId + ',' + "PrevSession Null" + ',' + SessStudentid + ',' + HostName + ',' + userAgent);
+                                            }
+                                            oSession = clsGeneralSchk.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, PreClassid, Sessstname, Pagepath);
+
                                             string insertSessionScoreQuery = "INSERT INTO StdtSessColScore (SchoolId,StudentId,DSTempSetColId,DSTempSetColCalcId,StdtSessionHdrId,Score,CreatedBy,CreatedOn)"
                                                 + "values(" + oSession.SchoolId + "," + oSession.StudentId + "," + Convert.ToInt32(oDS.dtColumns.Rows[i]["DSTempSetColId"].ToString()) + ","
                                                 + Convert.ToInt32(dr["DSTempSetColCalcId"].ToString()) + "," + sessHdrId + ","
