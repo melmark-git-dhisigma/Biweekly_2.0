@@ -951,7 +951,8 @@ public partial class Graph : System.Web.UI.Page
                 Console.WriteLine("Error: " + ex);
 
                 ClsErrorLog errlog = new ClsErrorLog();
-                errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\n StudentId ID = " + Studids + "\n" + ex.ToString());
+                errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\nStored Procedure: DashboardStaffAcademic" +
+                    "\nStudentId ID = " + Studids + "\n" + ex.ToString());
             }
             finally
             {
@@ -1140,7 +1141,8 @@ public partial class Graph : System.Web.UI.Page
                 Console.WriteLine("Error: " + ex);
 
                 ClsErrorLog errlog = new ClsErrorLog();
-                errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\n StudentId ID = " + Studids + "\n" + ex.ToString());
+                errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\nStored Procedure: DashboardStaffClinicalNew" +
+                    "\nStudentId ID = " + Studids + "\n" + ex.ToString());
             }
             finally
             {
@@ -1506,35 +1508,44 @@ public partial class Graph : System.Web.UI.Page
         //String proc = "[dbo].[DashboardClientAcademic]";
 
         //DataTable dt = objdata.ReturnNewAcademicTable(proc, classid, studentid, mistrial);
+        try
+        {
+            SqlCommand cmd = null;
+            DataTable dt = new DataTable();
+            SqlConnection con = objdata.Open();
+            SqlDataAdapter da = new SqlDataAdapter();
+            cmd = new SqlCommand("DashboardClientAcademic", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.CommandTimeout = 600;
+            cmd.Parameters.AddWithValue("@ParamClassid", classid);
+            cmd.Parameters.AddWithValue("@ParamStudid", studentid);
+            cmd.Parameters.AddWithValue("@ParamMistrial", mistrial);
+            da = new SqlDataAdapter(cmd);
+            da.Fill(dt);
 
-        SqlCommand cmd = null;
-        DataTable dt = new DataTable();
-        SqlConnection con = objdata.Open();
-        SqlDataAdapter da = new SqlDataAdapter();
-        cmd = new SqlCommand("DashboardClientAcademic", con);
-        cmd.CommandType = CommandType.StoredProcedure;
-        cmd.CommandTimeout = 600;
-        cmd.Parameters.AddWithValue("@ParamClassid", classid);
-        cmd.Parameters.AddWithValue("@ParamStudid", studentid);
-        cmd.Parameters.AddWithValue("@ParamMistrial", mistrial);
-        da = new SqlDataAdapter(cmd);
-        da.Fill(dt);
 
-
-        foreach (DataRow dr in dt.Rows)
+            foreach (DataRow dr in dt.Rows)
             {
-            row = new Dictionary<string, object>();
-            foreach (DataColumn dc in dt.Columns)
+                row = new Dictionary<string, object>();
+                foreach (DataColumn dc in dt.Columns)
                 {
-                row.Add(dc.ColumnName, dr[dc]);
-            }
-            rows.Add(row);
-
+                    row.Add(dc.ColumnName, dr[dc]);
                 }
+                rows.Add(row);
 
-        JavaScriptSerializer json = new JavaScriptSerializer();
-        string dat = json.Serialize(rows);
-        return json.Serialize(rows);
+            }
+
+            JavaScriptSerializer json = new JavaScriptSerializer();
+            string dat = json.Serialize(rows);
+            return json.Serialize(rows);
+        }
+        catch (Exception ex)
+        {
+            ClsErrorLog errlog = new ClsErrorLog();
+            errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\nStored Procedure: DashboardClientAcademic" +
+                "\nStudentId ID = " + studentid + "\n" + ex.ToString());
+            return null;
+        }
             }
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -1546,33 +1557,42 @@ public partial class Graph : System.Web.UI.Page
         //String proc = "[dbo].[DashboardClientAcademicPercentage]";
 
         //DataTable dt = objdata.ReturnNewAcademicTablePerc(proc, classid, studentid);
+        try
+        {
+            SqlCommand cmd = null;
+            DataTable dt = new DataTable();
+            SqlConnection con = objdata.Open();
+            SqlDataAdapter da = new SqlDataAdapter();
+            cmd = new SqlCommand("DashboardClientAcademicPercentage", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.CommandTimeout = 600;
+            cmd.Parameters.AddWithValue("@ParamClassid", classid);
+            cmd.Parameters.AddWithValue("@ParamStudid", studentid);
+            da = new SqlDataAdapter(cmd);
+            da.Fill(dt);
 
-        SqlCommand cmd = null;
-        DataTable dt = new DataTable();
-        SqlConnection con = objdata.Open();
-        SqlDataAdapter da = new SqlDataAdapter();
-        cmd = new SqlCommand("DashboardClientAcademicPercentage", con);
-        cmd.CommandType = CommandType.StoredProcedure;
-        cmd.CommandTimeout = 600;
-        cmd.Parameters.AddWithValue("@ParamClassid", classid);
-        cmd.Parameters.AddWithValue("@ParamStudid", studentid);
-        da = new SqlDataAdapter(cmd);
-        da.Fill(dt);
-
-        foreach (DataRow dr in dt.Rows)
+            foreach (DataRow dr in dt.Rows)
             {
-            row = new Dictionary<string, object>();
-            foreach (DataColumn dc in dt.Columns)
+                row = new Dictionary<string, object>();
+                foreach (DataColumn dc in dt.Columns)
                 {
-                row.Add(dc.ColumnName, dr[dc]);
-            }
-            rows.Add(row);
-
+                    row.Add(dc.ColumnName, dr[dc]);
                 }
+                rows.Add(row);
 
-        JavaScriptSerializer json = new JavaScriptSerializer();
-        string dat = json.Serialize(rows);
-        return json.Serialize(rows);
+            }
+
+            JavaScriptSerializer json = new JavaScriptSerializer();
+            string dat = json.Serialize(rows);
+            return json.Serialize(rows);
+        }
+        catch (Exception ex)
+        {
+            ClsErrorLog errlog = new ClsErrorLog();
+            errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\nStored Procedure: DashboardClientAcademicPercentage" +
+                "\nStudentId ID = " + studentid + "\n" + ex.ToString());
+            return null;
+        }
     }
 
     [WebMethod]
@@ -1583,96 +1603,104 @@ public partial class Graph : System.Web.UI.Page
         string str = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
         SqlConnection cn = new SqlConnection(str);
         cn.Open();
-
-        List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
-        Dictionary<string, object> row;
-        //String proc = "[dbo].[DashboardClientClinicalNew]";
-
-        //DataTable dt = objData.ReturnNewTableClinicClient(proc, cid, sid);
-
-        SqlCommand cmd = null;
-        DataTable dt = new DataTable();
-        SqlConnection con = objData.Open();
-        SqlDataAdapter da = new SqlDataAdapter();
-        cmd = new SqlCommand("DashboardClientClinicalNew", con);
-        cmd.CommandType = CommandType.StoredProcedure;
-        cmd.CommandTimeout = 600;
-        cmd.Parameters.AddWithValue("@ParamClassid", cid);
-        cmd.Parameters.AddWithValue("@ParamStudid", sid);
-        da = new SqlDataAdapter(cmd);
-        da.Fill(dt);
-
-        if (dt != null && dt.Rows.Count > 0)
+        try
         {
-            var grouped = dt.AsEnumerable()
-                .GroupBy(row1 => new
-                {
-                    StudentId = row1.Field<int>("StudentId"),
-                    MeasurementId = row1.Field<int>("MeasurementId"),
-                    ClassId = row1.Field<int>("ClassId")
-                })
-                .Select(g =>
-                {
-                    var first = g.First();
-                    var newRow = dt.NewRow();
+            List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+            Dictionary<string, object> row;
+            //String proc = "[dbo].[DashboardClientClinicalNew]";
 
-                    newRow["StudentId"] = g.Key.StudentId;
-                    newRow["MeasurementId"] = g.Key.MeasurementId;
-                    newRow["ClassId"] = g.Key.ClassId;
-                    newRow["BehaviourSession"] = g.Sum(r => r.Field<int>("BehaviourSession"));
+            //DataTable dt = objData.ReturnNewTableClinicClient(proc, cid, sid);
+            SqlCommand cmd = null;
+            DataTable dt = new DataTable();
+            SqlConnection con = objData.Open();
+            SqlDataAdapter da = new SqlDataAdapter();
+            cmd = new SqlCommand("DashboardClientClinicalNew", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.CommandTimeout = 600;
+            cmd.Parameters.AddWithValue("@ParamClassid", cid);
+            cmd.Parameters.AddWithValue("@ParamStudid", sid);
+            da = new SqlDataAdapter(cmd);
+            da.Fill(dt);
 
-                    foreach (DataColumn col in dt.Columns)
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                var grouped = dt.AsEnumerable()
+                    .GroupBy(row1 => new
                     {
-                        if (col.ColumnName == "StudentId" ||
-                            col.ColumnName == "MeasurementId" ||
-                            col.ColumnName == "ClassId" ||
-                            col.ColumnName == "BehaviourSession")
-                            continue;
+                        StudentId = row1.Field<int>("StudentId"),
+                        MeasurementId = row1.Field<int>("MeasurementId"),
+                        ClassId = row1.Field<int>("ClassId")
+                    })
+                    .Select(g =>
+                    {
+                        var first = g.First();
+                        var newRow = dt.NewRow();
 
-                        newRow[col.ColumnName] = first[col.ColumnName];
-                    }
+                        newRow["StudentId"] = g.Key.StudentId;
+                        newRow["MeasurementId"] = g.Key.MeasurementId;
+                        newRow["ClassId"] = g.Key.ClassId;
+                        newRow["BehaviourSession"] = g.Sum(r => r.Field<int>("BehaviourSession"));
 
-                    return newRow;
-                });
+                        foreach (DataColumn col in dt.Columns)
+                        {
+                            if (col.ColumnName == "StudentId" ||
+                                col.ColumnName == "MeasurementId" ||
+                                col.ColumnName == "ClassId" ||
+                                col.ColumnName == "BehaviourSession")
+                                continue;
 
-            DataTable groupedDt = dt.Clone(); // Clone the schema
-            foreach (var row1 in grouped)
-                groupedDt.Rows.Add(row1.ItemArray);
+                            newRow[col.ColumnName] = first[col.ColumnName];
+                        }
 
-            dt = groupedDt;
+                        return newRow;
+                    });
 
-            // Add MaxCount column
-            int maxCount = dt.AsEnumerable()
-                             .Max(row2 => row2.Field<int>("BehaviourSession"));
+                DataTable groupedDt = dt.Clone(); // Clone the schema
+                foreach (var row1 in grouped)
+                    groupedDt.Rows.Add(row1.ItemArray);
 
-            if (!dt.Columns.Contains("MaxCount"))
-                dt.Columns.Add("MaxCount", typeof(int));
+                dt = groupedDt;
 
-            foreach (DataRow row2 in dt.Rows)
-            {
-                row2["MaxCount"] = maxCount;
+                // Add MaxCount column
+                int maxCount = dt.AsEnumerable()
+                                 .Max(row2 => row2.Field<int>("BehaviourSession"));
+
+                if (!dt.Columns.Contains("MaxCount"))
+                    dt.Columns.Add("MaxCount", typeof(int));
+
+                foreach (DataRow row2 in dt.Rows)
+                {
+                    row2["MaxCount"] = maxCount;
+                }
             }
-        }
-        else
-        {
-            return "[]"; // or return an error object
-        }
-
-        // Convert DataTable to JSON
-        foreach (DataRow dr in dt.Rows)
-        {
-            row = new Dictionary<string, object>();
-            foreach (DataColumn dc in dt.Columns)
+            else
             {
-                row.Add(dc.ColumnName, dr[dc]);
+                return "[]"; // or return an error object
             }
-            rows.Add(row);
-        }
 
-        JavaScriptSerializer json = new JavaScriptSerializer();
-        string dat = json.Serialize(rows);
-        Debug.WriteLine(dat);
-        return json.Serialize(rows);
+            // Convert DataTable to JSON
+            foreach (DataRow dr in dt.Rows)
+            {
+                row = new Dictionary<string, object>();
+                foreach (DataColumn dc in dt.Columns)
+                {
+                    row.Add(dc.ColumnName, dr[dc]);
+                }
+                rows.Add(row);
+            }
+
+            JavaScriptSerializer json = new JavaScriptSerializer();
+            string dat = json.Serialize(rows);
+            Debug.WriteLine(dat);
+            return json.Serialize(rows);
+        }
+        catch (Exception ex)
+        {
+            ClsErrorLog errlog = new ClsErrorLog();
+            errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\nStored Procedure: DashboardClientClinicalNew" +
+                "\nStudentId ID = " + sid + "\n" + ex.ToString());
+            return null;
+        }
     }
 
 
@@ -1719,63 +1747,80 @@ public partial class Graph : System.Web.UI.Page
             gvClinicalByStaff.DataSource = null;
             gvClinicalByStaff.DataBind();
 
+            try
+            {
+                DataTable DtAcademic = new DataTable();
+                SqlCommand cmdAcademic = new SqlCommand("DashboardAcademicTable", con);
+                cmdAcademic.CommandType = CommandType.StoredProcedure;
+                cmdAcademic.CommandTimeout = 600;
+                cmdAcademic.Parameters.AddWithValue("@ParamStartDate", startDate);
+                cmdAcademic.Parameters.AddWithValue("@ParamEndDate", endDate);
+                cmdAcademic.Parameters.AddWithValue("@StudentIds", Studids);
+                cmdAcademic.Parameters.AddWithValue("@UserIds", Userids);
+                cmdAcademic.Parameters.AddWithValue("@ParamMistrial", Mistrial);
+                cmdAcademic.Parameters.AddWithValue("@ClassIds", Classids);
+                SqlDataAdapter daAcademic = new SqlDataAdapter(cmdAcademic);
+                daAcademic.Fill(DtAcademic);
 
-            DataTable DtAcademic = new DataTable();
-            SqlCommand cmdAcademic = new SqlCommand("DashboardAcademicTable", con);
-            cmdAcademic.CommandType = CommandType.StoredProcedure;
-            cmdAcademic.CommandTimeout = 600;
-            cmdAcademic.Parameters.AddWithValue("@ParamStartDate", startDate);
-            cmdAcademic.Parameters.AddWithValue("@ParamEndDate", endDate);
-            cmdAcademic.Parameters.AddWithValue("@StudentIds", Studids);
-            cmdAcademic.Parameters.AddWithValue("@UserIds", Userids);
-            cmdAcademic.Parameters.AddWithValue("@ParamMistrial", Mistrial);
-            cmdAcademic.Parameters.AddWithValue("@ClassIds", Classids);
-            SqlDataAdapter daAcademic = new SqlDataAdapter(cmdAcademic);
-            daAcademic.Fill(DtAcademic);
-            
-            DataTable dtAcademicStaff = PivotDataTableStaff(DtAcademic);
-            DtAcademic = PivotDataTableClient(DtAcademic);
+                DataTable dtAcademicStaff = PivotDataTableStaff(DtAcademic);
+                DtAcademic = PivotDataTableClient(DtAcademic);
 
-            DtAcademic = fillDates(DtAcademic, startDate, endDate);
-            dtAcademicStaff = fillDates(dtAcademicStaff, startDate, endDate);
+                DtAcademic = fillDates(DtAcademic, startDate, endDate);
+                dtAcademicStaff = fillDates(dtAcademicStaff, startDate, endDate);
 
-            AddDynamicColumnsClientAcademic(DtAcademic);
-            AddDynamicColumnsStaffAcademic(dtAcademicStaff);
-            
-            gvProgramsByClient.DataSource = DtAcademic;
-            gvProgramsByClient.DataBind();
+                AddDynamicColumnsClientAcademic(DtAcademic);
+                AddDynamicColumnsStaffAcademic(dtAcademicStaff);
 
-            gvProgramsByStaff.DataSource = dtAcademicStaff;
-            gvProgramsByStaff.DataBind();
+                gvProgramsByClient.DataSource = DtAcademic;
+                gvProgramsByClient.DataBind();
 
-            DataTable DtClinical = new DataTable();
-            SqlCommand cmdClinical = new SqlCommand("DashboardClinicalTable", con);
-            cmdClinical.CommandType = CommandType.StoredProcedure;
-            cmdClinical.CommandTimeout = 600;
-            cmdClinical.Parameters.AddWithValue("@ParamStartDate", startDate);
-            cmdClinical.Parameters.AddWithValue("@ParamEndDate", endDate);
-            cmdClinical.Parameters.AddWithValue("@StudentIds", Studids);
-            cmdClinical.Parameters.AddWithValue("@UserIds", Userids);
-            cmdClinical.Parameters.AddWithValue("@ClassIds", Classids);
-            SqlDataAdapter daClinical = new SqlDataAdapter(cmdClinical);
-            daClinical.Fill(DtClinical);
-            DtClinical = addCountPerDate(DtClinical);
-            DataTable dtClinicalStaff = PivotDataTableStaff(DtClinical);
-            DtClinical = PivotDataTableClient(DtClinical);
+                gvProgramsByStaff.DataSource = dtAcademicStaff;
+                gvProgramsByStaff.DataBind();
+            }
+            catch (Exception ex)
+            {
+                ClsErrorLog errlog = new ClsErrorLog();
+                errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\nStored Procedure: DashboardAcademicTable" +
+                    "\nStudentId ID = " + Studids + "\n" + ex.ToString());
+                throw ex;
+            }
+            try
+            {
+                DataTable DtClinical = new DataTable();
+                SqlCommand cmdClinical = new SqlCommand("DashboardClinicalTable", con);
+                cmdClinical.CommandType = CommandType.StoredProcedure;
+                cmdClinical.CommandTimeout = 600;
+                cmdClinical.Parameters.AddWithValue("@ParamStartDate", startDate);
+                cmdClinical.Parameters.AddWithValue("@ParamEndDate", endDate);
+                cmdClinical.Parameters.AddWithValue("@StudentIds", Studids);
+                cmdClinical.Parameters.AddWithValue("@UserIds", Userids);
+                cmdClinical.Parameters.AddWithValue("@ClassIds", Classids);
+                SqlDataAdapter daClinical = new SqlDataAdapter(cmdClinical);
+                daClinical.Fill(DtClinical);
+                DtClinical = addCountPerDate(DtClinical);
+                DataTable dtClinicalStaff = PivotDataTableStaff(DtClinical);
+                DtClinical = PivotDataTableClient(DtClinical);
 
-            DtClinical = fillDates(DtClinical, startDate, endDate);
-            dtClinicalStaff = fillDates(dtClinicalStaff, startDate, endDate);
+                DtClinical = fillDates(DtClinical, startDate, endDate);
+                dtClinicalStaff = fillDates(dtClinicalStaff, startDate, endDate);
 
 
-            AddDynamicColumnsClientClinical(DtClinical);
-            AddDynamicColumnsStaffClinical(dtClinicalStaff);
+                AddDynamicColumnsClientClinical(DtClinical);
+                AddDynamicColumnsStaffClinical(dtClinicalStaff);
 
-            gvClinicalByClient.DataSource = DtClinical;
-            gvClinicalByClient.DataBind();
+                gvClinicalByClient.DataSource = DtClinical;
+                gvClinicalByClient.DataBind();
 
-            gvClinicalByStaff.DataSource = dtClinicalStaff;
-            gvClinicalByStaff.DataBind();
-
+                gvClinicalByStaff.DataSource = dtClinicalStaff;
+                gvClinicalByStaff.DataBind();
+            }
+            catch (Exception ex)
+            {
+                ClsErrorLog errlog = new ClsErrorLog();
+                errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\nStored Procedure: DashboardClinicalTable" +
+                    "\nStudentId ID = " + Studids + "\n" + ex.ToString());
+                throw ex;
+            }
             //ddcb_clas.SelectedIndex = 0;
             highcheck.Visible = false;
             BtnRefresh.Visible = false;
