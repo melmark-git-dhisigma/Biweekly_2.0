@@ -77,6 +77,7 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
        
         if (!IsPostBack)
         {
+            ViewState["OnlyActiveMaint"] = chkOnlyActiveMaint.Checked;
             ShowAllLPs("");
             LoadData();            
         }
@@ -338,7 +339,10 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
             string selQry = "";
             if (oSession != null)
             {
-
+                bool onlyActiveMaint = OnlyActiveMaintFlag;
+                string statusWhitelist = onlyActiveMaint
+                    ? "'Approved','Maintenance'"
+                    : "'Approved','Maintenance','Pending Approval','In Progress'";
                 //query to check the current IEP status of the student.....
                 if (oSession.SchoolId == 2)
 
@@ -395,7 +399,7 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
                             }
                             string tags = "<li id='li_" + drGl["GoalId"].ToString() + "' style='position: static;' class='accordion'>" +
                                  "<h2 class='' onclick='h2click(this);'><span class='dd'></span><a href='#our-name'>" + drGl["GoalCode"].ToString() + "</a><div id=&apos;" + drGl["StdtGoalId"].ToString() + "&apos; class='container'>" +
-                                 "<span><img width='15px' height='7px' style='position: absolute; float: left ! important; padding-right: 0px; margin: 4px -15px 0px; display: none;' src='images/load.gif'>" + chkbox + "Included in IEP</span><a href='#' class='dlt' onclick='deleteLPandGoal(this.parentNode,this.parentNode.id,&apos;Goal&apos;,event);'></a></div></h2>" +
+                                 "<span><img width='15px' height='7px' style='position: absolute; float: left ! important; padding-right: 0px; margin: 4px -15px 0px; display: none;' src='images/load.gif'>" + chkbox + "Included in IEP/ISP</span><a href='#' class='dlt' onclick='deleteLPandGoal(this.parentNode,this.parentNode.id,&apos;Goal&apos;,event);'></a></div></h2>" +
                                  "<div style='display: none;background-color:#E1E1E1;border-radius:0px 0px 7px 7px;' class='wrapper'>";
                             //"<img width='16px' height='15px' title='Refresh' style='padding-left: 97%;' src='images/arrows_refresh.png' onclick='refreshGoal(this);'>";
                             ul_selGoals.InnerHtml += tags;
@@ -458,7 +462,7 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
                                 //"((select COUNT(LessonPlanId) FROM StdtLessonPlan where ActiveInd='D' AND LessonplanId=SLP.lessonplanid AND StudentId=" + oSession.StudentId + ")=0 OR (select COUNT(StatusId) " +
                                 "((select COUNT(StatusId) " +
                                 "FROM DSTempHdr DSTH WHERE DSTH.LessonPlanId = SLP.lessonplanid AND DSTH.StudentId=" + oSession.StudentId + " AND DSTH.StatusId IN (SELECT LookupId FROM LookUp Look WHERE Look.LookupType='TemplateStatus' " +
-                                "AND Look.LookupName IN ('In Progress', 'Pending Approval', 'Approved', 'Maintenance')))>0) ORDER BY LessonOrder";
+                                "AND Look.LookupName IN (" + statusWhitelist + ")))>0) ORDER BY LessonOrder";
                             ///end
                             ///
                             DataTable dtLPs = oData.ReturnDataTable(selLPs, false);
@@ -487,7 +491,7 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
                                     string LPtags = "<div id='div_" + drLP["LessonPlanId"].ToString() + "' class='ingrContainer'><h3>" + drLP["LessonPlanName"].ToString() + "</h3><div id=&apos;" + drLP["StdtLessonPlanId"].ToString() + "&apos; class='container'>" +
                                              "<span style='float:left;'><img width='15px' height='7px' style='position: absolute; float: left ! important; padding-right: 0px; margin: 4px -15px 0px; display: none;' src='images/load.gif'>" + LPchkbxDay + "Day </span>" +
                                              "<span style='float:left;'><img width='15px' height='7px' style='position: absolute; float: left ! important; padding-right: 0px; margin: 4px -15px 0px; display: none;' src='images/load.gif'> " + LPchkbxResi + "Residential </span>" +
-                                             "<span><img width='15px' height='7px' style='position: absolute; float: left ! important; padding-right: 0px; margin: 4px -15px 0px; display: none;' src='images/load.gif'>" + LPchkbx + "Included in IEP</span></div><br clear='all' />" +//<a href='#' class='dlt' onclick='deleteLPandGoal(this,this.parentNode.id,&apos;LP&apos;,event);'></a>
+                                             "<span><img width='15px' height='7px' style='position: absolute; float: left ! important; padding-right: 0px; margin: 4px -15px 0px; display: none;' src='images/load.gif'>" + LPchkbx + "Included in IEP/ISP</span></div><br clear='all' />" +//<a href='#' class='dlt' onclick='deleteLPandGoal(this,this.parentNode.id,&apos;LP&apos;,event);'></a>
                                              "<p>" + drLP["LessonPlanDesc"].ToString() + " </p>" +
                                              "</div>";
                                     ul_selGoals.InnerHtml += LPtags;
@@ -776,6 +780,10 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
             ul_Goals.InnerHtml = "";
             if (oSession != null)
             {
+                bool onlyActiveMaint = OnlyActiveMaintFlag;
+                string statusWhitelist = onlyActiveMaint
+                    ? "'Approved','Maintenance'"
+                    : "'Approved','Maintenance','Pending Approval','In Progress'";
                 //query to find all the goals .....
                 string selgoal = "SELECT DISTINCT Rel.GoalId,Gl.GoalName,Gl.GoalCode " +
                                 "FROM GoalLPRel Rel " +
@@ -856,7 +864,8 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
                                 "LP.LessonPlanId=SLP.LessonPlanId ) LessonExist,(SELECT COUNT(DSTempHdrId) FROM DSTempHdr HDR WHERE HDR.LessonPlanId=LP.LessonPlanId AND StudentId IS NULL) DSTMPID  , " +
                                 "(SELECT COUNT(DSTempHdrId) FROM DSTempHdr HDR INNER JOIN lookup ON HDR.statusid = lookup.lookupid WHERE HDR.LessonPlanId=LP.LessonPlanId AND StudentId IS NULL AND HDR.isDynamic=0 AND lookupname<>(" + lookupQuery + ")) Status FROM (GoalLPRel Rel INNER JOIN LessonPlan LP " +
                                 "ON LP.LessonPlanId=Rel.LessonPlanId) INNER JOIN (Goal Gl INNER JOIN GoalType Typ ON Typ.GoalTypeId=Gl.GoalTypeId) ON Gl.GoalId=Rel.GoalId " + conditn + " AND LP.LessonPlanId = " + Convert.ToInt32(hdLessonId.Value) + " ) GLP " +
-                                "WHERE GLP.DSTMPID=0 AND Status=0 AND GLP.LessonExist=0 ORDER BY GLP.LessonPlanName,GoalId,GLP.LessonPlanId ";
+                                "WHERE GLP.DSTMPID=0 AND Status=0 AND GLP.LessonExist=0 "+
+                                "ORDER BY GLP.LessonPlanName,GoalId,GLP.LessonPlanId ";
                         }
                     }
                     else
@@ -1395,7 +1404,7 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
                 }
                 else
                 {
-                    retrn = "Deletion Not Possible : Lessonplan is Included in IEP";
+                    retrn = "Deletion Not Possible : Lessonplan is Included in IEP/ISP";
                 }
                 //System.Web.UI.ScriptManager.RegisterClientScriptBlock(Page, typeof(Page), "Script", "", true);
                 //     Page.Redirect("default.aspx", false);
@@ -1757,7 +1766,6 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
                     HttpContext.Current.Session["Objective"] = txtObjective.Text;
                     hdLessonId.Value = LPid.ToString();
                 }
-
             }
         }
         catch (Exception ex)
@@ -1825,7 +1833,8 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
             //StudentLp = Convert.ToInt32(oData.FetchValue("SELECT COUNT(*) FROM DSTempHdr INNER JOIN lookup ON HDR.statusid = lookup.lookupid WHERE  RTRIM(LTRIM(LOWER(DSTemplateName)))= RTRIM(LTRIM(LOWER('" + clsGeneral.convertQuotes(txtLPname.Text.Trim()) + "'))) AND  lookupname not in('Deleted','SoftDelete')) AND StudentId='" + oSession.StudentId + "' AND (SELECT GoalId FROM StdtLessonPlan WHERE StdtLessonPlanId=DSTempHdr.StdtLessonplanId)='" + ddlGoals.SelectedItem.Value + "'"));
             if (StudentLp > 0)
             {
-                ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "alert('Lesson plan name already exist under this goal. Please enter another name...');", true);
+                ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "alert('Lesson plan name already exist under this goal. Please enter another name or Add under Different Goal...');", true);
+                ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "hideLoader();", true);
                 ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "showAddLp();", true);
 
             }
@@ -2123,7 +2132,7 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
                 int oldParentSetId = 0;
                 DataTable dtParentStep = new DataTable();
                 strQuery = "SELECT  DSTempParentStepId,SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn"
-                    + " FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempHdrId = " + tempHdrId;
+                    + " FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + tempHdrId + " AND ActiveInd = 'A')  AND DSTempHdrId = " + tempHdrId;
                 dtParentStep = oData.ReturnDataTable(strQuery, Con, Trans, false);
                 if (dtParentStep != null)
                 {
@@ -2292,6 +2301,61 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
         catch (Exception Ex)
         {
             throw Ex;
+        }
+    }
+
+    protected void chkOnlyActiveMaint_CheckedChanged(object sender, EventArgs e)
+    {
+        try
+        {
+            ScriptManager.RegisterStartupScript(this, GetType(), "showLoaderAfterChk", "showLoaders();", true);
+            ul_selGoals.InnerHtml = "";
+            ViewState["OnlyActiveMaint"] = chkOnlyActiveMaint.Checked;
+            LoadAssignLPs();   // your existing method that builds the Assigned grid
+            // If you also filter the left bank, call ShowAllLPs("") here if desired.
+        }
+        finally
+        {
+            // Always hide the loader even if an exception or 0 rows
+            ScriptManager.RegisterStartupScript(this, GetType(), "hideLoaderAfterChk", "hideLoader();", true);
+            //ScriptManager.RegisterStartupScript(this, GetType(), "hideNewLoaderAfterChk", "unblockUI();", true);
+        }
+    }
+
+    private static readonly string[] STATUSES_ACTIVE_MAINT = { "Approved", "Maintenance" };
+    private static readonly string[] STATUSES_WHEN_UNCHECKED = { "Approved", "Maintenance", "In Progress", "Pending Approval" };
+
+    private IEnumerable<string> GetStatusWhitelist()
+    {
+        // If your DB uses "Active" instead of "Approved", replace it here.
+        return chkOnlyActiveMaint.Checked ? STATUSES_ACTIVE_MAINT : STATUSES_WHEN_UNCHECKED;
+    }
+
+    private static string BuildInClause(SqlCommand cmd, string paramBase, IEnumerable<string> values)
+    {
+        var list = values.Distinct().ToList();
+        if (list.Count == 0)
+            return "SELECT 1 WHERE 1=0"; // yields IN (SELECT 1 WHERE 1=0) -> empty set
+
+        var paramNames = new List<string>(list.Count);
+        for (int i = 0; i < list.Count; i++)
+        {
+            string p = paramBase + i; // "@status0", "@status1", ...
+            var par = cmd.Parameters.Add(p, SqlDbType.NVarChar, 50);
+            par.Value = list[i];
+            paramNames.Add(p);
+        }
+        return string.Join(",", paramNames); // "@status0,@status1"
+    }
+
+    private bool OnlyActiveMaintFlag
+    {
+        get
+        {
+            object v = ViewState["OnlyActiveMaint"];
+            if (v is bool) return (bool)v;
+            if (v != null) return Convert.ToBoolean(v);
+            return false;
         }
     }
 }
