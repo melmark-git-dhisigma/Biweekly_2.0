@@ -17,7 +17,7 @@
    <script src="../Scripts/highcharts/7.1.2/modules/accessibility.js"></script>
     <script src="../Scripts/highcharts/7.1.2/grouped-categories.js"></script>
      <script src="../Scripts/highcharts/7.1.2/modules/xrange.js"></script>
-    <script src="../Scripts/highcharts/7.1.2/modules/exporting.js"></script>
+<%--    <script src="../Scripts/highcharts/7.1.2/modules/exporting.js"></script>--%>
         <script src="../Scripts/html2canvas.min.js"></script>
             <script src="../Scripts/es6-promise.auto.min.js"></script>
         <script src="../Scripts/es6-promise.min.js"></script>
@@ -846,6 +846,9 @@
                                 val = val + 1
                             });
                             Highcharts.chart('medcont', {
+                                exporting: {
+                                    enabled: false
+                                },
                                 chart: {
                                     type: 'xrange',
                                     plotBorderWidth: 2,
@@ -1600,6 +1603,9 @@
             
             function drawGraph(treatment, secstatus, leftY, rightY, ser, plotdata, rownum, leftmax, rightmax, minxvalue, maxxvalue, rotangle) {
                             var chart = Highcharts.chart('cont', {
+                    exporting: {
+                        enabled: false
+                    },
                                 chart: {
                                     plotBorderWidth: 2,
                                     plotBorderColor: 'black',
@@ -1793,6 +1799,9 @@
             //incident graph start
             function drawGraphInc(treatment, secstatus, leftY, rightY, ser, plotdata, incCat,leftmax, rightmax, minxvalue, maxxvalue) {
                 var chart = Highcharts.chart('cont', {
+                    exporting: {
+                        enabled: false
+                    },
                     chart: {
                         type:'scatter',
                         plotBorderWidth: 2,
@@ -2111,9 +2120,7 @@ year
                 return formattedDate;
             }
             var charts1, charts2;
-
             var lessnamegroup = "<%=lname%>".replace(/\$/g, '"');
-            ;
             var lessnm = [];
             var currentItem = '';
             var insideQuotes = false;
@@ -2272,6 +2279,9 @@ year
                                 val = val + 1
                             });
                             Highcharts.chart('medcont', {
+                                exporting: {
+                                    enabled: false
+                                },
                                 chart: {
                                     type: 'xrange',
                                     plotBorderWidth: 2,
