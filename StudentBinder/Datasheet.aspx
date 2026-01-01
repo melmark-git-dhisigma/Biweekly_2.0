@@ -990,17 +990,17 @@
                  var ahr = parseInt(hrvalue);                
                 var amin = parseInt(minvalue);
                 var asec = parseInt(secvalue);
-                if ((ahr > 24)  ||(amin > 60)||(asec > 60))                    
+                if ((ahr > 24) || (amin > 59) || (asec > 59))                    
                      {
-                    alert("Keep Time Formate");
+                    alert("Keep Time Format");
                     return;
                 }
                 if ((ahr <0) || (amin <0) || (asec <0)) {
-                    alert("Keep Time Formate");
+                    alert("Keep Time Format");
                     return;
                 }
                 //if ((ahr == 0) && (amin == 0) && (asec == 0)) {
-                //    alert("Keep Time Formate");
+                //    alert("Keep Time Format");
                 //    return;
                 //}
                 var displayval = "";
@@ -1197,15 +1197,15 @@
                 //var asec = parseInt(secvalue);
                 //if ((ahr > 24)  ||(amin > 60)||(asec > 60))                    
                 //     {
-                //    alert("Keep Time Formate");
+                //    alert("Keep Time Format");
                 //    return;
                 //}
                 //if ((ahr <0) || (amin <0) || (asec <0)) {
-                //    alert("Keep Time Formate");
+                //    alert("Keep Time Format");
                 //    return;
                 //}
                 //if ((ahr == 0) && (amin == 0) && (asec == 0)) {
-                //    alert("Keep Time Formate");
+                //    alert("Keep Time Format");
                 //    return;
                 //}
                 //var displayval = "";
@@ -1446,16 +1446,16 @@
                 var ahr = parseInt(hrvalue);
                 var amin = parseInt(minvalue);
                 var asec = parseInt(secvalue);
-                if ((ahr > 24) || (amin > 60) || (asec > 60)) {
-                    alert("Keep Time Formate");
+                if ((ahr > 24) || (amin > 59) || (asec > 59)) {
+                    alert("Keep Time Format");
                     return;
                 }
                 if ((ahr < 0) || (amin < 0) || (asec < 0)) {
-                    alert("Keep Time Formate");
+                    alert("Keep Time Format");
                     return;
                 }
                 //if ((ahr == 0) && (amin == 0) && (asec == 0)) {
-                //    alert("Keep Time Formate");
+                //    alert("Keep Time Format");
                 //    return;
                 //}
                 var displayval = "";
