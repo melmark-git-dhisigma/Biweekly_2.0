@@ -924,7 +924,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         {
                             RadioButtonListSets.Items[0].Selected = true;
                         }
-                        if (RadioButtonListSets.SelectedValue.ToString()=="")
+                             if (RadioButtonListSets.SelectedValue.ToString() == "")
                         {
                             RadioButtonListSets.Items[0].Selected = true;
                             loadStepOverrid(Convert.ToInt32(RadioButtonListSets.SelectedValue.ToString()));
@@ -1240,10 +1240,10 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                 else
 								    RadioButtonListSteps.Items[0].Selected = true;
 
-                            if (RadioButtonListSteps.SelectedValue.ToString()=="")
-                            {
-                                RadioButtonListSteps.Items[0].Selected = true;
-                            }
+                                if (RadioButtonListSteps.SelectedValue.ToString() == "")
+                                {
+                                    RadioButtonListSteps.Items[0].Selected = true;
+                                }
                                 // Approval Popup Issue New Lesson Creation [18 - jun -2020] - Dev 1  r
 
                             }
@@ -2028,7 +2028,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         try
         {
             selQuerry = "SELECT DSTempParentStepId, ROW_NUMBER() Over (Order by DSTempHdrId, SortOrder) As [Sln],SortOrder FROM DSTempParentStep WHERE DSTempHdrId = "
-                + headerId + " and activeInd = 'A' ORDER BY DSTempHdrId, SortOrder";
+                + headerId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + headerId + " AND ActiveInd = 'A')   and activeInd = 'A' ORDER BY DSTempHdrId, SortOrder";
             DataTable dtList = objData.ReturnDataTable(selQuerry, false);
             if (dtList.Rows.Count > 0)
             {
@@ -5980,7 +5980,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 if (chkEnd.Checked == true)
                 {
 
-                    string selQuery = "SELECT ISNULL(MAX(SortOrder),0) FROM DSTempParentStep WHERE DSTempHdrId = " + headerId + " AND ActiveInd = 'A'";
+                    string selQuery = "SELECT ISNULL(MAX(SortOrder),0) FROM DSTempParentStep WHERE DSTempHdrId = " + headerId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + headerId + " AND ActiveInd = 'A')   AND ActiveInd = 'A'";
                     objCount = objData.FetchValue(selQuery);
                     selectedText = Convert.ToInt32(objCount) + 1;
                 }
@@ -8435,7 +8435,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 if (chkEnd.Checked == true)
                 {
 
-                    string selQuery = "SELECT ISNULL(MAX(SortOrder),0) FROM DSTempParentStep WHERE DSTempHdrId = " + headerId + " AND ActiveInd = 'A'";
+                    string selQuery = "SELECT ISNULL(MAX(SortOrder),0) FROM DSTempParentStep WHERE DSTempHdrId = " + headerId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + headerId + " AND ActiveInd = 'A')   AND ActiveInd = 'A'";
                     objCount = objData.FetchValue(selQuery);
                     selectedText = Convert.ToInt32(objCount) + 1;
                 }
@@ -8702,7 +8702,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     ///UPDATE SORTORDER OF PARENTSTEP
                     ///
                     strQurry = "SELECT  DSTempParentStepId,SortOrder FROM DSTempParentStep"
-                        + " WHERE DSTempHdrId=" + headerId + "AND ActiveInd = 'A' AND SortOrder >" + currentSortOrder + " AND SortOrder <=" + newSortOrder;
+                        + " WHERE DSTempHdrId=" + headerId + "AND ActiveInd = 'A'  AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + headerId + " AND ActiveInd = 'A') AND SortOrder >" + currentSortOrder + " AND SortOrder <=" + newSortOrder;
                     DataTable dtList = objData.ReturnDataTableWithTransaction(strQurry, con, Transs, false);
 
                     for (int i = 0; i < dtList.Rows.Count; i++)
@@ -8736,7 +8736,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     ///UPDATE SORTORDER OF PARENTSTEP
                     ///
                     strQurry = "SELECT  DSTempParentStepId,SortOrder FROM DSTempParentStep"
-                        + " WHERE DSTempHdrId=" + headerId + "AND ActiveInd = 'A' AND SortOrder <" + currentSortOrder + " AND SortOrder >=" + newSortOrder;
+                        + " WHERE DSTempHdrId=" + headerId + "AND ActiveInd = 'A' AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + headerId + " AND ActiveInd = 'A')   AND SortOrder <" + currentSortOrder + " AND SortOrder >=" + newSortOrder;
                     DataTable dtList = objData.ReturnDataTableWithTransaction(strQurry, con, Transs, false);
 
                     for (int i = 0; i < dtList.Rows.Count; i++)
@@ -9526,7 +9526,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             BtnAddStep_Click(sender, e); // To Hide Update Button on Edit - Update is in Progress -- Dev 2 [10-Jul-2020]
 
             strQurry = "SELECT  DSTempParentStepId,SortOrder FROM DSTempParentStep"
-                      + " WHERE DSTempHdrId = " + headerId + " And ActiveInd = 'A' AND SortOrder >" + currentSortOrder;
+                      + " WHERE DSTempHdrId = " + headerId + " And ActiveInd = 'A' AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + headerId + " AND ActiveInd = 'A')   AND SortOrder >" + currentSortOrder;
             DataTable dtList = objData.ReturnDataTable(strQurry, false);
 
 
@@ -14299,7 +14299,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             return;
                         }
 
-                        string strQrystepTot = "SELECT Count(DSTempParentStepId) from DSTempParentStep where DSTempHdrId=" + TemplateId + "  and ActiveInd='A'";
+                        string strQrystepTot = "SELECT Count(DSTempParentStepId) from DSTempParentStep where DSTempHdrId=" + TemplateId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + TemplateId + " AND ActiveInd = 'A')    and ActiveInd='A'";
                         int dtCheckstepTot = Convert.ToInt32(objData.FetchValue(strQrystepTot));
                         if (dtCheckstepTot > 0)
                         {
@@ -15110,7 +15110,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             return;
                         }
 
-                        string strQrystepTot = "SELECT Count(DSTempParentStepId) from DSTempParentStep where DSTempHdrId=" + TemplateId + "  and ActiveInd='A'";
+                        string strQrystepTot = "SELECT Count(DSTempParentStepId) from DSTempParentStep where DSTempHdrId=" + TemplateId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + TemplateId + " AND ActiveInd = 'A')  and ActiveInd='A'";
                         int dtCheckstepTot = Convert.ToInt32(objData.FetchValue(strQrystepTot));
                         if (dtCheckstepTot > 0)
                         {
@@ -19624,7 +19624,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 DataTable dtParentStep = new DataTable();
                 // strQuery = "INSERT INTO DSTempParentStep(SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn) ";
                 strQuery = "SELECT  DSTempParentStepId,SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn"
-                    + " FROM DSTempParentStep WHERE ActiveInd='A' and DSTempHdrId = " + templateid;
+                    + " FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + templateid + " AND ActiveInd = 'A') and DSTempHdrId = " + templateid;
                 dtParentStep = objData.ReturnDataTable(strQuery, Con, Trans, false);
                 //  int DSTempParentStepId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                 // DataTable dt
@@ -21372,7 +21372,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             return;
                         }
 
-                       string strQrystepTot = "SELECT Count(DSTempParentStepId) from DSTempParentStep where DSTempHdrId=" + TemplateId + "  and ActiveInd='A'";
+                       string strQrystepTot = "SELECT Count(DSTempParentStepId) from DSTempParentStep where DSTempHdrId=" + TemplateId + "  AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + TemplateId + " AND ActiveInd = 'A') and ActiveInd='A'";
                         int dtCheckstepTot = Convert.ToInt32(objData.FetchValue(strQrystepTot));
                         if (dtCheckstepTot > 0)
                         {

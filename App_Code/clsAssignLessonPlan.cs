@@ -430,7 +430,7 @@ public class clsAssignLessonPlan
                 DataTable dtParentStep = new DataTable();
                 // strQuery = "INSERT INTO DSTempParentStep(SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn) ";
                 strQuery = "SELECT  DSTempParentStepId,SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn"
-                    + " FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempHdrId = " + templateid;
+                    + " FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + templateid + " AND ActiveInd = 'A')   AND DSTempHdrId = " + templateid;
                 dtParentStep = objData.ReturnDataTable(strQuery, Con, Trans, false);
                 //  int DSTempParentStepId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                 // DataTable dt
@@ -711,7 +711,7 @@ public class clsAssignLessonPlan
                         DataTable dtParentStep = new DataTable();
                         // strQuery = "INSERT INTO DSTempParentStep(SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn) ";
                         strQuery = "SELECT  DSTempParentStepId,SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn"
-                            + " FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempHdrId = " + OldTempId;
+                            + " FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + OldTempId + " AND ActiveInd = 'A')  AND DSTempHdrId = " + OldTempId;
                         dtParentStep = objData.ReturnDataTable(strQuery, Con, Trans, false);
                         int DSTempParentStepId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
                         // DataTable dt
