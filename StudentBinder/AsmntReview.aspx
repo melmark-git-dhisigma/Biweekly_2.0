@@ -81,12 +81,89 @@
             width: 100%;
         }
 
+        .fullOverlayCG {
+    display: none;
+    top: 0;
+    left: 0;
+    position: fixed;
+    z-index: 2000;
+    width: 100%;
+    height: 45%;
+    /*background-color: rgba(0, 0, 0, 0.6);  semi-transparent black */
+    background-color: rgba(0, 0, 0, 0.6); /* Red with 60% opacity */
+
+}
+
+/* Centered container for loader message and spinner */
+.overlayText {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-size: 20px;
+    text-align: center;
+}
+
+/* Spinner style */
+.spinner {
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.popup {
+      display: none;
+      position: fixed;
+      left: 50%;
+      top: 10%;
+      transform: translate(-50%, -50%);
+      background-color: #fff;
+      padding: 20px;
+      /*border: 2px ridge #333;*/
+      z-index: 1000;
+      font-family: Arial, Helvetica, sans-serif;
+      padding: 5px 5px 30px 5px;
+      border: 5px solid #b2ccca;
+    }
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 999;
+    }
 
 
         /*-----------------------------------------------------------JQuery End-------------------------------------------*/
     </style>
 
     <script type="text/javascript">
+        function showLoader(message) {
+            if (message) {
+                document.getElementById('loaderMessage').textContent = message;
+            }
+            $('.fullOverlayCG').fadeIn('fast');
+        }
+
+        function hideLoader() {
+            $('.fullOverlayCG').fadeOut('fast');
+        }
+
+        function showLoaders() {
+            $('.fullOverlayCG').fadeIn('fast');
+        }
+
         function HideButton() {
             $('.fullOverlay').fadeIn('slow', function () {
                 $('#AddLPDiv').fadeOut();
@@ -98,6 +175,7 @@
             $('#AddLPDiv').fadeIn();
         }
         function CheckGoalLp() {
+            $('.fullOverlayCG').fadeIn('fast');
             var LPName = document.getElementById("txtLPname").value;
             var flag;
             PageMethods.CheckLpName('CheckGoalLp', LPName, function (data) {
@@ -108,8 +186,8 @@
                     flag = confirm("The lesson Plan Name is already added in " + GoalName + " Goals.Do You still want to continue?");
                     if (flag == true) {
                         $('.fullOverlay').fadeIn('slow', function () {
-                        $('#AddLPDiv').fadeOut();
-                        $('.innerLoading').fadeIn();
+                            $('#AddLPDiv').fadeOut();
+                            $('.innerLoading').fadeIn();
                         });
                         __doPostBack('btnAddLP', '');
                         return true;
@@ -119,18 +197,18 @@
                         $('#AddLPDiv').fadeOut();
                         $('.innerLoading').fadeOut();
                         return false;
-                        
-                    }                    
+
+                    }
                 }
                 else {
                     $('.fullOverlay').fadeIn('slow', function () {
-                    $('#AddLPDiv').fadeOut();
-                    $('.innerLoading').fadeIn();
+                        $('#AddLPDiv').fadeOut();
+                        $('.innerLoading').fadeIn();
                     });
                     __doPostBack('btnAddLP', '');
-                    return true;                  
-                }          
-                
+                    return true;
+                }
+
             });
         }
 
@@ -169,19 +247,20 @@
             });
         });
 
-        var temp = '<div id="LP_Loading" class="ingrContainer" style="opacity:0.4;">' +
-                        '<span></span>' +
-                        '<img width="100px" height="12px" src="images/load.gif" style="padding: 28px 41% 0;"><br clear="all" /><p></p></div>';
+        //var temp = '<div id="LP_Loading" class="ingrContainer" style="opacity:0.4;">' +
+        //                '<span></span>' +
+        //                '<img width="100px" height="12px" src="images/load.gif" style="padding: 28px 41% 0;"><br clear="all" /><p></p></div>';
         //function to add stdtLPs.....
-        function AssignGoalAndLPs(LP, LPname, goalid, goalname, LPdesc, LPName) {
+        function AssignGoalAndLPs(LP, LPname, goalid, goalname, LPdesc) {
+            $('.fullOverlayCG').fadeIn('fast');
             goalid = 'a_' + goalid;
             AssignGoal(goalid, goalname, null);
             var ind = 0;
-            var chkLP=0;
-            goalid = goalid.split("_")[1]; 
+            var chkLP = 0;
+            goalid = goalid.split("_")[1];
             var golid = '#li_' + goalid;
             var id; var chkIEP; var chkStat; var chkday; var chkdaystring;
-            window.setTimeout(function () {     //delay 4 secnds 
+            //window.setTimeout(function () {     //delay 4 secnds 
                 var flag;
                 PageMethods.CheckLpName(LP,LPName, function (data) {
                     $('#ul_selGoals').find(golid + ' .wrapper #LP_Loading').remove();
@@ -191,7 +270,7 @@
                         var GoalName = data.split("*")[1]
                         if (lessonchk != 'Lpbtnadd') {
                             flag = confirm("The lesson Plan Name is already added in " + GoalName + " Goals.Do You still want to continue?");
-                            if (flag == true) {                                
+                            if (flag == true) {
                                 chkLP = 1;
                             }
                             else {
@@ -204,10 +283,10 @@
                         else {
                             chkLP = 1;
                         }
-                    }                    
+                    }
                     else {
                         chkLP = 1;
-                    }                    
+                    }
 
                     if (chkLP == 1)
                     {
@@ -217,7 +296,7 @@
                             if (data == 'exists') {
                                 ind = 1;
                             }
-                            else if (data == "0") { ind = 1; }                    
+                            else if (data == "0") { ind = 1; }
                             else if (status == 'multipleLP') { ind = 1; }
                             else if (status == 'multipleLPSGoal') { ind = 1; }
                             else {
@@ -227,32 +306,44 @@
                                 chkday = datas[2];
                                 if (chkIEP == "0") { chkStat = ""; }
                                 else { chkStat = "checked=true"; }
-                                if (chkday == "1") {
-                                    chkdaystring = "<input name='Day' class='rdoDay' checked='true' type='checkbox' value='' onclick='updateLessonPlan(this,this.parentNode.parentNode.id," + LP + ",&apos;LP&apos;,event);' />Day</span>"
-                                        + "<span style='float:left;'><img width='15px' height='7px' style='position: absolute; float: left ! important; padding-right: 0px; margin: 4px -15px 0px; display: none;' src='images/load.gif'>"
-                                        + "<input name='Resi' class='rdoResi' type='checkbox' value='' onclick='updateLessonPlan(this,this.parentNode.parentNode.id," + LP + ",&apos;LP&apos;,event);' />Residential</span>";
+                                //if (chkday == "1") {
+                                //    chkdaystring = "<input name='Day' class='rdoDay' checked='true' type='checkbox' value='' onclick='updateLessonPlan(this,this.parentNode.parentNode.id," + LP + ",&apos;LP&apos;,event);' />Day</span>"
+                                //        + "<span style='float:left;'><img width='15px' height='7px' style='position: absolute; float: left ! important; padding-right: 0px; margin: 4px -15px 0px; display: none;' src='images/load.gif'>"
+                                //        + "<input name='Resi' class='rdoResi' type='checkbox' value='' onclick='updateLessonPlan(this,this.parentNode.parentNode.id," + LP + ",&apos;LP&apos;,event);' />Residential</span>";
 
-                                }
-                                if (chkday == "0") {
-                                    chkdaystring = "<input name='Day' class='rdoDay'  type='checkbox' value='' onclick='updateLessonPlan(this,this.parentNode.parentNode.id," + LP + ",&apos;LP&apos;,event);' />Day</span>"
-                                    +"<span style='float:left;'><img width='15px' height='7px' style='position: absolute; float: left ! important; padding-right: 0px; margin: 4px -15px 0px; display: none;' src='images/load.gif'>"
-                                    + "<input name='Resi' class='rdoResi' checked='true' type='checkbox' value='' onclick='updateLessonPlan(this,this.parentNode.parentNode.id," + LP + ",&apos;LP&apos;,event);' />Residential</span>";
+                                //}
+                                //if (chkday == "0") {
+                                //    chkdaystring = "<input name='Day' class='rdoDay'  type='checkbox' value='' onclick='updateLessonPlan(this,this.parentNode.parentNode.id," + LP + ",&apos;LP&apos;,event);' />Day</span>"
+                                //    +"<span style='float:left;'><img width='15px' height='7px' style='position: absolute; float: left ! important; padding-right: 0px; margin: 4px -15px 0px; display: none;' src='images/load.gif'>"
+                                //    + "<input name='Resi' class='rdoResi' checked='true' type='checkbox' value='' onclick='updateLessonPlan(this,this.parentNode.parentNode.id," + LP + ",&apos;LP&apos;,event);' />Residential</span>";
 
-                                }
+                                //}
                             }
 
                             if (ind == 0) {
-                                var temp = 'div_' + LP;
-                                var LPs = '<div id=' + temp + ' class="ingrContainer">' +
-                                    '<h3>' + LPname + '</h3><div id="' + id + '" class="container">' +
-                                    '<span style="float:left;"><img width="15px" height="7px" style="position: absolute; float: left ! important; padding-right: 0px; margin: 4px -15px 0px; display: none;" src="images/load.gif">'+chkdaystring+
-                                    '<span><img width="15px" height="7px" style="position: absolute; float: left ! important; padding-right: 0px; margin: 4px -15px 0px; display: none;" src="images/load.gif">' +
-                                    '<input name="" class="rdo" ' + chkStat + ' type="checkbox" value="" onclick="updateIEP(this,this.parentNode.parentNode.id,' + goalid + ',&apos;LP&apos;,event);" />Included in IEP</span>' +
+                                //var temp = 'div_' + LP;
+                                //var LPs = '<div id=' + temp + ' class="ingrContainer">' +
+                                //    '<h3>' + LPname + '</h3><div id="' + id + '" class="container">' +
+                                //    '<span style="float:left;"><img width="15px" height="7px" style="position: absolute; float: left ! important; padding-right: 0px; margin: 4px -15px 0px; display: none;" src="images/load.gif">'+chkdaystring+
+                                //    '<span><img width="15px" height="7px" style="position: absolute; float: left ! important; padding-right: 0px; margin: 4px -15px 0px; display: none;" src="images/load.gif">' +
+                                //    '<input name="" class="rdo" ' + chkStat + ' type="checkbox" value="" onclick="updateIEP(this,this.parentNode.parentNode.id,' + goalid + ',&apos;LP&apos;,event);" />Included in IEP/ISP</span>' +
                             
-                                  //  '<a href="#" class="dlt" onclick="deleteLPandGoal(this,this.parentNode.id,&apos;LP&apos;,event);"></a></div><br clear="all" />' +
-                                    '<p>' + LPdesc + ' </p></div>';
-                                var li3 = $('#ul_selGoals').find(golid);
-                                $(li3).find('.wrapper').append(LPs);
+                                //  //  '<a href="#" class="dlt" onclick="deleteLPandGoal(this,this.parentNode.id,&apos;LP&apos;,event);"></a></div><br clear="all" />' +
+                                //    '<p>' + LPdesc + ' </p></div>';
+                                //var li3 = $('#ul_selGoals').find(golid);
+                                //$(li3).find('.wrapper').append(LPs);
+                                $('#ul_selGoals').find(golid + ' .wrapper #LP_Loading').remove();
+                                $('.innerLoading').fadeOut();
+                                
+                                $('.fullOverlayCG').fadeOut('fast');
+                                document.getElementById('popup').style.display = 'block';
+                                document.getElementById('overlay').style.display = 'block';
+                                //document.getElementById('myTitle').style.visibility = 'visible';
+                                setTimeout(function () {
+                                    document.getElementById('overlay').style.display = 'none';
+                                    document.getElementById('popup').style.display = 'none';
+                                }, 4000);
+                                //$('.fullOverlayCG').fadeOut('fast');
                         
                             }
                             if (data == 'exists') {
@@ -262,17 +353,20 @@
                                 $("#divCopyTempAdmin").hide();
                                 $("#hdLessonId").val(LP);
                                 $("#hdGoalId").val(goalid);
+                                $('.fullOverlayCG').fadeOut('fast');
                             }
                     
                             var GoalName = data.split("*")[1];
                             if (status == 'multipleLP') {
                                 $('#ul_selGoals').find(golid + ' .wrapper #LP_Loading').remove();
                                 $('.innerLoading').fadeOut();
+                                $('.fullOverlayCG').fadeOut('fast');
                                 alert("Lesson already belongs to " + GoalName + " Goal.As it was added via the administrator module, assigning it to multiple goals is not allowed.");
                             }
                             else if (status == 'multipleLPSGoal') {
                                 $('#ul_selGoals').find(golid + ' .wrapper #LP_Loading').remove();
                                 $('.innerLoading').fadeOut();
+                                $('.fullOverlayCG').fadeOut('fast');
                                 alert("Lesson already belongs to " + GoalName + " Goal.You cannot add the same lesson to the same goal again. ");
 
                             }
@@ -280,10 +374,13 @@
                             __doPostBack('lbLPBank', '');
                         });
                     }
-               
-            });
-                
-            }, 4000);            
+
+                });
+
+            //}, 1000);
+
+            $('#ul_selGoals').find(golid + ' .wrapper #LP_Loading').remove();
+            $('.innerLoading').fadeOut();
             
         }
 
@@ -368,10 +465,9 @@
                 flag = true;
             }
             Goalid = Goalid.split("_")[1];
-            $('#ul_selGoals').append('<li id="loading" style="position: static;opacity:0.5;" class="accordion">' +
-				'<h2 class=""><span class="dd"></span><img width="100px" height="12px" src="images/load.gif" style="padding: 10px 0px 0px 40%;">' +
-                '<div class="container"></div></h2></li>');
-
+            //$('#ul_selGoals').append('<li id="loading" style="position: static;opacity:0.5;" class="accordion">' +
+			//	'<h2 class=""><span class="dd"></span><img width="100px" height="12px" src="images/load.gif" style="padding: 10px 0px 0px 40%;">' +
+            //    '<div class="container"></div></h2></li>');
             PageMethods.SaveGoal(Goalid, flag, function (data) {
                 var ind = 0;
                 Goalid = 'li_' + Goalid;
@@ -456,7 +552,7 @@
 
                     spn2.appendChild(imgload);
                     spn2.appendChild(chk);
-                    spn2.innerHTML += 'Included in IEP';
+                    spn2.innerHTML += 'Included in IEP/ISP';
 
 
                     var atag2 = document.createElement('a');
@@ -918,7 +1014,8 @@
                 <div class="itlepartContainer">
                     <h2 style="margin: 0px 0px 0px 5px;">1 <span>Choose Source</span></h2>
                     <h2 style="margin: 0px 0px 0px 40px;">2 <span>Choose Goals and Lessons</span></h2>
-                    <h2 style="margin: 0px 0px 0px 45px;">3 <span>Assign Goals and Lessons</span></h2>  
+                    <h2 style="margin: 0px 0px 0px 45px;">3 <span>Assign Goals and Lessons</span></h2> 
+                     
                     <div style="float: right; width: 61px;">
                         <%-- <asp:UpdatePanel ID="UpdatePanel1" runat="server" style="float: left; padding-top: 6px; margin-right: 10px;">
                             <ContentTemplate>
@@ -970,6 +1067,7 @@
                         <br clear="all">
                         <div id="page">
                             <div id="content">
+                                <asp:CheckBox ID="chkOnlyActiveMaint" runat="server" Text="Show only Active & Maintenance" Checked="true" AutoPostBack="true" OnCheckedChanged="chkOnlyActiveMaint_CheckedChanged"/>
                                 <ul>
                                     <li style="position: static;" class="accordion">
                                         <h2 class="tBG" onclick="h2click(this);"><a class="jj" href="#our-company">By Latest Assessment(s)</a></h2>
@@ -1089,6 +1187,7 @@
                     <!------------------------------------End Container Start----------------------------------->
                     <div class="righMainContainer">
                         <h3> Assigned Goals and Lessons </h3>
+                        <h4 id="myTitle" style="margin: 0px 0px 0px 45px; visibility: hidden; color: red;"><span>Lesson successfully added to In-Progress folder of Create Lesson Plans</span></h4>
                         <div id="Div7">
 
                             <div id="Div8">
@@ -1270,7 +1369,7 @@
                                         <tr>
                                             <td class="auto-style1"></td>
                                             <td class="auto-style1">
-                                                <asp:Button ID="btnAddLP" runat="server" CssClass="NFButtonWithNoImage" Width="100px" Text="Submit" UseSubmitBehavior="false"  OnClick="btnAddLP_Click" onClientClick="return CheckGoalLp()"/>
+                                                <asp:Button ID="btnAddLP" runat="server" CssClass="NFButtonWithNoImage" Width="100px" Text="Submit" UseSubmitBehavior="false"  OnClick="btnAddLP_Click" OnClientClick="return CheckGoalLp()"/>
                                            <%-- OnClientClick="disableButton();"--%>
                                         </tr>
                                         <tr>
@@ -1311,7 +1410,21 @@
 
             </div>
 
+            <div class="overlay" id="overlay" onclick="hidePopup()"></div>
+<div class="popup" id="popup" style="color: green;">
+  <p>Lesson successfully added to In-Progress folder of Create Lesson Plans</p>
+  <%--<button onclick="hidePopup()">Close</button>--%>
+</div>
 
+
+            <div class="fullOverlayCG" style="display: none;">
+    <div class="overlayText">
+        <div class="spinner"></div>
+        <p id="loaderMessage">Working...</p>
+    </div>
+</div>
+
+            <div id="customMessage"></div>
 
             <div class="fullOverlay">
             </div>
@@ -1364,7 +1477,8 @@
 
             </div>
     </form>
-    <script type="text/javascript">
+    <script type="text/javascript">          
+            
 
         function popPrompts() {
 
