@@ -5504,14 +5504,15 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         drpTasklist.Visible = true;
 
                         taskOth = dtList.Rows[0]["TaskOther"].ToString();
-                        if (taskOth == "1")
-                        {
-                            chainType = "Other";
-                        }
-                        else
-                        {
+                        //if (taskOth == "1")
+                        //{
+                        //    chainType = "Other";
+                        //}
+                        //else
+                        //{
+                        //    chainType = dtList.Rows[0]["ChainType"].ToString();
+                        //}
                             chainType = dtList.Rows[0]["ChainType"].ToString();
-                        }
                         drpTasklist.SelectedValue = chainType.ToString();
 
                         rbtnPromptLevel.Visible = false;
