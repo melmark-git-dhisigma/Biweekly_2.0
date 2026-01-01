@@ -1364,18 +1364,21 @@
                             plotdict['dashStyle'] = style;
                             plotdict['value'] = extractdate(item['aggredateddate']);
                             plotdict['width'] = 1;
+                            var datescorealign = findmaxscorefordate(res);
+                            var arr = checkarrow(res);
+
                             var str = item['eventname'];
                             var txtal; var xax, yax;
                             var valign;
                             if (item['eventtype'] == "Major") {
                                 txtal = 'right';
                                 xax = -2;
-                                valign = 'middle'
+                                valign = getValueByAggredatedDate(item['aggredateddate'], datescorealign, arr)
                             }
                             else {
                                 txtal = 'left';
                                 xax = 9;
-                                valign = 'middle';
+                                valign = getValueByAggredatedDate(item['aggredateddate'], datescorealign, arr);
                             }
                             plotdict['label'] = {
                                 text: str,
@@ -2563,18 +2566,20 @@
                             plotdict['dashStyle'] = style;
                             plotdict['value'] = extractdate(item['aggredateddate']);
                             plotdict['width'] = 1;
+                            var datescorealign = findmaxscorefordate(res);
+                            var arr = checkarrow(res);
                             var str = item['eventname'];
                             var txtal; var xax, yax;
                             var valign;
                             if (item['eventtype'] == "Major") {
                                 txtal = 'right';
                                 xax = -2;
-                                valign = 'middle'
+                                valign = valign = getValueByAggredatedDate(item['aggredateddate'], datescorealign, arr)
                             }
                             else {
                                 txtal = 'left';
                                 xax = 9;
-                                valign = 'middle';
+                                valign = valign = getValueByAggredatedDate(item['aggredateddate'], datescorealign, arr);
                             }
                             plotdict['label'] = {
                                 text: str,
@@ -3165,7 +3170,78 @@
                 });
                 setTimeout(callback, 1000);
             }
+            function findmaxscorefordate(data) {
+                var resultObj = {};
 
+                for (var i = 0; i < data.length; i++) {
+                    var item = data[i];
+                    var date = item.aggredateddate;
+
+                    // Get values safely (if null → treat as 0)
+                    var freq = item.frequency == null ? 0 : item.frequency;
+                    var freqSec = item.frequencysec == null ? 0 : item.frequencysec;
+
+                    var itemMax = Math.max(freq, freqSec);
+
+                    // If this date not added before
+                    if (!resultObj[date]) {
+                        resultObj[date] = {
+                            AggredatedDate: date,
+                            maxScore: itemMax
+                        };
+                    } else {
+                        // Update maxScore if current row has a higher one
+                        if (itemMax > resultObj[date].maxScore) {
+                            resultObj[date].maxScore = itemMax;
+                        }
+                    }
+                }
+
+                // Build the result array
+                var result = [];
+                for (var key in resultObj) {
+
+                    var maxScore = resultObj[key].maxScore;
+
+                    // maxScore > 0 → middle else bottom
+                    var value = (maxScore !== null && maxScore > 0)
+                        ? "middle"
+                        : "bottom";
+
+                    result.push({
+                        AggredatedDate: key,
+                        value: value
+                    });
+                }
+
+                return result;
+            }
+
+            function getValueByAggredatedDate(dateToSearch, resultArray, arr) {
+                for (var i = 0; i < resultArray.length; i++) {
+                    if (resultArray[i].AggredatedDate == dateToSearch) {
+                        if (arr.includes(dateToSearch)) {
+                            return "middle";
+                        }
+                        else {
+                            return "bottom";
+                        }
+                    }
+                }
+                return "middle";
+            }
+            function checkarrow(data) {
+                var dateArray = [];
+
+                for (var i = 0; i < data.length; i++) {
+                    var item = data[i];
+
+                    if (item.arrownote !== null && item.arrownote !== "") {
+                        dateArray.push(item.aggredateddate);
+                    }
+                }
+                return dateArray;
+            }
         </script>
     </form>
 </body>
