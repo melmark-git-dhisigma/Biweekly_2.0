@@ -251,7 +251,7 @@
     var currentStudentId = $('#hidCureentStudent').val();//document.getElementById('hidCureentStudent').value(); // This could be checked with your backend session data if necessary
 
             // If the selected studentId doesn't match the current studentId, refresh the page
-    if(currentStudentId!=0)
+    if (currentStudentId != 0 && currentStudentId != undefined && currentStudentId != null && currentStudentId != "" && currentStudentId > 0)
     if (selectedStudentId !== currentStudentId) {
         alert("This tab is no longer active. Please switch to the previous tab.");
                 //location.reload();  // Refresh the page to sync the session and the UI
