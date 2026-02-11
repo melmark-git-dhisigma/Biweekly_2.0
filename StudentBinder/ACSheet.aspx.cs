@@ -30,6 +30,7 @@ using DocumentFormat.OpenXml.Math;
 using Xceed.Document.NET;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using System.Runtime.InteropServices.ComTypes;
+using System.Text;
 public partial class StudentBinder_ACSheet : System.Web.UI.Page
 {
     static string[] columns;
@@ -49,6 +50,10 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
         sess = (clsSession)Session["UserSession"];
+        if (!ClientScript.IsStartupScriptRegistered("persons"))
+        {
+            RegisterPersonsScript();
+        }
         if (sess == null)
         {
             Response.Redirect("Error.aspx?Error=Your session has expired. Please log-in again");
@@ -115,7 +120,20 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             MultiView1.ActiveViewIndex = 1;
             // FillStudent();
             FillData();
+            MultiView1.ActiveViewIndex = 1;
+
+            ListBox lstPersons = (ListBox)MultiView1.FindControl("lstPersons");
+
         }
+        objData = new clsData();
+        var dt = objData.ReturnDataTable("select UserId, UserLName + ', ' + UserFName as Name from [User] WHERE ActiveInd = 'A' ORDER BY UserLName,UserFName", false);
+        var js = new StringBuilder("var persons = [");
+        foreach (DataRow r in dt.Rows)
+        {
+            js.AppendFormat("{{id:{0}, name:'{1}'}},",r["UserId"],r["Name"].ToString().Replace("'", "\\'"));
+        }
+        js.Append("];");
+        ScriptManager.RegisterStartupScript(this, GetType(), "persons", js.ToString(), true);
     }
 
 
@@ -2244,6 +2262,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             }
         }
     }
+
     protected void loadExtraData()
     {
         objData = new clsData();
@@ -2524,7 +2543,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                                   "',Attendees='" + clsGeneral.convertQuotes(attendees) + "',IEPYear='" + clsGeneral.convertQuotes(IEPyear) + "',IEPSigDate='" + clsGeneral.convertQuotes(IEPDate) + "',Reviewed='" +clsGeneral.convertQuotes( review) + "',MetObjective='" + c1 + "',MetGoal='" + c2 + "',NotMaintaining='" + c3 +
                                   "',Progressing1='"+radBtnList1+"',Progressing2='"+radBtnList2+"',Progressing3='"+radBtnList3+"',Progressing4='"+radBtnList4+"',Progressing5='"+radBtnList5+"',Progressing6='"+radBtnList6+"',Progressing7='"+radBtnList7+"' " +
                                   "WHERE AccSheetId=" + AccShtId + "";
-            objData.Execute(UpdateAcdsht);
+            testupdate += Convert.ToInt32(objData.Execute(UpdateAcdsht));
 
             int personResp = 0;
             string textVal = "";
@@ -2549,18 +2568,21 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                     {
                         if (txtPersonResponsibleEdit.Text != "")
                         {
-                            textVal = txtPersonResponsibleEdit.Text;
-                            if (textVal.Contains(","))
+                            HtmlInputHidden hid = (HtmlInputHidden)row2.FindControl("hidPersonResponsibleId");
+
+                            if (hid != null && int.TryParse(hid.Value, out personResp))
                             {
-                                userFName = clsGeneral.convertQuotes(textVal.Substring(textVal.IndexOf(",") + 1).Trim());
-                                userLName = clsGeneral.convertQuotes(textVal.Substring(0, textVal.IndexOf(",")).Trim());
                             }
                             else
                             {
-                                userFName = userLName = clsGeneral.convertQuotes(textVal.Trim());
+                                if (!string.IsNullOrWhiteSpace(txtPersonResponsibleEdit.Text))
+                                {
+                                    continue;
+                                }
+                                PersonRespCheck = 0;
+                                testupdate = 0;
+                                break;
                             }
-                            userQry = "select UserId from [User] where UserLName = '" + userLName + "' and UserFName = '" + userFName + "'";
-                            personResp = Convert.ToInt32(objData.FetchValue(userQry));
                             if (personResp == 0)
                             {
                                 PersonRespCheck = 0;
@@ -4010,31 +4032,24 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             gvAgendaItem.Visible = false;
         }
     }
-    protected void TextBox1_TextChanged(object sender, EventArgs e)
-    {
 
+    public class PersonItem
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
     }
 
-   
+    private void RegisterPersonsScript()
+    {
+        objData = new clsData();
+        var dt = objData.ReturnDataTable("select UserId, UserLName + ', ' + UserFName as Name from [User] WHERE ActiveInd = 'A' ORDER BY UserLName,UserFName",false);
+        var js = new StringBuilder("var persons = [");
+        foreach (DataRow r in dt.Rows)
+        {
+            js.AppendFormat("{{id:{0}, name:'{1}'}},",r["UserId"],r["Name"].ToString().Replace("'", "\\'"));
+        }
+        js.Append("];");
+        ScriptManager.RegisterStartupScript(this, GetType(), "persons", js.ToString(), true);
+    }
 
-    //protected void CheckBoxList1_SelectedIndexChanged(object sender, EventArgs e)
-    //{
-    //    if (CheckBoxList1.SelectedValue == "Met Objective" || CheckBoxList1.SelectedValue == "Met Goal")
-    //    {
-    //        //CheckBoxList1.SelectedItem.Attributes["style"] = "color:green";
-    //         CheckBoxList1.SelectedItem.Attributes.Add("style", "color: green; font-weight: bold");
-    //    }
-       
-    //    if (CheckBoxList1.SelectedValue == "Not Maintaining")
-    //    {
-    //        CheckBoxList1.SelectedItem.Attributes.Add("style", "color: red; font-weight: bold");
-    //    }
-    //    //LoadPMeetingGVNew();
-    //    //LoadCMeetingGVNew();
-    //    //loadDataListFilter();
-    //    //string dateOfMtng = ViewState["CurrentDate"].ToString();
-    //    //LoadMeetingsNew(dateOfMtng);
-    //    //loadExtraData();     
-
-    //}
 }
