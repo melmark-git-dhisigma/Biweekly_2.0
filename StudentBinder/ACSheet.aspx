@@ -371,6 +371,45 @@
             width: 411px;
         }
 
+
+
+        .person-autocomplete {
+            background-color: #f9fafb;
+            cursor: pointer;
+        }
+        .person-autocomplete:focus {
+            background-color: #fff;
+        }
+        .person-autocomplete {
+            background-image: url("data:image/svg+xml;utf8,<svg fill='gray' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 30px;
+        }
+
+        .dropdown-list option {
+            padding: 6px;
+            cursor: pointer;
+        }
+        .dropdown-list option:hover {
+            background-color: #f0f0f0;
+        }
+
+        .person-select-wrapper {
+            position: relative;
+        }
+
+        .person-select-wrapper::after {
+            content: "▾"; /* dropdown arrow */
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none; /* allow clicks into textbox */
+            color: #666;
+            font-size: 14px;
+        }
+
         </style>
     <script>
         function allowBackSpace(e, obj) {
@@ -1021,7 +1060,12 @@
                                                                                                             </asp:TemplateField>
                                                                                                             <asp:TemplateField HeaderText="Person Responsible">
                                                                                                                 <ItemTemplate>
-                                                                                                                    <asp:TextBox runat="server" ID="txtPPersonResponsible" CssClass = "autosuggest" Width="175px" Text='<%# Eval("PPersonResponsible") %>' Enabled="true"></asp:TextBox>
+                                                                                                                    <div class="person-select-wrapper">
+                                                                                                                        <asp:TextBox ID="txtPPersonResponsible" runat="server" CssClass="person-select" AutoComplete="off" Width="175px" Text='<%# Eval("PPersonResponsible") %>' onfocus="openPersonDropdownFromTextbox(this);setActivePersonTextbox(this);" onkeyup="setActivePersonTextbox(this);resetPersonSelectionOnType(this); filterPersonListFromTextbox(this);" onblur="validatePersonTextbox(this);" />
+                                                                                                                    </div>
+                                                                                                                    <input type="hidden" runat="server" id="Hidden1" class="person-id" />
+                                                                                                                    <input type="hidden" runat="server" id="Hidden2" class="person-name" />
+                                                                                                                    <asp:Label runat="server" CssClass="person-error" ForeColor="Red" Style="display:none;" Text="Please select person from list" />
                                                                                                                 </ItemTemplate>
                                                                                                             </asp:TemplateField>
                                                                                                             <asp:TemplateField HeaderText="Deadlines">
@@ -1091,10 +1135,13 @@
                                                                                                             </asp:TemplateField>
                                                                                                             <asp:TemplateField HeaderText="Person Responsible">
                                                                                                                 <ItemTemplate>
-                                                                                                                    <div>
-                                                                                                                    <asp:TextBox runat="server" ID="txtPersonResponsible" CssClass = "autosuggest" Width="175px"  Text='<%# Eval("PersonResponsible") %>'></asp:TextBox>
-                                                                                                                    <asp:TextBox runat="server" ID="txtCPersonResponsible" CssClass = "autosuggest" Width="175px" class ="hd" Text='<%# Eval("CPersonResponsible") %>' style="display:none"></asp:TextBox>
-                                                                                                                        </div>
+                                                                                                                    <div class="person-select-wrapper">
+                                                                                                                        <asp:TextBox ID="txtPersonResponsible" runat="server" CssClass="person-select" AutoComplete="off" Width="175px" Text='<%# Eval("PersonResponsible") %>' onfocus="setActivePersonTextbox(this); openPersonDropdownFromTextbox(this);" onkeyup="setActivePersonTextbox(this); filterPersonListFromTextbox(this);" />
+                                                                                                                    </div>
+                                                                                                                    <input type="hidden" id="Hidden5" runat="server" class="person-id" />
+                                                                                                                    <input type="hidden" id="Hidden6" runat="server" class="person-name" />
+                                                                                                                    <asp:Label runat="server" CssClass="person-error" ForeColor="Red" Style="display:none;" Text="Please select person from list" />
+                                                                                                                    <asp:TextBox ID="txtCPersonResponsible" runat="server" CssClass="hd" Text='<%# Eval("CPersonResponsible") %>' Style="display:none" />
                                                                                                                 </ItemTemplate>
                                                                                                             </asp:TemplateField>
                                                                                                             <asp:TemplateField HeaderText="Deadlines">
@@ -1166,7 +1213,7 @@
                                                             </tr>
                                                             <tr>
                                                                 <td colspan="3" style="text-align: center;">
-                                                                    <asp:Button ID="btnSave" runat="server" CssClass="NFButton" OnClick="Save_Click" OnClientClick="return scrollToTop(this);" Text="Save" Visible="true" />
+                                                                    <asp:Button ID="btnSave" runat="server" CssClass="NFButton" OnClick="Save_Click" OnClientClick="return validatePersonSelection() && scrollToTop(this);" Text="Save" Visible="true" />
                                                                 </td>
                                                             </tr>
                                                         </table>
@@ -1601,12 +1648,17 @@
                                                                                                             </asp:TemplateField>
                                                                                                             <asp:TemplateField HeaderText="Person Responsible">
                                                                                                                 <ItemTemplate>
-                                                                                                                    <asp:TextBox runat="server" ID="txtPPersonResponsibleEdit" CssClass = "autosuggest" Width="175px" Text='<%# Eval("PPersonResponsibleEdit") %>' Enabled="true"></asp:TextBox>
+                                                                                                                    <div class="person-select-wrapper">
+                                                                                                                        <asp:TextBox ID="txtPPersonResponsibleEdit" runat="server" CssClass="person-select" AutoComplete="off" Width="175px" Text='<%# Eval("PPersonResponsibleEdit") %>' onfocus="openPersonDropdownFromTextbox(this);" onkeyup="filterPersonListFromTextbox(this);" />
+                                                                                                                    </div>
+                                                                                                                    <input id="Hidden3" type="hidden" runat="server" class="person-id" />
+                                                                                                                    <input id="Hidden4" type="hidden" runat="server" class="person-name" />
+                                                                                                                    <asp:Label runat="server" CssClass="person-error" ForeColor="Red" Style="display:none;" />
                                                                                                                 </ItemTemplate>
                                                                                                             </asp:TemplateField>
                                                                                                             <asp:TemplateField HeaderText="Deadlines">
                                                                                                                 <ItemTemplate>
-                                                                                                                    <asp:TextBox runat="server" ID="txtPDeadlinesEdit" Placeholder="MM/DD/YYYY" Width="100px" Text='<%# Eval("PDeadlinesEdit") %>' Enabled="true" >></asp:TextBox>
+                                                                                                                    <asp:TextBox runat="server" ID="txtPDeadlinesEdit" Placeholder="MM/DD/YYYY" Width="100px" Text='<%# Eval("PDeadlinesEdit") %>' Enabled="true"></asp:TextBox>
                                                                                                                     <asp:RegularExpressionValidator runat="server" ControlToValidate="txtPDeadlinesEdit" ValidationExpression="(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$"
                                                                                                                             ErrorMessage="*" ValidationGroup="Group1" />
                                                                                                                 </ItemTemplate>
@@ -1670,10 +1722,13 @@
                                                                                                             </asp:TemplateField>
                                                                                                             <asp:TemplateField HeaderText="Person Responsible">
                                                                                                                 <ItemTemplate>
-                                                                                                                    <div>
-                                                                                                                    <asp:TextBox runat="server" ID="txtPersonResponsibleEdit" CssClass = "autosuggest" Width="175px"  Text='<%# Eval("PersonResponsibleEdit") %>'></asp:TextBox>
-                                                                                                                    <asp:TextBox runat="server" ID="txtCPersonResponsibleEdit" CssClass = "autosuggest" Width="175px" Class="hd" Text='<%# Eval("CPersonResponsibleEdit") %>' style="display:none"></asp:TextBox>
-                                                                                                                        </div>
+                                                                                                                    <div class="person-select-wrapper">
+                                                                                                                        <asp:TextBox ID="txtPersonResponsibleEdit" runat="server" CssClass="person-select" AutoComplete="off" Width="175px" Text='<%# Eval("PersonResponsibleEdit") %>' onfocus="openPersonDropdownFromTextbox(this);" onkeyup="filterPersonListFromTextbox(this);" />
+                                                                                                                    </div>
+                                                                                                                    <input id="hidPersonResponsibleId" type="hidden" runat="server" class="person-id" />
+                                                                                                                    <input id="hidPersonResponsibleName" type="hidden" runat="server" class="person-name" />
+                                                                                                                    <asp:Label runat="server" CssClass="person-error" ForeColor="Red" Style="display:none;" />
+                                                                                                                    <asp:TextBox ID="txtCPersonResponsibleEdit" runat="server" CssClass="hd" Text='<%# Eval("CPersonResponsibleEdit") %>' Style="display:none" />
                                                                                                                 </ItemTemplate>
                                                                                                             </asp:TemplateField>
                                                                                                             <asp:TemplateField HeaderText="Deadlines">
@@ -1992,8 +2047,392 @@
                  });
              }
 
+
+             function validatePersonSelection() {
+                 var isValid = true;
+
+                 document.querySelectorAll(".person-select").forEach(function (textbox) {
+                     var row = getGridViewRow(textbox);
+                     if (!row) return;
+
+                     var personId = row.querySelector(".person-id");
+                     var errorLabel = row.querySelector(".person-error");
+
+                     if (!personId || personId.value === "") {
+                         textbox.value = "";
+                         if (errorLabel) errorLabel.style.display = "inline";
+                         isValid = false;
+                     } else {
+                         if (errorLabel) errorLabel.style.display = "none";
+                     }
+                 });
+
+                 return isValid;
+             }
+
+
+             function filterPersonListFromTextbox(txt) {
+
+                 if (!personDropdownOpen) {
+                     openPersonDropdownFromTextbox(txt);
+                 }
+
+                 var list = document.getElementById('lstPersonsGlobal');
+                 if (!list) return;
+
+                 var input = txt.value.toLowerCase();
+
+                 for (var i = 0; i < list.options.length; i++) {
+                     var opt = list.options[i];
+                     opt.style.display =
+                         opt.text.toLowerCase().includes(input) ? '' : 'none';
+                 }
+             }
+
+
+             function selectPersonFromGlobalList(list) {
+                 if (!activePersonRow || !activePersonTextbox) return;
+                 if (list.selectedIndex < 0) return;
+
+                 var opt = list.options[list.selectedIndex];
+
+                 var hidId = activePersonRow.querySelector("input.person-id");
+                 var hidName = activePersonRow.querySelector("input.person-name");
+                 var err = activePersonRow.querySelector(".person-error");
+
+                 if (!hidId || !hidName) {
+                     console.error("Hidden fields missing in row", activePersonRow);
+                     return;
+                 }
+
+                 activePersonTextbox.value = opt.text;
+                 hidId.value = opt.value;
+                 hidName.value = opt.text;
+
+                 if (err) err.style.display = 'none';
+
+                 closePersonDropdown();
+             }
+
+             var activePersonTextbox = null;
+             var activePersonRow = null;
+             var personDropdownOpen = false;
+             var dropdownOpen = false;
+
+             function setLastValidValue(txt, value) {
+                 txt.dataset.lastValid = value || '';
+             }
+
+
+             function loadPersonsGlobal() {
+                 if (!Array.isArray(persons)) {
+                     console.error('persons array missing');
+                     return;
+                 }
+
+                 var list = document.getElementById('lstPersonsGlobal');
+                 if (!list) return;
+
+                 list.innerHTML = '';
+
+                 for (var i = 0; i < persons.length; i++) {
+                     var opt = document.createElement('option');
+                     opt.value = persons[i].id;
+                     opt.textContent = persons[i].name;
+                     list.appendChild(opt);
+                 }
+             }
+
+             function openPersonDropdownFromTextbox(txt) {
+                 var opened = document.querySelectorAll(".person-select[data-open]");
+                 for (var i = 0; i < opened.length; i++) {
+                     opened[i].removeAttribute("data-open");
+                 }
+
+                 txt.setAttribute("data-open", "true");
+
+                 activePersonTextbox = txt;
+                 activePersonRow = getGridViewRow(txt);
+
+                 var pnl = document.getElementById('pnlPersonDropdownGlobal');
+                 var list = document.getElementById('lstPersonsGlobal');
+
+                 if (!pnl || !list) return;
+
+                 loadPersonsGlobal();
+
+                 var rect = txt.getBoundingClientRect();
+
+                 pnl.style.position = 'absolute';
+                 pnl.style.top = (rect.bottom + window.scrollY) + 'px';
+                 pnl.style.left = (rect.left + window.scrollX) + 'px';
+                 pnl.style.width = rect.width + 'px';
+                 pnl.style.display = 'block';
+                 pnl.style.zIndex = 99999;
+
+                 personDropdownOpen = true;
+             }
+
+             function positionDropdownBelowTextbox(txt, pnl) {
+                 if (!txt || !pnl) return;
+
+                 var rect = txt.getBoundingClientRect();
+
+                 var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                 var scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+                 pnl.style.position = 'absolute';
+                 pnl.style.top = (rect.bottom + scrollTop) + 'px';
+                 pnl.style.left = (rect.left + scrollLeft) + 'px';
+                 pnl.style.width = rect.width + 'px';
+                 pnl.style.zIndex = 99999;
+             }
+
+
+             document.addEventListener('input', function (e) {
+                 if (!e.target.classList.contains('person-select')) return;
+
+                 var row = e.target.closest("td").parentElement;
+                 if (!row) return;
+
+                 var hid = row.querySelector(".person-id");
+                 if (hid) hid.value = '';
+                 var lbl = row.querySelector(".person-error");
+                 if (lbl) lbl.style.display = 'none';
+             });
+
+             document.addEventListener("mousedown", function (e) {
+
+                 var pnl = document.getElementById("pnlPersonDropdownGlobal");
+                 if (!pnl || pnl.style.display === "none") return;
+
+                 // click inside dropdown or textbox → ignore
+                 if (
+                     e.target.closest(".person-select-wrapper") ||
+                     e.target.closest(".person-select") ||
+                     pnl.contains(e.target)
+                 ) {
+                     return;
+                 }
+
+                 // 🔥 FIND THE TEXTBOX THAT OPENED THE DROPDOWN
+                 var txt = document.querySelector(".person-select[data-open='true']");
+                 if (!txt) {
+                     pnl.style.display = "none";
+                     return;
+                 }
+
+                 var row = getGridViewRow(txt);
+                 if (!row) return;
+
+                 var hid = row.querySelector(".person-id");
+                 var err = row.querySelector(".person-error");
+
+                 if (!hid || !hid.value) {
+                     txt.value = "";
+                     if (err) {
+                         err.textContent = "Please select person from list";
+                         err.style.display = "inline";
+                     }
+                 } else {
+                     if (err) err.style.display = "none";
+                 }
+
+                 txt.removeAttribute("data-open");
+                 pnl.style.display = "none";
+             });
+
+
+             function finalizePersonTextbox() {
+                 if (!activePersonTextbox || !activePersonRow) return;
+
+                 var hid = activePersonRow.querySelector("input[data-role='person-id']")
+                 var lbl = activePersonRow.querySelector(".person-error");
+
+                 if (!hid || !hid.value) {
+                     activePersonTextbox.value = '';
+                     if (lbl) {
+                         lbl.textContent = 'Please select a person';
+                         lbl.style.display = 'inline';
+                     }
+                 } else {
+                     if (lbl) lbl.style.display = 'none';
+                 }
+
+                 activePersonTextbox = null;
+                 activePersonRow = null;
+             }
+
+             function closeAndFinalizePersonTextbox() {
+
+                 var pnl = document.getElementById('pnlPersonDropdownGlobal');
+                 if (pnl) pnl.style.display = 'none';
+
+                 if (activePersonTextbox && activePersonRow) {
+
+                     var hid = activePersonRow.querySelector("input[data-role='person-id']")
+                     var lbl = activePersonRow.querySelector(".person-error");
+
+                     if (!hid || !hid.value) {
+                         activePersonTextbox.value = '';
+                         if (lbl) {
+                             lbl.textContent = 'Please select a person';
+                             lbl.style.display = 'inline';
+                         }
+                     } else {
+                         if (lbl) lbl.style.display = 'none';
+                     }
+                 }
+
+                 activePersonTextbox = null;
+                 activePersonRow = null;
+                 personDropdownOpen = false;
+             }
+
+             (function () {
+                 var pnl = document.getElementById('pnlPersonDropdownGlobal');
+                 if (pnl && pnl.parentElement !== document.body) {
+                     document.body.appendChild(pnl);
+                 }
+             })();
+
+             function closePersonDropdown() {
+                 var pnl = document.getElementById('pnlPersonDropdownGlobal');
+                 if (!pnl) return;
+
+                 pnl.style.display = 'none';
+                 personDropdownOpen = false;
+                 activePersonTextbox = null;
+             }
+
+             function closeAllPersonDropdowns() {
+                 var panels = document.querySelectorAll('.person-dropdown');
+                 for (var i = 0; i < panels.length; i++) {
+                     panels[i].style.display = "none";
+                 }
+
+                 personDropdownOpen = false;
+             }
+
+             function closeAndValidate() {
+
+                 var pnl = document.getElementById('pnlPersonDropdownGlobal');
+                 if (pnl) pnl.style.display = 'none';
+
+                 if (activePersonTextbox && activePersonRow) {
+
+                     var hid = activePersonRow.querySelector("input.person-id");
+                     var err = activePersonRow.querySelector(".person-error");
+
+                     if (!hid || !hid.value) {
+                         activePersonTextbox.value = '';
+                         if (err) {
+                             err.innerHTML = 'Please select a person';
+                             err.style.display = 'inline';
+                         }
+                     } else {
+                         if (err) err.style.display = 'none';
+                     }
+                 }
+
+                 dropdownOpen = false;
+                 activePersonTextbox = null;
+                 activePersonRow = null;
+             }
+
+             function getGridViewRow(el) {
+                 while (el && el.tagName !== "TR") {
+                     el = el.parentElement;
+                 }
+                 return el;
+             }
+
+             function validatePersonTextbox(textbox) {
+                 setTimeout(function () {
+                     var row = getGridViewRow(textbox);
+                     if (!row) return;
+
+                     var personId = row.querySelector(".person-id");
+                     var errorLabel = row.querySelector(".person-error");
+
+                     if (textbox.value.trim() !== "" && !personId.value) {
+                         textbox.value = "";
+                         if (errorLabel) errorLabel.style.display = "block";
+                     }
+                 }, 150);
+             }
+
+             function resetPersonSelectionOnType(textbox) {
+                 var row = getGridViewRow(textbox);
+                 if (!row) return;
+
+                 var personId = row.querySelector(".person-id");
+                 var personName = row.querySelector(".person-name");
+                 var errorLabel = row.querySelector(".person-error");
+
+                 // If user edits AFTER selection → invalidate
+                 if (textbox.dataset.selectedValue &&
+                     textbox.value !== textbox.dataset.selectedValue) {
+
+                     personId.value = "";
+                     personName.value = "";
+                     textbox.dataset.selectedValue = "";
+
+                     if (errorLabel) errorLabel.style.display = "none";
+                 }
+             }
+
+             document.addEventListener("click", function (e) {
+
+                 // Ignore clicks inside textbox or dropdown
+                 if (
+                     e.target.closest(".person-select") ||
+                     e.target.closest("#pnlPersonDropdownGlobal")
+                 ) {
+                     return;
+                 }
+
+                 // Validate ONLY the active textbox
+                 if (activePersonTextbox) {
+                     validatePersonTextbox(activePersonTextbox);
+                     activePersonTextbox = null; // reset
+                 }
+             });
+
+             function setActivePersonTextbox(tb) {
+                 activePersonTextbox = tb;
+             }
+
+             (function () {
+                 var form = document.getElementById("form1");
+
+                 form.addEventListener("keydown", function (e) {
+                     var key = e.key || e.keyCode;
+
+                     if (key === "Enter" || key === 13) {
+                         var target = e.target || e.srcElement;
+
+                         // Allow Enter on buttons explicitly
+                         if (
+                             target.tagName === "BUTTON" ||
+                             (target.tagName === "INPUT" &&
+                                 (target.type === "button" || target.type === "submit"))
+                         ) {
+                             return true;
+                         }
+
+                         // Block Enter everywhere else
+                         e.preventDefault();
+                         e.stopPropagation();
+                         return false;
+                     }
+                 }, true);
+             })();
+
         </script>
-         
+        <asp:Panel ID="pnlPersonDropdownGlobal" runat="server" ClientIDMode="Static" CssClass="dropdown-panel person-dropdown" style="display:none; position:absolute; z-index:99999;" onclick="event.stopPropagation();">
+            <select id="lstPersonsGlobal" size="8" style="width:100%;" onclick="selectPersonFromGlobalList(this)"></select>
+        </asp:Panel>
     </form>
 </body>
 </html>
