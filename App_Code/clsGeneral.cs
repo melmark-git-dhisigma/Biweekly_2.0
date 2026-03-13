@@ -260,7 +260,7 @@ public class clsGeneral
 
             strQuery = "Select DISTINCT O.ObjectName as Name,O.ObjectURL as URL,SortOrder from Object O Inner Join RoleGroupPerm RGP On O.ObjectId=RGP.ObjectId ";
             strQuery += "Inner Join UserRoleGroup URG On RGP.RoleGroupId=URG.RoleGroupId Where URG.UserId=" + UserId + "   ";
-            strQuery += " And (RGP.ReadInd=1 Or RGP.WriteInd=1) AND URG.ActiveInd = 'A' And O.ObjectUrl is Not Null and ObjectType='P' order By SortOrder Asc ";
+            strQuery += " And (RGP.ReadInd=1 Or RGP.WriteInd=1) AND URG.ActiveInd = 'A' And O.ObjectUrl is Not Null and ObjectType='P'  And o.SchoolId=" + SchoolId + " order By SortOrder Asc ";
 
 
             DataTable Dt = objData.ReturnDataTable(strQuery, false);
