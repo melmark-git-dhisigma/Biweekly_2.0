@@ -313,6 +313,10 @@
             if (n == 5) {title = "Excel View Report"; $("#ExcelView").trigger('click'); }
             if (n == 6) {title = "Progress Summary Report"; $("#ProgressSummaryReport").trigger('click'); }
             if (n == 7) { title = "Progress Summary Report"; $("#ClinicalProgressSummaryReport").trigger('click'); }
+            if (n == 9) { title = "Time Cycle Chart"; $("#TimeCycleCharts").trigger('click'); }
+            if (n == 10) { title = "Step/Trial Data"; selSubmenu(document.getElementById("TextBased.aspx"), 0, 0); }
+            if (n == 11) { title = ""; selSubmenu(document.getElementById("BlockSchedule.aspx"), 0, 0); }
+
             if (n == 8) { $("#GraphTab").trigger('click'); }
             document.getElementById('tdTitle').innerHTML = title;
         }
@@ -2095,6 +2099,10 @@
                         dname = "divGR" + Id + "" + MenuIds + ""
                         iname = "divIGR" + Id + "" + MenuIds + "";
                     }
+                    else if (x.value == ("TimeCycleChart.aspx" + Ids).toString()) {
+                        dname = "divTCC" + Id + "" + MenuIds + ""
+                        iname = "divTCC" + Id + "" + MenuIds + "";
+                    }
                     else if (x.value == ("IEPView.aspx" + Ids).toString()) {
                         dname = "divIEP" + Id + "" + MenuIds + ""
                         iname = "divIIEP" + Id + "" + MenuIds + "";
@@ -2569,6 +2577,11 @@
                     iname = "divIEXP" + Id + "" + MenuIds + "";
                     divname = "divEXP" + Id;
                 }
+                else if (x.value == ("TimeCycleChart.aspx" + Ids).toString()) {
+                    dname = "divTCC" + Id + "" + MenuIds + ""
+                    iname = "divTCC" + Id + "" + MenuIds + "";
+                    divname = "divTCC" + Id + "" + MenuIds + ""
+                }
                 else {
                     dname = "divTFBEH" + Id + "" + MenuIds + ""
                     iname = "divTFBEH" + Id + "" + MenuIds + "";
@@ -2899,6 +2912,9 @@
 
             if (dname.indexOf('divGTG') >= 0) {
                 title = "Graph Grid";
+            }
+            if (dname.indexOf('divTCC') >= 0) {
+                title = "Time Cycle Chart";
             }
             if (dname.indexOf('divEXP') >= 0) {
                 title = "";
