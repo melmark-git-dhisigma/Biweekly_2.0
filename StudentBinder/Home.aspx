@@ -195,7 +195,7 @@
             padding: 20px;
             background: #fff;
             box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            z-index: 1003;
+            z-index: 9999;
             text-align: center;
             font-family: Arial, sans-serif;
         }
@@ -208,7 +208,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.5);
-            z-index: 1003;
+            z-index: 9999;
         }
 
         .popup-button {
@@ -945,13 +945,13 @@
                 $('#slider').css("top", '73%');
                 $('#dropper').removeAttr('onclick');
 
-                $('.checkPopUp').css("width", '600px');
-                $('#A3').css('margin-left', '580px');
+                $('.checkPopUp').css("width", '800px');
+                $('#A3').css('margin-left', '780px');
                 $('#A3').css('position', 'absolute');
                 $('#A3').css('top', '-24px');
                 $('#A3').removeClass('close sprited');
                 $('#stCheckIn').css('width', '100%');
-                $('#stCheckIn').css('height', '450px');
+                $('#stCheckIn').css('height', '380px');
 
 
             }
@@ -1698,24 +1698,30 @@
 
 
 
-            if (response == null) {
+            //if (response == null) {
 
-                var flag = confirm("Student not Checked In, Do you want the Student to be Checked In ?");
-                if (flag) {
-                    PageMethods.setCheckInn(document.getElementById('hidCureentStudent').value, OnSuccessCheckIn);
+            //    var flag = confirm("Student not Checked In, Do you want the Student to be Checked In ?");
+            //    if (flag) {
+            //        PageMethods.setCheckInn(document.getElementById('hidCureentStudent').value, OnSuccessCheckIn);
 
                     $('.fillLessons1').hide();
                     $('.fillLessons2').hide();
                     $('.fillLessons').hide();
                     PopupLessonPlans1('DatasheetTab');
-                }
+            //    }
 
-                //alert("Student not Checked Inn");
-            }
-            else {
+            //    //alert("Student not Checked Inn");
+            //}
+            //else {
 
+            if (!response || response.length === 0) {
                 PopupLessonPlans1('DatasheetTab');
-                if (response.length <= 0) {
+                selSubmenuforBehavior();
+                return;
+            }
+
+            //PopupLessonPlans1('DatasheetTab');
+            if (response.length <= 0) {
 
                     selSubmenuforBehavior();
                 }
@@ -1731,9 +1737,53 @@
                         }
                     }
                 }
-            }
+            //}
 
         }
+
+        function checkAndSelectLesson(el, id) {
+            var stud = document.getElementById('hidCureentStudent').value;
+            console.log("Stud:"+stud);
+            // helper: set sessions and go to the lesson page
+            function goToLesson() {
+                PageMethods.setMenuSess("DATASHEETS", function () {
+                    PageMethods.setIDSess(id, function () {
+                        window.location.href = "Datasheet.aspx";
+                    }, onErr);
+                }, onErr);
+            }
+
+            function onErr(err) {
+                console.error(err);
+                alert("Something went wrong. Please try again.");
+            }
+
+            //PageMethods.getStudentStatus(stud, function (isCheckedIn) {
+            //    if (!isCheckedIn) {
+            //        // Show the custom modal. When finished, always call goToLesson()
+            //        showCheckinPrompt(stud, {
+            //            message: "Client not checked-in",
+            //            onFinish: function () {
+            //                // proceed to lesson regardless of choice or setCheckInn result
+            //                goToLesson();
+            //            },
+            //            onError: function (err) {
+            //                // optional: log the error - does not block the lesson
+            //                console.error('setCheckInn error:', err);
+            //            }
+            //        });
+            //        return;
+            //    }
+
+            //    // Already checked in
+            //    goToLesson();
+            //}, onErr);
+
+
+            goToLesson();
+        }
+
+
         function OnSuccessCheckIn(result) {
             var dtsht = document.getElementById('DATASHEETS');
             if (dtsht != null) {
@@ -4442,6 +4492,118 @@
                 Notification.requestPermission();
         }
         });
+
+        (function () {
+            var modalHtml = '\
+  <div id="checkin-modal-overlay" style="display:none;position:fixed;inset:0;z-index:2000;backdrop-filter: blur(2px);">\
+    <div id="checkin-modal" role="dialog" aria-modal="true" aria-labelledby="checkin-modal-message" style="position:relative;max-width:480px;margin:8% auto;padding:18px;background:#fff;border-radius:8px;box-shadow:0 8px 30px rgba(0,0,0,0.2);font-family:Arial,sans-serif;">\
+      <button id="checkin-close-btn" type="button" aria-label="Close" style="position:absolute;right:10px;top:10px;border:0;background:transparent;font-size:18px;cursor:pointer;color:#666;">&times;</button>\
+      <div id="checkin-modal-message" style="margin-bottom:14px;font-size:15px;color:#222;">Client not checked-in.</div>\
+      <div style="text-align:right">\
+        <button id="checkin-btn" type="button" style="margin-right:8px;padding:8px 12px;border-radius:6px;border:1px solid #2b6cb0;background:#2b6cb0;color:#fff;cursor:pointer;">Check-in</button>\
+        <button id="dont-checkin-btn" type="button" style="padding:8px 12px;border-radius:6px;border:1px solid #ccc;background:#fff;cursor:pointer;">Do not check-in</button>\
+      </div>\
+    </div>\
+  </div>';
+            var container = document.createElement('div');
+            container.innerHTML = modalHtml;
+            document.body.appendChild(container);
+
+            var overlay = document.getElementById('checkin-modal-overlay');
+            var modal = document.getElementById('checkin-modal');
+            var checkinBtn = document.getElementById('checkin-btn');
+            var dontCheckinBtn = document.getElementById('dont-checkin-btn');
+            var closeBtn = document.getElementById('checkin-close-btn');
+            var messageEl = document.getElementById('checkin-modal-message');
+
+            function showCheckinPrompt(studId, opts) {
+                opts = opts || {};
+                var onFinish = typeof opts.onFinish === 'function' ? opts.onFinish : function () {};
+                var onError = typeof opts.onError === 'function' ? opts.onError : function () {};
+
+                if (opts.message) messageEl.textContent = opts.message;
+                else messageEl.textContent = 'Client not checked-in.';
+
+                overlay.style.display = 'block';
+                var prevFocus = document.activeElement;
+                checkinBtn.focus();
+
+                var handled = false;
+                function cleanup() {
+                    overlay.style.display = 'none';
+                    checkinBtn.removeEventListener('click', onCheckinClick);
+                    dontCheckinBtn.removeEventListener('click', onDontClick);
+                    closeBtn.removeEventListener('click', onCloseClick);
+                    overlay.removeEventListener('click', onOverlayClick);
+                    document.removeEventListener('keydown', onEsc);
+                    try { if (prevFocus && typeof prevFocus.focus === 'function') prevFocus.focus(); } catch(e) {}
+                }
+
+                // --- Handlers ---
+                function onCheckinClick(ev) {
+                    if (ev && ev.preventDefault) ev.preventDefault();
+                    if (handled) return;
+                    handled = true;
+
+                    if (typeof PageMethods !== 'undefined' && typeof PageMethods.setCheckInn === 'function') {
+                        PageMethods.setCheckInn(studId, function (result) {
+                            cleanup();
+                            onFinish(); // proceed to lesson
+                        }, function (err) {
+                            cleanup();
+                            onError(err);
+                            onFinish(); // still proceed
+                        });
+                    } else {
+                        cleanup();
+                        onFinish();
+                    }
+                }
+
+                function onDontClick(ev) {
+                    if (ev && ev.preventDefault) ev.preventDefault();
+                    if (handled) return;
+                    handled = true;
+                    cleanup();
+                    onFinish(); // proceed to lesson
+                }
+
+                // IMPORTANT: Close / overlay / ESC only dismiss modal (do NOT call onFinish)
+                function onCloseClick(ev) {
+                    if (ev && ev.preventDefault) ev.preventDefault();
+                    if (handled) return;
+                    handled = true;
+                    cleanup();
+                    // NO onFinish() here — dismiss only
+                }
+
+                function onOverlayClick(ev) {
+                    if (ev.target !== overlay) return;
+                    if (handled) return;
+                    handled = true;
+                    cleanup();
+                    // NO onFinish()
+                }
+
+                function onEsc(ev) {
+                    if (ev.key === 'Escape' || ev.key === 'Esc') {
+                        if (handled) return;
+                        handled = true;
+                        cleanup();
+                        // NO onFinish()
+                    }
+                }
+
+                // Wire handlers
+                checkinBtn.addEventListener('click', onCheckinClick);
+                dontCheckinBtn.addEventListener('click', onDontClick);
+                closeBtn.addEventListener('click', onCloseClick);
+                overlay.addEventListener('click', onOverlayClick);
+                document.addEventListener('keydown', onEsc);
+            }
+
+            window.showCheckinPrompt = showCheckinPrompt;
+        })();
     </script>
 <button id="unmute" style="display:none">Unmute</button>
 
@@ -4576,7 +4738,7 @@
 
                         <li class="box3">
                             <a href="#" onclick="ShowReminder();">CheckIn/CheckOut </a>
-                            <div class="checkPopUp">
+                            <div class="checkPopUp" style="width:800px;">
                                 <hr />
 
                                 <asp:UpdatePanel ID="UpdatePanel3" runat="server">
@@ -4584,7 +4746,7 @@
                                         <div id="Div3">
                                             <a id="A3" class="close sprited" href="#">
                                                 <img onclick="javascript: $('.checkPopUp').slideToggle('slow');" src="../Administration/images/closebtn.png" style="border: 0px;" width="24px" /></a>
-                                            <iframe id="stCheckIn" src="StudentCheckin.aspx" height="375px" scrolling="no" frameborder="0"></iframe>
+                                            <iframe id="stCheckIn" src="StudentCheckin.aspx" height="380px" width="100%" scrolling="no" frameborder="0"></iframe>
                                             <div style="text-align: right;">
                                             </div>
                                         </div>
@@ -4700,7 +4862,6 @@
                     playButton.addEventListener('click', unlock);
          
                     function unlock() {
-                        console.log("unlocking")
                         // create empty buffer and play it
                         var buffer = context.createBuffer(1, 1, 22050);
                         var source = context.createBufferSource();
