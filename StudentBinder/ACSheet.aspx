@@ -295,6 +295,45 @@
 
         
 
+        function ShowLoader() {
+            $('#overlay').fadeIn('fast');         // Gray overlay
+            $('.loading').fadeIn('fast');         // Loader
+        }
+
+        function HideLoader() {
+            $('.loading').fadeOut('fast');
+            $('#overlay').fadeOut('fast');
+        }
+
+        function attachLoaderToLessonType() {
+            var rbl = document.getElementById('<%= rbtnLsnClassTypeAc.ClientID %>');
+            if (!rbl) return;
+
+            var inputs = rbl.getElementsByTagName("input");
+            for (var i = 0; i < inputs.length; i++) {
+                var input = inputs[i];
+
+                if (input.getAttribute("data-loader-wired") === "1") continue;
+                input.setAttribute("data-loader-wired", "1");
+
+                if (input.addEventListener) {
+                    input.addEventListener("click", function () {
+                        ShowLoader();
+                    }, false);
+                } else if (input.attachEvent) {
+                    input.attachEvent("onclick", function () {
+                        ShowLoader();
+                    });
+                }
+            }
+        }
+
+        if (typeof (Sys) !== "undefined" && Sys.Application) {
+            Sys.Application.add_load(attachLoaderToLessonType);
+        } else {
+            window.onload = attachLoaderToLessonType;
+        }
+
     </script>
 
 
