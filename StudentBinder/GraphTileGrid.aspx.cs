@@ -32,6 +32,9 @@ public partial class StudentBinder_GraphTileGrid : System.Web.UI.Page
         if (s == "5") ClientScript.RegisterStartupScript(this.GetType(), "", "PopupExcelView();", true); //Response.Redirect("ExcelViewReport.aspx?studid=" + studid + "&pageid=" + pageid);
         if (s == "6") ClientScript.RegisterStartupScript(this.GetType(), "", "PopupAcademicPGSummary();", true);// Response.Redirect("ProgressSummaryReport.aspx?studid=" + studid + "&pageid=" + pageid);
         if (s == "7") ClientScript.RegisterStartupScript(this.GetType(), "", "PopupClinicalPGSummary();", true); //Response.Redirect("ProgressSummaryReportClinical.aspx?studid=" + studid + "&pageid=" + pageid);
+        if (s == "9") ClientScript.RegisterStartupScript(this.GetType(), "", "PopupTimeCycleChart();", true); //Response.Redirect("ProgressSummaryReportClinical.aspx?studid=" + studid + "&pageid=" + pageid);
+        if (s == "10") ClientScript.RegisterStartupScript(this.GetType(), "", "PopupSteptrial();", true); //Response.Redirect("ProgressSummaryReportClinical.aspx?studid=" + studid + "&pageid=" + pageid);
+        if (s == "11") ClientScript.RegisterStartupScript(this.GetType(), "", "PopupBlockschedule();", true); //Response.Redirect("ProgressSummaryReportClinical.aspx?studid=" + studid + "&pageid=" + pageid);
 
             
         

@@ -310,9 +310,9 @@ public class clsSubmenu
             drChain["ID"] = "0";
             dtSubmenu.Rows.Add(drChain);
 
-            menulist = "Progress Report,Excel View,Progress Summary Report,Clinical Progress Summary Report, Step/Trial Data";
-            url = "ProgressReport.aspx,ExcelViewReport.aspx,ProgressSummaryReport.aspx,ProgressSummaryReportClinical.aspx,TextBased.aspx";
-            Ids = "0,0,0,0,0";
+            menulist = "Progress Report,Excel View,Time Cycle Charts,Progress Summary Report,Clinical Progress Summary Report, Step/Trial Data";
+            url = "ProgressReport.aspx,ExcelViewReport.aspx,TimeCycleChart.aspx,ProgressSummaryReport.aspx,ProgressSummaryReportClinical.aspx,TextBased.aspx";
+            Ids = "0,0,0,0,0,0";
             for (int count = 0; count < menulist.Split(',').Length; count++)
             {
                 String menuName = Regex.Replace(menulist.Split(',')[count], @"[^0-9a-zA-Z]+ ", "");
