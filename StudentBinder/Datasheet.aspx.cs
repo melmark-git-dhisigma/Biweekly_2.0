@@ -52,6 +52,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
     bool updateCheck = true;
     DateTime now = DateTime.Now;
     DateTime today = DateTime.Today;
+    int userId = 0; // To prevent Session Swap
+    int studentId = 0; // To prevent Session Swap
+    int classId = 0;
+    int schoolId = 0;
 
 
     protected void Page_Load(object sender, EventArgs e)
@@ -852,7 +856,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     int sessTotStepCount = Convert.ToInt32(Session["TotStepCount"]);
                                                     int dtRowCount = dt.Rows.Count;
                                                     int CrntSet = oDS.CrntSet;
-                                                    if (sessTotStepCount != dtRowCount)
+                                                    if (sessTotStepCount != dtRowCount && sessTotStepCount != 0)
                                                     {
                                                         clError.WriteToLog("StepCountMismatch:\n"+"StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString() + "\nCurrent SetId:" + CrntSet + "\nSession TotStepCount:"+sessTotStepCount+"  DataTable StepCount:"+dtRowCount+"\nQuery:\n" + sqlStr + "\nDataTable:\n" + ConvertDataTableToString(dt));
                                                     }
@@ -1011,7 +1015,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 int sessTotStepCount = Convert.ToInt32(Session["TotStepCount"]);
                                 int dtRowCount = dt.Rows.Count;
                                 int CrntSet = oDS.CrntSet;
-                                if (sessTotStepCount != dtRowCount)
+                                if (sessTotStepCount != dtRowCount && sessTotStepCount != 0)
                                 {
                                     clError.WriteToLog("StepCountMismatch:\n" + "StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString() + "\nCurrent SetId:" + CrntSet + "\nSession TotStepCount:" + sessTotStepCount + "  DataTable StepCount:" + dtRowCount + "\nQuery:\n" + sqlStr + "\nDataTable:\n" + ConvertDataTableToString(dt));
                                 }
@@ -2158,7 +2162,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             int sessTotStepCount = Convert.ToInt32(Session["TotStepCount"]);
                             int dtRowCount = Session["steporder"].ToString().Split(',').Length;
                             int CrntSet = oDS.CrntSet;
-                            if (sessTotStepCount != dtRowCount)
+                            if (sessTotStepCount != dtRowCount && sessTotStepCount != 0)
                             {
                                 clError.WriteToLog("StepCountMismatch:\n" + "StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString() + "Current SetId:" + CrntSet + "\nSession TotStepCount:" + sessTotStepCount + "  DataTable StepCount:" + dtRowCount + "\nSession Steporder:\n" + Session["steporder"].ToString() + "\n datatable" + Session["datatable"].ToString());
                             }
@@ -3673,6 +3677,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         int crntPrmpt = 0;
         if (oSession != null)
         {
+            userId = 0;
+            studentId = 0;
+            if (userId == 0 || studentId == 0)
+            {
+                Pagepath = "Datasheet: updateDatas/IdChecks";
+                IDChecks();
+            }
             Dictionary<string, string[]> dictSteps = LoadStepVals_toDict();
             if (dictSteps != null)
             {
@@ -3722,7 +3733,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         ////HtmlInputRadioButton rdoPlusMinus = (HtmlInputRadioButton)gr.FindControl("rdbRespPlus");
                                         if (chkMistrial.Checked == true) mistrial = "Y";
                                     }
-                                    string updSteps = "UPDATE StdtSessionStep SET Comments='" + txtStepCmnts.Text.Replace("'","''") + "',SessionStatusCd='" + mistrial + "',SelectedSample='" + hfSample.Value.Replace("'", "''").Trim() + "',ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() " +
+                                    string updSteps = "UPDATE StdtSessionStep SET Comments='" + txtStepCmnts.Text.Replace("'","''") + "',SessionStatusCd='" + mistrial + "',SelectedSample='" + hfSample.Value.Replace("'", "''").Trim() + "',ModifiedBy=" + userId + ",ModifiedOn=GETDATE() " +
                                         "WHERE StdtSessionStepId=" + hfStepid.Value + " AND StdtSessionHdrId=" + sessHdrId + "";
                                     if (hfStepid.Value != null && hfStepid.Value.ToString() != "")
                                     {
@@ -3763,7 +3774,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                 }
 
-                                string updStpDtls = "UPDATE StdtSessionDtl SET StepVal='" + pair.Value[scoreIndex].Replace("'", "''") + "',CurrentPrompt='" + crntPrmpt + "',SessionStatusCd='" + mistrial + "',ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() " +
+                                string updStpDtls = "UPDATE StdtSessionDtl SET StepVal='" + pair.Value[scoreIndex].Replace("'", "''") + "',CurrentPrompt='" + crntPrmpt + "',SessionStatusCd='" + mistrial + "',ModifiedBy=" + userId + ",ModifiedOn=GETDATE() " +
                                     "WHERE StdtSessionStepId=" + hfStepid.Value + " AND DSTempSetColId=" + pair.Key + "";
                                 if (hfStepid.Value != null && hfStepid.Value.ToString() != "")
                                 {
@@ -3873,7 +3884,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         if (Convert.ToBoolean(ViewState["IsHistory"]) == true)
                         {
                             updQry = "update StdtSessionHdr SET AssignedToId=1,SessMissTrailStus='" + sessMistrial + "',SessMissTrailRsn='" + hdnMissTrialRsn.Value + "',"
-                        + "Comments='" + clsGeneral.convertQuotes( txtNote.Text.Trim()) + "',ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE(),IsUpdate=1 WHERE StdtSessionHdrId=" + sessHdrId + "";
+                        + "Comments='" + clsGeneral.convertQuotes( txtNote.Text.Trim()) + "',ModifiedBy=" + userId + ",ModifiedOn=GETDATE(),IsUpdate=1 WHERE StdtSessionHdrId=" + sessHdrId + "";
 
                         }
                         else
@@ -3913,7 +3924,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 else
                                     where = "IsUpdate=0";
                                 updQry = "update StdtSessionHdr SET AssignedToId=1,SessionStatusCd='" + status + "',SessMissTrailStus='" + sessMistrial + "',SessMissTrailRsn='" + hdnMissTrialRsn.Value + "',"
-                               + "Comments='" + clsGeneral.convertQuotes(txtNote.Text.Trim()) + "',ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE()," + where + " WHERE StdtSessionHdrId=" + sessHdrId + "";
+                               + "Comments='" + clsGeneral.convertQuotes(txtNote.Text.Trim()) + "',ModifiedBy=" + userId + ",ModifiedOn=GETDATE()," + where + " WHERE StdtSessionHdrId=" + sessHdrId + "";
                             }
                         }
                         if (updQry != "")
@@ -3979,8 +3990,15 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         }
                         if (Ismaint)
                             iIsmaintain = 1;
+                        userId = 0;
+                        studentId = 0;
+                        if (userId == 0 || studentId == 0)
+                        {
+                            Pagepath = "Datasheet: updateDraft/IdChecks";
+                            IDChecks();
+                        }
                         updQry = "update StdtSessionHdr SET IsMaintanace=" + iIsmaintain + ", AssignedToId=1,EndTs=GETDATE(),SessionStatusCd='D',SessMissTrailStus='" + sessMistrial + "',SessMissTrailRsn='" + hdnMissTrialRsn.Value + "',"
-                        + "Comments='" + clsGeneral.convertQuotes(txtNote.Text.Trim()) + "',ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE StdtSessionHdrId=" + sessHdrId + "";
+                        + "Comments='" + clsGeneral.convertQuotes(txtNote.Text.Trim()) + "',ModifiedBy=" + userId + ",ModifiedOn=GETDATE() WHERE StdtSessionHdrId=" + sessHdrId + "";
                         int retrn = oData.ExecuteWithTrans(updQry, con, trans);
                         if (retrn > 0) { updateDatas(sessHdrId, con, trans); valid_Ind = true; updateCheck = true; }
                         else
@@ -4531,12 +4549,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             //if (Convert.ToBoolean(ViewState["IsHistory"]) == false)
                                             //{
-                                            string curesesid = this.Session.SessionID.ToString();
+                                            curesesid = this.Session.SessionID.ToString();
                                             string HostName = Dns.GetHostName();
                                             userAgent = HttpContext.Current.Request.UserAgent.ToString();
                                             ip = clsGeneral.GetIPAddress();
                                             ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
-                                            Pagepath = "Datasheet : btnSubmit_Click";
+                                            Pagepath = "Datasheet : SaveMeasuremnts";
                                             if (Prevsess != null)
                                             {
                                                 sesserrlog.WriteToLog(today.ToString("yyyy-MM-dd") + ',' + now.ToString("HH:mm:ss") + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + Prevsess.LoginId.ToString() + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + Prevsess.UserName + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + Prevsess.SessionID + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + Prevsess.Classid + ',' + PreClassid + ',' + oSession.StudentId + ',' + Prevsess.StudentId + ',' + SessStudentid + ',' + HostName + ',' + userAgent);
@@ -4546,11 +4564,57 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 sesserrlog.WriteToLog(today.ToString("yyyy-MM-dd") + ',' + now.ToString("HH:mm:ss") + ',' + oSession.LoginTime.ToString() + ',' + oSession.LoginId.ToString() + ',' + "PrevSession Null" + ',' + preid.ToString() + ',' + ip + ',' + oSession.UserName + ',' + "PrevSession Null" + ',' + preuser + ',' + oSession.SchoolId + ',' + "Log" + ',' + oSession.SessionID + ',' + "PrevSession Null" + ',' + curesesid + ',' + Pagepath + ',' + oSession.Classid + ',' + "PrevSession Null" + ',' + PreClassid + ',' + oSession.StudentId + ',' + "PrevSession Null" + ',' + SessStudentid + ',' + HostName + ',' + userAgent);
                                             }
                                             oSession = clsGeneralSchk.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, PreClassid, Sessstname, Pagepath);
-
+                                            if (curesesid != "" && Prevsess != null)
+                                            {
+                                                if ((curesesid != oSession.SessionID || preid != oSession.LoginId || preuser != oSession.UserName || SessStudentid != oSession.StudentId || Sessstname != oSession.StudentName || PreClassid != oSession.Classid) && Prevsess != oSession)
+                                                {
+                                                    if (curesesid == Prevsess.SessionID)
+                                                    {
+                                                        oSession = Prevsess;
+                                                        oSession.LoginId = preid;
+                                                        oSession.UserName = preuser;
+                                                        oSession.StudentId = SessStudentid;
+                                                        oSession.StudentName = Sessstname;
+                                                        oSession.Classid = PreClassid;
+                                                    }
+                                                    else
+                                                    {
+                                                        ClsErrorLog clError = new ClsErrorLog();
+                                                        clError.WriteToLog(today.ToString("yyyy-MM-dd") + ',' + now.ToString("HH:mm:ss")
+                                                            + "\nStdtSessColScoreLog " 
+                                                            + "\nLogin Time: " + oSession.LoginTime.ToString() 
+                                                            + "\nLogin Id: " + oSession.LoginId.ToString() 
+                                                            + "\nPre Sess Login Id: " + Prevsess.LoginId.ToString() 
+                                                            + "\nPre Id: " + preid.ToString() 
+                                                            + "\nIP: " + ip 
+                                                            + "\nCurent Username: " + oSession.UserName
+                                                            + "\nPreUser: " + preuser 
+                                                            + "\nSchool Id: " + oSession.SchoolId 
+                                                            + "\nSessCheckDatasheet" 
+                                                            + "\nSessionID: " + oSession.SessionID 
+                                                            + "\nPrev SessionID: " + Prevsess.SessionID 
+                                                            + "\nCur Sess Id " + curesesid 
+                                                            + "\nCould_Not_match_with_PrevessId" 
+                                                            + "\nClass Id: " + oSession.Classid 
+                                                            + "\nPre Sess Class Id: " + Prevsess.Classid 
+                                                            + "\nPre Class Id: " + PreClassid 
+                                                            + "\nStudent Id: " + oSession.StudentId 
+                                                            + "\nPre Student Id: " + Prevsess.StudentId 
+                                                            + "\nSessStudent Id: " + SessStudentid);
+                                                    }
+                                                }
+                                            }
+                                            userId = 0;
+                                            studentId = 0;
+                                            if (userId == 0 || studentId == 0)
+                                            {
+                                                Pagepath = "Datasheet: SaveMeasuremnts/IdChecks";
+                                                IDChecks();
+                                            }
                                             string insertSessionScoreQuery = "INSERT INTO StdtSessColScore (SchoolId,StudentId,DSTempSetColId,DSTempSetColCalcId,StdtSessionHdrId,Score,CreatedBy,CreatedOn)"
-                                                + "values(" + oSession.SchoolId + "," + oSession.StudentId + "," + Convert.ToInt32(oDS.dtColumns.Rows[i]["DSTempSetColId"].ToString()) + ","
+                                                + "values(" + oSession.SchoolId + "," + studentId + "," + Convert.ToInt32(oDS.dtColumns.Rows[i]["DSTempSetColId"].ToString()) + ","
                                                 + Convert.ToInt32(dr["DSTempSetColCalcId"].ToString()) + "," + sessHdrId + ","
-                                                + "" + float.Parse(score) + "," + oSession.LoginId + ",GETDATE())";
+                                                + "" + float.Parse(score) + "," + userId + ",GETDATE())";
                                             if (oData.ExecuteWithScopeandConnection(insertSessionScoreQuery, con, tran) > 0) valid = true;
                                             //}
 
@@ -4976,8 +5040,9 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 trans = con.BeginTransaction();
 
                 oSession = (clsSession)Session["UserSession"];
+                Pagepath = "Datasheet : btnIOASelect_Click";
                 
-                
+                IDChecks();
                 oTemp = (ClsTemplateSession)Session["BiweeklySession"];
                 string sel = "SELECT TOP 1 StdtSessionHdrId, SessionNbr FROM StdtSessionHdr WHERE StudentId=" + oSession.StudentId + " AND SchoolId=" + oSession.SchoolId + " AND DSTempHdrId=" + oTemp.TemplateId + " AND SessionStatusCd='D' AND IsMaintanace ='" + hdn_isMaintainance.Value + "' AND IOAInd='N'";
                 DataTable dtHdrs = oData.ReturnDataTable(sel, false);
@@ -5023,7 +5088,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     {
                         Int32 sessTotStepCount = Convert.ToInt32(Session["TotStepCount"]);
                         Int32 dtRowCount = Session["steporder"].ToString().Split(',').Length;
-                        if (sessTotStepCount != dtRowCount)
+                        if (sessTotStepCount != dtRowCount && sessTotStepCount != 0)
                         {
                             clErr.WriteToLog("StepCountMismatch:\nSession TotStepCount:" + sessTotStepCount + "  DataTable StepCount:" + dtRowCount + "\nSession Steporder:\n" + Session["steporder"].ToString() + "StdtSessionHdrId=" + ViewState["StdtSessHdr"].ToString() + "Current SetId:" + oDS.CrntSet + "\n datatable=" + Session["datatable"].ToString());
                         }
@@ -5237,6 +5302,9 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         }
         if (!alreadydisc)
         {
+            oSession = (clsSession)Session["UserSession"];
+            Pagepath = "Datasheet : btnSave_Click";
+            IDChecks();
             SaveDraft();
             if (Convert.ToBoolean(ViewState["IsHistory"]) == true)
             {
@@ -5323,12 +5391,19 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         oSession = (clsSession)Session["UserSession"];
         int sessHdrId = Convert.ToInt32(ViewState["StdtSessHdr"]);
         oDS = (clsDataSheet)Session[DatasheetKey];
+        userId = 0;
+        studentId = 0;
+        if (userId == 0 || studentId == 0)
+        {
+            Pagepath = "Datasheet: SaveIOAPercentage/IdChecks";
+            IDChecks();
+        }
         if (oDS.IOAInd == "Y")
         {
             SqlCommand cmd = new SqlCommand("SELECT IOASessionHdrId FROM StdtSessionHdr WHERE StdtSessionHdrId=" + sessHdrId, con);
             cmd.Transaction = trans;
             int IOAsesshdrId = Convert.ToInt32(cmd.ExecuteScalar());
-            string UpdateIOA = "UPDATE StdtSessionHdr SET EndTs=GETDATE(),SessionStatusCd='S',Comments='" + clsGeneral.convertQuotes(txtNote.Text.Trim()) + "',ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE StdtSessionHdrId=" + sessHdrId;
+            string UpdateIOA = "UPDATE StdtSessionHdr SET EndTs=GETDATE(),SessionStatusCd='S',Comments='" + clsGeneral.convertQuotes(txtNote.Text.Trim()) + "',ModifiedBy=" + userId + ",ModifiedOn=GETDATE() WHERE StdtSessionHdrId=" + sessHdrId;
             int retrn = oData.ExecuteWithTrans(UpdateIOA, con, trans);
             if (retrn > 0)
             {
@@ -5349,6 +5424,15 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         bool transCheck1 = false;
         bool transCheck2 = false;
         IsMaintanace = Convert.ToBoolean(hdn_isMaintainance.Value);
+        oSession = (clsSession)Session["UserSession"];
+        string curesesid = this.Session.SessionID.ToString();
+        string HostName = Dns.GetHostName();
+        userAgent = HttpContext.Current.Request.UserAgent.ToString();
+        ip = clsGeneral.GetIPAddress();
+        Pagepath = "Datasheet : btnSubmit_Click";
+        IDChecks();
+
+
         try
         {
             string sqlStr = "select statusMessage from StdtDSStat where DSTempHdrId=" + oTemp.TemplateId;
@@ -5363,15 +5447,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             trans = con.BeginTransaction();
             if (updateDraft(Convert.ToInt32(ViewState["StdtSessHdr"]), "Submit", con, trans))
             {
-                oSession = (clsSession)Session["UserSession"];
                 oTemp = (ClsTemplateSession)HttpContext.Current.Session["BiweeklySession"];
 
                 bool reslt2 = SaveMeasuremnts(Convert.ToInt32(ViewState["StdtSessHdr"].ToString()), con, trans);
 
-                string curesesid = this.Session.SessionID.ToString();
-                string HostName = Dns.GetHostName();
-                userAgent = HttpContext.Current.Request.UserAgent.ToString();
-                ip = clsGeneral.GetIPAddress();
+               
                 ClsSessionErrorlog sesserrlog = new ClsSessionErrorlog();
                 Pagepath = "Datasheet : btnSubmit_Click";
                 if (Prevsess != null)
@@ -5394,7 +5474,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         DataTable DTCurrentDtl = oData.ReturnDataTableWithTransaction("SELECT HDR.DSTempHdrId,CASE WHEN ST.SetCd IS NOT NULL THEN 'SET '+ST.SetCd END AS SetName,CASE WHEN STP.SortOrder <>0 THEN 'Step '+CONVERT(VARCHAR(10),STP.SortOrder) END AS StepName,HDR.CurrentStepId,HDR.CurrentPromptId,HDR.LessonPlanId,HDR.CurrentSetId,PT.LookupName AS PromptName FROM StdtSessionHdr HDR LEFT JOIN DSTempSet ST ON HDR.CurrentSetId=ST.DSTempSetId LEFT JOIN DSTempStep STP ON HDR.CurrentStepId=STP.DSTempStepId LEFT JOIN LookUp PT ON HDR.CurrentPromptId=PT.LookupId WHERE StdtSessionHdrId=" + Convert.ToInt32(ViewState["StdtSessHdr"]), con, trans, false);
                         string EvntName = DTCurrentDtl.Rows[0]["SetName"].ToString();
                         string strQuery = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,EventName,StdtSessEventType,SetId,EvntTs,SessionNbr,EventType,LessonPlanId,TimeStampForReport)VALUES" +
-     " (" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + DTCurrentDtl.Rows[0]["DSTempHdrId"] + ",'" + EvntName.Replace("'", "''") + "','Major'," + DTCurrentDtl.Rows[0]["CurrentSetId"] + ",GETDATE(),1,'EV', " + DTCurrentDtl.Rows[0]["LessonPlanId"] + ",DATEADD(HH,(SELECT (COUNT(*)+1) FROM StdtSessEvent WHERE CONVERT(DATE,EvntTs)=CONVERT(DATE,GETDATE()) AND " + "SchoolId=" + oSession.SchoolId + " AND StudentId=" + oSession.StudentId + " AND EventType='EV' AND LessonPlanId=" + DTCurrentDtl.Rows[0]["LessonPlanId"] + ")," + "CONVERT(datetime,GETDATE())))";
+     " (" + oSession.SchoolId + "," + classId + "," + studentId + "," + DTCurrentDtl.Rows[0]["DSTempHdrId"] + ",'" + EvntName.Replace("'", "''") + "','Major'," + DTCurrentDtl.Rows[0]["CurrentSetId"] + ",GETDATE(),1,'EV', " + DTCurrentDtl.Rows[0]["LessonPlanId"] + ",DATEADD(HH,(SELECT (COUNT(*)+1) FROM StdtSessEvent WHERE CONVERT(DATE,EvntTs)=CONVERT(DATE,GETDATE()) AND " + "SchoolId=" + oSession.SchoolId + " AND StudentId=" + studentId + " AND EventType='EV' AND LessonPlanId=" + DTCurrentDtl.Rows[0]["LessonPlanId"] + ")," + "CONVERT(datetime,GETDATE())))";
                         oData.ExecuteWithTrans(strQuery, con, trans);
                         string stepName = "";
                         if (Convert.ToString(DTCurrentDtl.Rows[0]["CurrentStepId"]) != "")
@@ -5410,14 +5490,14 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             if (Convert.ToString(DTCurrentDtl.Rows[0]["StepName"]) != "")
                         {
                             strQuery = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,EventName,StdtSessEventType,EvntTs,SessionNbr,EventType,StepId,SetId,LessonPlanId,TimeStampForReport)VALUES" +
-    "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + DTCurrentDtl.Rows[0]["DSTempHdrId"] + ",'" + DTCurrentDtl.Rows[0]["StepName"] + "','Minor'," + "GETDATE(),1,'EV'," + DTCurrentDtl.Rows[0]["CurrentStepId"] + "," + DTCurrentDtl.Rows[0]["CurrentSetId"] + "," + DTCurrentDtl.Rows[0]["LessonPlanId"] + ",DATEADD(HH,(SELECT (COUNT(*)+1) FROM StdtSessEvent WHERE CONVERT(DATE,EvntTs)=CONVERT(DATE,getdate()) AND " + "SchoolId=" + oSession.SchoolId + " AND StudentId=" + oSession.StudentId + " AND EventType='EV' AND LessonPlanId=" + DTCurrentDtl.Rows[0]["LessonPlanId"] + ")," + "CONVERT(datetime,getdate())))";
+    "(" + oSession.SchoolId + "," + classId + "," + studentId + "," + DTCurrentDtl.Rows[0]["DSTempHdrId"] + ",'" + DTCurrentDtl.Rows[0]["StepName"] + "','Minor'," + "GETDATE(),1,'EV'," + DTCurrentDtl.Rows[0]["CurrentStepId"] + "," + DTCurrentDtl.Rows[0]["CurrentSetId"] + "," + DTCurrentDtl.Rows[0]["LessonPlanId"] + ",DATEADD(HH,(SELECT (COUNT(*)+1) FROM StdtSessEvent WHERE CONVERT(DATE,EvntTs)=CONVERT(DATE,getdate()) AND " + "SchoolId=" + oSession.SchoolId + " AND StudentId=" + studentId + " AND EventType='EV' AND LessonPlanId=" + DTCurrentDtl.Rows[0]["LessonPlanId"] + ")," + "CONVERT(datetime,getdate())))";
                             oData.ExecuteWithTrans(strQuery, con, trans);
                         }
 
                         if (Convert.ToString(DTCurrentDtl.Rows[0]["PromptName"]) != "")
                         {
                             strQuery = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,EventName,StdtSessEventType,EvntTs,SessionNbr,EventType,SetId,StepId,PromptId,LessonPlanId,TimeStampForReport)VALUES" +
-   "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + DTCurrentDtl.Rows[0]["DSTempHdrId"] + ",'" + DTCurrentDtl.Rows[0]["PromptName"] + "','Minor'," + "GETDATE(),1,'EV'," + DTCurrentDtl.Rows[0]["CurrentSetId"] + "," + DTCurrentDtl.Rows[0]["CurrentStepId"] + "," + DTCurrentDtl.Rows[0]["CurrentPromptId"] + "," + DTCurrentDtl.Rows[0]["LessonPlanId"] + ",DATEADD(HH,(SELECT (COUNT(*)+1) FROM StdtSessEvent WHERE CONVERT(DATE,EvntTs)=CONVERT(DATE,getdate()) AND " + "SchoolId=" + oSession.SchoolId + " AND StudentId=" + oSession.StudentId + " AND EventType='EV' AND LessonPlanId=" + DTCurrentDtl.Rows[0]["LessonPlanId"] + ")," + "getdate()))";
+   "(" + oSession.SchoolId + "," + classId + "," + studentId + "," + DTCurrentDtl.Rows[0]["DSTempHdrId"] + ",'" + DTCurrentDtl.Rows[0]["PromptName"] + "','Minor'," + "GETDATE(),1,'EV'," + DTCurrentDtl.Rows[0]["CurrentSetId"] + "," + DTCurrentDtl.Rows[0]["CurrentStepId"] + "," + DTCurrentDtl.Rows[0]["CurrentPromptId"] + "," + DTCurrentDtl.Rows[0]["LessonPlanId"] + ",DATEADD(HH,(SELECT (COUNT(*)+1) FROM StdtSessEvent WHERE CONVERT(DATE,EvntTs)=CONVERT(DATE,getdate()) AND " + "SchoolId=" + oSession.SchoolId + " AND StudentId=" +studentId + " AND EventType='EV' AND LessonPlanId=" + DTCurrentDtl.Rows[0]["LessonPlanId"] + ")," + "getdate()))";
                             oData.ExecuteWithTrans(strQuery, con, trans);
                         }
 
@@ -5527,7 +5607,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         object objIOA = oData.FetchValue(strIOA);
                         if (objstat != null && objstat.ToString() == "D" && objIOA.ToString() == "Y")
                         {
-                            string UpdateIOA = "UPDATE StdtSessionHdr SET EndTs=GETDATE(),SessionStatusCd='S',Comments='" + clsGeneral.convertQuotes(txtNote.Text.Trim()) + "',ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE StdtSessionHdrId=" + sessHdrId;
+                            string UpdateIOA = "UPDATE StdtSessionHdr SET EndTs=GETDATE(),SessionStatusCd='S',Comments='" + clsGeneral.convertQuotes(txtNote.Text.Trim()) + "',ModifiedBy=" + userId + ",ModifiedOn=GETDATE() WHERE StdtSessionHdrId=" + sessHdrId;
                             oData.Execute(UpdateIOA);
                         }
                     }
@@ -5575,7 +5655,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     {
                         string sessnm = "SELECT SessionNbr FROM StdtSessionHdr WHERE StdtSessionHdrId=" + Convert.ToInt32(ViewState["StdtSessHdr"]);
                         object sessnmr = oData.FetchValue(sessnm);
-                        string upddate = "update StdtsessEvent SET ModifiedOn=GETDATE() WHERE SessionNbr=" + Convert.ToInt32(sessnmr) + " and  DstempHdrId=" + oTemp.TemplateId + " and StudentId=" + oSession.StudentId + " and SchoolId=" +oSession.SchoolId + " and EventName='ProbeMode' and StdtSessEventType ='Minor' and EventType='EV' and discardstatus is NULL ";
+                        string upddate = "update StdtsessEvent SET ModifiedOn=GETDATE() WHERE SessionNbr=" + Convert.ToInt32(sessnmr) + " and  DstempHdrId=" + oTemp.TemplateId + " and StudentId=" +studentId + " and SchoolId=" +oSession.SchoolId + " and EventName='ProbeMode' and StdtSessEventType ='Minor' and EventType='EV' and discardstatus is NULL ";
                         oData.Execute(upddate);
                     }
                     if(transCheck1 && transCheck2)
@@ -6022,6 +6102,14 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
             bool GlobalSetMoveBack = false;
             bool GlobalSetMoveUp = false;
+
+            userId = 0;
+            studentId = 0;
+            if (userId == 0 || studentId == 0)
+            {
+                Pagepath = "Datasheet: checkScore/IdChecks";
+                IDChecks();
+            }
 
             foreach (DataRow dr in dt.Rows)
             {
@@ -6814,15 +6902,15 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
 
                     oDisc = new DiscreteSession();
-                    TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                    TrialLists = oDisc.GetTrialLists(studentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
 
                     //if (chainedInptData.MultiTeacherRequired)
-                    bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId, trans, con);
+                    bMultyTchr = oDisc.MultiTeacherStatus(studentId, oTemp.TemplateId, trans, con);
                     // else
                     //    bMultyTchr = false;
 
                     // if (chainedInptData.IOARequired)
-                    bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId, trans, con);
+                    bIOA = oDisc.IOAStats(studentId, oTemp.TemplateId, trans, con);
                     // else
                     //    bIOA = false;
                     //Trials = trails.GetTrialLists(8, 1, ht[key].RequiredSession(), key);
@@ -6942,12 +7030,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 colCalId = Convert.ToInt32(ViewState["colCalId"]);
                                 if (TempRules.pctCustomMoveUp.iScoreRequired > 0)
                                 {
-                                    bcustMoveUp = ValidateUp(oSession.StudentId, colCalId, TempRules.pctCustomMoveUp.iScoreRequired, reqSess,
+                                    bcustMoveUp = ValidateUp(studentId, colCalId, TempRules.pctCustomMoveUp.iScoreRequired, reqSess,
                                         TempRules.pctCustomMoveUp.iTotalCorrectInstance, TempRules.pctCustomMoveUp.bConsequetiveIndex, status, trans, con);
                                 }
                                 if (TempRules.pctCustomMoveDown.iScoreRequired > 0)
                                 {
-                                    bCustMoveDown = ValidateDown(oSession.StudentId, colCalId, TempRules.pctCustomMoveDown.iScoreRequired, reqSess,
+                                    bCustMoveDown = ValidateDown(studentId, colCalId, TempRules.pctCustomMoveDown.iScoreRequired, reqSess,
                                         TempRules.pctCustomMoveDown.iTotalCorrectInstance, TempRules.pctCustomMoveDown.bConsequetiveIndex, status, trans, con);
                                 }
                             }
@@ -6978,7 +7066,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         bPromptAvgDurationMoveUp = false;
                                     if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                     {
-                                        bPromptAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                        bPromptAvgDurationMoveUp = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -7016,7 +7104,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             bPromptAvgDurationMoveDown = false;
                                         if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                         {
-                                            bPromptAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                            bPromptAvgDurationMoveDown = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -7057,7 +7145,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
-                                                bstepAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                bstepAvgDurationMoveUp = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
@@ -7102,7 +7190,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         {
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bstepAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                bstepAvgDurationMoveDown = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
@@ -7160,7 +7248,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
-                                                bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                bAvgDurationMoveUp = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -7196,7 +7284,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                bAvgDurationMoveDown = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -7238,7 +7326,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             bPromptTotDurationMoveUp = false;
                                         if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                         {
-                                            bPromptTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                            bPromptTotDurationMoveUp = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -7276,7 +7364,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptTotDurationMoveDown = false;
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bPromptTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                bPromptTotDurationMoveDown = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -7317,7 +7405,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
-                                                bstepTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                bstepTotDurationMoveUp = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
@@ -7362,7 +7450,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         {
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bstepTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                bstepTotDurationMoveDown = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
@@ -7419,7 +7507,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 //CompletionStatusSet = "";
-                                                bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                bTotDurationMoveUp = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -7454,7 +7542,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                bTotDurationMoveDown = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -7506,7 +7594,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         bPromptAvgDurationMoveUp = false;
                                     if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                     {
-                                        bPromptAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                        bPromptAvgDurationMoveUp = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -7544,7 +7632,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             bPromptAvgDurationMoveDown = false;
                                         if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                         {
-                                            bPromptAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                            bPromptAvgDurationMoveDown = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -7585,7 +7673,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
-                                                bstepAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                bstepAvgDurationMoveUp = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
@@ -7630,7 +7718,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         {
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bstepAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                bstepAvgDurationMoveDown = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
@@ -7687,7 +7775,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
-                                                bAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                bAvgDurationMoveUp = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -7723,7 +7811,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                bAvgDurationMoveDown = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -7765,7 +7853,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             bPromptTotDurationMoveUp = false;
                                         if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                         {
-                                            bPromptTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                            bPromptTotDurationMoveUp = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -7803,7 +7891,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             bPromptTotDurationMoveDown = false;
                                         if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                         {
-                                            bPromptTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                            bPromptTotDurationMoveDown = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -7844,7 +7932,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
-                                                bstepTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                bstepTotDurationMoveUp = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
@@ -7889,7 +7977,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         {
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bstepTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                bstepTotDurationMoveDown = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
@@ -7946,7 +8034,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 //CompletionStatusSet = "";
-                                                bTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                bTotDurationMoveUp = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -7981,7 +8069,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                bTotDurationMoveDown = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -8025,22 +8113,22 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             //    totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                             //    if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                             //    {
-                            //        bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                            //        bAvgDurationMoveUp = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                             //            TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                             //    }
                             //    if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                             //    {
-                            //        bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                            //        bAvgDurationMoveDown = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                             //            TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                             //    }
                             //    if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                             //    {
-                            //        bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                            //        bTotDurationMoveUp = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                             //            TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                             //    }
                             //    if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                             //    {
-                            //        bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                            //        bTotDurationMoveDown = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                             //            TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                             //    }
                             //    if ((bAvgDurationMoveUp == false) || (bTotDurationMoveUp == false))
@@ -8077,7 +8165,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         bPromptFrequencyMoveUp = false;
                                     if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                     {
-                                        bPromptFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                        bPromptFrequencyMoveUp = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -8114,7 +8202,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             bPromptFrequencyMoveDown = false;
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
-                                            bPromptFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                            bPromptFrequencyMoveDown = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -8158,7 +8246,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
-                                            bstepFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                            bstepFrequencyMoveUp = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             int stepcount = TrialLists.trialsCount;
@@ -8203,7 +8291,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     {
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
-                                            bstepFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                            bstepFrequencyMoveDown = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                             int stepcount = TrialLists.trialsCount;
@@ -8261,7 +8349,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
-                                            bFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                            bFrequencyMoveUp = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -8296,7 +8384,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
-                                            bFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                            bFrequencyMoveDown = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -8343,7 +8431,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         bPromptFrequencyMoveUp = false;
                                     if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                     {
-                                        bPromptFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                        bPromptFrequencyMoveUp = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -8380,7 +8468,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             bPromptFrequencyMoveDown = false;
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
-                                            bPromptFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                            bPromptFrequencyMoveDown = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -8424,7 +8512,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
-                                            bstepFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                            bstepFrequencyMoveUp = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             int stepcount = TrialLists.trialsCount;
@@ -8469,7 +8557,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     {
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
-                                            bstepFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                            bstepFrequencyMoveDown = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                             int stepcount = TrialLists.trialsCount;
@@ -8527,7 +8615,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
-                                            bFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                            bFrequencyMoveUp = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -8561,7 +8649,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
-                                            bFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                            bFrequencyMoveDown = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -8611,7 +8699,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     bPromptIndallMoveUp = false;
                                 if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0)
                                 {
-                                    bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                    bPromptIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                         TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
@@ -8649,7 +8737,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                     if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                                     {
-                                        bstepIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                        bstepIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         int stepcount = TrialLists.trialsCount;
@@ -8693,7 +8781,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                     if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                                     {
-                                        bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                        bIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
@@ -8746,7 +8834,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     bPromptIndallMoveUp = false;
                                 if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0)
                                 {
-                                    bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                    bPromptIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                         TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
@@ -8784,7 +8872,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                     if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                                     {
-                                        bstepIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                        bstepIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         int stepcount = TrialLists.trialsCount;
@@ -8828,7 +8916,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                     if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                                     {
-                                        bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                        bIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
@@ -8901,7 +8989,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                         if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                         {
-                                            bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                            bAvgDurationMoveUp = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -8937,7 +9025,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                         {
-                                            bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                            bAvgDurationMoveDown = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -8976,7 +9064,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptAvgDurationMoveUp = false;
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
-                                                bPromptAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                bPromptAvgDurationMoveUp = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -9012,7 +9100,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     bPromptAvgDurationMoveDown = false;
                                                 if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bPromptAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                    bPromptAvgDurationMoveDown = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -9051,7 +9139,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                                 if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                 {
-                                                    bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                    bAvgDurationMoveUp = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                         TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -9087,7 +9175,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 }
                                                 if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                    bAvgDurationMoveDown = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -9132,7 +9220,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                         {
                                             CompletionStatusSet = "";
-                                            bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                            bTotDurationMoveUp = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -9167,7 +9255,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                         {
-                                            bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                            bTotDurationMoveDown = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -9209,7 +9297,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptTotDurationMoveUp = false;
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
-                                                bPromptTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                bPromptTotDurationMoveUp = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -9245,7 +9333,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     bPromptTotDurationMoveDown = false;
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bPromptTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                    bPromptTotDurationMoveDown = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -9287,7 +9375,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     CompletionStatusSet = "";
-                                                    bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                    bTotDurationMoveUp = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                         TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -9322,7 +9410,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 }
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                    bTotDurationMoveDown = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -9374,7 +9462,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                         if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                         {
-                                            bAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                            bAvgDurationMoveUp = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -9410,7 +9498,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                         {
-                                            bAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                            bAvgDurationMoveDown = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -9449,7 +9537,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptAvgDurationMoveUp = false;
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
-                                                bPromptAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                bPromptAvgDurationMoveUp = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -9485,7 +9573,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     bPromptAvgDurationMoveDown = false;
                                                 if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bPromptAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                    bPromptAvgDurationMoveDown = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -9524,7 +9612,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                                 if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                 {
-                                                    bAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                    bAvgDurationMoveUp = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                         TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -9560,7 +9648,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 }
                                                 if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                    bAvgDurationMoveDown = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -9605,7 +9693,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                         {
                                             CompletionStatusSet = "";
-                                            bTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                            bTotDurationMoveUp = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -9640,7 +9728,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                         {
-                                            bTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                            bTotDurationMoveDown = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -9682,7 +9770,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptTotDurationMoveUp = false;
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
-                                                bPromptTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                bPromptTotDurationMoveUp = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -9718,7 +9806,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     bPromptTotDurationMoveDown = false;
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bPromptTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                    bPromptTotDurationMoveDown = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -9760,7 +9848,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     CompletionStatusSet = "";
-                                                    bTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                    bTotDurationMoveUp = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                         TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -9795,7 +9883,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 }
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                    bTotDurationMoveDown = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -9855,7 +9943,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         freqId = Convert.ToInt32(ViewState["freqId"]);
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
-                                            bFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                            bFrequencyMoveUp = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -9889,7 +9977,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
-                                            bFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                            bFrequencyMoveDown = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -9926,7 +10014,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             bPromptFrequencyMoveUp = false;
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
-                                            bPromptFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                            bPromptFrequencyMoveUp = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveUpbIOAReqd, bIOA);
@@ -9961,7 +10049,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptFrequencyMoveDown = false;
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
-                                                bPromptFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                                bPromptFrequencyMoveDown = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveDownbIOAReqd, bIOA);
@@ -10000,7 +10088,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
-                                                bFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                                bFrequencyMoveUp = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -10034,7 +10122,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
-                                                bFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                                bFrequencyMoveDown = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -10081,7 +10169,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         freqId = Convert.ToInt32(ViewState["freqId"]);
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
-                                            bFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                            bFrequencyMoveUp = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -10115,7 +10203,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
-                                            bFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                            bFrequencyMoveDown = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -10152,7 +10240,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             bPromptFrequencyMoveUp = false;
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
-                                            bPromptFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                            bPromptFrequencyMoveUp = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveUpbIOAReqd, bIOA);
@@ -10187,7 +10275,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptFrequencyMoveDown = false;
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
-                                                bPromptFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                                bPromptFrequencyMoveDown = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveDownbIOAReqd, bIOA);
@@ -10226,7 +10314,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
-                                                bFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                                bFrequencyMoveUp = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -10260,7 +10348,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
-                                                bFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                                bFrequencyMoveDown = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -10315,7 +10403,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     int indexB = 0;
                                     foreach (DataRow drstepID in dtstepIDs.Rows)
                                     {
-                                        string updStepStat = "UPDATE StdtDSStepStat SET PromptId=" + sesResultchain[index].StepPrompts[indexB] + ",ModifiedBy=" + oSession.LoginId + " ,ModifiedOn=GETDATE() WHERE " +
+                                        string updStepStat = "UPDATE StdtDSStepStat SET PromptId=" + sesResultchain[index].StepPrompts[indexB] + ",ModifiedBy=" + userId + " ,ModifiedOn=GETDATE() WHERE " +
                                             "DSTempSetColId=" + dr["DSTempSetColId"].ToString() + " AND DSTempStepId=" + drstepID["DSTempStepId"].ToString() + "";
                                         oData.ExecuteWithTrans(updStepStat, con, trans);
                                         indexB++;
@@ -10340,7 +10428,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     bPromptIndallMoveUp = false;
                                 if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0)
                                 {
-                                    bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                    bPromptIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                         TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
@@ -10384,7 +10472,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         bPromptIndallMoveDown = false;
                                     if (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0)
                                     {
-                                        bPromptIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
+                                        bPromptIndallMoveDown = ValidateDown1(studentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
                                             TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveDownbIOAReqd, bIOA);
@@ -10431,7 +10519,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                     if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0 && !check)
                                     {
-                                        bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                        bIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
@@ -10461,7 +10549,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     if ((TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && check) || (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && !check1))
                                     {
-                                        bIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
+                                        bIndallMoveDown = ValidateDown1(studentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
                                             TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
@@ -10514,7 +10602,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     bPromptIndallMoveUp = false;
                                 if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0)
                                 {
-                                    bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                    bPromptIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                         TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
@@ -10555,7 +10643,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         bPromptIndallMoveDown = false;
                                     if (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0)
                                     {
-                                        bPromptIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
+                                        bPromptIndallMoveDown = ValidateDown1(studentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
                                             TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveDownbIOAReqd, bIOA);
@@ -10601,7 +10689,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                     if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0 && !check)
                                     {
-                                        bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                        bIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
@@ -10630,7 +10718,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     if ((TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && check) || (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && !check1))
                                     {
-                                        bIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
+                                        bIndallMoveDown = ValidateDown1(studentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
                                             TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
@@ -10679,7 +10767,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             //Check for all previous step that it all succeeds to move forward
                             for (int istep = 1; istep < iCurrentStepExecuting; istep++)
                             {
-                                TrialLists = oDisc.GetTrialListsForPreStep(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, istep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                                TrialLists = oDisc.GetTrialListsForPreStep(studentId, oTemp.TemplateId, iCurrentSetId, istep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                                 chainedCols[sColName].SessionCount = TrialLists.sessionCount;
                                 sesResultchain[index] = null;
                                 chainedCols[sColName].SetInputData(istep.ToString(), TargetPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -10754,10 +10842,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                                     if (Convert.ToBoolean(mod) != true)
                                                                     {
                                                                         string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
-                                                                        "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
+                                                                        "(" + oSession.SchoolId + "," + classId + "," + studentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
                                                                         oData.ExecuteWithTrans(insqry, con, trans);
 
-                                                                        string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
+                                                                        string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + userId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
                                                                         oData.ExecuteWithTrans(updqry, con, trans);
                                                                     }
                                                                 }
@@ -10784,13 +10872,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     int retunID = Convert.ToInt32(oData.FetchValue(strQuery));
                                                     sEventType = "STEP MOVEDOWN";
                                                     if (bPrompt)
-                                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompts, istep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                        oDisc.updateStepStatus(oSession.SchoolId, classId, studentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompts, istep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                                     else
-                                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, retunID, iCurrentSetId, oTemp.TemplateId, istep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
-                                                    //oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].NextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId);
+                                                        oDisc.updateStepStatus(oSession.SchoolId, classId, studentId, retunID, iCurrentSetId, oTemp.TemplateId, istep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
+                                                    //oDisc.updateStepStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sesResultchain[0].NextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId);
                                                     //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                                     //{
-                                                    //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
+                                                    //    oDisc.insertEventStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
                                                     //}
                                                     bStepCountCriteria = true;
                                                     // }
@@ -10802,7 +10890,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (!bRuleStatusIOA)
                                                 {
                                                     // Functionto reset rule type values in StdtEvent Table
-                                                    oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                                    oDisc.resetEvntStatus(classId, studentId, oTemp.TemplateId);
                                                     sEventAlertStatu = "IOAEvntStatus=true,Step_MoveDown=true";
                                                     // Functionto Update rule Events values in StdtEvent Table
                                                     oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatu);
@@ -10810,7 +10898,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (!bRuleStatusMultiTchr)
                                                 {
                                                     // Functionto reset rule type values in StdtEvent Table
-                                                    oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                                    oDisc.resetEvntStatus(classId, studentId, oTemp.TemplateId);
                                                     sEventAlertStatu = "MultiTchrEvntStatus=true,Step_MoveDown=true";
                                                     // Functionto Update rule Events values in StdtEvent Table
                                                     oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatu);
@@ -10840,7 +10928,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             {
                                 bStepCountCriteria = false;
                                 sesResultchain[index] = null;
-                                TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                                TrialLists = oDisc.GetTrialLists(studentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                                 chainedCols[sColName].SessionCount = TrialLists.sessionCount;
                                 chainedCols[sColName].SetInputData(iCurrentStep.ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
                                 sesResultchain[index] = Chained.Model.Execute(chainedCols[sColName], false, bpromptColumn, oDS.ChainType);
@@ -10879,7 +10967,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         {
                                             bool stepMoveUpflag = sesResultchain[index].MovedForwardStep;
                                             bool stepMoveDownflag = sesResultchain[index].MovedBackStep;
-                                            TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                                            TrialLists = oDisc.GetTrialLists(studentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                                             chainedCols[sColName].StepCount = TrialLists.trialsCount;
 
                                             chainedCols[sColName].SetInputData((iCurrentStep - 1).ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -10947,7 +11035,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     else
                                     {
-                                        TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                                        TrialLists = oDisc.GetTrialLists(studentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                                         chainedCols[sColName].StepCount = TrialLists.trialsCount;
 
                                         chainedCols[sColName].SetInputData((iCurrentStep - 1).ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -11014,7 +11102,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 //    {
                                 //        if (sesResultchain[index].MovedForwardPrompt || sesResultchain[index].MovedBackPrompt)
                                 //        {
-                                //            TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true);
+                                //            TrialLists = oDisc.GetTrialLists(studentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true);
                                 //            chainedCols[sColName].StepCount = TrialLists.trialsCount;
 
                                 //            chainedCols[sColName].SetInputData((iCurrentStep - 1).ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -11023,7 +11111,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 //    }
                                 //    else
                                 //    {
-                                //        TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true);
+                                //        TrialLists = oDisc.GetTrialLists(studentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true);
                                 //        chainedCols[sColName].StepCount = TrialLists.trialsCount;
 
                                 //        chainedCols[sColName].SetInputData((iCurrentStep - 1).ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -11544,12 +11632,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                                     if (sesResultchain[0].CompletionStatus == "COMPLETED" || CompletionStatusSet == "COMPLETED")
                                                     {
-                                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                        oDisc.updateSetStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
 
                                                     }
                                                     else
                                                     {
-                                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                        oDisc.updateSetStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                                     }
                                                 }
                                                 else
@@ -11573,36 +11661,36 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                             //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                                             if (sesResultchain[0].CompletionStatus == "COMPLETED" || CompletionStatusSet == "COMPLETED")
                                                             {
-                                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                                oDisc.updateSetStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
 
                                                             }
                                                             else
                                                             {
-                                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                                oDisc.updateSetStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                                             }
                                                         }
                                                         else
-                                                            oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                            oDisc.updateSetStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                                     }
                                                     else
-                                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                        oDisc.updateSetStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
 
                                                 }
                                                 bPromptMoveUp = false;
-                                                //oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].NextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId);
+                                                //oDisc.updateSetStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sesResultchain[0].NextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId);
                                                 //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                                 //{
-                                                //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
+                                                //    oDisc.insertEventStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
                                                 //}
                                                 if (oDS.ChainType == "Total Task")
                                                 {
                                                     if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                                     {
-                                                        oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, oSession.StudentId, oSession.LoginId, Convert.ToInt32(LessonTargetPrompt), con, trans);
+                                                        oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, studentId, userId, Convert.ToInt32(LessonTargetPrompt), con, trans);
                                                     }
                                                     else
                                                     {
-                                                        oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, oSession.StudentId, oSession.LoginId, iPrompt, con, trans);
+                                                        oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, studentId, userId, iPrompt, con, trans);
                                                     }
                                                 }
                                             }
@@ -11615,7 +11703,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             {
 
                                                 // Functionto reset rule type values in StdtEvent Table
-                                                oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                                oDisc.resetEvntStatus(classId, studentId, oTemp.TemplateId);
                                                 sEventAlertStatus = "IOAEvntStatus=true,Set_MoveUp=true";
                                                 // Functionto Update rule Events values in StdtEvent Table
                                                 oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatus);
@@ -11623,7 +11711,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (!bRuleStatusMultiTchr)
                                             {
                                                 // Functionto reset rule type values in StdtEvent Table
-                                                oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                                oDisc.resetEvntStatus(classId, studentId, oTemp.TemplateId);
                                                 sEventAlertStatus = "MultiTchrEvntStatus=true,Set_MoveUp=true";
                                                 // Functionto Update rule Events values in StdtEvent Table
                                                 oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventType);
@@ -11665,7 +11753,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     //if (mod_flag)
                                                     //{
                                                     //    oData = new clsData();
-                                                    //    string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
+                                                    //    string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + userId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
                                                     //    oData.Execute(updqry);
                                                     //}
                                                     if (mod_flag)
@@ -11678,10 +11766,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                             if (Convert.ToBoolean(mod) != true)
                                                             {
                                                                 string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
-                                                                "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
+                                                                "(" + oSession.SchoolId + "," + classId + "," + studentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
                                                                 oData.ExecuteWithTrans(insqry, con, trans);
 
-                                                                string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
+                                                                string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + userId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
                                                                 oData.ExecuteWithTrans(updqry, con, trans);
                                                             }
                                                         }
@@ -11706,7 +11794,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             sEventType = "SET MOVEDOWN";
                                             if (bPrompt)
-                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                oDisc.updateSetStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                             else
                                             {
                                                 if (LessonpromptUsed.Length > 0)
@@ -11725,24 +11813,24 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                                 iPrompt = Convert.ToInt32(LessonpromptUsed[0]);
                                                             }
                                                         }
-                                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                        oDisc.updateSetStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                                     }
                                                     else
-                                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                        oDisc.updateSetStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                                 }
                                                 else
-                                                    oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                    oDisc.updateSetStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
 
 
                                             }
-                                            //oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].NextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId);
+                                            //oDisc.updateSetStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sesResultchain[0].NextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId);
                                             //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                             //{
-                                            //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
+                                            //    oDisc.insertEventStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
                                             //}
                                             if (oDS.ChainType == "Total Task")
                                             {
-                                                oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, oSession.StudentId, oSession.LoginId, Convert.ToInt32(iPrompt), con, trans);
+                                                oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, studentId, userId, Convert.ToInt32(iPrompt), con, trans);
                                             }
                                         }
                                     }
@@ -11753,7 +11841,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (!bRuleStatusIOA)
                                         {
                                             // Functionto reset rule type values in StdtEvent Table
-                                            oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                            oDisc.resetEvntStatus(classId, studentId, oTemp.TemplateId);
                                             sEventAlertStatus = "IOAEvntStatus=true,Set_MoveDown=true";
                                             // Functionto Update rule Events values in StdtEvent Table
                                             oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatus);
@@ -11761,7 +11849,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (!bRuleStatusMultiTchr)
                                         {
                                             // Functionto reset rule type values in StdtEvent Table
-                                            oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                            oDisc.resetEvntStatus(classId, studentId, oTemp.TemplateId);
                                             sEventAlertStatus = "MultiTchrEvntStatus=true,Set_MoveDown=true";
                                             // Functionto Update rule Events values in StdtEvent Table
                                             oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventType);
@@ -11803,7 +11891,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             sEventType = "STEP MOVEUP";
                                             if (bPrompt)
-                                                oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                oDisc.updateStepStatus(oSession.SchoolId, classId, studentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                             else
                                             {
                                                 if (LessonpromptUsed.Length > 0)
@@ -11822,19 +11910,19 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                                 iPrompt = Convert.ToInt32(LessonpromptUsed[0]);
                                                             }
                                                         }
-                                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                        oDisc.updateStepStatus(oSession.SchoolId, classId, studentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                                     }
                                                     else
-                                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                        oDisc.updateStepStatus(oSession.SchoolId, classId, studentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                                 }
                                                 else
-                                                    oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                    oDisc.updateStepStatus(oSession.SchoolId, classId, studentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                             }
                                             bPromptMoveUp = false;
-                                            //oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].NextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId);
+                                            //oDisc.updateStepStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sesResultchain[0].NextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId);
                                             //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                             //{
-                                            //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
+                                            //    oDisc.insertEventStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
                                             //}
                                         }
                                     }
@@ -11845,7 +11933,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (!bRuleStatusIOA)
                                         {
                                             // Functionto reset rule type values in StdtEvent Table
-                                            oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                            oDisc.resetEvntStatus(classId, studentId, oTemp.TemplateId);
                                             sEventAlertStatus = "IOAEvntStatus=true,Step_MoveUp=true";
                                             // Functionto Update rule Events values in StdtEvent Table
                                             oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatus);
@@ -11853,7 +11941,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (!bRuleStatusMultiTchr)
                                         {
                                             // Functionto reset rule type values in StdtEvent Table
-                                            oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                            oDisc.resetEvntStatus(classId, studentId, oTemp.TemplateId);
                                             sEventAlertStatus = "MultiTchrEvntStatus=true,Step_MoveUp=true";
                                             // Functionto Update rule Events values in StdtEvent Table
                                             oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventType);
@@ -11895,10 +11983,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                             if (Convert.ToBoolean(mod) != true)
                                                             {
                                                                 string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
-                                                                "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
+                                                                "(" + oSession.SchoolId + "," + classId + "," + studentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
                                                                 oData.ExecuteWithTrans(insqry, con, trans);
 
-                                                                string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
+                                                                string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + userId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
                                                                 oData.ExecuteWithTrans(updqry, con, trans);
                                                             }
                                                         }
@@ -11922,7 +12010,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             sEventType = "STEP MOVEDOWN";
                                             if (bPrompt)
-                                                oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                oDisc.updateStepStatus(oSession.SchoolId, classId, studentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                             else
                                             {
                                                 if (LessonpromptUsed.Length > 0)
@@ -11941,18 +12029,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                                 iPrompt = Convert.ToInt32(LessonpromptUsed[0]);
                                                             }
                                                         }
-                                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                        oDisc.updateStepStatus(oSession.SchoolId, classId, studentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                                     }
                                                     else
-                                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                        oDisc.updateStepStatus(oSession.SchoolId, classId, studentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                                 }
                                                 else
-                                                    oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                    oDisc.updateStepStatus(oSession.SchoolId, classId, studentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                             }
-                                            //oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].NextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId);
+                                            //oDisc.updateStepStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sesResultchain[0].NextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId);
                                             //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                             //{
-                                            //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
+                                            //    oDisc.insertEventStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
                                             //}
                                         }
                                     }
@@ -11963,7 +12051,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (!bRuleStatusIOA)
                                         {
                                             // Functionto reset rule type values in StdtEvent Table
-                                            oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                            oDisc.resetEvntStatus(classId, studentId, oTemp.TemplateId);
                                             sEventAlertStatus = "IOAEvntStatus=true,Step_MoveDown=true";
                                             // Functionto Update rule Events values in StdtEvent Table
                                             oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatus);
@@ -11971,7 +12059,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (!bRuleStatusMultiTchr)
                                         {
                                             // Functionto reset rule type values in StdtEvent Table
-                                            oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                            oDisc.resetEvntStatus(classId, studentId, oTemp.TemplateId);
                                             sEventAlertStatus = "MultiTchrEvntStatus=true,Step_MoveDown=true";
                                             // Functionto Update rule Events values in StdtEvent Table
                                             oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventType);
@@ -11997,10 +12085,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (sCurrentLessonPrompt == sNextLessonPrompt)
                                         { }
                                         else
-                                            oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
+                                            oDisc.updatePromptStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sNextLessonPrompt, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                                         //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                         //{
-                                        //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
+                                        //    oDisc.insertEventStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
                                         //}
                                     }
                                     else
@@ -12010,7 +12098,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (!bRuleStatusIOA)
                                         {
                                             // Functionto reset rule type values in StdtEvent Table
-                                            oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                            oDisc.resetEvntStatus(classId, studentId, oTemp.TemplateId);
                                             sEventAlertStatus = "IOAEvntStatus=true,Prompt_MoveUp=true";
                                             // Functionto Update rule Events values in StdtEvent Table
                                             oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatus);
@@ -12018,7 +12106,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (!bRuleStatusMultiTchr)
                                         {
                                             // Functionto reset rule type values in StdtEvent Table
-                                            oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                            oDisc.resetEvntStatus(classId, studentId, oTemp.TemplateId);
                                             sEventAlertStatus = "MultiTchrEvntStatus=true,Prompt_MoveUp=true";
                                             // Functionto Update rule Events values in StdtEvent Table
                                             oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventType);
@@ -12057,10 +12145,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                         if (Convert.ToBoolean(mod) != true)
                                                         {
                                                             string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
-                                                            "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
+                                                            "(" + oSession.SchoolId + "," + classId + "," + studentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
                                                             oData.ExecuteWithTrans(insqry, con, trans);
 
-                                                            string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
+                                                            string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + userId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
                                                             oData.ExecuteWithTrans(updqry, con, trans);
                                                         }
                                                     }
@@ -12070,10 +12158,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
 
                                         sEventType = "PROMPT MOVEDOWN";
-                                        oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
+                                        oDisc.updatePromptStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sNextLessonPrompt, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                                         //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                         //{
-                                        //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
+                                        //    oDisc.insertEventStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
                                         //}
                                     }
                                     else
@@ -12083,7 +12171,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (!bRuleStatusIOA)
                                         {
                                             // Functionto reset rule type values in StdtEvent Table
-                                            oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                            oDisc.resetEvntStatus(classId, studentId, oTemp.TemplateId);
                                             sEventAlertStatus = "IOAEvntStatus=true,Prompt_MoveDown=true";
                                             // Functionto Update rule Events values in StdtEvent Table
                                             oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatus);
@@ -12091,7 +12179,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (!bRuleStatusMultiTchr)
                                         {
                                             // Functionto reset rule type values in StdtEvent Table
-                                            oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                            oDisc.resetEvntStatus(classId, studentId, oTemp.TemplateId);
                                             sEventAlertStatus = "MultiTchrEvntStatus=true,Prompt_MoveDown=true";
                                             // Functionto Update rule Events values in StdtEvent Table
                                             oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventType);
@@ -12112,12 +12200,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     //oDisc = new DiscreteSession();
                                     //oDS.CrntStep = sesResultchain[0].NextStep - 1;
                                     //if (bPrompt)
-                                    //    oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, Convert.ToInt32(sesResultchain[0].NextPrompt), oTemp.TemplateId, oDS.CrntStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
+                                    //    oDisc.updateStepStatus(oSession.SchoolId, classId, studentId, Convert.ToInt32(sesResultchain[0].NextPrompt), oTemp.TemplateId, oDS.CrntStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
                                     //else
-                                    //    oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, oDS.CrntStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
-                                    //oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
-                                    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
-                                    //oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId);
+                                    //    oDisc.updateStepStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, oDS.CrntStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
+                                    //oDisc.insertEventStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
+                                    oDisc.insertEventStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
+                                    //oDisc.insertEventStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId);
 
                                 }
                                 else if (bSetMoveUp == true)
@@ -12560,14 +12648,14 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     int counter = discreteCols.Count;
                     int ind = 0;
                     oDisc = new DiscreteSession();
-                    TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, discreteCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                    TrialLists = oDisc.GetTrialLists(studentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, discreteCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                     //if (discreteInptData.MultiTeacherRequired)
-                    bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId, trans, con);
+                    bMultyTchr = oDisc.MultiTeacherStatus(studentId, oTemp.TemplateId, trans, con);
                     // else
                     //    bMultyTchr = false;
 
                     // if (discreteInptData.IOARequired)
-                    bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId, trans, con);
+                    bIOA = oDisc.IOAStats(studentId, oTemp.TemplateId, trans, con);
                     // else
                     //     bIOA = false;
                     //Trials = trails.GetTrialLists(8, 1, ht[key].RequiredSession(), key);
@@ -12685,7 +12773,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 CompletionStatusSet = "";
                                 //int iStudentId, int colCalId, float iScoreRequired, int iSessonNumber,int iTotalCorrectInstance,bool bConsequetiveIndex, bool flag
                                 bool status = false;
-                                bcustMoveUp = ValidateUp(oSession.StudentId, colCalId, TempRules.pctCustomMoveUp.iScoreRequired, reqSess,
+                                bcustMoveUp = ValidateUp(studentId, colCalId, TempRules.pctCustomMoveUp.iScoreRequired, reqSess,
                                     TempRules.pctCustomMoveUp.iTotalCorrectInstance, TempRules.pctCustomMoveUp.bConsequetiveIndex, status, trans, con);
                                 int setcount = TrialLists.totalSet;
 
@@ -12714,7 +12802,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             if (TempRules.pctCustomMoveDown.iScoreRequired > 0)
                             {
                                 bool status = false;
-                                bCustMoveDown = ValidateDown(oSession.StudentId, colCalId, TempRules.pctCustomMoveDown.iScoreRequired, reqSess,
+                                bCustMoveDown = ValidateDown(studentId, colCalId, TempRules.pctCustomMoveDown.iScoreRequired, reqSess,
                                     TempRules.pctCustomMoveDown.iTotalCorrectInstance, TempRules.pctCustomMoveDown.bConsequetiveIndex, status, trans, con);
                                 int setcount = TrialLists.totalSet;
 
@@ -12766,7 +12854,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                     if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                     {
-                                        bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                        bAvgDurationMoveUp = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
@@ -12805,7 +12893,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                     {
-                                        bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                        bAvgDurationMoveDown = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                             TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
@@ -12854,7 +12942,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             bPromptAvgDurationMoveUp = false;
                                         if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                         {
-                                            bPromptAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                            bPromptAvgDurationMoveUp = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -12890,7 +12978,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptAvgDurationMoveDown = false;
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bPromptAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                bPromptAvgDurationMoveDown = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -12928,7 +13016,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
-                                                bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                bAvgDurationMoveUp = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -12967,7 +13055,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                bAvgDurationMoveDown = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -13015,7 +13103,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                     {
                                         CompletionStatusSet = "";
-                                        bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                        bTotDurationMoveUp = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
@@ -13053,7 +13141,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                     {
-                                        bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                        bTotDurationMoveDown = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                             TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
@@ -13106,7 +13194,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             bPromptTotDurationMoveUp = false;
                                         if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                         {
-                                            bPromptTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                            bPromptTotDurationMoveUp = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -13142,7 +13230,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptTotDurationMoveDown = false;
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bPromptTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                bPromptTotDurationMoveDown = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -13184,7 +13272,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 CompletionStatusSet = "";
-                                                bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                bTotDurationMoveUp = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -13222,7 +13310,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                bTotDurationMoveDown = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -13278,7 +13366,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                     if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                     {
-                                        bAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                        bAvgDurationMoveUp = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
@@ -13317,7 +13405,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                     {
-                                        bAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                        bAvgDurationMoveDown = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                             TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
@@ -13366,7 +13454,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             bPromptAvgDurationMoveUp = false;
                                         if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                         {
-                                            bPromptAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                            bPromptAvgDurationMoveUp = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -13402,7 +13490,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptAvgDurationMoveDown = false;
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bPromptAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                bPromptAvgDurationMoveDown = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -13440,7 +13528,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
-                                                bAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                bAvgDurationMoveUp = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -13479,7 +13567,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                bAvgDurationMoveDown = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -13527,7 +13615,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                     {
                                         CompletionStatusSet = "";
-                                        bTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                        bTotDurationMoveUp = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
@@ -13565,7 +13653,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                     {
-                                        bTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                        bTotDurationMoveDown = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                             TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
@@ -13617,7 +13705,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             bPromptTotDurationMoveUp = false;
                                         if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                         {
-                                            bPromptTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                            bPromptTotDurationMoveUp = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -13653,7 +13741,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptTotDurationMoveDown = false;
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bPromptTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                bPromptTotDurationMoveDown = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -13695,7 +13783,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 CompletionStatusSet = "";
-                                                bTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                bTotDurationMoveUp = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -13733,7 +13821,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                bTotDurationMoveDown = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -13797,7 +13885,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     freqId = Convert.ToInt32(ViewState["freqId"]);
                                     if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                     {
-                                        bFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                        bFrequencyMoveUp = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
@@ -13834,7 +13922,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                     {
-                                        bFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                        bFrequencyMoveDown = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                             TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
@@ -13881,7 +13969,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         bPromptFrequencyMoveUp = false;
                                     if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                     {
-                                        bPromptFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                        bPromptFrequencyMoveUp = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveUpbIOAReqd, bIOA);
@@ -13917,7 +14005,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             bPromptFrequencyMoveDown = false;
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
-                                            bPromptFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                            bPromptFrequencyMoveDown = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveDownbIOAReqd, bIOA);
@@ -13955,7 +14043,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
-                                            bFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                            bFrequencyMoveUp = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -13992,7 +14080,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
-                                            bFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                            bFrequencyMoveDown = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -14042,7 +14130,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     freqId = Convert.ToInt32(ViewState["freqId"]);
                                     if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                     {
-                                        bFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                        bFrequencyMoveUp = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
@@ -14079,7 +14167,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                     {
-                                        bFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                        bFrequencyMoveDown = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                             TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
@@ -14127,7 +14215,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         bPromptFrequencyMoveUp = false;
                                     if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                     {
-                                        bPromptFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                        bPromptFrequencyMoveUp = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveUpbIOAReqd, bIOA);
@@ -14163,7 +14251,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             bPromptFrequencyMoveDown = false;
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
-                                            bPromptFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                            bPromptFrequencyMoveDown = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveDownbIOAReqd, bIOA);
@@ -14201,7 +14289,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
-                                            bFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                            bFrequencyMoveUp = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -14238,7 +14326,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
-                                            bFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                            bFrequencyMoveDown = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -14295,7 +14383,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 bPromptIndallMoveUp = false;
                             if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                             {
-                                bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                bPromptIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                     TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
@@ -14336,7 +14424,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     bPromptIndallMoveDown = false;
                                 if (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0)
                                 {
-                                    bPromptIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
+                                    bPromptIndallMoveDown = ValidateDown1(studentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
                                         TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
 
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveDownbIOAReqd, bIOA);
@@ -14380,7 +14468,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                 if (TempRules.pctIndAllMoveUp.iScoreRequired > 0 && !check)
                                 {
-                                    bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                    bIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                         TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                     int setcount = TrialLists.totalSet;
 
@@ -14413,7 +14501,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 }
                                 if ((TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && check) || (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && !check1))
                                 {
-                                    bIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
+                                    bIndallMoveDown = ValidateDown1(studentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
                                         TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
                                     int setcount = TrialLists.totalSet;
 
@@ -14465,7 +14553,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 bPromptIndallMoveUp = false;
                             if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                             {
-                                bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                bPromptIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                     TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
@@ -14506,7 +14594,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     bPromptIndallMoveDown = false;
                                 if (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0)
                                 {
-                                    bPromptIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
+                                    bPromptIndallMoveDown = ValidateDown1(studentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
                                         TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
 
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveDownbIOAReqd, bIOA);
@@ -14550,7 +14638,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                 if (TempRules.pctIndAllMoveUp.iScoreRequired > 0 && !check)
                                 {
-                                    bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                    bIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                         TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                     int setcount = TrialLists.totalSet;
 
@@ -14583,7 +14671,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 }
                                 if ((TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && check) || (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && !check1))
                                 {
-                                    bIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
+                                    bIndallMoveDown = ValidateDown1(studentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
                                         TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
                                     int setcount = TrialLists.totalSet;
 
@@ -14851,11 +14939,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             //if (sesResult[0].CompletionStatus == "COMPLETED")
                                             if (sesResult[0].CompletionStatus == "COMPLETED" || CompletionStatusSet == "COMPLETED")
                                             {
-                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                oDisc.updateSetStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                             }
                                             else
                                             {
-                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                oDisc.updateSetStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                             }
                                         }
                                         else
@@ -14864,11 +14952,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             {
                                                 if (CompletionStatusSet == "COMPLETED")
                                                 {
-                                                    oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                    oDisc.updateSetStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                                 }
                                                 else
                                                 {
-                                                    oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                    oDisc.updateSetStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                                 }
                                             }
                                         }
@@ -14878,7 +14966,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         bPromptMoveUp = false;
                                         //if (sesResult[0].CompletionStatus == "COMPLETED")
                                         //{
-                                        //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResult[0].CompletionStatus, sEventType, iSessionNmbr);
+                                        //    oDisc.insertEventStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sesResult[0].CompletionStatus, sEventType, iSessionNmbr);
                                         //}                                        
                                     }
                                 }
@@ -14889,7 +14977,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if (!bRuleStatusIOA)
                                     {
                                         // Function to reset rule type values in StdtEvent Table
-                                        oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                        oDisc.resetEvntStatus(classId, studentId, oTemp.TemplateId);
                                         sEventAlertStatus = "IOAEvntStatus=true,Set_MoveUp=true";
                                         // Functionto Update rule Events values in StdtEvent Table
                                         oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatus);
@@ -14897,7 +14985,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if (!bRuleStatusMultiTchr)
                                     {
                                         // Functionto reset rule type values in StdtEvent Table
-                                        oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                        oDisc.resetEvntStatus(classId, studentId, oTemp.TemplateId);
                                         sEventAlertStatus = "MultiTchrEvntStatus=true,Set_MoveUp=true";
                                         // Functionto Update rule Events values in StdtEvent Table
                                         oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventType);
@@ -14947,10 +15035,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     if (Convert.ToBoolean(mod) != true)
                                                     {
                                                         string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
-                                                        "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
+                                                        "(" + oSession.SchoolId + "," + classId + "," + studentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
                                                         oData.ExecuteWithTrans(insqry, con, trans);
 
-                                                        string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
+                                                        string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + userId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
                                                         oData.ExecuteWithTrans(updqry, con, trans);
                                                     }
                                                 }
@@ -14977,18 +15065,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     sEventType = "SET MOVEDOWN";
                                     if (sesResult[0] != null) //liju
-                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResult[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                        oDisc.updateSetStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResult[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                     else
                                     {
                                         if (FreqDurTextFlag)
                                         {
-                                            oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                            oDisc.updateSetStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                         }
                                     }
                                     bPromptMoveUp = false;
                                     //if (sesResult[0].CompletionStatus == "COMPLETED")
                                     //{
-                                    //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResult[0].CompletionStatus, sEventType, iSessionNmbr);
+                                    //    oDisc.insertEventStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sesResult[0].CompletionStatus, sEventType, iSessionNmbr);
                                     //}
                                 }
                             }
@@ -14999,7 +15087,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (!bRuleStatusIOA)
                                 {
                                     // Functionto reset rule type values in StdtEvent Table
-                                    oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                    oDisc.resetEvntStatus(classId, studentId, oTemp.TemplateId);
                                     sEventAlertStatus = "IOAEvntStatus=true,Set_MoveDown=true";
                                     // Functionto Update rule Events values in StdtEvent Table
                                     oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatus);
@@ -15007,7 +15095,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (!bRuleStatusMultiTchr)
                                 {
                                     // Functionto reset rule type values in StdtEvent Table
-                                    oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                    oDisc.resetEvntStatus(classId, studentId, oTemp.TemplateId);
                                     sEventAlertStatus = "MultiTchrEvntStatus=true,Set_MoveDown=true";
                                     // Functionto Update rule Events values in StdtEvent Table
                                     oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventType);
@@ -15033,17 +15121,17 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 { }
                                 else
                                     if (sesResult[0] != null)
-                                        oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResult[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
+                                        oDisc.updatePromptStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sNextLessonPrompt, sesResult[0].CompletionStatus, sEventType, iSessionNmbr, userId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                                     else
                                     {
                                         if (FreqDurTextFlag)
                                         {
-                                            oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
+                                            oDisc.updatePromptStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sNextLessonPrompt, CompletionStatusSet, sEventType, iSessionNmbr, userId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                                         }
                                     }
                                 //if (sesResult[0].CompletionStatus == "COMPLETED")
                                 //{
-                                //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResult[0].CompletionStatus, sEventType, iSessionNmbr);
+                                //    oDisc.insertEventStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sesResult[0].CompletionStatus, sEventType, iSessionNmbr);
                                 //}
                             }
                             else
@@ -15053,7 +15141,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (!bRuleStatusIOA)
                                 {
                                     // Functionto reset rule type values in StdtEvent Table
-                                    oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                    oDisc.resetEvntStatus(classId, studentId, oTemp.TemplateId);
                                     sEventAlertStatus = "IOAEvntStatus=true,Prompt_MoveUp=true";
                                     // Functionto Update rule Events values in StdtEvent Table
                                     oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatus);
@@ -15061,7 +15149,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (!bRuleStatusMultiTchr)
                                 {
                                     // Functionto reset rule type values in StdtEvent Table
-                                    oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                    oDisc.resetEvntStatus(classId, studentId, oTemp.TemplateId);
                                     sEventAlertStatus = "MultiTchrEvntStatus=true,Prompt_MoveUp=true";
                                     // Functionto Update rule Events values in StdtEvent Table
                                     oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventType);
@@ -15099,10 +15187,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (Convert.ToBoolean(mod) != true)
                                                 {
                                                     string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
-                                                    "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
+                                                    "(" + oSession.SchoolId + "," + classId + "," + studentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
                                                     oData.ExecuteWithTrans(insqry, con, trans);
 
-                                                    string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
+                                                    string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + userId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
                                                     oData.ExecuteWithTrans(updqry, con, trans);
                                                 }
                                             }
@@ -15113,17 +15201,17 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                 sEventType = "PROMPT MOVEDOWN";
                                 if (sesResult[0] != null)
-                                    oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResult[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
+                                    oDisc.updatePromptStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sNextLessonPrompt, sesResult[0].CompletionStatus, sEventType, iSessionNmbr, userId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                                 else
                                 {
                                     if (FreqDurTextFlag)
                                     {
-                                        oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
+                                        oDisc.updatePromptStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sNextLessonPrompt, CompletionStatusSet, sEventType, iSessionNmbr, userId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                                     }
                                 }
                                 //if (sesResult[0].CompletionStatus == "COMPLETED")
                                 //{
-                                //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResult[0].CompletionStatus, sEventType, iSessionNmbr);
+                                //    oDisc.insertEventStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, sesResult[0].CompletionStatus, sEventType, iSessionNmbr);
                                 //}
                             }
                             else
@@ -15133,7 +15221,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (!bRuleStatusIOA)
                                 {
                                     // Functionto reset rule type values in StdtEvent Table
-                                    oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                    oDisc.resetEvntStatus(classId, studentId, oTemp.TemplateId);
                                     sEventAlertStatus = "IOAEvntStatus=true,Prompt_MoveDown=true";
                                     // Functionto Update rule Events values in StdtEvent Table
                                     oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatus);
@@ -15141,7 +15229,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (!bRuleStatusMultiTchr)
                                 {
                                     // Functionto reset rule type values in StdtEvent Table
-                                    oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                    oDisc.resetEvntStatus(classId, studentId, oTemp.TemplateId);
                                     sEventAlertStatus = "MultiTchrEvntStatus=true,Prompt_MoveDown=true";
                                     // Functionto Update rule Events values in StdtEvent Table
                                     oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventType);
@@ -15160,7 +15248,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if (bSetCompleted)
                                     {
                                         //bStatusFlag = true;
-                                        oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                        oDisc.insertEventStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                     }
                                     else if (bSetMoveUp == true)
                                     {
@@ -15175,7 +15263,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     {
                                         if (bSetCompleted)
                                         {
-                                            oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                            oDisc.insertEventStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                         }
                                         else if (bSetMoveUp == true)
                                         {
@@ -15191,7 +15279,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 {
                                     if (bSetCompleted)
                                     {
-                                        oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                        oDisc.insertEventStatus(oSession.SchoolId, classId, studentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                     }
                                     else if (bSetMoveUp == true)
                                     {
@@ -15405,6 +15493,14 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             bool GlobalIsFirstPrompt = false;
             bool GlobalIsFirstStep = false;
             bool GlobalIsFirstSet = false;
+
+            userId = 0;
+            studentId = 0;
+            if (userId == 0 || studentId == 0)
+            {
+                Pagepath = "Datasheet: checkScoreMulty/IdChecks";
+                IDChecks();
+            }
 
             strQry = " SELECT Hdr.SkillType, Hdr.LessonPlanId, ISNULL(MAX(NextSetId),0) NextSetId,ISNULL(MAX(NextSetNmbr),0) NextSetNmbr " +
                  " ,ISNULL(MAX(NextStepId),0)NextStepId,ISNULL(MAX(NextPromptId),0)NextPromptId" +
@@ -16588,15 +16684,15 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
 
                         oDisc = new DiscreteSession();
-                        TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                        TrialLists = oDisc.GetTrialLists(studentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
 
                         //if (chainedInptData.MultiTeacherRequired)
-                        bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId, trans, con);
+                        bMultyTchr = oDisc.MultiTeacherStatus(studentId, oTemp.TemplateId, trans, con);
                         // else
                         //    bMultyTchr = false;
 
                         // if (chainedInptData.IOARequired)
-                        bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId, trans, con);
+                        bIOA = oDisc.IOAStats(studentId, oTemp.TemplateId, trans, con);
                         // else
                         //    bIOA = false;
                         //Trials = trails.GetTrialLists(8, 1, ht[key].RequiredSession(), key);
@@ -16717,12 +16813,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     colCalId = Convert.ToInt32(ViewState["colCalId"]);
                                     if (TempRules.pctCustomMoveUp.iScoreRequired > 0)
                                     {
-                                        bcustMoveUp = ValidateUp(oSession.StudentId, colCalId, TempRules.pctCustomMoveUp.iScoreRequired, reqSess,
+                                        bcustMoveUp = ValidateUp(studentId, colCalId, TempRules.pctCustomMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctCustomMoveUp.iTotalCorrectInstance, TempRules.pctCustomMoveUp.bConsequetiveIndex, status, trans, con);
                                     }
                                     if (TempRules.pctCustomMoveDown.iScoreRequired > 0)
                                     {
-                                        bCustMoveDown = ValidateDown(oSession.StudentId, colCalId, TempRules.pctCustomMoveDown.iScoreRequired, reqSess,
+                                        bCustMoveDown = ValidateDown(studentId, colCalId, TempRules.pctCustomMoveDown.iScoreRequired, reqSess,
                                             TempRules.pctCustomMoveDown.iTotalCorrectInstance, TempRules.pctCustomMoveDown.bConsequetiveIndex, status, trans, con);
 
                                     }
@@ -16754,7 +16850,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             bPromptAvgDurationMoveUp = false;
                                         if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                         {
-                                            bPromptAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                            bPromptAvgDurationMoveUp = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -16793,7 +16889,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptAvgDurationMoveDown = false;
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bPromptAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                bPromptAvgDurationMoveDown = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -16835,7 +16931,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                                 if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                 {
-                                                    bstepAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                    bstepAvgDurationMoveUp = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                         TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                     int stepcount = TrialLists.trialsCount;
@@ -16885,7 +16981,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             {
                                                 if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bstepAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                    bstepAvgDurationMoveDown = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     int stepcount = TrialLists.trialsCount;
@@ -16949,7 +17045,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                                 if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                 {
-                                                    bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                    bAvgDurationMoveUp = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                         TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -16997,7 +17093,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 {
                                                     if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                     {
-                                                        bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                        bAvgDurationMoveDown = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                             TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                         int setcount = TrialLists.totalSet;
 
@@ -17045,7 +17141,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptTotDurationMoveUp = false;
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
-                                                bPromptTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                bPromptTotDurationMoveUp = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -17084,7 +17180,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptTotDurationMoveDown = false;
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bPromptTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                bPromptTotDurationMoveDown = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -17126,7 +17222,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                                 if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                 {
-                                                    bstepTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                    bstepTotDurationMoveUp = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                         TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                     int stepcount = TrialLists.trialsCount;
@@ -17176,7 +17272,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             {
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bstepTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                    bstepTotDurationMoveDown = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     int stepcount = TrialLists.trialsCount;
@@ -17240,7 +17336,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     //CompletionStatusSet = "";
-                                                    bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                    bTotDurationMoveUp = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                         TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -17289,7 +17385,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             {
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                    bTotDurationMoveDown = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -17346,7 +17442,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             bPromptAvgDurationMoveUp = false;
                                         if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                         {
-                                            bPromptAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                            bPromptAvgDurationMoveUp = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -17385,7 +17481,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptAvgDurationMoveDown = false;
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bPromptAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                bPromptAvgDurationMoveDown = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -17427,7 +17523,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                                 if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                 {
-                                                    bstepAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                    bstepAvgDurationMoveUp = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                         TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                     int stepcount = TrialLists.trialsCount;
@@ -17477,7 +17573,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             {
                                                 if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bstepAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                    bstepAvgDurationMoveDown = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     int stepcount = TrialLists.trialsCount;
@@ -17541,7 +17637,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                                 if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                 {
-                                                    bAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                    bAvgDurationMoveUp = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                         TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -17590,7 +17686,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             {
                                                 if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                    bAvgDurationMoveDown = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -17638,7 +17734,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptTotDurationMoveUp = false;
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
-                                                bPromptTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                bPromptTotDurationMoveUp = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -17677,7 +17773,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptTotDurationMoveDown = false;
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bPromptTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                bPromptTotDurationMoveDown = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -17719,7 +17815,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                                 if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                 {
-                                                    bstepTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                    bstepTotDurationMoveUp = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                         TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                     int stepcount = TrialLists.trialsCount;
@@ -17769,7 +17865,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             {
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bstepTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                    bstepTotDurationMoveDown = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     int stepcount = TrialLists.trialsCount;
@@ -17831,7 +17927,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     //CompletionStatusSet = "";
-                                                    bTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                    bTotDurationMoveUp = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                         TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -17879,7 +17975,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             {
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                    bTotDurationMoveDown = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -17929,22 +18025,22 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 //    totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                 //    if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                 //    {
-                                //        bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                //        bAvgDurationMoveUp = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                 //            TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                 //    }
                                 //    if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                 //    {
-                                //        bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                //        bAvgDurationMoveDown = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                 //            TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                 //    }
                                 //    if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                 //    {
-                                //        bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                //        bTotDurationMoveUp = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                 //            TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                 //    }
                                 //    if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                 //    {
-                                //        bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                //        bTotDurationMoveDown = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                 //            TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                 //    }
                                 //    if ((bAvgDurationMoveUp == false) || (bTotDurationMoveUp == false))
@@ -17981,7 +18077,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             bPromptFrequencyMoveUp = false;
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
-                                            bPromptFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                            bPromptFrequencyMoveUp = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -18019,7 +18115,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptFrequencyMoveDown = false;
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
-                                                bPromptFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                                bPromptFrequencyMoveDown = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -18064,7 +18160,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
-                                                bstepFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                                bstepFrequencyMoveUp = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
@@ -18116,7 +18212,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         {
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
-                                                bstepFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                                bstepFrequencyMoveDown = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
@@ -18183,7 +18279,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
-                                                bFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                                bFrequencyMoveUp = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -18229,7 +18325,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             {
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
-                                                bFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                                bFrequencyMoveDown = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -18283,7 +18379,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             bPromptFrequencyMoveUp = false;
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
-                                            bPromptFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                            bPromptFrequencyMoveUp = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -18321,7 +18417,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptFrequencyMoveDown = false;
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
-                                                bPromptFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                                bPromptFrequencyMoveDown = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -18366,7 +18462,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
-                                                bstepFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                                bstepFrequencyMoveUp = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
@@ -18416,7 +18512,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         {
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
-                                                bstepFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                                bstepFrequencyMoveDown = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 int stepcount = TrialLists.trialsCount;
@@ -18479,7 +18575,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
-                                                bFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                                bFrequencyMoveUp = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -18525,7 +18621,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             {
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
-                                                bFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                                bFrequencyMoveDown = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -18580,7 +18676,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         bPromptIndallMoveUp = false;
                                     if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0)
                                     {
-                                        bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                        bPromptIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
@@ -18622,7 +18718,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                         if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                                         {
-                                            bstepIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                            bstepIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             int stepcount = TrialLists.trialsCount;
@@ -18672,7 +18768,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                         if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                                         {
-                                            bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                            bIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -18731,7 +18827,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         bPromptIndallMoveUp = false;
                                     if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0)
                                     {
-                                        bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                        bPromptIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
@@ -18773,7 +18869,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         TempRules = GetStepRules(oTemp.TemplateId, iColId, trans, con);
                                         if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                                         {
-                                            bstepIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                            bstepIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             int stepcount = TrialLists.trialsCount;
@@ -18823,7 +18919,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                         if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                                         {
-                                            bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                            bIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -18905,7 +19001,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
-                                                bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                bAvgDurationMoveUp = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -18948,7 +19044,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                bAvgDurationMoveDown = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -18997,7 +19093,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     bPromptAvgDurationMoveUp = false;
                                                 if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                 {
-                                                    bPromptAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                    bPromptAvgDurationMoveUp = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                         TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -19034,7 +19130,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                         bPromptAvgDurationMoveDown = false;
                                                     if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                     {
-                                                        bPromptAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                        bPromptAvgDurationMoveDown = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                             TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -19074,7 +19170,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                                     if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                     {
-                                                        bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                        bAvgDurationMoveUp = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                             TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                         int setcount = TrialLists.totalSet;
 
@@ -19118,7 +19214,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     }
                                                     if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                     {
-                                                        bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                        bAvgDurationMoveDown = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                             TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                         int setcount = TrialLists.totalSet;
 
@@ -19159,7 +19255,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 CompletionStatusSet = "";
-                                                bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                bTotDurationMoveUp = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -19201,7 +19297,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                bTotDurationMoveDown = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -19246,7 +19342,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     bPromptTotDurationMoveUp = false;
                                                 if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                 {
-                                                    bPromptTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                    bPromptTotDurationMoveUp = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                         TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -19283,7 +19379,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                         bPromptTotDurationMoveDown = false;
                                                     if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                     {
-                                                        bPromptTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                        bPromptTotDurationMoveDown = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                             TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -19326,7 +19422,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                     {
                                                         CompletionStatusSet = "";
-                                                        bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                        bTotDurationMoveUp = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                             TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                         int setcount = TrialLists.totalSet;
 
@@ -19368,7 +19464,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     }
                                                     if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                     {
-                                                        bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                        bTotDurationMoveDown = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                             TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                         int setcount = TrialLists.totalSet;
 
@@ -19423,7 +19519,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
-                                                bAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                bAvgDurationMoveUp = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -19466,7 +19562,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                bAvgDurationMoveDown = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -19508,7 +19604,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     bPromptAvgDurationMoveUp = false;
                                                 if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                 {
-                                                    bPromptAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                    bPromptAvgDurationMoveUp = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                         TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -19545,7 +19641,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                         bPromptAvgDurationMoveDown = false;
                                                     if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                     {
-                                                        bPromptAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                        bPromptAvgDurationMoveDown = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                             TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -19585,7 +19681,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                                     if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                     {
-                                                        bAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                        bAvgDurationMoveUp = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                             TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                         int setcount = TrialLists.totalSet;
 
@@ -19628,7 +19724,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     }
                                                     if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                     {
-                                                        bAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                        bAvgDurationMoveDown = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                             TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                         int setcount = TrialLists.totalSet;
 
@@ -19669,7 +19765,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
                                                 CompletionStatusSet = "";
-                                                bTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                bTotDurationMoveUp = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -19709,7 +19805,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                             {
-                                                bTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                bTotDurationMoveDown = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -19754,7 +19850,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     bPromptTotDurationMoveUp = false;
                                                 if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                 {
-                                                    bPromptTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                    bPromptTotDurationMoveUp = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                         TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -19791,7 +19887,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                         bPromptTotDurationMoveDown = false;
                                                     if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                     {
-                                                        bPromptTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                        bPromptTotDurationMoveDown = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                             TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -19834,7 +19930,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                     {
                                                         CompletionStatusSet = "";
-                                                        bTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                        bTotDurationMoveUp = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                             TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                         int setcount = TrialLists.totalSet;
 
@@ -19876,7 +19972,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     }
                                                     if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                     {
-                                                        bTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                        bTotDurationMoveDown = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                             TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                         int setcount = TrialLists.totalSet;
 
@@ -19932,7 +20028,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             freqId = Convert.ToInt32(ViewState["freqId"]);
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
-                                                bFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                                bFrequencyMoveUp = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -19973,7 +20069,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
-                                                bFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                                bFrequencyMoveDown = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -20013,7 +20109,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptFrequencyMoveUp = false;
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
-                                                bPromptFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                                bPromptFrequencyMoveUp = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveUpbIOAReqd, bIOA);
@@ -20049,7 +20145,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     bPromptFrequencyMoveDown = false;
                                                 if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bPromptFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                                    bPromptFrequencyMoveDown = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveDownbIOAReqd, bIOA);
@@ -20089,7 +20185,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                                 if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                                 {
-                                                    bFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                                    bFrequencyMoveUp = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                         TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -20130,7 +20226,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 }
                                                 if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                                    bFrequencyMoveDown = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -20180,7 +20276,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             freqId = Convert.ToInt32(ViewState["freqId"]);
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
-                                                bFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                                bFrequencyMoveUp = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -20221,7 +20317,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
-                                                bFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                                bFrequencyMoveDown = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -20261,7 +20357,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptFrequencyMoveUp = false;
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
-                                                bPromptFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                                bPromptFrequencyMoveUp = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveUpbIOAReqd, bIOA);
@@ -20297,7 +20393,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     bPromptFrequencyMoveDown = false;
                                                 if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bPromptFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                                    bPromptFrequencyMoveDown = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveDownbIOAReqd, bIOA);
@@ -20337,7 +20433,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                                 if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                                 {
-                                                    bFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                                    bFrequencyMoveUp = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                         TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -20378,7 +20474,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 }
                                                 if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                                    bFrequencyMoveDown = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -20439,7 +20535,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             Int32.Parse(sesResultchain[index].StepPrompts[indexB]);
                                             foreach (DataRow drstepID in dtstepIDs.Rows)
                                             {
-                                                string updStepStat = "UPDATE StdtDSStepStat SET PromptId=" + sesResultchain[index].StepPrompts[indexB] + ",ModifiedBy=" + oSession.LoginId + " ,ModifiedOn=GETDATE() WHERE " +
+                                                string updStepStat = "UPDATE StdtDSStepStat SET PromptId=" + sesResultchain[index].StepPrompts[indexB] + ",ModifiedBy=" + userId + " ,ModifiedOn=GETDATE() WHERE " +
                                                     "DSTempSetColId=" + dr["DSTempSetColId"].ToString() + " AND DSTempStepId=" + drstepID["DSTempStepId"].ToString() + "";
                                                 oData.ExecuteWithTrans(updStepStat, con, trans);
                                                 indexB++;
@@ -20466,7 +20562,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         bPromptIndallMoveUp = false;
                                     if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0)
                                     {
-                                        bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                        bPromptIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
@@ -20511,7 +20607,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             bPromptIndallMoveDown = false;
                                         if (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0)
                                         {
-                                            bPromptIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
+                                            bPromptIndallMoveDown = ValidateDown1(studentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveDownbIOAReqd, bIOA);
@@ -20559,7 +20655,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                         if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0 && !check)
                                         {
-                                            bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                            bIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -20598,7 +20694,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         if ((TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && check) || (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && !check1))
                                         {
-                                            bIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
+                                            bIndallMoveDown = ValidateDown1(studentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -20662,7 +20758,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         bPromptIndallMoveUp = false;
                                     if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0)
                                     {
-                                        bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                        bPromptIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
@@ -20704,7 +20800,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             bPromptIndallMoveDown = false;
                                         if (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0)
                                         {
-                                            bPromptIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
+                                            bPromptIndallMoveDown = ValidateDown1(studentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveDownbIOAReqd, bIOA);
@@ -20751,7 +20847,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                         if (TempRules.pctIndAllMoveUp.iTotalCorrectInstance > 0 && !check)
                                         {
-                                            bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                            bIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -20789,7 +20885,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         if ((TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && check) || (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && !check1))
                                         {
-                                            bIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
+                                            bIndallMoveDown = ValidateDown1(studentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -20850,7 +20946,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 //Check for all previous step that it all succeeds to move forward
                                 for (int istep = 1; istep < iCurrentStepExecuting; istep++)
                                 {
-                                    TrialLists = oDisc.GetTrialListsForPreStep(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, istep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                                    TrialLists = oDisc.GetTrialListsForPreStep(studentId, oTemp.TemplateId, iCurrentSetId, istep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                                     chainedCols[sColName].SessionCount = TrialLists.sessionCount;
                                     sesResultchain[index] = null;
                                     chainedCols[sColName].SetInputData(istep.ToString(), TargetPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -20925,10 +21021,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                                         if (Convert.ToBoolean(mod) != true)
                                                                         {
                                                                             string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
-                                                                            "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
+                                                                            "(" + oSession.SchoolId + "," + oSession.Classid + "," + studentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
                                                                             oData.ExecuteWithTrans(insqry, con, trans);
 
-                                                                            string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
+                                                                            string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + userId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
                                                                             oData.ExecuteWithTrans(updqry, con, trans);
                                                                         }
                                                                     }
@@ -20955,13 +21051,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                         int retunID = Convert.ToInt32(oData.FetchValue(strQuery));
                                                         sEventType = "STEP MOVEDOWN";
                                                         if (bPrompt)
-                                                            oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompts, (iCurrentStep-1).ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                            oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, studentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompts, (iCurrentStep-1).ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                                         else
-                                                            oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, retunID, iCurrentSetId, oTemp.TemplateId, istep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
-                                                        //oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].NextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId);
+                                                            oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, studentId, retunID, iCurrentSetId, oTemp.TemplateId, istep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
+                                                        //oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sesResultchain[0].NextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId);
                                                         //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                                         //{
-                                                        //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
+                                                        //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
                                                         //}
                                                         bStepCountCriteria = true;
                                                         // }
@@ -20973,7 +21069,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     if (!bRuleStatusIOA)
                                                     {
                                                         // Functionto reset rule type values in StdtEvent Table
-                                                        oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                                        oDisc.resetEvntStatus(oSession.Classid, studentId, oTemp.TemplateId);
                                                         sEventAlertStatu = "IOAEvntStatus=true,Step_MoveDown=true";
                                                         // Functionto Update rule Events values in StdtEvent Table
                                                         oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatu);
@@ -20981,7 +21077,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     if (!bRuleStatusMultiTchr)
                                                     {
                                                         // Functionto reset rule type values in StdtEvent Table
-                                                        oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                                        oDisc.resetEvntStatus(oSession.Classid, studentId, oTemp.TemplateId);
                                                         sEventAlertStatu = "MultiTchrEvntStatus=true,Step_MoveDown=true";
                                                         // Functionto Update rule Events values in StdtEvent Table
                                                         oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatu);
@@ -21011,7 +21107,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 {
                                     bStepCountCriteria = false;
                                     sesResultchain[index] = null;
-                                    TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                                    TrialLists = oDisc.GetTrialLists(studentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                                     chainedCols[sColName].SessionCount = TrialLists.sessionCount;
                                     chainedCols[sColName].SetInputData(iCurrentStep.ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
                                     sesResultchain[index] = Chained.Model.Execute(chainedCols[sColName], false, bpromptColumn, oDS.ChainType);
@@ -21050,7 +21146,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             {
                                                 bool stepMoveUpflag = sesResultchain[index].MovedForwardStep;
                                                 bool stepMoveDownflag = sesResultchain[index].MovedBackStep;
-                                                TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                                                TrialLists = oDisc.GetTrialLists(studentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                                                 chainedCols[sColName].StepCount = TrialLists.trialsCount;
 
                                                 chainedCols[sColName].SetInputData((iCurrentStep - 1).ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -21118,7 +21214,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         else
                                         {
-                                            TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                                            TrialLists = oDisc.GetTrialLists(studentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                                             chainedCols[sColName].StepCount = TrialLists.trialsCount;
 
                                             chainedCols[sColName].SetInputData((iCurrentStep - 1).ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -21185,7 +21281,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     //    {
                                     //        if (sesResultchain[index].MovedForwardPrompt || sesResultchain[index].MovedBackPrompt)
                                     //        {
-                                    //            TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true);
+                                    //            TrialLists = oDisc.GetTrialLists(studentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true);
                                     //            chainedCols[sColName].StepCount = TrialLists.trialsCount;
 
                                     //            chainedCols[sColName].SetInputData((iCurrentStep - 1).ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -21194,7 +21290,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     //    }
                                     //    else
                                     //    {
-                                    //        TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true);
+                                    //        TrialLists = oDisc.GetTrialLists(studentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, chainedCols[sColName].RequiredSession(), sColName, true);
                                     //        chainedCols[sColName].StepCount = TrialLists.trialsCount;
 
                                     //        chainedCols[sColName].SetInputData((iCurrentStep - 1).ToString(), sCurrentPrompt, TargetPrompt, iCurrentSetNbr.ToString(), TrialLists.totalSet.ToString(), TrialLists.arTrials);
@@ -22346,14 +22442,14 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         int counter = discreteCols.Count;
                         int ind = 0;
                         oDisc = new DiscreteSession();
-                        TrialLists = oDisc.GetTrialLists(oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, discreteCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
+                        TrialLists = oDisc.GetTrialLists(studentId, oTemp.TemplateId, iCurrentSetId, iCurrentStep, discreteCols[sColName].RequiredSession(), sColName, false, hfPlusMinusResp.Value, coltypeCode, oDS.ChainType, trans, con);
                         //if (discreteInptData.MultiTeacherRequired)
-                        bMultyTchr = oDisc.MultiTeacherStatus(oSession.StudentId, oTemp.TemplateId, trans, con);
+                        bMultyTchr = oDisc.MultiTeacherStatus(studentId, oTemp.TemplateId, trans, con);
                         // else
                         //    bMultyTchr = false;
 
                         // if (discreteInptData.IOARequired)
-                        bIOA = oDisc.IOAStats(oSession.StudentId, oTemp.TemplateId, trans, con);
+                        bIOA = oDisc.IOAStats(studentId, oTemp.TemplateId, trans, con);
                         // else
                         //     bIOA = false;
                         //Trials = trails.GetTrialLists(8, 1, ht[key].RequiredSession(), key);
@@ -22471,7 +22567,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     CompletionStatusSet = "";
                                     //int iStudentId, int colCalId, float iScoreRequired, int iSessonNumber,int iTotalCorrectInstance,bool bConsequetiveIndex, bool flag
                                     bool status = false;
-                                    bcustMoveUp = ValidateUp(oSession.StudentId, colCalId, TempRules.pctCustomMoveUp.iScoreRequired, reqSess,
+                                    bcustMoveUp = ValidateUp(studentId, colCalId, TempRules.pctCustomMoveUp.iScoreRequired, reqSess,
                                         TempRules.pctCustomMoveUp.iTotalCorrectInstance, TempRules.pctCustomMoveUp.bConsequetiveIndex, status, trans, con);
                                     int setcount = TrialLists.totalSet;
 
@@ -22504,7 +22600,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (TempRules.pctCustomMoveDown.iScoreRequired > 0)
                                 {
                                     bool status = false;
-                                    bCustMoveDown = ValidateDown(oSession.StudentId, colCalId, TempRules.pctCustomMoveDown.iScoreRequired, reqSess,
+                                    bCustMoveDown = ValidateDown(studentId, colCalId, TempRules.pctCustomMoveDown.iScoreRequired, reqSess,
                                         TempRules.pctCustomMoveDown.iTotalCorrectInstance, TempRules.pctCustomMoveDown.bConsequetiveIndex, status, trans, con);
                                     int setcount = TrialLists.totalSet;
 
@@ -22561,7 +22657,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                         {
                                             CompletionStatusSet = "";
-                                            bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                            bAvgDurationMoveUp = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -22603,7 +22699,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                         {
-                                            bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                            bAvgDurationMoveDown = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -22645,7 +22741,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptAvgDurationMoveUp = false;
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
-                                                bPromptAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                bPromptAvgDurationMoveUp = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -22682,7 +22778,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     bPromptAvgDurationMoveDown = false;
                                                 if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bPromptAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                    bPromptAvgDurationMoveDown = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -22721,7 +22817,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                                 if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                 {
-                                                    bAvgDurationMoveUp = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                    bAvgDurationMoveUp = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                         TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -22764,7 +22860,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 }
                                                 if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bAvgDurationMoveDown = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                    bAvgDurationMoveDown = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -22805,7 +22901,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                         {
                                             CompletionStatusSet = "";
-                                            bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                            bTotDurationMoveUp = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -22847,7 +22943,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                         {
-                                            bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                            bTotDurationMoveDown = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -22892,7 +22988,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptTotDurationMoveUp = false;
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
-                                                bPromptTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                bPromptTotDurationMoveUp = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -22929,7 +23025,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     bPromptTotDurationMoveDown = false;
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bPromptTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                    bPromptTotDurationMoveDown = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -22972,7 +23068,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     CompletionStatusSet = "";
-                                                    bTotDurationMoveUp = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                    bTotDurationMoveUp = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                         TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -23004,7 +23100,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 }
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bTotDurationMoveDown = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                    bTotDurationMoveDown = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -23053,7 +23149,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         totDuraionId = Convert.ToInt32(ViewState["totDuraionId"]);
                                         if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                         {
-                                            bAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                            bAvgDurationMoveUp = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -23096,7 +23192,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                         {
-                                            bAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                            bAvgDurationMoveDown = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -23138,7 +23234,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptAvgDurationMoveUp = false;
                                             if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                             {
-                                                bPromptAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                bPromptAvgDurationMoveUp = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -23175,7 +23271,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     bPromptAvgDurationMoveDown = false;
                                                 if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bPromptAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                    bPromptAvgDurationMoveDown = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -23214,7 +23310,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                                 if (TempRules.pctAvgDurationMoveUp.iScoreRequired > 0)
                                                 {
-                                                    bAvgDurationMoveUp = ValidateDown(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
+                                                    bAvgDurationMoveUp = ValidateDown(studentId, avgDurationId, TempRules.pctAvgDurationMoveUp.iScoreRequired, reqSess,
                                                         TempRules.pctAvgDurationMoveUp.iTotalCorrectInstance, TempRules.pctAvgDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -23257,7 +23353,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 }
                                                 if (TempRules.pctAvgDurationMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bAvgDurationMoveDown = ValidateUp(oSession.StudentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
+                                                    bAvgDurationMoveDown = ValidateUp(studentId, avgDurationId, TempRules.pctAvgDurationMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctAvgDurationMoveDown.iTotalCorrectInstance, TempRules.pctAvgDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -23298,7 +23394,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                         {
                                             CompletionStatusSet = "";
-                                            bTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                            bTotDurationMoveUp = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -23340,7 +23436,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                         {
-                                            bTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                            bTotDurationMoveDown = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -23385,7 +23481,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptTotDurationMoveUp = false;
                                             if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                             {
-                                                bPromptTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                bPromptTotDurationMoveUp = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveUpIOA, bIOA);
@@ -23422,7 +23518,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     bPromptTotDurationMoveDown = false;
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bPromptTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                    bPromptTotDurationMoveDown = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptMoveDownIOA, bIOA);
@@ -23465,7 +23561,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (TempRules.pctTotalDurationMoveUp.iScoreRequired > 0)
                                                 {
                                                     CompletionStatusSet = "";
-                                                    bTotDurationMoveUp = ValidateDown(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
+                                                    bTotDurationMoveUp = ValidateDown(studentId, totDuraionId, TempRules.pctTotalDurationMoveUp.iScoreRequired, reqSess,
                                                         TempRules.pctTotalDurationMoveUp.iTotalCorrectInstance, TempRules.pctTotalDurationMoveUp.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -23497,7 +23593,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 }
                                                 if (TempRules.pctTotalDurationMoveDown.iScoreRequired > 0)
                                                 {
-                                                    bTotDurationMoveDown = ValidateUp(oSession.StudentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
+                                                    bTotDurationMoveDown = ValidateUp(studentId, totDuraionId, TempRules.pctTotalDurationMoveDown.iScoreRequired, reqSess,
                                                         TempRules.pctTotalDurationMoveDown.iTotalCorrectInstance, TempRules.pctTotalDurationMoveDown.bConsequetiveIndex, status, trans, con);
                                                     int setcount = TrialLists.totalSet;
 
@@ -23554,7 +23650,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         freqId = Convert.ToInt32(ViewState["freqId"]);
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
-                                            bFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                            bFrequencyMoveUp = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -23594,7 +23690,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
-                                            bFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                            bFrequencyMoveDown = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -23634,7 +23730,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             bPromptFrequencyMoveUp = false;
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
-                                            bPromptFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                            bPromptFrequencyMoveUp = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveUpbIOAReqd, bIOA);
@@ -23671,7 +23767,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptFrequencyMoveDown = false;
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
-                                                bPromptFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                                bPromptFrequencyMoveDown = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveDownbIOAReqd, bIOA);
@@ -23710,7 +23806,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
-                                                bFrequencyMoveUp = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                                bFrequencyMoveUp = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -23751,7 +23847,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
-                                                bFrequencyMoveDown = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                                bFrequencyMoveDown = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -23794,7 +23890,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         freqId = Convert.ToInt32(ViewState["freqId"]);
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
-                                            bFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                            bFrequencyMoveUp = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -23835,7 +23931,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         }
                                         if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                         {
-                                            bFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                            bFrequencyMoveDown = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                             int setcount = TrialLists.totalSet;
 
@@ -23875,7 +23971,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             bPromptFrequencyMoveUp = false;
                                         if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                         {
-                                            bPromptFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                            bPromptFrequencyMoveUp = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                 TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
 
                                             bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveUpbIOAReqd, bIOA);
@@ -23912,7 +24008,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 bPromptFrequencyMoveDown = false;
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
-                                                bPromptFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                                bPromptFrequencyMoveDown = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
 
                                                 bRuleStatusIOA = oDisc.checkConditionIOA(bPromptFrequencyMoveDownbIOAReqd, bIOA);
@@ -23951,7 +24047,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                             if (TempRules.pctFrequencyMoveUp.iScoreRequired > 0)
                                             {
-                                                bFrequencyMoveUp = ValidateDown(oSession.StudentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
+                                                bFrequencyMoveUp = ValidateDown(studentId, freqId, TempRules.pctFrequencyMoveUp.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveUp.iTotalCorrectInstance, TempRules.pctFrequencyMoveUp.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -23992,7 +24088,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             }
                                             if (TempRules.pctFrequencyMoveDown.iScoreRequired > 0)
                                             {
-                                                bFrequencyMoveDown = ValidateUp(oSession.StudentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
+                                                bFrequencyMoveDown = ValidateUp(studentId, freqId, TempRules.pctFrequencyMoveDown.iScoreRequired, reqSess,
                                                     TempRules.pctFrequencyMoveDown.iTotalCorrectInstance, TempRules.pctFrequencyMoveDown.bConsequetiveIndex, status, trans, con);
                                                 int setcount = TrialLists.totalSet;
 
@@ -24041,7 +24137,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     bPromptIndallMoveUp = false;
                                 if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                                 {
-                                    bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                    bPromptIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                         TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
@@ -24083,7 +24179,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         bPromptIndallMoveDown = false;
                                     if (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0)
                                     {
-                                        bPromptIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
+                                        bPromptIndallMoveDown = ValidateDown1(studentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
                                             TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveDownbIOAReqd, bIOA);
@@ -24128,7 +24224,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                     if (TempRules.pctIndAllMoveUp.iScoreRequired > 0 && !check)
                                     {
-                                        bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                        bIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
@@ -24167,7 +24263,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     if ((TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && check) || (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && !check1))
                                     {
-                                        bIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
+                                        bIndallMoveDown = ValidateDown1(studentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
                                             TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
@@ -24226,7 +24322,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     bPromptIndallMoveUp = false;
                                 if (TempRules.pctIndAllMoveUp.iScoreRequired > 0)
                                 {
-                                    bPromptIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                    bPromptIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                         TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
 
                                     bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveUpbIOAReqd, bIOA);
@@ -24268,7 +24364,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         bPromptIndallMoveDown = false;
                                     if (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0)
                                     {
-                                        bPromptIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
+                                        bPromptIndallMoveDown = ValidateDown1(studentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
                                             TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
 
                                         bRuleStatusIOA = oDisc.checkConditionIOA(bPromptIndallMoveDownbIOAReqd, bIOA);
@@ -24313,7 +24409,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                                     if (TempRules.pctIndAllMoveUp.iScoreRequired > 0 && !check)
                                     {
-                                        bIndallMoveUp = ValidateUp1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
+                                        bIndallMoveUp = ValidateUp1(studentId, IndeallId, TempRules.pctIndAllMoveUp.iScoreRequired, reqSess,
                                             TempRules.pctIndAllMoveUp.iTotalCorrectInstance, TempRules.pctIndAllMoveUp.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
@@ -24352,7 +24448,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     if ((TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && check) || (TempRules.pctIndAllMoveDown.iTotalCorrectInstance > 0 && !check1))
                                     {
-                                        bIndallMoveDown = ValidateDown1(oSession.StudentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
+                                        bIndallMoveDown = ValidateDown1(studentId, IndeallId, TempRules.pctIndAllMoveDown.iScoreRequired, reqSess,
                                             TempRules.pctIndAllMoveDown.iTotalCorrectInstance, TempRules.pctIndAllMoveDown.bConsequetiveIndex, status, trans, con);
                                         int setcount = TrialLists.totalSet;
 
@@ -24791,12 +24887,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         {
                                             if (sesResultchain[0].CompletionStatus == "COMPLETED" || CompletionStatusSet == "COMPLETED")
                                             {
-                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
 
                                             }
                                             else
                                             {
-                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                             }
                                         }
                                         else
@@ -24819,37 +24915,37 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     }
                                                     if (sesResultchain[0].CompletionStatus == "COMPLETED" || CompletionStatusSet == "COMPLETED")
                                                     {
-                                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
 
                                                     }
                                                     else
                                                     {
-                                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                                     }
                                                 }
                                                 else
-                                                    oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                    oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                             }
                                             else
-                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
 
                                         }
                                         bPromptMoveUp = false;
                                         GlobalPromptMoveUp = false;
-                                        //oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].NextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId);
+                                        //oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sesResultchain[0].NextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId);
                                         //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                         //{
-                                        //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
+                                        //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
                                         //}
                                         if (oDS.ChainType == "Total Task")
                                         {
                                             if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                             {
-                                                oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, oSession.StudentId, oSession.LoginId, Convert.ToInt32(LessonTargetPrompt), con, trans);
+                                                oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, studentId, userId, Convert.ToInt32(LessonTargetPrompt), con, trans);
                                             }
                                             else
                                             {
-                                                oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, oSession.StudentId, oSession.LoginId, iPrompt, con, trans);
+                                                oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, studentId, userId, iPrompt, con, trans);
                                             }
                                         }
                                     }
@@ -24862,7 +24958,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     {
 
                                         // Functionto reset rule type values in StdtEvent Table
-                                        oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                        oDisc.resetEvntStatus(oSession.Classid, studentId, oTemp.TemplateId);
                                         sEventAlertStatus = "IOAEvntStatus=true,Set_MoveUp=true";
                                         // Functionto Update rule Events values in StdtEvent Table
                                         oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatus);
@@ -24870,7 +24966,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if (!bRuleStatusMultiTchr)
                                     {
                                         // Functionto reset rule type values in StdtEvent Table
-                                        oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                        oDisc.resetEvntStatus(oSession.Classid, studentId, oTemp.TemplateId);
                                         sEventAlertStatus = "MultiTchrEvntStatus=true,Set_MoveUp=true";
                                         // Functionto Update rule Events values in StdtEvent Table
                                         oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventType);
@@ -24912,7 +25008,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             //if (mod_flag)
                                             //{
                                             //    oData = new clsData();
-                                            //    string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
+                                            //    string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + userId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
                                             //    oData.Execute(updqry);
                                             //}
                                             if (mod_flag)
@@ -24925,10 +25021,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     if (Convert.ToBoolean(mod) != true)
                                                     {
                                                         string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
-                                                        "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
+                                                        "(" + oSession.SchoolId + "," + oSession.Classid + "," + studentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
                                                         oData.ExecuteWithTrans(insqry, con, trans);
 
-                                                        string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
+                                                        string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + userId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
                                                         oData.ExecuteWithTrans(updqry, con, trans);
                                                     }
                                                 }
@@ -24953,7 +25049,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     sEventType = "SET MOVEDOWN";
                                     if (bPrompt)
-                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                     else
                                     {
                                         if (LessonpromptUsed.Length > 0)
@@ -24972,24 +25068,24 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                         iPrompt = Convert.ToInt32(LessonpromptUsed[0]);
                                                     }
                                                 }
-                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                             }
                                             else
-                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                         }
                                         else
-                                            oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                            oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, iCurrentSetId, nextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
 
 
                                     }
-                                    //oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].NextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId);
+                                    //oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sesResultchain[0].NextSet.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId);
                                     //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                     //{
-                                    //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
+                                    //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
                                     //}
                                     if (oDS.ChainType == "Total Task")
                                     {
-                                        oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, oSession.StudentId, oSession.LoginId, Convert.ToInt32(iPrompt), con, trans);
+                                        oDisc.updateStepPromptForTotalTask(oTemp.TemplateId, studentId, userId, Convert.ToInt32(iPrompt), con, trans);
                                     }
                                 }
                             }
@@ -25000,7 +25096,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (!bRuleStatusIOA)
                                 {
                                     // Functionto reset rule type values in StdtEvent Table
-                                    oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                    oDisc.resetEvntStatus(oSession.Classid, studentId, oTemp.TemplateId);
                                     sEventAlertStatus = "IOAEvntStatus=true,Set_MoveDown=true";
                                     // Functionto Update rule Events values in StdtEvent Table
                                     oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatus);
@@ -25008,7 +25104,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (!bRuleStatusMultiTchr)
                                 {
                                     // Functionto reset rule type values in StdtEvent Table
-                                    oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                    oDisc.resetEvntStatus(oSession.Classid, studentId, oTemp.TemplateId);
                                     sEventAlertStatus = "MultiTchrEvntStatus=true,Set_MoveDown=true";
                                     // Functionto Update rule Events values in StdtEvent Table
                                     oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventType);
@@ -25050,7 +25146,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     sEventType = "STEP MOVEUP";
                                     if (bPrompt)
-                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, studentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                     else
                                     {
                                         if (LessonpromptUsed.Length > 0)
@@ -25069,20 +25165,20 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                         iPrompt = Convert.ToInt32(LessonpromptUsed[0]);
                                                     }
                                                 }
-                                                oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, studentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                             }
                                             else
-                                                oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, studentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                         }
                                         else
-                                            oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                            oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, studentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                     }
                                     bPromptMoveUp = false;
                                     GlobalPromptMoveUp = false;
-                                    //oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].NextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId);
+                                    //oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sesResultchain[0].NextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId);
                                     //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                     //{
-                                    //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
+                                    //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
                                     //}
                                 }
                             }
@@ -25093,7 +25189,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (!bRuleStatusIOA)
                                 {
                                     // Functionto reset rule type values in StdtEvent Table
-                                    oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                    oDisc.resetEvntStatus(oSession.Classid, studentId, oTemp.TemplateId);
                                     sEventAlertStatus = "IOAEvntStatus=true,Step_MoveUp=true";
                                     // Functionto Update rule Events values in StdtEvent Table
                                     oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatus);
@@ -25101,7 +25197,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (!bRuleStatusMultiTchr)
                                 {
                                     // Functionto reset rule type values in StdtEvent Table
-                                    oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                    oDisc.resetEvntStatus(oSession.Classid, studentId, oTemp.TemplateId);
                                     sEventAlertStatus = "MultiTchrEvntStatus=true,Step_MoveUp=true";
                                     // Functionto Update rule Events values in StdtEvent Table
                                     oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventType);
@@ -25143,10 +25239,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                     if (Convert.ToBoolean(mod) != true)
                                                     {
                                                         string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
-                                                        "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
+                                                        "(" + oSession.SchoolId + "," + oSession.Classid + "," + studentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
                                                         oData.ExecuteWithTrans(insqry, con, trans);
 
-                                                        string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
+                                                        string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + userId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
                                                         oData.ExecuteWithTrans(updqry, con, trans);
                                                     }
                                                 }
@@ -25170,7 +25266,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     }
                                     sEventType = "STEP MOVEDOWN";
                                     if (bPrompt)
-                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                        oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, studentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                     else
                                     {
                                         if (LessonpromptUsed.Length > 0)
@@ -25189,18 +25285,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                         iPrompt = Convert.ToInt32(LessonpromptUsed[0]);
                                                     }
                                                 }
-                                                oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, studentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, iPrompt, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                             }
                                             else
-                                                oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                                oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, studentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                         }
                                         else
-                                            oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                            oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, studentId, iCurrentStep, iCurrentSetId, oTemp.TemplateId, nextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                     }
-                                    //oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].NextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId);
+                                    //oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sesResultchain[0].NextStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId);
                                     //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                     //{
-                                    //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
+                                    //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
                                     //}
                                 }
                             }
@@ -25211,7 +25307,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (!bRuleStatusIOA)
                                 {
                                     // Functionto reset rule type values in StdtEvent Table
-                                    oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                    oDisc.resetEvntStatus(oSession.Classid, studentId, oTemp.TemplateId);
                                     sEventAlertStatus = "IOAEvntStatus=true,Step_MoveDown=true";
                                     // Functionto Update rule Events values in StdtEvent Table
                                     oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatus);
@@ -25219,7 +25315,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (!bRuleStatusMultiTchr)
                                 {
                                     // Functionto reset rule type values in StdtEvent Table
-                                    oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                    oDisc.resetEvntStatus(oSession.Classid, studentId, oTemp.TemplateId);
                                     sEventAlertStatus = "MultiTchrEvntStatus=true,Step_MoveDown=true";
                                     // Functionto Update rule Events values in StdtEvent Table
                                     oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventType);
@@ -25245,10 +25341,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (sCurrentLessonPrompt == sNextLessonPrompt)
                                 { }
                                 else
-                                    oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
+                                    oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sNextLessonPrompt, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                                 //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                 //{
-                                //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
+                                //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
                                 //}
                             }
                             else
@@ -25258,7 +25354,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (!bRuleStatusIOA)
                                 {
                                     // Functionto reset rule type values in StdtEvent Table
-                                    oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                    oDisc.resetEvntStatus(oSession.Classid, studentId, oTemp.TemplateId);
                                     sEventAlertStatus = "IOAEvntStatus=true,Prompt_MoveUp=true";
                                     // Functionto Update rule Events values in StdtEvent Table
                                     oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatus);
@@ -25266,7 +25362,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (!bRuleStatusMultiTchr)
                                 {
                                     // Functionto reset rule type values in StdtEvent Table
-                                    oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                    oDisc.resetEvntStatus(oSession.Classid, studentId, oTemp.TemplateId);
                                     sEventAlertStatus = "MultiTchrEvntStatus=true,Prompt_MoveUp=true";
                                     // Functionto Update rule Events values in StdtEvent Table
                                     oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventType);
@@ -25305,10 +25401,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                                 if (Convert.ToBoolean(mod) != true)
                                                 {
                                                     string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
-                                                    "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
+                                                    "(" + oSession.SchoolId + "," + oSession.Classid + "," + studentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
                                                     oData.ExecuteWithTrans(insqry, con, trans);
 
-                                                    string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
+                                                    string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + userId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
                                                     oData.ExecuteWithTrans(updqry, con, trans);
                                                 }
                                             }
@@ -25318,10 +25414,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
 
                                 sEventType = "PROMPT MOVEDOWN";
-                                oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
+                                oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sNextLessonPrompt, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                                 //if (sesResultchain[0].CompletionStatus == "COMPLETED")
                                 //{
-                                //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
+                                //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
                                 //}
                             }
                             else
@@ -25331,7 +25427,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (!bRuleStatusIOA)
                                 {
                                     // Functionto reset rule type values in StdtEvent Table
-                                    oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                    oDisc.resetEvntStatus(oSession.Classid, studentId, oTemp.TemplateId);
                                     sEventAlertStatus = "IOAEvntStatus=true,Prompt_MoveDown=true";
                                     // Functionto Update rule Events values in StdtEvent Table
                                     oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatus);
@@ -25339,7 +25435,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 if (!bRuleStatusMultiTchr)
                                 {
                                     // Functionto reset rule type values in StdtEvent Table
-                                    oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                    oDisc.resetEvntStatus(oSession.Classid, studentId, oTemp.TemplateId);
                                     sEventAlertStatus = "MultiTchrEvntStatus=true,Prompt_MoveDown=true";
                                     // Functionto Update rule Events values in StdtEvent Table
                                     oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventType);
@@ -25360,12 +25456,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             //oDisc = new DiscreteSession();
                             //oDS.CrntStep = sesResultchain[0].NextStep - 1;
                             //if (bPrompt)
-                            //    oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, Convert.ToInt32(sesResultchain[0].NextPrompt), oTemp.TemplateId, oDS.CrntStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
+                            //    oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, studentId, Convert.ToInt32(sesResultchain[0].NextPrompt), oTemp.TemplateId, oDS.CrntStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
                             //else
-                            //    oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, oDS.CrntStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
-                            //oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
-                            oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
-                            //oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId);
+                            //    oDisc.updateStepStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, oDS.CrntStep.ToString(), sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
+                            //oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr);
+                            oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
+                            //oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sesResultchain[0].CompletionStatus, sEventType, iSessionNmbr, userId);
 
                         }
                         else if (bSetMoveUp == true)
@@ -25528,11 +25624,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 {
                                     if (sesResult[0].CompletionStatus == "COMPLETED" || CompletionStatusSet == "COMPLETED")
                                     {
-                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                     }
                                     else
                                     {
-                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                        oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                     }
                                 }
                                 else
@@ -25541,11 +25637,11 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     {
                                         if (CompletionStatusSet == "COMPLETED")
                                         {
-                                            oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                            oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, iCurrentSetId, Convert.ToInt32(LessonTargetPrompt), nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                         }
                                         else
                                         {
-                                            oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                            oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                         }
                                     }
                                 }
@@ -25555,7 +25651,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 bPromptMoveUp = false;
                                 //if (sesResult[0].CompletionStatus == "COMPLETED")
                                 //{
-                                //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResult[0].CompletionStatus, sEventType, iSessionNmbr);
+                                //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sesResult[0].CompletionStatus, sEventType, iSessionNmbr);
                                 //}                                        
                             }
                         }
@@ -25566,7 +25662,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             if (!bRuleStatusIOA)
                             {
                                 // Function to reset rule type values in StdtEvent Table
-                                oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                oDisc.resetEvntStatus(oSession.Classid, studentId, oTemp.TemplateId);
                                 sEventAlertStatus = "IOAEvntStatus=true,Set_MoveUp=true";
                                 // Functionto Update rule Events values in StdtEvent Table
                                 oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatus);
@@ -25574,7 +25670,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             if (!bRuleStatusMultiTchr)
                             {
                                 // Functionto reset rule type values in StdtEvent Table
-                                oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                                oDisc.resetEvntStatus(oSession.Classid, studentId, oTemp.TemplateId);
                                 sEventAlertStatus = "MultiTchrEvntStatus=true,Set_MoveUp=true";
                                 // Functionto Update rule Events values in StdtEvent Table
                                 oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventType);
@@ -25624,10 +25720,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                             if (Convert.ToBoolean(mod) != true)
                                             {
                                                 string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
-                                                "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
+                                                "(" + oSession.SchoolId + "," + oSession.Classid + "," + studentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
                                                 oData.ExecuteWithTrans(insqry, con, trans);
 
-                                                string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
+                                                string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + userId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
                                                 oData.ExecuteWithTrans(updqry, con, trans);
                                             }
                                         }
@@ -25654,18 +25750,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             }
                             sEventType = "SET MOVEDOWN";
                             if (sesResult[0] != null) //liju
-                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResult[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), sesResult[0].CompletionStatus, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                             else
                             {
                                 if (DiscreteFreqDurTextFlag)
                                 {
-                                    oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                    oDisc.updateSetStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, iCurrentSetId, iPrompt, nextSet.ToString(), CompletionStatusSet, sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                 }
                             }
                             bPromptMoveUp = false;
                             //if (sesResult[0].CompletionStatus == "COMPLETED")
                             //{
-                            //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResult[0].CompletionStatus, sEventType, iSessionNmbr);
+                            //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sesResult[0].CompletionStatus, sEventType, iSessionNmbr);
                             //}
                         }
                     }
@@ -25676,7 +25772,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         if (!bRuleStatusIOA)
                         {
                             // Functionto reset rule type values in StdtEvent Table
-                            oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                            oDisc.resetEvntStatus(oSession.Classid, studentId, oTemp.TemplateId);
                             sEventAlertStatus = "IOAEvntStatus=true,Set_MoveDown=true";
                             // Functionto Update rule Events values in StdtEvent Table
                             oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatus);
@@ -25684,7 +25780,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         if (!bRuleStatusMultiTchr)
                         {
                             // Functionto reset rule type values in StdtEvent Table
-                            oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                            oDisc.resetEvntStatus(oSession.Classid, studentId, oTemp.TemplateId);
                             sEventAlertStatus = "MultiTchrEvntStatus=true,Set_MoveDown=true";
                             // Functionto Update rule Events values in StdtEvent Table
                             oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventType);
@@ -25710,17 +25806,17 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         { }
                         else
                             if (sesResult[0] != null)
-                                oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResult[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
+                                oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sNextLessonPrompt, sesResult[0].CompletionStatus, sEventType, iSessionNmbr, userId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                             else
                             {
                                 if (DiscreteFreqDurTextFlag)
                                 {
-                                    oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
+                                    oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sNextLessonPrompt, CompletionStatusSet, sEventType, iSessionNmbr, userId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                                 }
                             }
                         //if (sesResult[0].CompletionStatus == "COMPLETED")
                         //{
-                        //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResult[0].CompletionStatus, sEventType, iSessionNmbr);
+                        //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sesResult[0].CompletionStatus, sEventType, iSessionNmbr);
                         //}
                     }
                     else
@@ -25730,7 +25826,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         if (!bRuleStatusIOA)
                         {
                             // Functionto reset rule type values in StdtEvent Table
-                            oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                            oDisc.resetEvntStatus(oSession.Classid, studentId, oTemp.TemplateId);
                             sEventAlertStatus = "IOAEvntStatus=true,Prompt_MoveUp=true";
                             // Functionto Update rule Events values in StdtEvent Table
                             oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatus);
@@ -25738,7 +25834,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         if (!bRuleStatusMultiTchr)
                         {
                             // Functionto reset rule type values in StdtEvent Table
-                            oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                            oDisc.resetEvntStatus(oSession.Classid, studentId, oTemp.TemplateId);
                             sEventAlertStatus = "MultiTchrEvntStatus=true,Prompt_MoveUp=true";
                             // Functionto Update rule Events values in StdtEvent Table
                             oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventType);
@@ -25776,10 +25872,10 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                         if (Convert.ToBoolean(mod) != true)
                                         {
                                             string insqry = "INSERT INTO StdtSessEvent(SchoolId,ClassId,StudentId,DSTempHdrId,StdtSessEventType,EvntTs,SessionNbr,EventType)VALUES" +
-                                            "(" + oSession.SchoolId + "," + oSession.Classid + "," + oSession.StudentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
+                                            "(" + oSession.SchoolId + "," + oSession.Classid + "," + studentId + "," + oTemp.TemplateId + ",'MODIFICATION',GETDATE()," + iSessionNmbr + ",'EV')";
                                             oData.ExecuteWithTrans(insqry, con, trans);
 
-                                            string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + oSession.LoginId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
+                                            string updqry = "UPDATE DSTempHdr SET ModificationInd=1,ModifiedBy=" + userId + ",ModifiedOn=GETDATE() WHERE DSTempHdrId=" + oTemp.TemplateId;
                                             oData.ExecuteWithTrans(updqry, con, trans);
                                         }
                                     }
@@ -25790,17 +25886,17 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
                         sEventType = "PROMPT MOVEDOWN";
                         if (sesResult[0] != null)
-                            oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, sesResult[0].CompletionStatus, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
+                            oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sNextLessonPrompt, sesResult[0].CompletionStatus, sEventType, iSessionNmbr, userId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                         else
                         {
                             if (DiscreteFreqDurTextFlag)
                             {
-                                oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sNextLessonPrompt, CompletionStatusSet, sEventType, iSessionNmbr, oSession.LoginId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
+                                oDisc.updatePromptStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sNextLessonPrompt, CompletionStatusSet, sEventType, iSessionNmbr, userId, Convert.ToInt32(sCurrentLessonPrompt), iCurrentSetId, iCurrentStep, sLessonPlanId, con, trans);
                             }
                         }
                         //if (sesResult[0].CompletionStatus == "COMPLETED")
                         //{
-                        //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, sesResult[0].CompletionStatus, sEventType, iSessionNmbr);
+                        //    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, sesResult[0].CompletionStatus, sEventType, iSessionNmbr);
                         //}
                     }
                     else
@@ -25810,7 +25906,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         if (!bRuleStatusIOA)
                         {
                             // Functionto reset rule type values in StdtEvent Table
-                            oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                            oDisc.resetEvntStatus(oSession.Classid, studentId, oTemp.TemplateId);
                             sEventAlertStatus = "IOAEvntStatus=true,Prompt_MoveDown=true";
                             // Functionto Update rule Events values in StdtEvent Table
                             oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventAlertStatus);
@@ -25818,7 +25914,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         if (!bRuleStatusMultiTchr)
                         {
                             // Functionto reset rule type values in StdtEvent Table
-                            oDisc.resetEvntStatus(oSession.Classid, oSession.StudentId, oTemp.TemplateId);
+                            oDisc.resetEvntStatus(oSession.Classid, studentId, oTemp.TemplateId);
                             sEventAlertStatus = "MultiTchrEvntStatus=true,Prompt_MoveDown=true";
                             // Functionto Update rule Events values in StdtEvent Table
                             oDisc.UpdateAlertEvent(oTemp.TemplateId, sEventType);
@@ -25837,7 +25933,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             if (bSetCompleted)
                             {
                                 //bStatusFlag = true;
-                                oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                             }
                             else if (bSetMoveUp == true)
                             {
@@ -25852,7 +25948,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             {
                                 if (bSetCompleted)
                                 {
-                                    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                    oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                                 }
                                 else if (bSetMoveUp == true)
                                 {
@@ -25868,7 +25964,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                         {
                             if (bSetCompleted)
                             {
-                                oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, oSession.StudentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, oSession.LoginId, sLessonPlanId, con, trans);
+                                oDisc.insertEventStatus(oSession.SchoolId, oSession.Classid, studentId, oTemp.TemplateId, iCurrentSetId, "COMPLETED", sEventType, iSessionNmbr, userId, sLessonPlanId, con, trans);
                             }
                             else if (bSetMoveUp == true)
                             {
@@ -28963,6 +29059,9 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             trans = con.BeginTransaction();
             if (Convert.ToInt32(hfAutoSaveCount.Value) > 0)
             {
+                oSession = (clsSession)Session["UserSession"];
+                Pagepath = "Datasheet : Timer1_Tick";
+                IDChecks();
                 updateDraft(Convert.ToInt32(ViewState["StdtSessHdr"]), "Save", con, trans);
                 oData.CommitTransation(trans, con);
                 con.Close();
@@ -30662,6 +30761,9 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     bool reslt = SaveDraft("D", "N", "insert", con, trans, false);
                     if (reslt)
                     {
+
+                        Pagepath = "Datasheet : btn_go_Click";
+                        IDChecks();
                         bool reslt2 = SaveMeasuremnts(Convert.ToInt32(ViewState["StdtSessHdr"].ToString()), con, trans);
                         if (reslt2) oData.CommitTransation(trans, con);
                         else if (trans.Connection.State == ConnectionState.Open) oData.RollBackTransation(trans, con);
@@ -30756,6 +30858,9 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         bool reslt = SaveDraft("D", "N", "insert", con, trans, false);
         if (reslt)
         {
+            oSession = (clsSession)Session["UserSession"];
+            Pagepath = "Datasheet : btn_continue_Click";
+            IDChecks();
             bool reslt2 = SaveMeasuremnts(Convert.ToInt32(ViewState["StdtSessHdr"].ToString()), con, trans);
             if (reslt2) oData.CommitTransation(trans, con);
             else if (trans.Connection.State == ConnectionState.Open) oData.RollBackTransation(trans, con);
@@ -31065,6 +31170,8 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
 
             oData = new clsData();
             oSession = (clsSession)Session["UserSession"];
+            Pagepath = "Datasheet : Continue_IsM_True";
+            IDChecks();
             oTemp = (ClsTemplateSession)Session["BiweeklySession"];
 
             oData = new clsData();
@@ -31268,6 +31375,8 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         SqlTransaction trans = null;
         try
         {
+            Pagepath = "Datasheet : btnAddTrial_Click";
+            IDChecks();
             Session["ISAddTrial"] = "True";
             SaveDraft();
             tdMsg.InnerHtml = "";
@@ -32448,6 +32557,9 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
     protected void btnSave2_Click(object sender, EventArgs e)
     {
         int printSave = 1;
+        oSession = (clsSession)Session["UserSession"];
+        Pagepath = "Datasheet : btnSave2_Click";
+        IDChecks();
         SaveDraft();
         if (Convert.ToBoolean(ViewState["IsHistory"]) == true)
         {
@@ -32987,6 +33099,23 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         catch (Exception ex)
         {
             clsData.WriteToLog("Error logging combined data:"+ex.ToString());
+        }
+    }
+    protected void IDChecks()
+    {
+        oSession = clsGeneralSchk.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, PreClassid, Sessstname, Pagepath);
+        userId = oSession.LoginId;
+        studentId = oSession.StudentId;
+        classId = oSession.Classid;
+        schoolId = oSession.SchoolId;
+        if (userId != preid || studentId != SessStudentid || classId != PreClassid)
+        {
+            if (curesesid == Prevsess.SessionID)
+            {
+                userId = preid;
+                studentId = SessStudentid;
+                classId = PreClassid;
+            }
         }
     }
       
