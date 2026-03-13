@@ -630,6 +630,37 @@ public partial class Home : System.Web.UI.Page
         }
     }
 
+    [WebMethod]
+    public static bool getStudentStatus(string studId)
+    {
+        try
+        {
+            clsSession objSess = (clsSession)HttpContext.Current.Session["UserSession"];
+            if (objSess == null)
+            {
+                HttpContext.Current.Response.Redirect("~/Administration/Error.aspx?Error=Your session has expired. Please log-in again");
+            }
+
+            int studentId = Convert.ToInt32(studId.Split('-')[1]);
+
+            // Check if a check-in record exists for today
+            bool blExist = objData.IFExists(
+                "SELECT StudentId FROM StdtSessEvent " +
+                "WHERE StudentId=" + studentId +
+                " AND ClassId=" + objSess.Classid +
+                " AND EventType='CH' " +
+                " AND SchoolId=" + objSess.SchoolId +
+                " AND CONVERT(DATE,CreatedOn)=CONVERT(DATE,GETDATE()) " +
+                " AND CheckStatus='True'"
+            );
+
+            return blExist;  // true = checked in, false = not checked in
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+    }
 
     [WebMethod]
     public static clsSubmenu[] FillSubMenu(string Menu)
@@ -681,14 +712,14 @@ public partial class Home : System.Web.UI.Page
             }
             if (Menu.Trim() == "DATASHEETS")
             {
-                if (IsChecked == true)
-                {
+                //if (IsChecked == true)
+                //{
                     dt = oSubmenu.getSubmenuList(Menu.Replace("\n", "").Trim(), oSession.StudentId.ToString(), oSession.SchoolId);
-                }
-                else
-                {
-                    return null;
-                }
+                //}
+                //else
+                //{
+                //    return null;
+                //}
             }
             else
             {
