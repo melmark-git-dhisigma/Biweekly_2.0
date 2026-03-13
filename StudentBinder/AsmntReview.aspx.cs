@@ -302,7 +302,7 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
                             //ul_Goals.InnerHtml += "<a href='#' id='" + drLP["LessonPlanId"].ToString() + "' class='grmb' onclick='AssignGoalAndLPs(this.id,this.firstChild.textContent," + goalid + "," + glname + "," + LPdesc + ");'>" +
                             //    "<div style='height: 20px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; width:56%;' title='" + drLP["LessonPlanName"].ToString() + "'>" + drLP["LessonPlanName"].ToString() +
                             //    "</div><div class='grapgContainer'><span style='background-position:-" + pos + "px;'></span><p>" + drLP["Percentage"].ToString() + "%</p></div></a>";
-                            string lpName = "&apos;" + HttpUtility.JavaScriptStringEncode(drLP["LessonPlanName"].ToString()) + "&apos;";
+
                             ul_Goals.InnerHtml += "<div class='grmb'><a style='width:100px;' href='#' id='" + drLP["LessonPlanId"].ToString() + "'  onclick='AssignGoalAndLPs(this.id,this.firstChild.textContent," + goalid + "," + glname + "," + LPdesc + ");'>" +
                                "<div style='height: 20px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;' title='" + drLP["LessonPlanName"].ToString() + "'>" + drLP["LessonPlanName"].ToString() +
                                "</div></a><img id='" + drLP["LessonPlanId"].ToString() + "' onclick='LoadLessonView(this.id," + goalid + ");' src='images/transbtn.png' height='15px' width='15px' style='float:right;margin:0 10px 0 0;' /><div class='grapgContainer'>" +
@@ -912,8 +912,8 @@ public partial class StudentBinder_AsmntReview : System.Web.UI.Page
                         //        "<div style='height: 20px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; width:56%;' title='" + drLP["LessonPlanName"].ToString() + "'>" + drLP["LessonPlanName"].ToString() +
                         //        "</div></a>";
 
-                        string lpName = HttpUtility.JavaScriptStringEncode(drLP["LessonPlanName"].ToString());
-                        ul_Goals.InnerHtml += "<div class='grmb'><a style='width:137px;' href='#' id='" + drLP["LessonPlanId"].ToString() + "'  onclick='AssignGoalAndLPs(this.id,this.firstChild.textContent," + goalid + ",&apos;" + goalname + "&apos;,&apos;" + drLP["LessonPlanDesc"].ToString() + "&apos;,&apos;" + lpName + "&apos;);'>" +
+
+                        ul_Goals.InnerHtml += "<div class='grmb'><a style='width:137px;' href='#' id='" + drLP["LessonPlanId"].ToString() + "'  onclick='AssignGoalAndLPs(this.id,this.firstChild.textContent," + goalid + ",&apos;" + goalname + "&apos;,&apos;" + drLP["LessonPlanDesc"].ToString() + "&apos;);'>" +
                                "<div style='height: 20px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; width:110%;' title='" + drLP["LessonPlanName"].ToString() + "'>" + drLP["LessonPlanName"].ToString() +
                                "</div></a><img id='" + drLP["LessonPlanId"].ToString() + "' onclick='LoadLessonView(this.id," + goalid + ");' src='images/transbtn.png' height='15px' width='15px' style='float:right;margin:0 10px 0 0;' /></div>";
 

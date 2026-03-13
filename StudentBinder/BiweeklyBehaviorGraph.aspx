@@ -1674,7 +1674,7 @@
             // rate duplicate data start
                 
                 
-                    Highcharts.chart('rategraph', {
+                Highcharts.chart('rategraph', {
                     exporting: {
                         enabled: false
                     },
@@ -2882,7 +2882,7 @@
                         }
                         // alert(ratefinal);
                         // rate duplicate data start
-                    Highcharts.chart('rategraph', {
+                        Highcharts.chart('rategraph', {
                             exporting: {
                                 enabled: false
                             },

@@ -1602,7 +1602,7 @@
             }
             
             function drawGraph(treatment, secstatus, leftY, rightY, ser, plotdata, rownum, leftmax, rightmax, minxvalue, maxxvalue, rotangle) {
-                            var chart = Highcharts.chart('cont', {
+                var chart = Highcharts.chart('cont', {
                     exporting: {
                         enabled: false
                     },

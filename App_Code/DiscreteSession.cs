@@ -695,7 +695,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
 
 
         strQueryMo = "SELECT RNK FROM (SELECT DSTempStepId,SortOrder,RANK() OVER (ORDER BY SortOrder) RNK FROM DSTempStep " +
-                    " WHERE DSTempHdrId = " + templateId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId=" + templateId + " AND ActiveInd = 'A') AND ActiveInd='A' ) AS Temp WHERE SortOrder = " + stepNumber;
+                    " WHERE DSTempHdrId = " + templateId + " AND DSTempSetId=" + SetId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId=" + templateId + " AND ActiveInd = 'A') AND ActiveInd='A' ) AS Temp WHERE SortOrder = " + stepNumber;
 
         object stepNumMo = objData.FetchValue(strQueryMo);
         string MasterOrder = "";
@@ -780,7 +780,7 @@ WHERE DSTempHdrId =27544 AND StudentId = 1 ) ORDER BY SS.StdtSessionHdrId
 
 
             strQueryMo = "SELECT RNK FROM (SELECT DSTempStepId,SortOrder,RANK() OVER (ORDER BY SortOrder) RNK FROM DSTempStep " +
-                        " WHERE DSTempHdrId = " + templateId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId=" + templateId + " AND ActiveInd = 'A') AND ActiveInd='A' ) AS Temp WHERE SortOrder = " + stepNumber;
+                        " WHERE DSTempHdrId = " + templateId + " AND DSTempSetId=" + SetId + " AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId=" + templateId + " AND ActiveInd = 'A') AND ActiveInd='A' ) AS Temp WHERE SortOrder = " + stepNumber;
           
             object stepNumMo = objData.FetchValue(strQueryMo);
             string MasterOrder = "";

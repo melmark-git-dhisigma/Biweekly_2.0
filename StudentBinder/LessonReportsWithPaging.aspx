@@ -1620,7 +1620,7 @@
                  //arrow end
                  //Event plot End
                              //Start Highchart
-                                     chart1 = Highcharts.chart('cont', {
+                 chart1 = Highcharts.chart('cont', {
                      exporting: {
                          enabled: false
                      },
@@ -1849,7 +1849,7 @@
                               medicData.push(meddata);
                                                  val = val + 1
                           });
-                                             chart2 = Highcharts.chart('medcont', {
+                          chart2 = Highcharts.chart('medcont', {
                               exporting: {
                                   enabled: false
                               },

@@ -369,7 +369,7 @@
 
             function succesMsg(msg) {
                 if (msg == "Student Reminder Saved Successfully") {
-                    parent.getAlarm();
+                    //parent.getAlarm();
                 }
                 //alert(msg);
                 document.getElementById('tdMsg').innerHTML = "<div class='valid_box'>" + msg + ".</div>";
@@ -378,7 +378,7 @@
 
             function outerSuccesMsg(msg) {
                 if (msg == "Student Reminder Saved Successfully") {
-                    parent.getAlarm();
+                    //parent.getAlarm();
                 }
                 //alert(msg);
                 //document.getElementById('tdMsg').innerHTML = "<div class='valid_box'>" + msg + ".</div>";

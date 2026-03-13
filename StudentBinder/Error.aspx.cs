@@ -13,7 +13,7 @@ public partial class Admin_Error : System.Web.UI.Page
         sess = (clsSession)Session["UserSession"];
         if (sess == null)
         {
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "navToLogin();", true);
+            Response.Redirect("../Administration/Login.aspx");
         }
         if (Request.QueryString["Error"] != null)
         {

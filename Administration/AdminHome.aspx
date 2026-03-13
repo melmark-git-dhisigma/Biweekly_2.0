@@ -5,7 +5,6 @@
 
     <script type="text/javascript">
 
-
         function adjustStyle(width) {
             width = parseInt(width);
 

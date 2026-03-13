@@ -262,7 +262,7 @@
             var id; var chkIEP; var chkStat; var chkday; var chkdaystring;
             //window.setTimeout(function () {     //delay 4 secnds 
                 var flag;
-                PageMethods.CheckLpName(LP,LPName, function (data) {
+                PageMethods.CheckLpName(LP, LPname, function (data) {
                     $('#ul_selGoals').find(golid + ' .wrapper #LP_Loading').remove();
                     var status = data.split("*")[0]
                     if (status == 'multipleLP') {
