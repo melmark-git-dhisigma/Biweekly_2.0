@@ -953,7 +953,7 @@ public class clsData
 
             SqlCommand cmd = new SqlCommand(Query, con);
             SqlDataAdapter Da = new SqlDataAdapter(cmd);
-            cmd.CommandTimeout = 120;
+            cmd.CommandTimeout = 240;
             Da.Fill(Dt);
             cmd = null;
             Da = null;
