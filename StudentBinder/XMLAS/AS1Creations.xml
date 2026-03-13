@@ -7,7 +7,7 @@
       <Mapping Column="DateOfMeeting" PlaceHolder="PlcMeetingDate"/>
       <Mapping Column="GoalArea" PlaceHolder="PlcGoalArea"/>
       <Mapping Column="Goal" PlaceHolder="PlcGoal"/>
-      <Mapping Column="Benchmarks" PlaceHolder="plcBenchmarkGoal"/>
+      <Mapping Column="Objective" PlaceHolder="plcBenchmarkGoal"/>
       
       <Mapping Column="Curr" PlaceHolder="PlcCurrent"/>
       
@@ -64,7 +64,7 @@
       <Mapping Column="Prompt7" PlaceHolder="PlcPromt7"/>
 
       <Mapping Column="IOA1" PlaceHolder="Ioa1"/>
-      <Mapping Column="IOA2" PlaceHolder="PlcIoaPercent2"/>
+      <Mapping Column="IOA2" PlaceHolder="Ioa2"/>
       <Mapping Column="IOA3" PlaceHolder="Ioa3"/>
       <Mapping Column="IOA4" PlaceHolder="Ioa4"/>
       <Mapping Column="IOA5" PlaceHolder="Ioa5"/>

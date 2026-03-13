@@ -140,6 +140,7 @@
                 multiClickExport = true;
                 btn.style.opacity = '0.5';
                 $('#fullContents').fadeOut('fast');
+                $('#overlay').fadeIn('fast');
                 $('.loading').fadeIn('fast');
                 return true;
             }
@@ -410,6 +411,29 @@
             font-size: 14px;
         }
 
+        #newoverlay {
+            display:block;
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,0.5);
+            z-index:1000;
+            display:flex;
+            justify-content:center;
+            align-items:flex-start;
+            padding-top:3%;
+            padding-left:11%;
+        }
+
+        #newloader {
+            z-index:100000;
+            color:white;
+            font-size:20px;
+            text-align:center;
+        }
+
         </style>
     <script>
         function allowBackSpace(e, obj) {
@@ -426,6 +450,14 @@
 
 </head>
 <body>
+    <div id="newoverlay">
+        <div id="newloader">
+            <div class="innerLoading">
+                <img src="../Administration/images/load.gif" />
+                <div>Please Wait...</div>
+            </div>
+        </div>
+    </div>
     <form id="form1" runat="server">
         <asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>
        
@@ -506,7 +538,7 @@
                                                     <div class='nobdrrcontainer'>
                                                         <asp:DataList ID="dlAcdate" runat="server" OnItemCommand="lnkDate_Click">
                                                             <ItemTemplate>
-                                                                <asp:LinkButton ID="lnkDate" CssClass="grmb" runat="server" Text='<%# DataBinder.Eval(Container.DataItem,"EDate","{0:MM/dd/yyyy}") %>' ToolTip='<%# DataBinder.Eval(Container.DataItem,"EDate","{0:MM/dd/yyyy}") %>' CommandArgument='<%# DataBinder.Eval(Container.DataItem,"EDate","{0:MM/dd/yyyy}") %>'></asp:LinkButton>
+                                                                <asp:LinkButton ID="lnkDate" OnClientClick="ShowWaiting();" CssClass="grmb" runat="server" Text='<%# DataBinder.Eval(Container.DataItem,"EDate","{0:MM/dd/yyyy}") %>' ToolTip='<%# DataBinder.Eval(Container.DataItem,"EDate","{0:MM/dd/yyyy}") %>' CommandArgument='<%# DataBinder.Eval(Container.DataItem,"EDate","{0:MM/dd/yyyy}") %>'></asp:LinkButton>
                                                             </ItemTemplate>
                                                         </asp:DataList>
                                                             <div class='clear'></div>
@@ -545,36 +577,67 @@
                         <tr>
                                 <td class="auto-style4" rowspan="2">
                                 <asp:RadioButtonList ID="rbtnLsnClassTypeAc" runat="server" AutoPostBack="true" 
-                                    OnSelectedIndexChanged="LessonTypeSelect" Width="222px" RepeatDirection="Horizontal">
+                                    OnSelectedIndexChanged="LessonTypeSelect" Width="222px" RepeatDirection="Horizontal" RepeatLayout="Flow">
                                     <asp:ListItem Value="Day">Day</asp:ListItem>
                                     <asp:ListItem Value="Residence">Residence</asp:ListItem>
                                     <asp:ListItem Value="Day,Residence" Selected="True">Both</asp:ListItem>
                                 </asp:RadioButtonList>
                                 &nbsp;</td>
+                            <%--Lesson Plan Filter (Disabled)--%>
+                                <%--<td><asp:DropDownList ID="ddlLessonFilter" runat="server" AutoPostBack="true"
+                                    OnSelectedIndexChanged="LessonTypeSelect">
+                                    <asp:ListItem Text="Active" Value="Active"/>
+                                    <asp:ListItem Text="Maintenance" Value="Maintenance" />
+                                    <asp:ListItem Text="Inactive" Value="Inactive" />
+                                    <asp:ListItem Text="Only current IEP/ISP date range" Value="CurrentIEP" Selected="True" />
+                                    <asp:ListItem Text="All" Value="All" />
+                                </asp:DropDownList></td>--%>
                                 </tr>
 
-                        <table style="width: 100%">
+                        <table style="width:100%; border-collapse:collapse;">
                             
                             
                             
                             <tr>
-                                <td id="tdMsg1" runat="server" class="auto-style4">
-                                    <asp:Label ID="AttendeesLabel" runat="server" Text="Attendees :"></asp:Label>
-                                    &nbsp;<br />
-                                    <asp:TextBox ID="AttendeesText" runat="server" Height="57px" TextMode="MultiLine" Width="502px"></asp:TextBox>
+                                <td style="vertical-align:top;"></td>
+
+                                <td id="tdDateOfMeeting" runat="server" style="vertical-align:top; text-align:left;">
+                                    <table>
+                                        <tr>
+                                            <td>Date of Meeting:</td>
+                                            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<asp:TextBox ID="txtDateOfMeeting" runat="server" CssClass="datepicker" Height="30px" /></td>
+                                        </tr>
+                                    </table>
                                 </td>
-                                <td id="tdMsg2" runat="server" class="auto-style3">
-                                    <asp:Label ID="IepyearLabel" runat="server" Text="IEP/ISP Year"></asp:Label>
-                                   &nbsp;:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;<asp:TextBox ID="Iepyeartxt" runat="server" Height="30px"></asp:TextBox>
-                                    <br />
-                                    <br />
-                                    <asp:Label ID="Ieplbl" runat="server" Text="IEP/ISP Signature Date"></asp:Label>
-                                    &nbsp;:&nbsp;
-                                    <asp:TextBox ID="Ieptxt" runat="server" Height="30px"></asp:TextBox>
-                                    </td>
                             </tr>
-                            
+
+                            <tr>
+                                <td id="tdMsg1" runat="server" style="vertical-align:top;">
+                                    <asp:Label ID="AttendeesLabel" runat="server" Text="Attendees:" />
+                                    <br />
+                                    <asp:TextBox ID="AttendeesText" runat="server"
+                                        TextMode="MultiLine" Width="502px" Height="57px" />
+                                    </td>
+
+                                <td id="tdMsg2" runat="server" style="vertical-align:top; text-align:left;">
+                                    <table>
+                                        <tr>
+                                            <td>IEP/ISP Year:</td>
+                                            <td>
+                                                <asp:TextBox ID="Iepyeartxt" runat="server" Height="30px" />
+                                            </td>
+                            </tr>
+                                        <tr>
+                                            <td>IEP/ISP Signature Date:</td>
+                                            <td>
+                                                <asp:TextBox ID="Ieptxt" runat="server" Height="30px" />
+                                            </td>
+                                        </tr>
                             </table>
+                                </td>
+                            </tr>
+
+                        </table>
                         <asp:UpdatePanel ID="UpdatePanelAgendaItem" runat="server">
                             <ContentTemplate>
 
@@ -678,11 +741,11 @@
                                                                                         <tr>
                                                                                             <td style="width:90px" class="tdText bor">Benchmarks/ Objectives:</td>
                                                                                             <td style="text-align:left" class="bor">
-                                                                                                <div id="txtbenchaMark" style="float:left" runat="server" height="50px" width="640"><%#Eval("Objective3") %></div>
+                                                                                                <div id="txtbenchaMark" style="float:left" runat="server" height="50px" width="640"><%#Eval("Objective") %></div>
                                                                                             </td>
                                                                                         </tr>
                                                                                         <tr>
-                                                                                            <td style="width:90px" class="tdText bor">Benchmarks/ Objectives:</td>
+                                                                                            <td style="width:90px" class="tdText bor">Current Progress:</td>
                                                                                             <td id="td1" runat="server" colspan="2">
                                                                                                 <label id="ch4" runat="server" style="color: #808080; ">
                                                                                                  <input type="Checkbox" runat="server" name="termsChkbx4" id="Checkbox4"  onclick="updateColor(this)"/>
@@ -894,7 +957,7 @@
                                                                                                         </td>
                                                                                                     </tr>
                                                                                                     <tr class="AltRowStyle">
-                                                                                                        <td>IOA (date/init/%) :</td>
+                                                                                                        <td>IOA (#IOAs/Avg%) :</td>
                                                                                                         <td>
                                                                                                             <asp:Label ID="lblIOA1" runat="server" Text='<%#Eval("IOAPer1") %>'></asp:Label>
                                                                                                         </td>
@@ -1258,7 +1321,7 @@
                                                                                         <tr>
                                                                                             <td style="width:90px" class="tdText bor">Benchmarks/ Objectives:</td>
                                                                                             <td style="text-align:left" class="bor">
-                                                                                                 <div id="txtbenchaMark" runat="server" height="50px" width="640"><%#Eval("Benchmarks") %></div>
+                                                                                                 <div id="txtbenchaMark" runat="server" height="50px" width="640"><%#Eval("Objective") %></div>
                                                                                             </td>
                                                                                         </tr>
                                                                                         <tr>
@@ -1483,7 +1546,7 @@
                                                                                                         </td>
                                                                                                     </tr>
                                                                                                     <tr class="AltRowStyle">
-                                                                                                        <td>IOA (date/init/%) :</td>
+                                                                                                        <td>IOA (#IOAs/Avg%) :</td>
                                                                                                         <td>
                                                                                                             <asp:Label ID="lblIOA8" runat="server" Text='<%#Eval("IOA1") %>'></asp:Label>
                                                                                                         </td>
@@ -1665,12 +1728,12 @@
                                                                                                             </asp:TemplateField>
                                                                                                              <asp:TemplateField>
                                                                                                                 <ItemTemplate>
-                                                                                                                    <asp:ImageButton ID="btnDelRowCurMeeting" CssClass="btn btn-blue" ImageUrl="~/Administration/images/trash.png" runat="server" Text="X" CommandName="delete" CommandArgument='<%# Eval("PMtngIdEdit") %>'  OnClientClick="return confirm('Are you sure you want to delete?');" />
+                                                                                                                    <asp:ImageButton ID="btnDelRowCurMeetingEdit" CssClass="btn btn-blue" ImageUrl="~/Administration/images/trash.png" runat="server" Text="X" CommandName="delete" CommandArgument='<%# Eval("PMtngIdEdit") %>'  OnClientClick="return confirm('Are you sure you want to delete?');" />
                                                                                                                 </ItemTemplate>
                                                                                                             </asp:TemplateField>
                                                                                                             <asp:TemplateField>
                                                                                                                 <ItemTemplate>
-                                                                                                                    <asp:ImageButton ID="btnAddRowCurMeeting" runat="server" ImageUrl="~/Administration/images/plusNew.PNG" CommandName="AddRow" CssClass="btn btn-blue" />
+                                                                                                                    <asp:ImageButton ID="btnAddRowCurMeetingEdit" runat="server" ImageUrl="~/Administration/images/plusNew.PNG" CommandName="AddRow" CssClass="btn btn-blue" />
                                                                                                                 </ItemTemplate>
                                                                                                             </asp:TemplateField>
                                                                                                         </Columns>
@@ -1740,12 +1803,12 @@
                                                                                                             </asp:TemplateField>
                                                                                                             <asp:TemplateField>
                                                                                                                 <ItemTemplate>
-                                                                                                                    <asp:ImageButton ID="btnDelRowCurMeeting" CssClass="btn btn-blue" ImageUrl="~/Administration/images/trash.png" runat="server" Text="X" CommandName="delete" CommandArgument='<%# Eval("CMtngIdEdit") %>' OnClientClick="return confirm('Are you sure you want to delete?');" />
+                                                                                                                    <asp:ImageButton ID="btnDelRowCurMeetingEdit" CssClass="btn btn-blue" ImageUrl="~/Administration/images/trash.png" runat="server" Text="X" CommandName="delete" CommandArgument='<%# Eval("CMtngIdEdit") %>' OnClientClick="return confirm('Are you sure you want to delete?');" />
                                                                                                                 </ItemTemplate>
                                                                                                             </asp:TemplateField>
                                                                                                             <asp:TemplateField>
                                                                                                                 <ItemTemplate>
-                                                                                                                    <asp:ImageButton ID="btnAddRowCurMeeting" runat="server" ImageUrl="~/Administration/images/plusNew.PNG" CommandName="AddRow" CssClass="btn btn-blue" />
+                                                                                                                    <asp:ImageButton ID="btnAddRowCurMeetingEdit" runat="server" ImageUrl="~/Administration/images/plusNew.PNG" CommandName="AddRow" CssClass="btn btn-blue" />
                                                                                                                 </ItemTemplate>
                                                                                                             </asp:TemplateField>
                                                                                                         </Columns>
@@ -1961,6 +2024,33 @@
                 InitAutoCompl();
             });        
            
+
+            function bindGenericDatePickers() {
+
+                $(".datepicker").each(function () {
+
+                    var $this = $(this);
+
+                    if ($this.hasClass("hasDatepicker")) {
+                        $this.datepicker("destroy");
+                    }
+
+                    $this
+                        .datepicker({
+                            dateFormat: "mm-dd-yy",
+                            changeMonth: true,
+                            changeYear: true,
+                            showAnim: ""
+                        })
+                        .off("click") 
+                        .on("click", function () {
+                            $(this).datepicker("show");
+                        });
+                });
+            }
+            $(document).ready(function () {
+                bindGenericDatePickers();
+            });
 
             function InitializeRequest(sender, args) {
             }
@@ -2428,6 +2518,34 @@
                      }
                  }, true);
              })();
+
+             function ShowWaiting() {
+                 ShowLoader();
+                 $('#newoverlay').fadeIn('fast');         // Gray overlay
+                 $('.newloader').fadeIn('fast');         // Loader
+
+             }
+
+             function HideWaiting() {
+                 HideLoader();
+                 $('#newoverlay').fadeOut('fast');         // Gray overlay
+                 $('.newloader').fadeOut('fast');         // Loader
+
+             }
+
+
+             window.onload = function () {
+
+                 setTimeout(function () {
+
+                     document.getElementById("newoverlay").style.opacity = "0";
+                     document.getElementById("newloader").style.opacity = "0";
+
+                     setTimeout(HideWaiting, 200);
+
+                 }, 50);
+
+             };
 
         </script>
         <asp:Panel ID="pnlPersonDropdownGlobal" runat="server" ClientIDMode="Static" CssClass="dropdown-panel person-dropdown" style="display:none; position:absolute; z-index:99999;" onclick="event.stopPropagation();">
