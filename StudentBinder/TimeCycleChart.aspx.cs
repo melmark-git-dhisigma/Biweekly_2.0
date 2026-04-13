@@ -758,6 +758,19 @@ public partial class StudentBinder_TimeCycleChart : System.Web.UI.Page
                         
                     
                 }
+            else
+            {
+                hdnFlag.Value = "1";
+                ScriptManager.RegisterStartupScript(
+                    this,
+                    this.GetType(),
+                    "alertMessage",
+                    "alert('No Data available to export');",
+                    true
+                );
+                Loaddata(ddlLessonplan.Items[0].Value, false);
+            }
+
             }
     }
     private DateTime RoundToNearestHalfHour(DateTime dt)
