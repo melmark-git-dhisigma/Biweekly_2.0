@@ -2110,7 +2110,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 LoadMeetingsNew(dateOfMtng);
                 loadExtraData();
                 Datacarryover(dtst, dted);
-                rbtnLsnClassTypeAc.Visible = true;
+                rbtnLsnClassTypeAc.Visible = false;
                 tdMsg1.Visible = true;
                 tdMsg2.Visible = true;
                 tdreview2.Visible = true;
