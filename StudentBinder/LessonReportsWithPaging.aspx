@@ -1524,44 +1524,36 @@
                              if (item['EventName'] == null) {
                                  item['EventName'] = "";
                              }
-                             var datescorealign = findmaxscorefordate(res);
-                             var arr = checkarrow(res);
                              var str = item['EventName'];
                              var txtal; var xax;
                              var valign;
                              if (item['EventType'] == "Major") {
                                  txtal = 'right';
                                  xax = -2;
-                                 valign = getValueByAggredatedDate(item['AggredatedDate'], datescorealign, arr)
                              }
                              else {
                                  txtal = 'left';
                                  xax = 9;
-
-                                 valign = getValueByAggredatedDate(item['AggredatedDate'], datescorealign, arr);
                              }
                              plotdict['label'] = {
                                  text: str,
-                                // textAlign: txtal,
-                                 formatter: function () {
-                                     var labelText = this.options.text;
-                                     labelText = labelText.replace(/↑/g, '<span style="font-size: 15px;">↑</span>')
-                                         .replace(/↓/g, '<span style="font-size: 15px;">↓</span>');
-                                     return labelText;
-                                 },
-                                 useHTML: true,
+                                 rotation: -90,
+                                 align: 'center',
+                                 verticalAlign: 'middle',
+                                 textAlign: 'center',
+                                 x: xax,
+                                 y: 0,
+                                 crop: false,
+                                 overflow: 'allow',
                                  style: {
                                      fontWeight: 'normal',
                                      color: 'black',
-                                                         fontSize: sizeOffont,
+                                     fontSize: sizeOffont,
                                      fontFamily: 'Arial',
-                                     textShadow: 'none',
-                                 },
-                                 // align: 'right',
-                                 //  textAlign: 'right',
-                                 x: xax,
-                                 verticalAlign: valign,
-                                 rotation: -90
+                                     textShadow: 'none'
+                                 }
+                                 
+                                
                              };
                              plotdict['label']['overflow'] = 'justify';
                              plotdict['label']['crop'] = false;
@@ -2708,44 +2700,36 @@
                                              item['EventName'] = "";
                                          }
 
-                                         var datescorealign = findmaxscorefordate(res);
-                                         var arr = checkarrow(res);
-                                         var str = item['EventName'];
-                                         var txtal; var xax;
-                                         var valign;
-                                         if (item['EventType'] == "Major") {
-                                             txtal = 'right';
-                                             xax = -2;
-                                             valign = getValueByAggredatedDate(item['AggredatedDate'], datescorealign, arr)
-                                         }
-                                         else {
-                                             txtal = 'left';
-                                             xax = 9;
-                                             valign = getValueByAggredatedDate(item['AggredatedDate'], datescorealign, arr);
-                                         }
-                                         plotdict['label'] = {
-                                             text: str,
-                                             // textAlign: txtal,
-                                             formatter: function () {
-                                                 var labelText = this.options.text;
-                                                 labelText = labelText.replace(/↑/g, '<span style="font-size: 15px;">↑</span>')
-                                                     .replace(/↓/g, '<span style="font-size: 15px;">↓</span>');
-                                                 return labelText;
-                                             },
-                                             useHTML: true,
-                                             style: {
-                                                 fontWeight: 'normal',
-                                                 color: 'black',
-                                                 fontSize: sizeOffont,
-                                                 fontFamily: 'Arial',
-                                                 textShadow: 'none',
-                                             },
-                                             // align: 'right',
-                                             //  textAlign: 'right',
-                                             x: xax,
-                                             verticalAlign: valign,
-                                             rotation: -90
-                                         };
+                                           ;
+                                                 var str = item['EventName'];
+                                                 var txtal; var xax;
+                                                 var valign;
+                                                 if (item['EventType'] == "Major") {
+                                                     txtal = 'right';
+                                                     xax = -2;
+                                                 }
+                                                 else {
+                                                     txtal = 'left';
+                                                     xax = 9;
+                                                 }
+                                                 plotdict['label'] = {
+                                                     text: str,
+                                                     rotation: -90,
+                                                     align: 'center',
+                                                     verticalAlign: 'middle',
+                                                     textAlign: 'center',
+                                                     x: xax,
+                                                     y: 0,
+                                                     crop: false,
+                                                     overflow: 'allow',
+                                                     style: {
+                                                         fontWeight: 'normal',
+                                                         color: 'black',
+                                                         fontSize: sizeOffont,
+                                                         fontFamily: 'Arial',
+                                                         textShadow: 'none'
+                                                     }
+                                                 };
                                          plotdict['label']['overflow'] = 'justify';
                                          plotdict['label']['crop'] = false;
                                          plotdata.push(plotdict);
@@ -3241,67 +3225,7 @@
 
         
 
-             function findmaxscorefordate(data)
-             {
-                 var resultObj = {};
-
-                 for (var i = 0; i < data.length; i++) {
-                     var item = data[i];
-                     var date = item.AggredatedDate;
-
-                     if (!resultObj[date]) {
-                         resultObj[date] = {
-                             AggredatedDate: date,
-                             maxScore: item.Score
-                         };
-                     } else {
-                         if (item.Score > resultObj[date].maxScore) {
-                             resultObj[date].maxScore = item.Score;
-                         }
-                     }
-                 }
-
-                 var result = [];
-                 for (var key in resultObj) {
-
-                     var maxScore = resultObj[key].maxScore;
-
-                     var value = (maxScore !== null && maxScore > 0)
-                         ? "middle"
-                         : "bottom";
-
-                     result.push({
-                         AggredatedDate: key,
-                         value: value
-                     });
-                 }
-                 return result;
-             }
-             function getValueByAggredatedDate(dateToSearch, resultArray, arr) {
-                 for (var i = 0; i < resultArray.length; i++) {
-                     if (resultArray[i].AggredatedDate == dateToSearch) {
-                         if (arr.includes(dateToSearch)) {
-                             return "middle";
-                         }
-                         else{
-                             return "bottom";
-                         }
-                     }
-                 }
-                 return "middle"; 
-             }
-             function checkarrow(data) {
-                 var dateArray = [];
-
-                 for (var i = 0; i < data.length; i++) {
-                     var item = data[i];
-
-                     if (item.ArrowNote !== null && item.Score >= 0) {
-                         dateArray.push(item.AggredatedDate);
-                     }
-                 }
-                 return dateArray;
-             }
+             
         </script>
     </form>
 </body>
