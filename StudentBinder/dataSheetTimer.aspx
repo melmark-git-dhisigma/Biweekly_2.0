@@ -1810,7 +1810,7 @@
                             + '<div class="tabContent4" style="top:400px; border: 0px;">'
                             //start
                           + '<div id="butSavReset" style="margin-top:25px"><input type="button" id="btnSaveOther,' + ulId[BehavCount] + '" class="btns save" value="Save" onclick="saveFreqYesOrNo(' + ulId[BehavCount] + ',this)"/>'
-                            + '<input type="button" class="btnr reset" value="Reset" onclick="resetTimeIntervals(' + ulId[BehavCount] + ', this)"/>'
+                            + '<input type="button" class="btnr reset" value="Reset" onclick="resetFrequencyYesorNo(' + ulId[BehavCount] + ', this)"/>'
                            + '</div>'
                            //end
                            + '</div>'
@@ -1873,7 +1873,7 @@
                             + '<div class="tabContent4" style="top:230px; border: 0px;">'
                             //
                           + '<div id="butSavReset" style="margin-top:25px"><input type="button" id="btnSaveOther,' + ulId[BehavCount] + '" class="btns save" value="Save" onclick="saveYesOrNo(' + ulId[BehavCount] + ',this)"/>'
-                            + '<input type="button" class="btnr reset" value="Reset" onclick="resetTimeIntervals(' + ulId[BehavCount] + ', this)"/>'
+                            + '<input type="button" class="btnr reset" value="Reset" onclick="resetYesOrNo(' + ulId[BehavCount] + ', this)"/>'
                            + '</div>'
                            //
                            + '</div>'
@@ -1955,7 +1955,7 @@
                             + '<div class="tabContent4" style="top:325px; border: 0px;">'
                             //
                           + '<div id="butSavReset" style="margin-top:25px"><input type="button" id="btnSaveOther,' + ulId[BehavCount] + '" class="btns save" value="Save" onclick="saveOtherFreq(' + ulId[BehavCount] + ',this)"/>'
-                            + '<input type="button" class="btnr reset" value="Reset" onclick="resetTimeIntervals(' + ulId[BehavCount] + ', this)"/>'
+                            + '<input type="button" class="btnr reset" value="Reset" onclick="resetFrequency(' + ulId[BehavCount] + ', this)"/>'
                            + '</div>'
                            //
                            + '</div>'
@@ -2484,7 +2484,7 @@
                             + '<div class="tabContent4" style="top:295px; border: 0px;">'
                             //start
                           + '<div id="butSavReset" style="margin-top:25px"><input type="button" id="btnSaveOther,' + ulId[BehavCount] + '" class="btns save" value="Save" onclick="saveYesOrNo(' + ulId[BehavCount] + ',this)"/>'
-                            + '<input type="button" class="btnr reset" value="Reset" onclick="resetTimeIntervals(' + ulId[BehavCount] + ', this)"/>'
+                            + '<input type="button" class="btnr reset" value="Reset" onclick="resetYesOrNo(' + ulId[BehavCount] + ', this)"/>'
                            + '</div>'
                            //end
                            + '</div>'
@@ -2551,7 +2551,7 @@
                              + '<div class="tabContent4" style="top:375px; border: 0px;">'
                              //start
                           + '<div id="butSavReset" style="margin-top:25px"><input type="button" id="btnSaveOther,' + ulId[BehavCount] + '" class="btns save" value="Save" onclick="saveOtherFreq(' + ulId[BehavCount] + ',this)"/>'
-                            + '<input type="button" class="btnr reset" value="Reset" onclick="resetTimeIntervals(' + ulId[BehavCount] + ', this)"/>'
+                            + '<input type="button" class="btnr reset" value="Reset" onclick="resetFrequency(' + ulId[BehavCount] + ', this)"/>'
                            + '</div>'
                            //end
                            + '</div>'
@@ -3180,6 +3180,24 @@
         }
         function resetOther(thisElem) {
 
+        }
+        function resetFrequencyYesorNo(behaveId, thisElem) {
+            drpfrq = document.getElementById('lblFrqCount' + behaveId);
+            drpfrq.value = '';
+            $('#btnYes' + behaveId).removeClass();
+            $('#btnYes' + behaveId).addClass("btnNothingClick");
+            $('#btnNo' + behaveId).removeClass();
+            $('#btnNo' + behaveId).addClass("btnNothingClick");
+        }
+        function resetFrequency(behaveId, thisElem) {
+            drpfrq = document.getElementById('lblFrqCount' + behaveId);
+            drpfrq.value = '';
+        }
+        function resetYesOrNo(behaveId, thisElem) {
+            $('#btnYes' + behaveId).removeClass();
+            $('#btnYes' + behaveId).addClass("btnNothingClick");
+            $('#btnNo' + behaveId).removeClass();
+            $('#btnNo' + behaveId).addClass("btnNothingClick");
         }
         function resetOther1(thisElem) {
             //resetOther calls are commented
