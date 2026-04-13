@@ -90,6 +90,35 @@
             label.style.fontWeight = "normal";
         }
     }
+    function loadDateFields() {
+
+        $('.dateField').each(function () {
+
+            if ($(this).hasClass('hasDatepicker')) {
+                $(this).datepicker('destroy');
+            }
+
+            $(this)
+                .attr('readonly', true)
+                .datepicker({
+                    dateFormat: "mm/dd/yy",
+                    changeMonth: true,
+                    changeYear: true
+                });
+        });
+    }
+
+    $(document).ready(function () {
+        loadDateFields();
+    });
+
+
+    if (typeof (Sys) !== "undefined") {
+        Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
+            loadDateFields();
+        });
+    }
+
 </script>
     
     <script type="text/javascript">
@@ -196,6 +225,7 @@
                      $('#overlay').fadeOut('slow');
                  });
              });
+             $("#txtSdate, #txtEdate").attr("readonly", true);
              //Upadte end date after start date change
              $("#txtSdate").datepicker({
                  dateFormat: "mm/dd/yy",
@@ -207,11 +237,11 @@
                      //add 98 days to selected date
                      startDate.setDate(startDate.getDate() + 98);
                      var minDate = dt2.datepicker('getDate');
-                     if (new Date(today) < new Date(startDate)) {
-                         dt2.datepicker('setDate', today);
-                         dt2.datepicker('option', 'maxDate', today);
-                     }
-                     else
+                     //if (new Date(today) < new Date(startDate)) {
+                     //    dt2.datepicker('setDate', today);
+                     //    dt2.datepicker('option', 'maxDate', today);
+                     //}
+                     //else
                          dt2.datepicker('setDate', startDate);
                      
                  }
@@ -219,6 +249,7 @@
              //Upadte start date after end date change
              $('#txtEdate').datepicker({
                  dateFormat: "mm/dd/yy",
+                 maxDate: +98,
                  onSelect: function () {
                      var dt1 = $('#txtSdate');
                      var endDate = $(this).datepicker('getDate');
@@ -483,6 +514,11 @@
         }
         
 
+        function showLoaderRbtn() {
+            ShowLoader();
+            var hdn = document.getElementById('<%= HiddenFieldRbtn.ClientID %>');
+            hdn.value = '1';
+        }
        
     </script>
 
@@ -616,11 +652,13 @@
                         <tr>
                                 <td class="auto-style4" rowspan="2">
                                 <asp:RadioButtonList ID="rbtnLsnClassTypeAc" runat="server" AutoPostBack="true" 
-                                    OnSelectedIndexChanged="LessonTypeSelect" Width="222px" RepeatDirection="Horizontal" RepeatLayout="Flow">
+                                    onchange="showLoaderRbtn();" Width="222px" RepeatDirection="Horizontal" RepeatLayout="Flow">
                                     <asp:ListItem Value="Day">Day</asp:ListItem>
                                     <asp:ListItem Value="Residence">Residence</asp:ListItem>
                                     <asp:ListItem Value="Day,Residence" Selected="True">Both</asp:ListItem>
                                 </asp:RadioButtonList>
+                                    <asp:HiddenField ID="HiddenFieldRbtn" Value="0" runat="server" />
+                                    
                                 &nbsp;</td>
                             <%--Lesson Plan Filter (Disabled)--%>
                                 <%--<td><asp:DropDownList ID="ddlLessonFilter" runat="server" AutoPostBack="true"
@@ -644,7 +682,7 @@
                                     <table>
                                         <tr>
                                             <td>Date of Meeting:</td>
-                                            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<asp:TextBox ID="txtDateOfMeeting" runat="server" CssClass="datepicker" Height="30px" /></td>
+                                            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<asp:TextBox ID="txtDateOfMeeting" runat="server" CssClass="datepicker" onkeydown="return false;" Height="30px" onpaste="return false;"/></td>
                                         </tr>
                                     </table>
                                 </td>
@@ -669,7 +707,7 @@
                                         <tr>
                                             <td>IEP/ISP Signature Date:</td>
                                             <td>
-                                                <asp:TextBox ID="Ieptxt" runat="server" Height="30px" />
+                                                <asp:TextBox ID="Ieptxt" runat="server" CssClass="dateField" Height="30px" />
                                             </td>
                                         </tr>
                             </table>
@@ -700,7 +738,7 @@
 </asp:TemplateField>
         <asp:TemplateField HeaderText="Date Added">
     <ItemTemplate>
-        <asp:TextBox ID="txtDateAdded" runat="server" Text='<%# Eval("DateAdded") %>'></asp:TextBox>
+        <asp:TextBox ID="txtDateAdded" runat="server" CssClass="dateField" Text='<%# Eval("DateAdded") %>'></asp:TextBox>
     </ItemTemplate>
 </asp:TemplateField>
                 <asp:TemplateField HeaderText="Discussed">
@@ -1172,7 +1210,7 @@
                                                                                                             </asp:TemplateField>
                                                                                                             <asp:TemplateField HeaderText="Deadlines">
                                                                                                                 <ItemTemplate>
-                                                                                                                    <asp:TextBox runat="server" ID="txtPDeadlines" Placeholder="MM/DD/YYYY" Width="100px" ValidationGroup="Group1" Text='<%# Eval("PDeadlines") %>'  Enabled="true"></asp:TextBox>
+                                                                                                                    <asp:TextBox runat="server" ID="txtPDeadlines" CssClass="dateField" Placeholder="MM/DD/YYYY" Width="100px" ValidationGroup="Group1" Text='<%# Eval("PDeadlines") %>'  Enabled="true"></asp:TextBox>
                                                                                                                     <asp:RegularExpressionValidator runat="server" ControlToValidate="txtPDeadlines" ValidationExpression="(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$"
                                                                                                                             ErrorMessage="*" ValidationGroup="Group1" />
                                                                                                                 </ItemTemplate>
@@ -1248,7 +1286,7 @@
                                                                                                             </asp:TemplateField>
                                                                                                             <asp:TemplateField HeaderText="Deadlines">
                                                                                                                 <ItemTemplate>
-                                                                                                                    <asp:TextBox runat="server" ID="txtCDeadlines" Placeholder="MM/DD/YYYY" Width="100px" Text='<%# Eval("CDeadlines") %>' ></asp:TextBox>
+                                                                                                                    <asp:TextBox runat="server" ID="txtCDeadlines" CssClass="dateField" Placeholder="MM/DD/YYYY" Width="100px" Text='<%# Eval("CDeadlines") %>' ></asp:TextBox>
                                                                                                                     <asp:RegularExpressionValidator runat="server" ControlToValidate="txtCDeadlines" ValidationExpression="(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$"
                                                                                                                             ErrorMessage="*" ValidationGroup="Group1" />
                                                                                                                 </ItemTemplate>
@@ -1760,7 +1798,7 @@
                                                                                                             </asp:TemplateField>
                                                                                                             <asp:TemplateField HeaderText="Deadlines">
                                                                                                                 <ItemTemplate>
-                                                                                                                    <asp:TextBox runat="server" ID="txtPDeadlinesEdit" Placeholder="MM/DD/YYYY" Width="100px" Text='<%# Eval("PDeadlinesEdit") %>' Enabled="true"></asp:TextBox>
+                                                                                                                    <asp:TextBox runat="server" ID="txtPDeadlinesEdit" CssClass="dateField" Placeholder="MM/DD/YYYY" Width="100px" Text='<%# Eval("PDeadlinesEdit") %>' Enabled="true"></asp:TextBox>
                                                                                                                     <asp:RegularExpressionValidator runat="server" ControlToValidate="txtPDeadlinesEdit" ValidationExpression="(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$"
                                                                                                                             ErrorMessage="*" ValidationGroup="Group1" />
                                                                                                                 </ItemTemplate>
@@ -1835,7 +1873,7 @@
                                                                                                             </asp:TemplateField>
                                                                                                             <asp:TemplateField HeaderText="Deadlines">
                                                                                                                 <ItemTemplate>
-                                                                                                                    <asp:TextBox runat="server" ID="txtCDeadlinesEdit" Placeholder="MM/DD/YYYY" Width="100px" Text='<%# Eval("CDeadlinesEdit") %>' ></asp:TextBox>
+                                                                                                                    <asp:TextBox runat="server" ID="txtCDeadlinesEdit" CssClass="dateField" Placeholder="MM/DD/YYYY" Width="100px" Text='<%# Eval("CDeadlinesEdit") %>' ></asp:TextBox>
                                                                                                                     <asp:RegularExpressionValidator runat="server" ControlToValidate="txtCDeadlinesEdit" ValidationExpression="(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$"
                                                                                                                             ErrorMessage="*" ValidationGroup="Group1" />
                                                                                                                 </ItemTemplate>
@@ -1983,11 +2021,11 @@
                                         <td style="width: 20%" class="tdText">Start Date:</td>
                                         <td style="width: 1%"><span style="color: red">*</span></td>
                                         <td style="width: 35%" class="tdText">
-                                            <asp:TextBox ID="txtSdate" runat="server" CssClass="textClass" Width="250px" onkeypress="return false" onkeydown='allowBackSpace(event,this)' onpaste="return false"></asp:TextBox></td>
+                                            <asp:TextBox ID="txtSdate" runat="server" CssClass="textClass" Width="250px" onkeydown='allowBackSpace(event,this)'></asp:TextBox></td>
                                         <td style="width: 10%" class="tdText">End Date:</td>
                                         <td style="width: 1%"><span style="color: red">*</span></td>
                                         <td style="width: 35%" class="tdText">
-                                            <asp:TextBox ID="txtEdate" runat="server" CssClass="textClass" Width="250px" onkeypress="return false" onkeydown='allowBackSpace(event,this)' onpaste="return false"></asp:TextBox></td>
+                                            <asp:TextBox ID="txtEdate" runat="server" CssClass="textClass" Width="250px" onkeydown='allowBackSpace(event,this)'></asp:TextBox></td>
                                     </tr>
 
                                     <tr>
@@ -2076,7 +2114,7 @@
 
                     $this
                         .datepicker({
-                            dateFormat: "mm-dd-yy",
+                            dateFormat: "mm/dd/yy",
                             changeMonth: true,
                             changeYear: true,
                             showAnim: ""

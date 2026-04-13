@@ -50,6 +50,11 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
         sess = (clsSession)Session["UserSession"];
+        if (HiddenFieldRbtn.Value == "1")
+        {
+            LessonTypeSelect(sender, e);
+            HiddenFieldRbtn.Value = "0";
+        }
         if (!ClientScript.IsStartupScriptRegistered("persons"))
         {
             RegisterPersonsScript();
@@ -138,6 +143,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
         }
         js.Append("];");
         ScriptManager.RegisterStartupScript(this, GetType(), "persons", js.ToString(), true);
+        ScriptManager.RegisterStartupScript(this, this.GetType(), "loadDates", "loadDateFields();", true );
     }
 
 
@@ -769,15 +775,20 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
         Dtcheck = objData.ReturnDataTable(strQuery2, false);
         string strQuery3 = "select  MetObjective,MetGoal,NotMaintaining from StdtAcdSheet WHERE StudentId=" + sess.StudentId + " and CONVERT(char(10),DateOfMeeting,101)='" + stDate + "' AND CONVERT(char(10),EndDate,101)='" + endDate + "'";
         Dtcheck2 = objData.ReturnDataTable(strQuery3, false);
+        if (Dtcheck != null && Dtcheck.Rows.Count > 0)
+        {
         AttendeesText.Text = Dtcheck.Rows[0]["Attendees"].ToString();
         Iepyeartxt.Text = Dtcheck.Rows[0]["IEPYear"].ToString();
         Ieptxt.Text = Dtcheck.Rows[0]["IEPSigDate"].ToString();
         ReviewbydateUpdate.Text = Dtcheck.Rows[0]["Reviewed"].ToString();
-
+        }
         System.Data.DataTable ac = new System.Data.DataTable();
         string strQueryfind = "select Top 1 AccSheetId from StdtAcdSheet WHERE StudentId=" + sess.StudentId + " and CONVERT(char(10),DateOfMeeting,101)='" + stDate + "' AND CONVERT(char(10),EndDate,101)='" + endDate + "'";
         ac = objData.ReturnDataTable(strQueryfind, false);
+        if (ac != null && ac.Rows.Count > 0)
+        {
         ViewState["CurrentAccId"] = ac.Rows[0]["AccSheetId"];
+        }
         if (Dt != null)
         {
             if (Dt.Rows.Count > 0)
@@ -2048,15 +2059,12 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
     
     protected void btnPreAccSheet1_Click(object sender, EventArgs e)
     {
-        btnUpdateNew.Visible = false;
+        //btnUpdateNew.Visible = false;
         txtEdate.Text = DateTime.Now.Date.ToString("MM'/'dd'/'yyyy");
         DateTime Sdate = DateTime.Now.Date.AddDays(-98);
         txtSdate.Text = Sdate.Date.ToString("MM'/'dd'/'yyyy");
         string popup = " $(document).ready(function () { $('#overlay').fadeIn('fast',function () { $('#dialog').css('top', '5%'); $('#dialog').show(); }); $('#CancalGen').click(function () { $('#dialog').animate({ top: '-300%' }, function () { $('#overlay').fadeOut('slow'); }); }); });";
         ScriptManager.RegisterClientScriptBlock(this, typeof(System.Web.UI.Page), Guid.NewGuid().ToString(), popup, true);
-        AttendeesText.Text = "";
-        Iepyeartxt.Text = "";
-        Ieptxt.Text = "";
         ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
         // FillStudent();
     }
@@ -2083,6 +2091,9 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             tdMsg2.Visible = false;
             tdreview2.Visible = false;
             gvAgendaItem.Visible = false;
+            AttendeesText.Text = "";
+            Iepyeartxt.Text = "";
+            Ieptxt.Text = "";
             //btnBack.Text = "Cancel";
 
             string testIfPresent = "select AccSheetId from StdtAcdSheet where StudentId=" + sess.StudentId + " AND CONVERT(datetime,DateOfMeeting)=CONVERT(datetime,'" + dtst.ToString("MM/dd/yyyy") + "') AND CONVERT(datetime,EndDate)=CONVERT(datetime,'" + dted.ToString("MM/dd/yyyy") + "')";
