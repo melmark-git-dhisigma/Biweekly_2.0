@@ -253,7 +253,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
         dted = DateTime.ParseExact(txtEdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
 
         DateTime dateNow1 = dtst;
-        DateTime dateNow2 = dateNow1.AddDays(+14);
+        DateTime dateNow2 = dateNow1.AddDays(+13);
         DateTime dateNow3 = dateNow2.AddDays(+14);
         DateTime dateNow4 = dateNow3.AddDays(+14);
         DateTime dateNow5 = dateNow4.AddDays(+14);
@@ -2007,7 +2007,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             //DateTime dateNow1 = dateNow2.AddDays(-14);
 
             DateTime dateNow1 = dtst;
-            DateTime dateNow2 = dateNow1.AddDays(+14);
+            DateTime dateNow2 = dateNow1.AddDays(+13);
             DateTime dateNow3 = dateNow2.AddDays(+14);
             DateTime dateNow4 = dateNow3.AddDays(+14);
             DateTime dateNow5 = dateNow4.AddDays(+14);
@@ -2098,7 +2098,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 ViewState["CurrentDate"] = dateOfMtng;
                 LoadMeetingsNew(dateOfMtng);
                 loadExtraData();
-                Datacarryover(dted.ToString("MM/dd/yyyy"));
+                Datacarryover(dtst, dted);
                 rbtnLsnClassTypeAc.Visible = true;
                 tdMsg1.Visible = true;
                 tdMsg2.Visible = true;
@@ -2163,8 +2163,10 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
         return result;
     }
 
-    protected void Datacarryover(string endDate)
+    protected void Datacarryover(DateTime dtSt ,DateTime dtEd)
     {
+        string endDate = dtEd.ToString("MM/dd/yyyy");
+        string startDate = dtSt.ToString("MM/dd/yyyy");
         if (btnSave.Visible)
         {
             objData = new clsData();
@@ -2223,10 +2225,12 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             //    " StdtAcdSheet where StudentId = " + sess.StudentId + " AND CONVERT(datetime,EndDate)<CONVERT(datetime,'" + endDate + "') order by EndDate desc))";
             //DataTable DtAg = objData.ReturnDataTable(prevACSheet1, false);
 
-            string prevACSheet2 = "SELECT IEPYear,IEPSigDate,GoalArea,MetObjective,MetGoal,NotMaintaining,Progressing1,Progressing2,Progressing3,Progressing4,Progressing5,Progressing6,Progressing7 FROM StdtAcdSheet" +
-                " WHERE AccSheetId in (select AccSheetId from StdtAcdSheet where StudentId = " + sess.StudentId + " AND EndDate in (select top 1 EndDate from StdtAcdSheet where StudentId = " +
-                sess.StudentId + " AND CONVERT(datetime,EndDate)<CONVERT(datetime,'" + endDate + "') order by EndDate desc) and DateOfMeeting in (select top 1 DateOfMeeting from " +
-                " StdtAcdSheet where StudentId = " + sess.StudentId + " AND CONVERT(datetime,EndDate)<CONVERT(datetime,'" + endDate + "') order by EndDate desc))";
+            string prevACSheet2 = "SELECT IEPYear,IEPSigDate,GoalArea,MetObjective,MetGoal,NotMaintaining,GoalArea, " + 
+                                  "Progressing1,Progressing2,Progressing3,Progressing4,Progressing5,Progressing6,Progressing7, " +
+                                  "Period1, Period2, Period3, Period4, Period5, Period6, Period7 " + 
+                                  "FROM StdtAcdSheet WHERE AccSheetId in (select AccSheetId from StdtAcdSheet where StudentId = " + sess.StudentId + " AND EndDate in (select top 1 EndDate from StdtAcdSheet where StudentId = " +
+                                   sess.StudentId + " AND CONVERT(datetime,EndDate)<CONVERT(datetime,'" + endDate + "') order by EndDate desc) and DateOfMeeting in (select top 1 DateOfMeeting from " +
+                                  "StdtAcdSheet where StudentId = " + sess.StudentId + " AND CONVERT(datetime,EndDate)<CONVERT(datetime,'" + endDate + "') order by EndDate desc))";
 
             System.Data.DataTable Dt = objData.ReturnDataTable(prevACSheet2, false);
             foreach(DataRow dr1 in Dt.Rows)
@@ -2241,137 +2245,115 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
                 }
             }
 
-            //foreach (GridViewRow row in GridViewAccSheet.Rows)
-            //{
-            //    Label l1 = row.FindControl("lblGoalArea") as Label;
-            //    foreach(DataRow dr in Dt.Rows)
-            //    {
-            //        if(l1.Text == dr["GoalArea"].ToString())
-            //        {
-            //            RadioButtonList radBtnLst1 = row.FindControl("RadioButtonList1") as RadioButtonList;
-            //            RadioButtonList radBtnLst2 = row.FindControl("RadioButtonList2") as RadioButtonList;
-            //            RadioButtonList radBtnLst3 = row.FindControl("RadioButtonList3") as RadioButtonList;
-            //            RadioButtonList radBtnLst4 = row.FindControl("RadioButtonList4") as RadioButtonList;
-            //            RadioButtonList radBtnLst5 = row.FindControl("RadioButtonList5") as RadioButtonList;
-            //            RadioButtonList radBtnLst6 = row.FindControl("RadioButtonList6") as RadioButtonList;
-            //            RadioButtonList radBtnLst7 = row.FindControl("RadioButtonList7") as RadioButtonList;
-            //            if (dr["Progressing1"] != null)
-            //            {
-            //                radBtnLst1.SelectedValue = dr["Progressing1"].ToString();
-            //                if (radBtnLst1.SelectedValue == "Yes")
-            //                    radBtnLst1.Items[0].Attributes["Style"] = "color:lightgreen;";
-            //                else if (radBtnLst1.SelectedValue == "No")
-            //                    radBtnLst1.Items[1].Attributes["Style"] = "color:red;";
-            //                else if (radBtnLst1.SelectedValue == "No Change")
-            //                    radBtnLst1.Items[2].Attributes["Style"] = "color:yellow;";
-            //            }
-            //            if (dr["Progressing2"] != null)
-            //            {
-            //                radBtnLst2.SelectedValue = dr["Progressing2"].ToString();
-            //                if (radBtnLst2.SelectedValue == "Yes")
-            //                    radBtnLst2.Items[0].Attributes["Style"] = "color:lightgreen;";
-            //                else if (radBtnLst2.SelectedValue == "No")
-            //                    radBtnLst2.Items[1].Attributes["Style"] = "color:red;";
-            //                else if (radBtnLst2.SelectedValue == "No Change")
-            //                    radBtnLst2.Items[2].Attributes["Style"] = "color:yellow;";
-            //            }
-            //            if (dr["Progressing3"] != null)
-            //            {
-            //                radBtnLst3.SelectedValue = dr["Progressing3"].ToString();
-            //                if (radBtnLst3.SelectedValue == "Yes")
-            //                    radBtnLst3.Items[0].Attributes["Style"] = "color:lightgreen;";
-            //                else if (radBtnLst3.SelectedValue == "No")
-            //                    radBtnLst3.Items[1].Attributes["Style"] = "color:red;";
-            //                else if (radBtnLst3.SelectedValue == "No Change")
-            //                    radBtnLst3.Items[2].Attributes["Style"] = "color:yellow;";
-            //            }
-            //            if (dr["Progressing4"] != null)
-            //            {
-            //                radBtnLst4.SelectedValue = dr["Progressing4"].ToString();
-            //                if (radBtnLst4.SelectedValue == "Yes")
-            //                    radBtnLst4.Items[0].Attributes["Style"] = "color:lightgreen;";
-            //                else if (radBtnLst4.SelectedValue == "No")
-            //                    radBtnLst4.Items[1].Attributes["Style"] = "color:red;";
-            //                else if (radBtnLst4.SelectedValue == "No Change")
-            //                    radBtnLst4.Items[2].Attributes["Style"] = "color:yellow;";
-            //            }
-            //            if (dr["Progressing5"] != null)
-            //            {
-            //                radBtnLst5.SelectedValue = dr["Progressing5"].ToString();
-            //                if (radBtnLst5.SelectedValue == "Yes")
-            //                    radBtnLst5.Items[0].Attributes["Style"] = "color:lightgreen;";
-            //                else if (radBtnLst5.SelectedValue == "No")
-            //                    radBtnLst5.Items[1].Attributes["Style"] = "color:red;";
-            //                else if (radBtnLst5.SelectedValue == "No Change")
-            //                    radBtnLst5.Items[2].Attributes["Style"] = "color:yellow;";
-            //            }
-            //            if (dr["Progressing6"] != null)
-            //            {
-            //                radBtnLst6.SelectedValue = dr["Progressing6"].ToString();
-            //                if (radBtnLst6.SelectedValue == "Yes")
-            //                    radBtnLst6.Items[0].Attributes["Style"] = "color:lightgreen;";
-            //                else if (radBtnLst6.SelectedValue == "No")
-            //                    radBtnLst6.Items[1].Attributes["Style"] = "color:red;";
-            //                else if (radBtnLst6.SelectedValue == "No Change")
-            //                    radBtnLst6.Items[2].Attributes["Style"] = "color:yellow;";
-            //            }
-            //            if (dr["Progressing7"] != null)
-            //            {
-            //                radBtnLst7.SelectedValue = dr["Progressing7"].ToString();
-            //                if (radBtnLst7.SelectedValue == "Yes")
-            //                    radBtnLst7.Items[0].Attributes["Style"] = "color:lightgreen;";
-            //                else if (radBtnLst7.SelectedValue == "No")
-            //                    radBtnLst7.Items[1].Attributes["Style"] = "color:red;";
-            //                else if (radBtnLst7.SelectedValue == "No Change")
-            //                    radBtnLst7.Items[2].Attributes["Style"] = "color:yellow;";
-            //            }
-            //            if (dr["MetObjective"] != null && dr["MetGoal"] != null && dr["NotMaintaining"] != null)
-            //            {
 
-            //                HtmlInputCheckBox checkbox1 = row.FindControl("Checkbox4") as HtmlInputCheckBox;
-            //                HtmlInputCheckBox checkbox2 = row.FindControl("Checkbox5") as HtmlInputCheckBox;
-            //                HtmlInputCheckBox checkbox3 = row.FindControl("Checkbox6") as HtmlInputCheckBox;
-            //                int ch1 = Convert.ToInt32(dr["MetObjective"]);
-            //                int ch2 = Convert.ToInt32(dr["MetGoal"]);
-            //                int ch3 = Convert.ToInt32(dr["NotMaintaining"]);
-            //                if (ch1 == 1)
-            //                {
-            //                    checkbox1.Checked = true;
-            //                    HtmlGenericControl c1 = row.FindControl("ch4") as HtmlGenericControl;
-            //                    if (c1 != null)
-            //                    {
-            //                        c1.Style["color"] = "Green";
-            //                        c1.Style["font-weight"] = "bold";
-            //                    }
-            //                }
-            //                if (ch2 == 1)
-            //                {
-            //                    checkbox2.Checked = true;
-            //                    HtmlGenericControl c2 = row.FindControl("ch5") as HtmlGenericControl;
-            //                    if (c2 != null)
-            //                    {
-            //                        c2.Style["color"] = "Green";
-            //                        c2.Style["font-weight"] = "bold";
+            
+            DateTime[] newStartDates = new DateTime[7];
+            newStartDates[0] = dtSt;
 
-            //                    }
-            //                }
-            //                if (ch3 == 1)
-            //                {
-            //                    checkbox3.Checked = true;
-            //                    HtmlGenericControl c3 = row.FindControl("ch6") as HtmlGenericControl;
-            //                    if (c3 != null)
-            //                    {
-            //                        c3.Style["color"] = "Red";
-            //                        c3.Style["font-weight"] = "bold";
-            //                    }
-            //                }
-            //            }
-            //        }
-            //    }
+            for (int i = 1; i < newStartDates.Length; i++)
+            {
+                newStartDates[i] = newStartDates[i - 1].AddDays(14);
+            }
 
-            //}
+
+            int matchIndex = -1;        // index in newStartDates (0–6)
+            int matchedOldPeriod = -1;  // old period number (1–7)
+
+            if (Dt.Rows.Count > 0)
+            {
+                DataRow refRow = Dt.Rows[0];
+
+                for (int j = 1; j <= 7; j++)
+                {
+                    if (refRow["Period" + j] == DBNull.Value)
+                        continue;
+
+                    string[] parts = refRow["Period" + j].ToString().Split('-');
+                    if (parts.Length == 0)
+                        continue;
+
+                    string startStr = parts[0].Trim();
+
+                    DateTime oldStart;
+                    if (!DateTime.TryParseExact(
+                            startStr,
+                            "MM/dd/yyyy",
+                            System.Globalization.CultureInfo.InvariantCulture,
+                            System.Globalization.DateTimeStyles.None,
+                            out oldStart))
+                    {
+                        continue;
+            }
+
+                    int idx = Array.FindIndex(newStartDates,
+                        d => d.Date == oldStart.Date);
+
+                    if (idx != -1)
+                    {
+                        matchIndex = idx;
+                        matchedOldPeriod = j;
+                        break;
+        }
+                }
+            }
+
+
+            if (matchIndex == -1)
+            {
+                return;
+            }
+
+
+            Dictionary<string, DataRow> lessonLookup =
+                Dt.AsEnumerable()
+                  .GroupBy(r => r["GoalArea"].ToString().Trim().ToLower())
+                  .ToDictionary(g => g.Key, g => g.First());
+
+
+            foreach (GridViewRow row in GridViewAccSheet.Rows)
+            {
+                Label lblGoalArea = row.FindControl("lblGoalArea") as Label;
+                if (lblGoalArea == null)
+                    continue;
+
+                string goalArea = lblGoalArea.Text.Trim().ToLower();
+
+                DataRow dr;
+                if (!lessonLookup.TryGetValue(goalArea, out dr))
+                    continue;
+
+                // Apply from matched period forward
+                for (int k = matchedOldPeriod; k <= 7; k++)
+                {
+                    int newIndex = matchIndex + (k - matchedOldPeriod);
+
+                    if (newIndex >= 7)
+                        break;
+
+                    RadioButtonList radBtnLst =
+                        row.FindControl("RadioButtonList" + (newIndex + 1)) as RadioButtonList;
+
+                    if (radBtnLst == null)
+                        continue;
+
+                    string value = dr["Progressing" + k] as string ?? "";
+
+                    if (!string.IsNullOrEmpty(value))
+                        radBtnLst.SelectedValue = value;
+
+                    foreach (System.Web.UI.WebControls.ListItem item in radBtnLst.Items)
+                        item.Attributes["style"] = "";
+
+                    if (value == "Yes")
+                        radBtnLst.Items[0].Attributes["style"] = "color:lightgreen;";
+                    else if (value == "No")
+                        radBtnLst.Items[1].Attributes["style"] = "color:red;";
+                    else if (value == "No Change")
+                        radBtnLst.Items[2].Attributes["style"] = "color:yellow;";
+                }
             }
         }
+    }
 
     protected void loadExtraData()
     {
@@ -4011,7 +3993,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
         dted = DateTime.ParseExact(txtEdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
 
         //DateTime dateNow1 = dtst;
-        //DateTime dateNow2 = dateNow1.AddDays(+14);
+        //DateTime dateNow2 = dateNow1.AddDays(+13);
         //DateTime dateNow3 = dateNow2.AddDays(+14);
         //DateTime dateNow4 = dateNow3.AddDays(+14);
         //DateTime dateNow5 = dateNow4.AddDays(+14);
@@ -4147,6 +4129,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
             {
                 GridViewAccSheet.DataSource = Dt;
                 GridViewAccSheet.DataBind();
+                Datacarryover(dtst, dted);
                 btnUpdate.Visible = false;
                 btnUpdateNew.Visible = false;
                 btnImport.Visible = false;
