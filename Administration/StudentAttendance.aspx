@@ -6,7 +6,6 @@
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="PageContent" runat="Server">
-    <asp:HiddenField ID="hdnDownloadToken" runat="server" />
     <asp:ScriptManagerProxy ID="smProxy" runat="server" />
     <asp:Panel ID="pnlFilters" runat="server" DefaultButton="btnGenerate">
         <%--<asp:TextBox ID="txtSearch" runat="server" placeholder="Student # / Name" style="visibility:hidden"/>--%>
@@ -43,6 +42,7 @@
         </div>
       </div>
     </asp:Panel>
+    <iframe id="downloadMonitor" style="display:none;"></iframe>
     <style>
 
     .sheet { 
@@ -319,38 +319,23 @@
             window.addEventListener('load', function () { window.hideLoader(); });
         })();
 
-        (function () {
-            function getCookie(name) {
-                var m = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&') + '=([^;]*)'));
-                return m ? decodeURIComponent(m[1]) : null;
-            }
+        function startExport() {
 
-            window.startExport = function () {
-                // generate a simple token
-                var token = Date.now().toString();
-                var hf = document.getElementById('<%= hdnDownloadToken.ClientID %>');
-    if (hf) hf.value = token;
+            if (window.showLoader)
+                showLoader();
 
-      // clear any previous cookie, remember the expected token
-    document.cookie = 'downloadToken=; Max-Age=0; path=/';
-    window.expectedDownloadToken = token;
+            var monitor = document.getElementById("downloadMonitor");
 
-    if (window.showLoader) showLoader();
+            // detect when server response finishes
+            monitor.onload = function () {
+                if (window.hideLoader)
+                    hideLoader();
+            };
 
-      // poll for the cookie set by the server when the file response starts
-    if (window._dlPoll) clearInterval(window._dlPoll);
-    window._dlPoll = setInterval(function () {
-        var v = getCookie('downloadToken');
-        if (v && v === window.expectedDownloadToken) {
-            clearInterval(window._dlPoll);
-            if (window.hideLoader) hideLoader();
-            // cleanup cookie
-            document.cookie = 'downloadToken=; Max-Age=0; path=/';
+            // request a small completion ping
+            monitor.src = "DownloadMonitor.aspx?t=" + new Date().getTime();
+
+            return true; // allow export postback
         }
-    }, 500);
-
-    return true; // allow the submit to proceed
-  };
-        })();
     </script>
 </asp:Content>
