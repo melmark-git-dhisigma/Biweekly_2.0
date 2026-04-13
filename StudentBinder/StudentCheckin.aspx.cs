@@ -13,13 +13,14 @@ using System.Configuration;
 using System.Web.UI.HtmlControls;
 using System.Collections.Generic;
 using System.Web.Script.Serialization;
+using System.Text;
 
 public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
 {
 
     clsData objData = null;
-    static int StudentId = 0;
-    static int ClassId = 0; 
+    int StudentId = 0;
+    int ClassId = 0; 
     string strQuery = "";
     clsSession sess = null;
     protected void Page_Load(object sender, EventArgs e)
@@ -30,10 +31,13 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
         }
         if (!IsPostBack)
         {
+            calPast.SelectedDates.Clear();
+            calPast.SelectedDate = DateTime.MinValue;
             //imgBDay.ImageUrl = "~/StudentBinder/img/DayB.png";
             //ImgBRes.ImageUrl = "~/StudentBinder/img/ResG.png";
             hidSetVal.Value = "0";
             fillStudent("0", false);
+            LoadAttendanceCodesToJS();
             BindLocationDropdown();
             BindClientDropdown();
             pnlCalendar.Style["display"] = "none";
@@ -43,6 +47,17 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
             //    BindClientDropdown(ddlLocation.SelectedValue);
             //else
             //    ddlClient.Items.Clear();
+        }
+        else
+        {
+            string eventTarget = Request["__EVENTTARGET"];
+            if (eventTarget != null && eventTarget.Contains("calPast"))
+            {
+                return;
+            }
+
+            if (hidSearch.Value != "1")
+                fillStudent(hidSetVal.Value.ToString(), false);
         }
         var sm = ScriptManager.GetCurrent(this.Page);
             if (sm != null)
@@ -74,56 +89,52 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
         var drv = e.Row.DataItem as DataRowView;
         if (drv == null) return;
 
-        // ------------- 0. Put Extras into hidden field (your existing behavior) -------------
-        var hidExtras = e.Row.FindControl("hidExtraTimes") as HiddenField;
-        if (hidExtras != null)
+        //Set row attributes
+        try
         {
-            hidExtras.Value = Convert.ToString(drv["Extras"]);
+            if (drv["studentid"] != DBNull.Value)
+                e.Row.Attributes["data-studentid"] = drv["studentid"].ToString();
+
+            if (drv["classid"] != DBNull.Value)
+                e.Row.Attributes["data-classid"] = drv["classid"].ToString();
         }
+        catch { }
 
-        // ------------- 1. Read latest/main values from the datarow -------------
-        string inTime = "";
-        string outTime = "";
-        string latestCode = "";
-
+        // ---------------- MAIN VALUES ----------------
         object inVal = drv["InTime"];
-        if (inVal != DBNull.Value)
-        {
-            DateTime dt;
-            if (DateTime.TryParse(inVal.ToString(), out dt)) inTime = dt.ToString("HH:mm");
-        }
-
         object outVal = drv["OutTime"];
-        if (outVal != DBNull.Value)
-        {
-            DateTime dt;
-            if (DateTime.TryParse(outVal.ToString(), out dt)) outTime = dt.ToString("HH:mm");
-        }
+
+        string latestCode = "";
 
         if (drv.Row.Table.Columns.Contains("AttendanceCode") && drv["AttendanceCode"] != DBNull.Value)
             latestCode = drv["AttendanceCode"].ToString().Trim();
         else if (drv.Row.Table.Columns.Contains("LeaveCode") && drv["LeaveCode"] != DBNull.Value)
             latestCode = drv["LeaveCode"].ToString().Trim();
 
-        // ------------- 2. Set the main template controls (In / Out / Code) -------------
+        // ---------------- SET MAIN INPUTS ----------------
         TextBox txtIn = e.Row.FindControl("txtInTime") as TextBox;
         if (txtIn != null)
         {
             txtIn.Text = FormatToHHmm(inVal);
-            try { txtIn.Attributes["type"] = "time"; txtIn.Attributes["step"] = "60"; }
-            catch { }
+            txtIn.Attributes["type"] = "time";
+            txtIn.Attributes["step"] = "60";
         }
 
         TextBox txtOut = e.Row.FindControl("txtOutTime") as TextBox;
         if (txtOut != null)
         {
             txtOut.Text = FormatToHHmm(outVal);
-            try { txtOut.Attributes["type"] = "time"; txtOut.Attributes["step"] = "60"; }
-            catch { }
+            txtOut.Attributes["type"] = "time";
+            txtOut.Attributes["step"] = "60";
         }
 
-        // Prepare lookup once and reuse for main + extras
-        var dtLookup = GetAttendanceCodeLookup();
+        // ---------------- DROPDOWN ----------------
+        if (_attendanceLookup == null)
+        {
+            _attendanceLookup = GetAttendanceCodeLookup();
+        }
+
+        var dtLookup = _attendanceLookup;
 
         DropDownList ddlMain = e.Row.FindControl("ddlCode") as DropDownList;
         if (ddlMain != null)
@@ -134,215 +145,82 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
             {
                 foreach (DataRow r in dtLookup.Rows)
                 {
-                    string text = Convert.ToString(r["LookupName"]);
-                    string val = Convert.ToString(r["LookupId"]);
-                    ddlMain.Items.Add(new ListItem(text, val));
+                    ddlMain.Items.Add(new ListItem(
+                        Convert.ToString(r["LookupName"]),
+                        Convert.ToString(r["LookupId"])
+                    ));
                 }
             }
 
-            // Select the current value if present in data row (AttendanceCode or LeaveCode mapping)
-            if (!String.IsNullOrEmpty(latestCode))
+            if (!string.IsNullOrEmpty(latestCode))
             {
-                // attempt direct value match first
                 var li = ddlMain.Items.FindByValue(latestCode);
                 if (li != null) li.Selected = true;
-                else
-                {
-                    // fallback: if lookup table has LookupCode column, map LeaveCode -> LookupId
-                    if (dtLookup != null && dtLookup.Columns.Contains("LookupCode"))
-                    {
-                        DataRow[] matches = dtLookup.Select("LookupCode = '" + latestCode.Replace("'", "''") + "'");
-                        if (matches != null && matches.Length > 0)
-                        {
-                            string lookupId = Convert.ToString(matches[0]["LookupId"]);
-                            var li2 = ddlMain.Items.FindByValue(lookupId);
-                            if (li2 != null) li2.Selected = true;
-                        }
-                    }
-                }
             }
 
+            // send lookup to JS once
             if (dtLookup != null && dtLookup.Rows.Count > 0)
             {
-                // Build a simple list of { id: ..., name: ... } objects
                 var codesList = new List<object>();
+
                 foreach (DataRow r in dtLookup.Rows)
                 {
                     codesList.Add(new
                     {
                         id = Convert.ToString(r["LookupId"]),
-                        name = Convert.ToString(r["LookupName"]),
-                        // optional: include LookupCode if present
-                        code = dtLookup.Columns.Contains("LookupCode") ? Convert.ToString(r["LookupCode"]) : null
+                        name = Convert.ToString(r["LookupName"])
                     });
                 }
 
                 var serializer = new JavaScriptSerializer();
                 string json = serializer.Serialize(codesList);
-
-                // Register script once per page - use a fixed key so duplicates are suppressed
-                string script = "window.__attendanceCodes = " + json + ";";
-                Page.ClientScript.RegisterStartupScript(this.GetType(), "attendanceCodes", script, true);
             }
         }
 
-        // ------------- 3. Parse extras and prepare a list of extras to place -------------
-        string extrasRaw = hidExtras != null ? hidExtras.Value : (drv["Extras"] == DBNull.Value ? "" : drv["Extras"].ToString());
+        // ---------------- EXTRAS (ONLY PASS TO JS) ----------------
+        string extrasRaw = "";
 
-        var extrasList = new List<Tuple<string, string, string>>();
+        if (drv["Extras"] != DBNull.Value)
+            extrasRaw = drv["Extras"].ToString();
+        System.Diagnostics.Debug.WriteLine("ExtrasRaw: " + extrasRaw);
+        e.Row.Attributes["data-extras"] = extrasRaw;
 
-        if (!string.IsNullOrWhiteSpace(extrasRaw))
+        // ---------------- STATUS ----------------
+        string status = "-1";
+
+        if (drv["IsPresent"] != DBNull.Value)
         {
-            string[] items = extrasRaw.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (string rawItem in items)
-            {
-                if (string.IsNullOrWhiteSpace(rawItem)) continue;
-                string[] parts = rawItem.Split(new[] { '|' }, StringSplitOptions.None);
-                string exIn = parts.Length > 0 ? parts[0].Trim() : "";
-                string exOut = parts.Length > 1 ? parts[1].Trim() : "";
-                string exCode = parts.Length > 2 ? parts[2].Trim() : "";
+            var val = drv["IsPresent"].ToString().Trim().ToLower();
 
-                // skip fully empty
-                if (string.IsNullOrEmpty(exIn) && string.IsNullOrEmpty(exOut) && string.IsNullOrEmpty(exCode))
-                    continue;
-
-                // skip if identical to latest/main (avoids duplication)
-                bool inMatches = string.IsNullOrEmpty(inTime) ? string.IsNullOrEmpty(exIn) : inTime == exIn;
-                bool outMatches = string.IsNullOrEmpty(outTime) ? string.IsNullOrEmpty(exOut) : outTime == exOut;
-                bool codeMatches = string.IsNullOrEmpty(latestCode) ? string.IsNullOrEmpty(exCode) : latestCode == exCode;
-                if (inMatches && outMatches && codeMatches) continue;
-
-                extrasList.Add(Tuple.Create(exIn, exOut, exCode));
-            }
+            if (val == "1" || val == "true") status = "1";
+            else if (val == "0" || val == "false") status = "0";
         }
 
-        // ------------- 4. Find extra controls in the row (flexible detection) -------------
-        Func<Control, IEnumerable<Control>> allChildren = null;
-        allChildren = (root) =>
+        string baseClass = (e.Row.CssClass ?? "")
+            .Replace("active-row", "")
+            .Replace("row-absent", "")
+            .Replace("row-default", "")
+            .Trim();
+
+        if (status == "-1")
         {
-            var list = new List<Control>();
-            foreach (Control c in root.Controls)
-            {
-                list.Add(c);
-                if (c.HasControls()) list.AddRange(allChildren(c));
-            }
-            return list;
-        };
-
-        var all = allChildren(e.Row);
-
-        var inControls = all
-            .Where(c => c is TextBox && (c.ID != null && (c.ID.StartsWith("txtIn_", StringComparison.OrdinalIgnoreCase) || c.ID.StartsWith("txtInTime_", StringComparison.OrdinalIgnoreCase) || (c.ID.StartsWith("txtIn", StringComparison.OrdinalIgnoreCase) && c.ID != "txtInTime"))))
-            .Cast<TextBox>()
-            .OrderBy(t => t.ID, StringComparer.OrdinalIgnoreCase)
-            .ToList();
-
-        var outControls = all
-            .Where(c => c is TextBox && (c.ID != null && (c.ID.StartsWith("txtOut_", StringComparison.OrdinalIgnoreCase) || (c.ID.StartsWith("txtOut", StringComparison.OrdinalIgnoreCase) && c.ID != "txtOutTime"))))
-            .Cast<TextBox>()
-            .OrderBy(t => t.ID, StringComparer.OrdinalIgnoreCase)
-            .ToList();
-
-        var codeDdls = all
-            .Where(c => c is DropDownList && (c.ID != null && c.ID.StartsWith("ddlCode", StringComparison.OrdinalIgnoreCase) && c.ID != "ddlCode"))
-            .Cast<DropDownList>()
-            .OrderBy(d => d.ID, StringComparer.OrdinalIgnoreCase)
-            .ToList();
-
-        // ------------- 5. Fill extras into discovered controls -------------
-        for (int i = 0; i < extrasList.Count; i++)
-        {
-            var ex = extrasList[i];
-            string exIn = ex.Item1;
-            string exOut = ex.Item2;
-            string exCode = ex.Item3;
-
-            if (i < inControls.Count)
-            {
-                inControls[i].Text = string.IsNullOrEmpty(exIn) ? "" : exIn;
-                try { inControls[i].Attributes["type"] = "time"; inControls[i].Attributes["step"] = "60"; }
-                catch { }
-            }
-            if (i < outControls.Count)
-            {
-                outControls[i].Text = string.IsNullOrEmpty(exOut) ? "" : exOut;
-                try { outControls[i].Attributes["type"] = "time"; outControls[i].Attributes["step"] = "60"; }
-                catch { }
-            }
-            if (i < codeDdls.Count)
-            {
-                var ddlEx = codeDdls[i];
-                ddlEx.Items.Clear();
-                ddlEx.Items.Add(new ListItem("---Select---", ""));
-                if (dtLookup != null)
-                {
-                    foreach (DataRow r in dtLookup.Rows)
-                    {
-                        string text = Convert.ToString(r["LookupName"]);
-                        string val = Convert.ToString(r["LookupId"]);
-                        ddlEx.Items.Add(new ListItem(text, val));
-                    }
-                }
-
-                // Try to select by value first
-                if (!string.IsNullOrEmpty(exCode))
-                {
-                    var li = ddlEx.Items.FindByValue(exCode);
-                    if (li != null) li.Selected = true;
-                    else if (dtLookup != null && dtLookup.Columns.Contains("LookupCode"))
-                    {
-                        DataRow[] m = dtLookup.Select("LookupCode = '" + exCode.Replace("'", "''") + "'");
-                        if (m != null && m.Length > 0)
-                        {
-                            string lookupId = Convert.ToString(m[0]["LookupId"]);
-                            var li2 = ddlEx.Items.FindByValue(lookupId);
-                            if (li2 != null) li2.Selected = true;
-                        }
-                    }
-                }
-            }
+            e.Row.CssClass = baseClass + " row-default";
+            DisableAllInputs(e.Row);
         }
-
-        bool isPresent = true;
-        //DataRowView drv = e.Row.DataItem as DataRowView;
-        if (drv != null && drv.Row.Table.Columns.Contains("IsPresent"))
+        else if (status == "0")
         {
-            object val = drv["IsPresent"];
-            if (val != DBNull.Value)
-            {
-                bool tmpBool;
-                int tmpInt;
-                if (val is bool) isPresent = (bool)val;
-                else if (int.TryParse(val.ToString(), out tmpInt)) isPresent = tmpInt != 0;
-                else if (bool.TryParse(val.ToString(), out tmpBool)) isPresent = tmpBool;
-            }
-        }
+            e.Row.CssClass = baseClass + " row-absent";
 
-        // If Absent → grey & disable non-attendance columns
-        if (!isPresent)
-        {
-            e.Row.CssClass = (e.Row.CssClass ?? "") + " row-absent";
-
-            // Loop through each cell in this row
             for (int i = 0; i < e.Row.Cells.Count; i++)
             {
-                // Skip the Attendance column (first column = index 0)
-                // If your Attendance column is NOT first, change the index accordingly
-                if (i == 0) continue;
-                if (i == 5) continue;
-                if (i == 6) continue;
-                TableCell cell = e.Row.Cells[i];
-                DisableAllInputs(cell);
+                if (i == 0 || i == 5 || i == 6) continue;
+                DisableAllInputs(e.Row.Cells[i]);
             }
         }
-        else
+        else if (status == "1")
         {
-            // Ensure no old class remains
-            if (!string.IsNullOrEmpty(e.Row.CssClass) && e.Row.CssClass.Contains("row-absent"))
-                e.Row.CssClass = e.Row.CssClass.Replace("row-absent", "").Trim();
+            e.Row.CssClass = baseClass + " active-row";
         }
-
-        // Note: calendar state is intentionally NOT set here (avoid per-row overwrites).
     }
 
 
@@ -354,294 +232,241 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
 
     protected void grdGroup_RowCommand(object sender, GridViewCommandEventArgs e)
     {
-        if (e.CommandName != "Save") return;
-
-        var sm = ScriptManager.GetCurrent(Page);
-        string showSaveJs = "try{ if(window.showSaveLoader) showSaveLoader('Saving\\u2026'); else if(window.showLoader) showLoader('Saving\\u2026'); }catch(e){}";
-        if (sm != null && sm.IsInAsyncPostBack)
-            ScriptManager.RegisterStartupScript(Page, Page.GetType(), "showSaveLoader_" + Guid.NewGuid().ToString("N"), showSaveJs, true);
-        else
-            ClientScript.RegisterStartupScript(Page.GetType(), "showSaveLoader_" + Guid.NewGuid().ToString("N"), showSaveJs, true);
-
-        Button btn = e.CommandSource as Button;
-        if (btn == null) return;
-        GridViewRow row = btn.NamingContainer as GridViewRow;
-        if (row == null) return;
-
-
-        // --- existing logic to read studentId, classId ---
-        int studentId = 0, classId = 0;
-        if (grdGroup.DataKeys != null && grdGroup.DataKeys.Count > row.RowIndex)
-        {
-            var dk = grdGroup.DataKeys[row.RowIndex];
-            if (dk != null)
-            {
-                int.TryParse(Convert.ToString(dk.Values["studentid"]), out studentId);
-                int.TryParse(Convert.ToString(dk.Values["classid"]), out classId);
-            }
-        }
-
-        if (studentId <= 0 || classId <= 0)
-        {
-            ShowGridError("Cannot determine student/class id for saving.");
-            return;
-        }
-
-        // --- session ---
-        var sess = (clsSession)Session["UserSession"];
-        if (sess == null)
-        {
-            ShowGridError("Session expired. Please login again.");
-            return;
-        }
-
-        int schoolId = sess.SchoolId;
-        int userId = sess.LoginId;
-
-        // --- MAIN (primary) IN / OUT ---
-        var txtIn = row.FindControl("txtInTime") as TextBox;
-        var txtOut = row.FindControl("txtOutTime") as TextBox;
-
-        DateTime? effectiveDate = null;
         try
         {
-            string posted = Request.Form["hidPastDate"];
-            if (String.IsNullOrEmpty(posted) && hidPastDate != null)
+            if (e.CommandName != "Save") return;
+
+            Button btn = e.CommandSource as Button;
+            if (btn == null) return;
+
+            //get row safely
+            GridViewRow row = btn.NamingContainer as GridViewRow;
+            if (row == null) return;
+
+            //parse CommandArgument
+            string arg = Convert.ToString(e.CommandArgument);
+
+            int studentId = 0;
+            int classId = 0;
+
+            if (!string.IsNullOrEmpty(arg))
             {
-                // use UniqueID too if you prefer: Request.Form[hidPastDate.UniqueID]
-                posted = Request.Form[hidPastDate.UniqueID];
-                if (String.IsNullOrEmpty(posted)) posted = Request.Form[hidPastDate.ClientID];
+                var parts = arg.Split('|');
+
+                if (parts.Length == 2)
+                {
+                    int.TryParse(parts[0], out studentId);
+                    int.TryParse(parts[1], out classId);
+                }
             }
 
-            if (!String.IsNullOrEmpty(posted))
+            if (studentId <= 0 || classId <= 0)
+            {
+                ShowGridError("Cannot determine student/class id for saving.");
+                return;
+            }
+
+            // --- session ---
+            var sess = (clsSession)Session["UserSession"];
+            if (sess == null)
+            {
+                ShowGridError("Session expired. Please login again.");
+                return;
+            }
+
+            int schoolId = sess.SchoolId;
+            int userId = sess.LoginId;
+
+            // --- MAIN (primary) IN / OUT ---
+            var txtIn = row.FindControl("txtInTime") as TextBox;
+            var txtOut = row.FindControl("txtOutTime") as TextBox;
+
+            DateTime? effectiveDate = null;
+            try
+            {
+                string posted = Request.Form["hidPastDate"];
+                if (String.IsNullOrEmpty(posted) && hidPastDate != null)
+                {
+                    posted = Request.Form[hidPastDate.UniqueID];
+                    if (String.IsNullOrEmpty(posted)) posted = Request.Form[hidPastDate.ClientID];
+                }
+
+                if (!String.IsNullOrEmpty(posted))
+                {
+                    DateTime parsed;
+                    if (DateTime.TryParseExact(
+                            posted,
+                            "yyyy-MM-dd",
+                            CultureInfo.InvariantCulture,
+                            DateTimeStyles.None,
+                            out parsed))
+                    {
+                        effectiveDate = parsed.Date;
+                    }
+                }
+            }
+            catch { /* ignore form-read issues */ }
+
+            // 3) Fall back to server control's value if present
+            if (!effectiveDate.HasValue && hidPastDate != null && !String.IsNullOrEmpty(hidPastDate.Value))
             {
                 DateTime parsed;
-                if (DateTime.TryParse(posted, out parsed)) effectiveDate = parsed.Date;
+                if (DateTime.TryParse(hidPastDate.Value, out parsed)) effectiveDate = parsed.Date;
             }
-        }
-        catch { /* ignore form-read issues */ }
 
-        // 3) Fall back to server control's value if present
-        if (!effectiveDate.HasValue && hidPastDate != null && !String.IsNullOrEmpty(hidPastDate.Value))
-        {
-            DateTime parsed;
-            if (DateTime.TryParse(hidPastDate.Value, out parsed)) effectiveDate = parsed.Date;
-        }
+            // 4) Final fallback: today
+            if (!effectiveDate.HasValue) effectiveDate = DateTime.Today;
 
-        // 4) Final fallback: today
-        if (!effectiveDate.HasValue) effectiveDate = DateTime.Today;
+            string mainInText = GetPostedOrServerValue(txtIn);
+            string mainOutText = GetPostedOrServerValue(txtOut);
 
-        string mainInText = GetPostedOrServerValue(txtIn);
-        string mainOutText = GetPostedOrServerValue(txtOut);
+            // parse times relative to the selected date
+            DateTime? mainIn = ParseTimeToDate(mainInText, effectiveDate);
+            DateTime? mainOut = ParseTimeToDate(mainOutText, effectiveDate);
 
-        // parse times relative to the selected date
-        DateTime? mainIn = ParseTimeToDate(mainInText, effectiveDate);
-        DateTime? mainOut = ParseTimeToDate(mainOutText, effectiveDate);
+            // --- read code dropdown for the main pair ---
+            var ddlCode = row.FindControl("ddlCode") as DropDownList;
+            string mainCode = "";
 
-        // --- read code dropdown for the main pair ---
-        var ddlCode = row.FindControl("ddlCode") as DropDownList;
-        string mainCode = ddlCode != null ? ddlCode.SelectedValue : null;
-
-        // --- EXTRAS: read hidden field that contains serialized extras ---
-        string encoded = String.Empty;
-
-        // 1) client-side input named hidExtraTimes_{studentId} (common client naming)
-        string hidNameClient = "hidExtraTimes_" + studentId;
-        encoded = Convert.ToString(System.Web.HttpContext.Current.Request.Form[hidNameClient] ?? "");
-
-        if (String.IsNullOrEmpty(encoded))
-        {
-            // 2) maybe the server HiddenField was named just 'hidExtraTimes' in the template
-            //    and its rendered name will be the control UniqueID - attempt that:
-            var hfBase = row.FindControl("hidExtraTimes") as HiddenField;
-            if (hfBase != null)
+            if (ddlCode != null)
             {
-                // Prefer the actual posted value (unique id) if present
-                try
-                {
-                    string possiblePosted = System.Web.HttpContext.Current.Request.Form[hfBase.UniqueID];
-                    if (!String.IsNullOrEmpty(possiblePosted))
-                        encoded = possiblePosted;
-                    else
-                        encoded = hfBase.Value; // fallback
-                }
-                catch
-                {
-                    encoded = hfBase.Value;
-                }
+                string postedCode = Request.Form[ddlCode.UniqueID];
+                if (postedCode != null)
+                    mainCode = postedCode;
+                else
+                    mainCode = ddlCode.SelectedValue;
             }
-        }
 
-        // 3) fallback: try control named hidExtraTimes_{studentId} (if you added that server control)
-        if (String.IsNullOrEmpty(encoded))
-        {
-            var hfServer = row.FindControl("hidExtraTimes_" + studentId) as HiddenField;
-            if (hfServer != null) encoded = hfServer.Value;
-        }
+            mainCode = (mainCode ?? "").Trim();
 
-        // 4) final fallback: search for any hiddenfield in row whose ID starts with "hidExtraTimes"
-        if (String.IsNullOrEmpty(encoded))
-        {
-            HiddenField anyHf = null;
-            foreach (Control c in row.Controls)
+            string encoded = "";
+
+            string hidNameClient = "hidExtraTimes_" + studentId + "_" + classId;
+
+            //ONLY USE REQUEST.FORM
+            encoded = Convert.ToString(Request.Form[hidNameClient] ?? "");
+
+
+            // Parse extras robustly: support JSON array or semicolon-delimited "In|Out|Code;..."
+            var parsedExtras = new List<string[]>();
+            if (!string.IsNullOrEmpty(encoded))
             {
-                // recursive search helper
-                Func<Control, HiddenField> find = null;
-                find = (root) =>
+                // decode the whole string first (safe to do even if already decoded)
+                encoded = HttpUtility.UrlDecode(encoded).Trim();
+
+                // remove accidental leading/trailing semicolons
+                encoded = encoded.Trim(';');
+
+                // now split on ';' into pairs
+                var pairStrings = encoded.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var p in pairStrings)
                 {
-                    foreach (Control cc in root.Controls)
-                    {
-                        if (cc is HiddenField && cc.ID != null && cc.ID.StartsWith("hidExtraTimes", StringComparison.OrdinalIgnoreCase))
-                            return (HiddenField)cc;
-                        if (cc.HasControls())
-                        {
-                            var found = find(cc);
-                            if (found != null) return found;
-                        }
-                    }
-                    return null;
-                };
-                anyHf = find(row);
-                break;
-            }
-            if (anyHf != null) encoded = anyHf.Value;
-        }
+                    var trimmed = p.Trim();
+                    if (string.IsNullOrEmpty(trimmed)) continue;
 
+                    // attempt to split into up to 3 parts
+                    var pieces = trimmed.Split(new[] { '|' }, StringSplitOptions.None);
+                    string inS = pieces.Length > 0 ? HttpUtility.UrlDecode(pieces[0] ?? "") : "";
+                    string outS = pieces.Length > 1 ? HttpUtility.UrlDecode(pieces[1] ?? "") : "";
+                    string codeS = pieces.Length > 2 ? HttpUtility.UrlDecode(pieces[2] ?? "") : "";
 
+                    // ignore wholly empty
+                    if (String.IsNullOrWhiteSpace(inS) && String.IsNullOrWhiteSpace(outS)) continue;
 
-
-
-        // Parse extras robustly: support JSON array or semicolon-delimited "In|Out|Code;..."
-        var parsedExtras = new List<string[]>();
-        if (!string.IsNullOrEmpty(encoded))
-        {
-            // decode the whole string first (safe to do even if already decoded)
-            encoded = HttpUtility.UrlDecode(encoded).Trim();
-
-            // remove accidental leading/trailing semicolons
-            encoded = encoded.Trim(';');
-
-            // now split on ';' into pairs
-            var pairStrings = encoded.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (var p in pairStrings)
-            {
-                var trimmed = p.Trim();
-                if (string.IsNullOrEmpty(trimmed)) continue;
-
-                // attempt to split into up to 3 parts
-                var pieces = trimmed.Split(new[] { '|' }, StringSplitOptions.None);
-                string inS = pieces.Length > 0 ? HttpUtility.UrlDecode(pieces[0] ?? "") : "";
-                string outS = pieces.Length > 1 ? HttpUtility.UrlDecode(pieces[1] ?? "") : "";
-                string codeS = pieces.Length > 2 ? HttpUtility.UrlDecode(pieces[2] ?? "") : "";
-
-                // ignore wholly empty
-                if (String.IsNullOrWhiteSpace(inS) && String.IsNullOrWhiteSpace(outS)) continue;
-
-                parsedExtras.Add(new[] { inS, outS, codeS });
-            }
-        }
-
-
-        // Convert parsed extras into TimePair objects preserving order
-        var allPairs = new System.Collections.Generic.List<TimePair>();
-
-        // --- READ POSTED hidStatus value for this row (try multiple fallbacks) ---
-        string postedStatus = "";
-
-        // 1) preferred: client-side named hidStatus_<studentId>
-        if (studentId > 0)
-            postedStatus = Convert.ToString(System.Web.HttpContext.Current.Request.Form["hidStatus_" + studentId] ?? "");
-
-        // 2) fallback: posted generic hidStatus (server control rendered unique id or client-side control)
-        if (String.IsNullOrEmpty(postedStatus))
-        {
-            // try posted form value by simple name 'hidStatus'
-            postedStatus = Convert.ToString(System.Web.HttpContext.Current.Request.Form["hidStatus"] ?? "");
-        }
-
-        // 3) fallback: try server HiddenField control inside the row (use UniqueID to get actual posted name)
-        if (String.IsNullOrEmpty(postedStatus))
-        {
-            var hfStatusServer = row.FindControl("hidStatus") as HiddenField;
-            if (hfStatusServer != null)
-            {
-                try
-                {
-                    string possible = Convert.ToString(System.Web.HttpContext.Current.Request.Form[hfStatusServer.UniqueID] ?? "");
-                    if (!String.IsNullOrEmpty(possible)) postedStatus = possible;
-                    else postedStatus = hfStatusServer.Value ?? "";
-                }
-                catch
-                {
-                    postedStatus = hfStatusServer.Value ?? "";
+                    parsedExtras.Add(new[] { inS, outS, codeS });
                 }
             }
-        }
 
-        // Normalize postedStatus into nullable bool (1/True => true; 0/False => false; empty => null)
-        bool? postedIsPresent = null;
-        if (!String.IsNullOrEmpty(postedStatus))
-        {
-            var ps = postedStatus.Trim();
-            if (ps == "1" || ps.Equals("True", StringComparison.OrdinalIgnoreCase) || ps.Equals("Present", StringComparison.OrdinalIgnoreCase))
-                postedIsPresent = true;
-            else if (ps == "0" || ps.Equals("False", StringComparison.OrdinalIgnoreCase) || ps.Equals("Absent", StringComparison.OrdinalIgnoreCase))
-                postedIsPresent = false;
-            // otherwise leave as null (unknown)
-        }
+            var hfStatus = row.FindControl("hidStatus") as HiddenField;
 
-        // add primary (main) pair first — include posted presence
-        allPairs.Add(new TimePair
-        {
-            In = mainIn,
-            Out = mainOut,
-            Code = mainCode,
-            IsPresent = postedIsPresent
-        });
+            string postedStatus = "";
 
-        int startIndex = 0;
-        if (parsedExtras.Count > 0)
-        {
-            var p0 = parsedExtras[0];
-            var p0In = ParseTimeToDate(HttpUtility.UrlDecode(p0[0] ?? ""), effectiveDate);
-            var p0Out = ParseTimeToDate(HttpUtility.UrlDecode(p0[1] ?? ""), effectiveDate);
-            if (p0In == mainIn && p0Out == mainOut)
-                startIndex = 1; // skip duplicate
-        }
-
-        for (int i = startIndex; i < parsedExtras.Count; i++)
-        {
-            var arr = parsedExtras[i];
-            string inStr = arr.Length > 0 ? arr[0] : "";
-            string outStr = arr.Length > 1 ? arr[1] : "";
-            string codeStr = arr.Length > 2 ? arr[2] : "";
-
-            DateTime? inDt = ParseTimeToDate(inStr, effectiveDate);
-            DateTime? outDt = ParseTimeToDate(outStr, effectiveDate);
-
-            if (!inDt.HasValue && !outDt.HasValue) continue;
-
-            allPairs.Add(new TimePair
+            if (hfStatus != null)
             {
-                In = inDt,
-                Out = outDt,
-                Code = codeStr,
-                IsPresent = postedIsPresent    // keep same row-level presence for extras
-            });
-        }
+                postedStatus = Request.Form[hfStatus.UniqueID];
 
-        try
-        {
-            SaveOrderedPairs(studentId, classId, schoolId, userId, allPairs, deleteExtraDbRows: true, targetDate: effectiveDate);
-            string js = "setTimeout(function(){ if(typeof normalizeAllExtras === 'function'){ try{ normalizeAllExtras(); }catch(e){console && console.log && console.log('normalizeAllExtras error',e);} } },50);";
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "normalizeAfterSave_" + Guid.NewGuid().ToString("N"), js, true);
-            // show success band
-            ShowGridBand("Saved successfully", 3000, "success");
+                if (string.IsNullOrEmpty(postedStatus))
+                    postedStatus = hfStatus.Value;
+            }
+
+            bool postedIsPresentBool = false;
+            bool includeMainAbsentRow = false;
+
+            if (!string.IsNullOrEmpty(postedStatus))
+            {
+                var ps = postedStatus.Trim().ToLowerInvariant();
+
+                if (ps == "1" || ps == "true" || ps == "present")
+                {
+                    postedIsPresentBool = true;
+                }
+                else if (ps == "0" || ps == "false" || ps == "absent")
+                {
+                    postedIsPresentBool = false;
+                    includeMainAbsentRow = true;   // keep absent row even if code is blank
+                }
+            }
+
+            var allPairs = BuildTimePairs(
+                mainIn,
+                mainOut,
+                mainCode,
+                postedIsPresentBool,
+                parsedExtras,
+                effectiveDate ?? DateTime.Today,
+                includeMainAbsentRow
+            );
+
+
+
+            try
+            {
+                SaveOrderedPairs(studentId, classId, schoolId, userId, allPairs, deleteExtraDbRows: true, targetDate: effectiveDate);
+                fillStudent(hidSetVal.Value.ToString(), false);
+                ScriptManager.RegisterStartupScript(
+                    this,
+                    this.GetType(),
+                    "normalizeOnce_" + Guid.NewGuid().ToString("N"),
+                    "if(window.__isPostBackDone){ if(typeof normalizeAllExtras==='function') normalizeAllExtras(); }",
+                    true
+                );
+                // show success band
+                string jsSuccess = @"
+                setTimeout(function(){
+                    try{
+                        if(window.showGridBand)
+                            showGridBand('Saved successfully', 3000, 'success');
+                    }catch(e){}
+                }, 200);";
+
+                ScriptManager.RegisterStartupScript(
+                    upGrid,
+                    upGrid.GetType(),
+                    "successMsg_" + Guid.NewGuid().ToString("N"),
+                    jsSuccess,
+                    true
+                );
+
+                ScriptManager.RegisterStartupScript(
+                    this,
+                    this.GetType(),
+                    "blockPostbackAfterSave_" + Guid.NewGuid().ToString("N"),
+                    "window.__justSaved = true; setTimeout(function(){ window.__justSaved = false; }, 1000);",
+                    true
+                );
+            }
+            catch (Exception ex)
+            {
+                ShowGridError("Error saving attendance: " + ex.Message);
+            }
         }
         catch (Exception ex)
         {
-            ShowGridError("Error saving attendance: " + ex.Message);
+            ScriptManager.RegisterStartupScript(this, this.GetType(),
+                "err_" + Guid.NewGuid().ToString("N"),
+                "alert('ERROR: " + ex.Message.Replace("'", "") + "');",
+                true);
         }
     }
     private static string GetPostedOrServerValue(TextBox tb)
@@ -671,78 +496,7 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
         else
             ClientScript.RegisterStartupScript(Page.GetType(), "focus_" + ctl.ClientID, js, true);
     }
-    private void SaveCheckInCheckOutTime(int studentId, int classId, int schoolId, int userId,
-                                     DateTime? checkin, DateTime? checkout)
-    {
-        objData = new clsData();
 
-        if (!checkin.HasValue && !checkout.HasValue) return;
-
-        if (checkin.HasValue && checkout.HasValue && checkout.Value < checkin.Value)
-        {
-            checkout = null;
-            ShowGridError("OUT time cannot be earlier than IN time.");
-            return;
-        }
-
-        string checkinSql = checkin.HasValue ? "'" + checkin.Value.ToString("yyyy-MM-dd HH:mm:ss") + "'" : "NULL";
-        string checkoutSql = checkout.HasValue ? "'" + checkout.Value.ToString("yyyy-MM-dd HH:mm:ss") + "'" : "NULL";
-
-        string setClause = "";
-        if (checkin.HasValue) setClause += "CheckinTime=" + checkinSql;
-        if (checkout.HasValue) setClause += (setClause == "" ? "" : ", ") + "CheckoutTime=" + checkoutSql;
-        if (setClause == "") return;
-
-        string statusOnInsert = (checkout.HasValue && !checkin.HasValue) ? "False" : "True";
-
-        string pk = "StdtSessEventId";
-
-        string sql = @"UPDATE se
-               SET " + setClause + @", ModifiedOn = GETDATE()
-            FROM StdtSessEvent AS se
-            INNER JOIN (
-                SELECT TOP (1) " + pk + @"
-                FROM StdtSessEvent
-                WHERE SchoolId = " + schoolId + @"
-                  AND StudentId = " + studentId + @"
-                  AND ClassId   = " + classId + @"
-                  AND EventType = 'CH'
-                  AND CreatedOn >= CAST(GETDATE() AS date)
-                  AND CreatedOn <  DATEADD(day, 1, CAST(GETDATE() AS date))
-                ORDER BY ModifiedOn DESC, CreatedOn DESC
-            ) AS t ON t." + pk + @" = se." + pk + @";
-
-            IF @@ROWCOUNT = 0
-            BEGIN
-                INSERT INTO StdtSessEvent
-                    (SchoolId, StudentId, EvntTs, CheckStatus, ClassId, CreatedBy, CreatedOn, ModifiedOn, EventType, CheckinTime, CheckoutTime)
-                VALUES
-                    (" + schoolId + @", " + studentId + @", GETDATE(), '" + statusOnInsert + @"', " + classId + @", " + userId + @",
-                     GETDATE(), GETDATE(), 'CH', " + checkinSql + @", " + checkoutSql + @");
-            END";
-
-        objData.Execute(sql);
-        fillStudent(hidSetVal.Value.ToString(), false);
-        ShowGridSaved();
-    }
-
-    /////-------FUNCTION FOR ENTERING 0 INTO THE BEHAVIOR------
-    /////
-    //[System.Web.Services.WebMethod]
-    //private void SaveBehaviorForStudent(int StudentId) 
-    // {
-    //     objData = new clsData();
-    //     sess = (clsSession)Session["UserSession"];
-    //     string InsertBehavior = "SELECT MeasurementId FROM BehaviourDetails WHERE StudentId="+StudentId+" AND ActiveInd='A' AND MeasurementId NOT IN (SELECT DISTINCT MeasurementId FROM Behaviour WHERE StudentId="+StudentId+" AND CONVERT(DATE,CreatedOn)=CONVERT(DATE,GETDATE()))";
-    //     DataTable DTBehavior= objData.ReturnDataTable(InsertBehavior, false);
-    //     string InsertQuery = "";
-    //     int insertresult = 0;
-    //     foreach (DataRow Behaviour in DTBehavior.Rows)
-    //     {
-    //         InsertQuery = "Insert into Behaviour(MeasurementId,StudentId,FrequencyCount,ActiveInd,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,ObserverId) Values('" + Behaviour["MeasurementId"] + "','" + StudentId + "','" + 0 + "','A','" + sess.LoginId + "',getdate(),'" + sess.LoginId + "',getdate(),'" + sess.LoginId + "')";
-    //         insertresult = objData.Execute(InsertQuery);
-    //     }
-    // }
     private void SaveCheckIn(ImageButton Img, int StudentId, int ClassId, int Schoolid, int Userid)
     {
         objData = new clsData();
@@ -766,25 +520,12 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
             }
             else
             {
-                strQuery = "insert into StdtSessEvent (SchoolId,StudentId,EvntTs,CheckStatus,IsPresent,ClassId,CreatedBy,CreatedOn,ModifiedOn,EventType,CheckinTime)values(" + Schoolid + "," + StudentId + ",getdate(),'True',1," + ClassId + "," + Userid + ",getdate(),getdate(),'CH',GETDATE()) ";
+                strQuery = "insert into StdtSessEvent (SchoolId,StudentId,EvntTs,CheckStatus,IsPresent,ClassId,CreatedBy,CreatedOn,EventType,CheckinTime)values(" + Schoolid + "," + StudentId + ",getdate(),'True',1," + ClassId + "," + Userid + ",getdate(),'CH',GETDATE()) ";
                 objData.Execute(strQuery);
                 Img.ImageUrl = "~/StudentBinder/img/in.png";
             }
         }
     }
-    protected void Button1_Click(object sender, EventArgs e)
-    {
-        //if (txtSearch.Text == "")
-        //{
-        //    fillStudent(hidSetVal.Value.ToString(), false);
-        //}
-        //else
-        //{
-        //    fillStudent(hidSetVal.Value.ToString(), true);
-        //}
-
-    }
-
 
     private void fillStudent(string type, bool search)
     {
@@ -881,222 +622,155 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
 
             // convenience SQL snippets that vary depending on whether isoDate is used
             string eventsDateCondition = useIsoDate
-                ? "AND CONVERT(date, se.CreatedOn) = CONVERT(date, '" + isoDate + "')"    // or use CheckinTime if preferred
-                : "AND CONVERT(date, se.CreatedOn) = CONVERT(date, GETDATE())";
+                ? "AND CONVERT(date, ISNULL(se.CheckinTime, se.EvntTs)) = CONVERT(date, '" + isoDate + "')"
+                : "AND CONVERT(date, ISNULL(se.CheckinTime, se.EvntTs)) = CONVERT(date, GETDATE())";
 
             string presenceDateCondition = useIsoDate
-                ? "AND CONVERT(date, x.CheckinTime) = CONVERT(date, '" + isoDate + "')"
-                : "AND CONVERT(date, x.CheckinTime) = CONVERT(date, GETDATE())";
+                ? "AND CONVERT(date, ISNULL(x.CheckinTime, x.EvntTs)) = CONVERT(date, '" + isoDate + "')"
+                : "AND CONVERT(date, ISNULL(x.CheckinTime, x.EvntTs)) = CONVERT(date, GETDATE())";
 
             // placement date condition (only if isoDate used) - otherwise keep original plc.EndDate IS NULL requirement (or no date filter)
             string placementDateCondition = useIsoDate
                 ? "AND plc.StartDate <= '" + isoDate + "' AND (plc.EndDate IS NULL OR plc.EndDate >= '" + isoDate + "')"
-                : "AND plc.EndDate IS NULL"; // original semantics when not filtering by date
-            if (search == true)
-            {
-                //strQuery = "SELECT StudClass.StudentId as studentid,StudClass.name,StudClass.ClassId as classid,chkStatus =CASE WHEN (SELECT COUNT(*) FROM StdtSessEvent WHERE " +
-                //            "StudentId=StudClass.StudentId AND EventType='CH' AND  CONVERT(DATE,CheckinTime)=CONVERT(DATE,GETDATE()) AND CheckStatus='True' and ClassId=StudClass.ClassId AND SchoolId=" + sess.SchoolId + ")=0 THEN 0 ELSE 1 END ,ses.CheckinTime as InTime,ses.CheckoutTime as OutTime, 'True' as IsPresent " +
-                //            "FROM (Select s.StudentId,s.StudentLname+'  '+s.StudentFname+'-'+s.StudentNbr+'   '+'('+c.ClassName+')' as name,c.ClassId " +
-                //            "from Student s Inner Join StdtClass sc on s.StudentId=sc.StdtId Inner Join Class c " +
-                //            "on c.ClassId=sc.ClassId where s.ActiveInd='A' AND sc.ActiveInd='A' AND  (c.ResidenceInd='" + hidSetVal.Value + "' " + DayNRes + " ) AND s.StudentLname like'%" + txtSearch.Text + "%') AS StudClass OUTER APPLY( SELECT TOP(1) chkStatus   = CASE WHEN se.CheckStatus = 1 " +
-                //            "THEN 1 ELSE 0 END,se.CheckinTime,se.CheckoutTime FROM StdtSessEvent se WHERE se.StudentId = StudClass.StudentId AND se.ClassId = StudClass.ClassId AND se.EventType='CH' AND CONVERT(date, se.CreatedOn) = CONVERT(date, GETDATE())  ORDER BY se.ModifiedOn DESC ) AS ses " +
-                //            "GROUP BY StudClass.studentid, StudClass.classid, StudClass.NAME, ses.checkintime, ses.checkouttime";
-                //strQuery = "Select s.StudentId,s.StudentLname+'  '+s.StudentFname+'-'+s.StudentNbr+'   '+'('+c.ClassName+')' as name,c.ClassId,chkStatus = CASE Ss.CheckStatus WHEN 1 THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END   from Student s Inner Join StdtClass sc on s.StudentId=sc.StdtId Inner Join Class c on c.ClassId=sc.ClassId Left Join StdtSessEvent Ss on s.StudentId=Ss.StudentId AND c.ClassId =Ss.ClassId where s.ActiveInd='A' AND sc.ActiveInd='A' AND (EventType='CH' OR c.ResidenceInd='" + hidSetVal.Value + "') And s.StudentLname like'%" + txtSearch.Text + "%'  ";
+                : "AND plc.StartDate <= CONVERT(date, GETDATE()) AND (plc.EndDate IS NULL OR plc.EndDate >= CONVERT(date, GETDATE()))"; // original semantics when not filtering by date
 
-                strQuery = @"
-                ;WITH EventsOnDate AS
-                (
-                    SELECT 
-                        se.StudentId,
-                        se.ClassId,
-                        se.CheckinTime,
-                        se.CheckoutTime,
-                        se.CheckStatus,
-                        se.AttendanceCode,
-                        se.CreatedOn,
-                        se.ModifiedOn,
-                        ISNULL(se.IsPresent, 0) AS IsPresent,
-                        ROW_NUMBER() OVER (
-                            PARTITION BY se.StudentId, se.ClassId
-                            ORDER BY se.CreatedOn ASC, se.ModifiedOn ASC
-                        ) AS rn
-                    FROM StdtSessEvent se
-                    WHERE se.EventType = 'CH'
-                      " + eventsDateCondition + @"
-                      AND se.SchoolId = '" + sess.SchoolId + @"'
-                ),
-                FirstEvent AS
-                (
-                    SELECT StudentId, ClassId, CheckinTime, CheckoutTime, CheckStatus, AttendanceCode, CreatedOn, ModifiedOn, IsPresent
-                    FROM EventsOnDate
-                    WHERE rn = 1
-                ),
-                Extras AS
-                (
-                    SELECT et.StudentId, et.ClassId,
-                           STUFF((
-                               SELECT ';' +
-                                      ISNULL(CONVERT(varchar(5), e2.CheckinTime, 108),'') + '|' +
-                                      ISNULL(CONVERT(varchar(5), e2.CheckoutTime,108),'') + '|' +
-                                      ISNULL(CAST(e2.AttendanceCode AS varchar(10)),'')
-                               FROM EventsOnDate e2
-                               WHERE e2.StudentId = et.StudentId
-                                 AND e2.ClassId = et.ClassId
-                                 AND e2.rn > 1
-                                 AND (
-                                     e2.CheckinTime IS NOT NULL
-                                     OR e2.CheckoutTime IS NOT NULL
-                                     OR e2.AttendanceCode IS NOT NULL
-                                 )
-                               ORDER BY e2.CreatedOn ASC, e2.ModifiedOn ASC
-                               FOR XML PATH(''), TYPE
-                           ).value('.', 'NVARCHAR(MAX)'), 1, 1, '') AS ExtraList
-                    FROM EventsOnDate et
-                    GROUP BY et.StudentId, et.ClassId
-                )
+            strQuery = @"
+            ;WITH StudentScope AS
+            (
+                SELECT DISTINCT 
+                    s.StudentId, 
+                    c.ClassId
+                FROM Student s
+                INNER JOIN StdtClass sc2 ON s.StudentId = sc2.StdtId
+                INNER JOIN Class c ON c.ClassId = sc2.ClassId
+                INNER JOIN Placement plc 
+                    ON s.StudentId = plc.StudentPersonalId 
+                   AND plc.Location = sc2.ClassId
+                   AND plc.Status = 1
+                   " + placementDateCondition + @"
+                WHERE s.ActiveInd = 'A'
+                  AND sc2.ActiveInd = 'A'
+                  " + locationFilter + @"
+                  " + studentFilter + @"
+            ),
 
-                SELECT
-                    sc.StudentId AS studentid,
-                    sc.Name,
-                    sc.ClassId AS classid,
-                    CASE WHEN EXISTS (
-                         SELECT 1 FROM StdtSessEvent x
-                         WHERE x.StudentId = sc.StudentId AND x.ClassId = sc.ClassId
-                           AND x.EventType = 'CH' " + presenceDateCondition + @"
-                           AND x.CheckStatus = 'True' AND x.SchoolId = '" + sess.SchoolId + @"'
-                    ) THEN 1 ELSE 0 END AS chkStatus,
-                    fe.CheckinTime AS InTime,
-                    fe.CheckoutTime AS OutTime,
-                    ISNULL(CASE WHEN fe.IsPresent = 1 THEN 'True' ELSE 'False' END, 'False') AS IsPresent,
-                    ISNULL(extras.ExtraList, '') AS Extras,
-                    COALESCE(fe.AttendanceCode, NULL) AS AttendanceCode
-                FROM
-                (
-                    SELECT s.StudentId,
-                           s.StudentLname + '  ' + s.StudentFname + '-' + s.StudentNbr + '   ' + '(' + c.ClassName + ')' AS Name,
-                           c.ClassId
-                    FROM Student s
-                    INNER JOIN StdtClass sc2 ON s.StudentId = sc2.StdtId
-                    INNER JOIN Class c ON c.ClassId = sc2.ClassId
-                    INNER JOIN Placement plc 
-                        ON s.StudentId = plc.StudentPersonalId 
-                       AND plc.Location = sc2.ClassId
-                       AND plc.Status = 1
-                       " + placementDateCondition + @"
-                    WHERE s.ActiveInd = 'A'
-                      AND sc2.ActiveInd = 'A'
-                      --AND (c.ResidenceInd = '" + safeHidVal + @"' " + DayNRes + @")
-                      " + locationFilter + @"
-                      " + studentFilter + @"
-                ) sc
-                LEFT JOIN FirstEvent fe ON fe.StudentId = sc.StudentId AND fe.ClassId = sc.ClassId
-                LEFT JOIN Extras extras ON extras.StudentId = sc.StudentId AND extras.ClassId = sc.ClassId
-                ORDER BY
-                    CASE WHEN fe.CreatedOn IS NULL THEN 1 ELSE 0 END,
-                    fe.CreatedOn ASC;
-                ";
-                            }
-                            else
-                            {
-                                strQuery = @"
-                ;WITH EventsToday AS
-                (
-                    -- CH events for today (CreatedOn date) for this school
-                    SELECT 
-                        se.StudentId,
-                        se.ClassId,
-                        se.CheckinTime,
-                        se.CheckoutTime,
-                        se.CheckStatus,
-                        se.AttendanceCode,
-                        se.CreatedOn,
-                        se.ModifiedOn,
-                        ISNULL(se.IsPresent, 0) AS IsPresent,
-                        ROW_NUMBER() OVER (
-                            PARTITION BY se.StudentId, se.ClassId
-                            ORDER BY se.CreatedOn ASC, se.ModifiedOn ASC
-                        ) AS rn
-                    FROM StdtSessEvent se
-                    WHERE se.EventType = 'CH'
-                " + eventsDateCondition + @"
-                      AND se.SchoolId = '" + sess.SchoolId + @"'
-                ),
-                FirstEvent AS
-                (
-                    SELECT StudentId, ClassId, CheckinTime, CheckoutTime, CheckStatus, AttendanceCode, CreatedOn, ModifiedOn, IsPresent
-                    FROM EventsToday
-                    WHERE rn = 1
-                ),
-                Extras AS
-                (
-                    SELECT et.StudentId, et.ClassId,
-                           STUFF((
-                               SELECT ';' +
-                                      ISNULL(CONVERT(varchar(5), e2.CheckinTime, 108),'') + '|' +
-                                      ISNULL(CONVERT(varchar(5), e2.CheckoutTime,108),'') + '|' +
-                                      ISNULL(CAST(e2.AttendanceCode AS varchar(10)),'')
-                               FROM EventsToday e2
-                               WHERE e2.StudentId = et.StudentId
-                                 AND e2.ClassId = et.ClassId
-                                 AND e2.rn > 1
-                                 AND (
-                                     e2.CheckinTime IS NOT NULL
-                                     OR e2.CheckoutTime IS NOT NULL
-                                     OR e2.AttendanceCode IS NOT NULL
-                                 )
-                               ORDER BY e2.CreatedOn ASC, e2.ModifiedOn ASC
-                               FOR XML PATH(''), TYPE
-                           ).value('.', 'NVARCHAR(MAX)'), 1, 1, '') AS ExtraList
-                    FROM EventsToday et
-                    GROUP BY et.StudentId, et.ClassId
-                )
+            EventsOnDate AS
+            (
+                SELECT 
+                    se.StdtSessEventId,
+                    se.StudentId,
+                    se.ClassId,
+                    se.CheckinTime,
+                    se.CheckoutTime,
+                    se.CheckStatus,
+                    se.AttendanceCode,
+                    se.CreatedOn,
+                    se.ModifiedOn,
+                    se.IsPresent,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY se.StudentId, se.ClassId
+                        ORDER BY se.StdtSessEventId ASC
+                    ) AS rn
+                FROM StdtSessEvent se
+                WHERE se.EventType = 'CH'
+                  " + eventsDateCondition + @"
+                  AND se.SchoolId = '" + sess.SchoolId + @"'
+                  AND EXISTS (
+                      SELECT 1
+                      FROM StudentScope ss
+                      WHERE ss.StudentId = se.StudentId
+                        AND ss.ClassId = se.ClassId
+                  )
+            ),
 
-                SELECT
-                    sc.StudentId AS studentid,
-                    sc.Name,
-                    sc.ClassId AS classid,
-                    CASE WHEN EXISTS (
-                         SELECT 1 FROM StdtSessEvent x
-                         WHERE x.StudentId = sc.StudentId
-                           AND x.ClassId = sc.ClassId
-                           AND x.EventType = 'CH' " + presenceDateCondition + @"
-                           AND x.CheckStatus = 'True'
-                           AND x.SchoolId = '" + sess.SchoolId + @"'
-                    ) THEN 1 ELSE 0 END AS chkStatus,
-                    fe.CheckinTime AS InTime,
-                    fe.CheckoutTime AS OutTime,
-                    ISNULL(CASE WHEN fe.IsPresent = 1 THEN 'True' ELSE 'False' END, 'False') AS IsPresent,
-                    ISNULL(extras.ExtraList, '') AS Extras,
-                    COALESCE(fe.AttendanceCode, NULL) AS AttendanceCode
-                FROM
-                (
-                    -- include students who have an active placement (plc.EndDate IS NULL)
-                    -- and whose class matches the residence filter
-                    SELECT s.StudentId,
-                           s.StudentLname + '  ' + s.StudentFname + '-' + s.StudentNbr + '   ' + '(' + c.ClassName + ')' AS Name,
-                           c.ClassId
-                    FROM Student s
-                    INNER JOIN StdtClass sc2 ON s.StudentId = sc2.StdtId
-                    INNER JOIN Class c ON c.ClassId = sc2.ClassId
-                    INNER JOIN Placement plc 
-                        ON s.StudentId = plc.StudentPersonalId 
-                       AND plc.Location = sc2.ClassId
-                       AND plc.EndDate IS NULL
-                       AND plc.Status = 1
-                       " + placementDateCondition + @"
-                    WHERE s.ActiveInd = 'A'
-                      AND sc2.ActiveInd = 'A'
-                      --AND (c.ResidenceInd = '" + safeHidVal + @"' " + DayNRes + @")
-                ) sc
-                LEFT JOIN FirstEvent fe ON fe.StudentId = sc.StudentId AND fe.ClassId = sc.ClassId
-                LEFT JOIN Extras extras ON extras.StudentId = sc.StudentId AND extras.ClassId = sc.ClassId
-                ORDER BY Name ASC";
-//                    CASE WHEN fe.CreatedOn IS NULL THEN 1 ELSE 0 END,
-//                    fe.CreatedOn ASC;
-//                ";
-                //strQuery = "Select s.StudentId,s.StudentLname+'  '+s.StudentFname+'-'+s.StudentNbr+'   '+'('+c.ClassName+')' as name,c.ClassId,chkStatus = CASE Ss.CheckStatus WHEN 1 THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END   from Student s Inner Join StdtClass sc on s.StudentId=sc.StdtId Inner Join Class c on c.ClassId=sc.ClassId Left Join StdtSessEvent Ss on s.StudentId=Ss.StudentId AND c.ClassId =Ss.ClassId  where s.ActiveInd='A' AND sc.ActiveInd='A' AND (EventType='CH' OR c.ResidenceInd='" + hidSetVal.Value + "')";
-            }
+            FirstEvent AS
+            (
+                SELECT 
+                    StudentId, 
+                    ClassId, 
+                    CheckinTime, 
+                    CheckoutTime, 
+                    CheckStatus, 
+                    AttendanceCode, 
+                    CreatedOn, 
+                    ModifiedOn, 
+                    IsPresent
+                FROM EventsOnDate
+                WHERE rn = 1
+            ),
+
+            Extras AS
+            (
+                SELECT 
+                    e2.StudentId, 
+                    e2.ClassId,
+                    STUFF((
+                        SELECT ';' +
+                               ISNULL(CONVERT(varchar(5), e3.CheckinTime, 108),'') + '|' +
+                               ISNULL(CONVERT(varchar(5), e3.CheckoutTime,108),'') + '|' +
+                               ISNULL(CAST(e3.AttendanceCode AS varchar(10)),'')
+                        FROM EventsOnDate e3
+                        INNER JOIN FirstEvent fe 
+                            ON fe.StudentId = e3.StudentId 
+                           AND fe.ClassId = e3.ClassId
+                        WHERE e3.StudentId = e2.StudentId
+                          AND e3.ClassId = e2.ClassId
+                          AND e3.rn > 1
+                          AND NOT (
+                              (e3.CheckinTime = fe.CheckinTime OR (e3.CheckinTime IS NULL AND fe.CheckinTime IS NULL))
+                              AND
+                              (e3.CheckoutTime = fe.CheckoutTime OR (e3.CheckoutTime IS NULL AND fe.CheckoutTime IS NULL))
+                              AND
+                              (e3.AttendanceCode = fe.AttendanceCode OR (e3.AttendanceCode IS NULL AND fe.AttendanceCode IS NULL))
+                          )
+
+                          AND (
+                              e3.CheckinTime IS NOT NULL
+                              OR e3.CheckoutTime IS NOT NULL
+                              OR e3.AttendanceCode IS NOT NULL
+                          )
+
+                        ORDER BY e3.StdtSessEventId ASC
+                        FOR XML PATH(''), TYPE
+                    ).value('.', 'NVARCHAR(MAX)'), 1, 1, '') AS ExtraList
+                FROM EventsOnDate e2
+                GROUP BY e2.StudentId, e2.ClassId
+            )
+
+            SELECT
+                sc.StudentId AS studentid,
+                sc.Name,
+                sc.ClassId AS classid,
+                fe.IsPresent AS chkStatus,
+                fe.CheckinTime AS InTime,
+                fe.CheckoutTime AS OutTime,
+                fe.IsPresent AS IsPresent,
+                ISNULL(extras.ExtraList, '') AS Extras,
+                COALESCE(fe.AttendanceCode, NULL) AS AttendanceCode
+
+            FROM
+            (
+                SELECT 
+                    ss.StudentId,
+                    s.StudentLname + '  ' + s.StudentFname + '-' + s.StudentNbr + '   ' + '(' + c.ClassName + ')' AS Name,
+                    ss.ClassId
+                FROM StudentScope ss
+                INNER JOIN Student s ON s.StudentId = ss.StudentId
+                INNER JOIN Class c ON c.ClassId = ss.ClassId
+            ) sc
+
+            LEFT JOIN FirstEvent fe 
+                ON fe.StudentId = sc.StudentId 
+               AND fe.ClassId = sc.ClassId
+
+            LEFT JOIN Extras extras 
+                ON extras.StudentId = sc.StudentId 
+               AND extras.ClassId = sc.ClassId
+
+            ORDER BY Name ASC;";
+
             DataTable Dt = objData.ReturnDataTable(strQuery, false);
+
             if (Dt != null)
             {
                 if (Dt.Rows.Count > 0)
@@ -1109,15 +783,6 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
                     grdGroup.DataSource = Dt;
                     grdGroup.DataBind();
                 }
-
-                try
-                {
-                    if (upGrid != null)
-                    {
-                        upGrid.Update();
-                    }
-                }
-                catch { /* ignore if panel not available in some contexts */ }
             }
         }
         catch (Exception ex)
@@ -1202,27 +867,18 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
 
         grdGroup.PageIndex = 0;
 
-        var sm = ScriptManager.GetCurrent(Page);
-        string js = "showLoader('Searching…');";
-        if (sm != null && sm.IsInAsyncPostBack)
-            ScriptManager.RegisterStartupScript(Page, Page.GetType(), "showLoader", js, true);
-        else
-            ClientScript.RegisterStartupScript(Page.GetType(), "showLoader", js, true);
-
         if (hidSearch.Value == "0")
         {
             fillStudent(hidSetVal.Value.ToString(), false);
+            LoadAttendanceCodesToJS();
+            if (upGrid != null) upGrid.Update();
         }
         else
         {
             fillStudent(hidSetVal.Value.ToString(), true);
+            LoadAttendanceCodesToJS();
+            if (upGrid != null) upGrid.Update();
         }
-
-        js = "if(window.hideLoader) hideLoader();";
-        if (sm != null && sm.IsInAsyncPostBack)
-            ScriptManager.RegisterStartupScript(Page, Page.GetType(), "hideLoader", js, true);
-        else
-            ClientScript.RegisterStartupScript(Page.GetType(), "hideLoader", js, true);
     }
 
     private void ShowGridBand(string message, int milliseconds, string kind)
@@ -1363,14 +1019,12 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
     {
         return ResolveStatus(isPresentVal) ? "att-sw-present" : "att-sw-absent";
     }
-    protected string GetStatusHidden(object isPresentVal)
+    protected string GetStatusHidden(object isPresent)
     {
-        if (isPresentVal == null || isPresentVal == DBNull.Value) return "0";
-        if (isPresentVal is bool) return ((bool)isPresentVal) ? "1" : "0";
-        string s = isPresentVal.ToString().Trim();
-        if (s == "1" || s.Equals("True", StringComparison.OrdinalIgnoreCase) || s.Equals("Present", StringComparison.OrdinalIgnoreCase))
-            return "1";
-        return "0";
+        if (isPresent == null || isPresent == DBNull.Value)
+            return "-1";
+
+        return Convert.ToInt32(isPresent) == 1 ? "1" : "0";
     }
 
     // helper to format time values to HH:mm (returns empty string for null/DBNULL)
@@ -1432,11 +1086,11 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
         if (targetDate.HasValue)
         {
             string iso = targetDate.Value.ToString("yyyy-MM-dd");
-            dateCondition = "AND CreatedOn >= CAST('" + iso + "' AS date) AND CreatedOn < DATEADD(day,1,CAST('" + iso + "' AS date))";
+            dateCondition = "AND CAST(ISNULL(CheckinTime, EvntTs) AS date) = CAST('" + iso + "' AS date)";
         }
         else
         {
-            dateCondition = "AND CreatedOn >= CAST(GETDATE() AS date) AND CreatedOn < DATEADD(day,1,CAST(GETDATE() AS date))";
+            dateCondition = "AND CAST(ISNULL(CheckinTime, EvntTs) AS date) = CAST(GETDATE() AS date)";
         }
 
         string sqlSelect = @"
@@ -1451,8 +1105,8 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
         ";
 
         DataTable existing = objData.ReturnDataTable(sqlSelect, false) ?? new DataTable();
-
-        // iterate ordered pairs and update or insert, while saving Code and IsPresent
+        StringBuilder batch = new StringBuilder();
+        batch.AppendLine("BEGIN TRANSACTION;");
         for (int i = 0; i < allPairs.Count; i++)
         {
             var p = allPairs[i];
@@ -1460,20 +1114,12 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
             string checkinSql = p.In.HasValue ? "'" + p.In.Value.ToString("yyyy-MM-dd HH:mm:ss") + "'" : "NULL";
             string checkoutSql = p.Out.HasValue ? "'" + p.Out.Value.ToString("yyyy-MM-dd HH:mm:ss") + "'" : "NULL";
 
-            // determine CheckStatus logic (same as earlier)
-            string checkStatus = (p.Out.HasValue && !p.In.HasValue) ? "False" : "True";
+            string checkStatus =
+                (p.IsPresent.HasValue && !p.IsPresent.Value)
+                    ? "False"
+                    : ((p.Out.HasValue && !p.In.HasValue) ? "False" : "True");
 
-            // Prefer explicit posted IsPresent (from hidStatus) if available; otherwise fall back to checkStatus rule
-            string isPresentSql;
-            if (p.IsPresent.HasValue)
-            {
-                isPresentSql = p.IsPresent.Value ? "1" : "0";
-            }
-            else
-            {
-                // fallback: if OUT exists but IN missing, treat as absent (False); otherwise present
-                isPresentSql = (p.Out.HasValue && !p.In.HasValue) ? "0" : "1";
-            }
+            string isPresentSql = p.IsPresent.HasValue ? (p.IsPresent.Value ? "1" : "0") : "NULL";
 
 
             var exemptCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "LOA", "SICK" };
@@ -1591,26 +1237,32 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
                     ModifiedOn = GETDATE()
                 WHERE StdtSessEventId = " + pkVal + @"
             ";
-                objData.Execute(sqlUpdate);
+                batch.AppendLine(sqlUpdate);
             }
             else
             {
                 // INSERT a new row, include IsPresent and AttendanceCode
                 string attendanceInsertValue = (codeValue > 0) ? codeValue.ToString() : "NULL";
 
-                string createdOnValueSql = "GETDATE()";
+                string createdOnValueSql;
+
                 if (targetDate.HasValue)
                 {
-                    createdOnValueSql = "CAST('" + targetDate.Value.ToString("yyyy-MM-dd") + " 00:00:00' AS datetime)";
+                    string datePart = targetDate.Value.ToString("yyyy-MM-dd");
+                    createdOnValueSql = "CAST('" + datePart + "' AS datetime) + CAST(CONVERT(time, GETDATE()) AS datetime)";
+                }
+                else
+                {
+                    createdOnValueSql = "GETDATE()";
                 }
 
                 string sqlInsert = @"
                 INSERT INTO StdtSessEvent
-                    (SchoolId, StudentId, EvntTs, CheckStatus, IsPresent, ClassId, CreatedBy, CreatedOn, ModifiedOn, EventType, CheckinTime, CheckoutTime, AttendanceCode)
+                    (SchoolId, StudentId, EvntTs, CheckStatus, IsPresent, ClassId, CreatedBy, CreatedOn, EventType, CheckinTime, CheckoutTime, AttendanceCode)
                 VALUES
-                    (" + schoolId + ", " + studentId + ", GETDATE(), '" + checkStatus + "', " + isPresentSql + ", " + classId + ", " + userId + ", " + createdOnValueSql + ", GETDATE(), 'CH', " + checkinSql + ", " + checkoutSql + ", " + attendanceInsertValue + @")
-            ";
-                objData.Execute(sqlInsert);
+                    (" + schoolId + ", " + studentId + ", " + createdOnValueSql + ", '" + checkStatus + "', " + isPresentSql + ", " + classId + ", " + userId + ", " + createdOnValueSql + ", 'CH', " + checkinSql + ", " + checkoutSql + ", " + attendanceInsertValue + @")
+                ";
+                batch.AppendLine(sqlInsert);
             }
         }
 
@@ -1622,8 +1274,15 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
                 var pk = existing.Rows[j]["StdtSessEventId"];
                 string pkVal = Convert.ToString(pk);
                 string sqlDel = "DELETE FROM StdtSessEvent WHERE StdtSessEventId = " + pkVal;
-                objData.Execute(sqlDel);
+                batch.AppendLine(sqlDel);
             }
+        }
+
+        batch.AppendLine("COMMIT;");
+
+        if (batch.Length > 0)
+        {
+            objData.Execute(batch.ToString());
         }
 
         if (targetDate.HasValue)
@@ -1643,13 +1302,6 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
             try { if (hidPastDate != null) hidPastDate.Value = ""; }
             catch { }
         }
-
-        // Rebind grid to reflect the new data
-        try
-        {
-            fillStudent(hidSetVal.Value.ToString(), false);
-        }
-        catch { /* ignore rebind exceptions here */ }
     }
 
     private List<TimePair> ParseEncodedExtraTimes(string encoded)
@@ -1692,18 +1344,38 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
     private void BindLocationDropdown()
     {
         objData = new clsData();
+
+        DateTime targetDate = DateTime.Today;
+        DateTime parsedDate;
+        if (hidPastDate != null &&
+            !string.IsNullOrWhiteSpace(hidPastDate.Value) &&
+            DateTime.TryParseExact(hidPastDate.Value, "yyyy-MM-dd",
+                CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedDate))
+        {
+            targetDate = parsedDate.Date;
+        }
+
+        string dateSql = targetDate.ToString("yyyy-MM-dd");
+
         string sql = @"
-        SELECT DISTINCT c.ClassId AS LocationId, c.ClassName AS LocationName
+        SELECT DISTINCT
+            c.ClassId AS LocationId,
+            c.ClassName AS LocationName
         FROM Student s
-        INNER JOIN StdtClass sc ON s.StudentId = sc.StdtId
-        INNER JOIN Class c ON c.ClassId = sc.ClassId
-        INNER JOIN Placement p ON p.StudentPersonalId = s.StudentId
-                           AND p.Location = c.ClassId
-                           AND p.EndDate IS NULL
-                           AND p.Status = 1
-        WHERE s.ActiveInd = 'A' AND sc.ActiveInd = 'A' AND c.ActiveInd = 'A'
-        ORDER BY c.ClassName, c.ClassId;
-    ";
+        INNER JOIN StdtClass sc
+            ON s.StudentId = sc.StdtId
+        INNER JOIN Class c
+            ON c.ClassId = sc.ClassId
+        INNER JOIN Placement p
+            ON p.StudentPersonalId = s.StudentId
+           AND p.Location = c.ClassId
+           AND p.Status = 1
+        WHERE s.ActiveInd = 'A'
+          AND sc.ActiveInd = 'A'
+          AND c.ActiveInd = 'A'
+          AND p.StartDate <= '" + dateSql + @"'
+          AND (p.EndDate IS NULL OR p.EndDate >= '" + dateSql + @"')
+        ORDER BY c.ClassName, c.ClassId;";
 
         DataTable dt = objData.ReturnDataTable(sql, false);
 
@@ -1712,31 +1384,57 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
         if (dt != null)
         {
             foreach (DataRow r in dt.Rows)
-                ddlLocation.Items.Add(new ListItem(Convert.ToString(r["LocationName"]), Convert.ToString(r["LocationId"])));
+            {
+                ddlLocation.Items.Add(new ListItem(
+                    Convert.ToString(r["LocationName"]),
+                    Convert.ToString(r["LocationId"])
+                ));
+            }
         }
     }
 
     private void BindLocationDropdown(string clientId)
     {
-        string filter = "";
-        int sid;
         objData = new clsData();
+
+        DateTime targetDate = DateTime.Today;
+        DateTime parsedDate;
+        if (hidPastDate != null &&
+            !string.IsNullOrWhiteSpace(hidPastDate.Value) &&
+            DateTime.TryParseExact(hidPastDate.Value, "yyyy-MM-dd",
+                CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedDate))
+        {
+            targetDate = parsedDate.Date;
+        }
+
+        string dateSql = targetDate.ToString("yyyy-MM-dd");
+        string filter = "";
+
+        int sid;
         if (!string.IsNullOrEmpty(clientId) && int.TryParse(clientId, out sid))
         {
-            filter = " AND s.StudentId = " + sid.ToString();
+            filter = " AND s.StudentId = " + sid;
         }
 
         string sql = @"
-        SELECT DISTINCT c.ClassId AS LocationId, c.ClassName AS LocationName
+        SELECT DISTINCT
+            c.ClassId AS LocationId,
+            c.ClassName AS LocationName
         FROM Student s
-        INNER JOIN StdtClass sc ON s.StudentId = sc.StdtId
-        INNER JOIN Class c ON c.ClassId = sc.ClassId
-        INNER JOIN Placement p ON p.StudentPersonalId = s.StudentId
-                               AND p.Location = c.ClassId
-                               AND p.EndDate IS NULL
-                               AND p.Status = 1
-        WHERE s.ActiveInd = 'A' AND sc.ActiveInd = 'A' AND c.ActiveInd = 'A'
-        " + filter + @"
+        INNER JOIN StdtClass sc
+            ON s.StudentId = sc.StdtId
+        INNER JOIN Class c
+            ON c.ClassId = sc.ClassId
+        INNER JOIN Placement p
+            ON p.StudentPersonalId = s.StudentId
+           AND p.Location = c.ClassId
+           AND p.Status = 1
+        WHERE s.ActiveInd = 'A'
+          AND sc.ActiveInd = 'A'
+          AND c.ActiveInd = 'A'
+          " + filter + @"
+          AND p.StartDate <= '" + dateSql + @"'
+          AND (p.EndDate IS NULL OR p.EndDate >= '" + dateSql + @"')
         ORDER BY c.ClassName, c.ClassId;
     ";
 
@@ -1752,39 +1450,57 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
                 string lid = Convert.ToString(r["LocationId"]);
                 if (added.Contains(lid)) continue;
                 added.Add(lid);
-                ddlLocation.Items.Add(new ListItem(Convert.ToString(r["LocationName"]), lid));
+
+                ddlLocation.Items.Add(new ListItem(
+                    Convert.ToString(r["LocationName"]),
+                    lid
+                ));
             }
         }
     }
     private void BindClientDropdown()
     {
         objData = new clsData();
+
+        DateTime targetDate = DateTime.Today;
+        DateTime parsedDate;
+        if (hidPastDate != null &&
+            !string.IsNullOrWhiteSpace(hidPastDate.Value) &&
+            DateTime.TryParseExact(hidPastDate.Value, "yyyy-MM-dd",
+                CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedDate))
+        {
+            targetDate = parsedDate.Date;
+        }
+
+        string dateSql = targetDate.ToString("yyyy-MM-dd");
+
         string sql = @"
         SELECT DISTINCT
-            c.ClassId,
-            c.ClassName,
             s.StudentId,
             (s.StudentLname + ' ' + s.StudentFname) AS StudentName
         FROM Student s
-        INNER JOIN StdtClass sc ON s.StudentId = sc.StdtId
-        INNER JOIN Class c ON c.ClassId = sc.ClassId
-        INNER JOIN Placement p ON p.StudentPersonalId = s.StudentId
-                               AND p.Location = c.ClassId
-                               AND p.EndDate IS NULL
-                               AND p.Status = 1
+        INNER JOIN StdtClass sc
+            ON s.StudentId = sc.StdtId
+        INNER JOIN Class c
+            ON c.ClassId = sc.ClassId
+        INNER JOIN Placement p
+            ON p.StudentPersonalId = s.StudentId
+           AND p.Location = c.ClassId
+           AND p.Status = 1
         WHERE s.ActiveInd = 'A'
           AND sc.ActiveInd = 'A'
           AND c.ActiveInd = 'A'
-        ORDER BY c.ClassId, s.StudentId;
+          AND p.StartDate <= '" + dateSql + @"'
+          AND (p.EndDate IS NULL OR p.EndDate >= '" + dateSql + @"')
+        ORDER BY StudentName, s.StudentId;
     ";
 
         DataTable dt = objData.ReturnDataTable(sql, false);
 
         ddlClient.Items.Clear();
-        ddlClient.Items.Add(new ListItem("-- All Students --", "")); // optional
+        ddlClient.Items.Add(new ListItem("-- All Students --", ""));
         if (dt != null)
         {
-            // as query returns class+student rows, just add unique students
             var added = new HashSet<string>();
             foreach (DataRow r in dt.Rows)
             {
@@ -1801,12 +1517,25 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
     }
     private void BindClientDropdown(string locationId)
     {
-        string filter = "";
-        int loc;
         objData = new clsData();
+
+        DateTime targetDate = DateTime.Today;
+        DateTime parsedDate;
+        if (hidPastDate != null &&
+            !string.IsNullOrWhiteSpace(hidPastDate.Value) &&
+            DateTime.TryParseExact(hidPastDate.Value, "yyyy-MM-dd",
+                CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedDate))
+        {
+            targetDate = parsedDate.Date;
+        }
+
+        string dateSql = targetDate.ToString("yyyy-MM-dd");
+        string filter = "";
+
+        int loc;
         if (!string.IsNullOrEmpty(locationId) && int.TryParse(locationId, out loc))
         {
-            filter = " AND c.ClassId = " + loc.ToString();
+            filter = " AND c.ClassId = " + loc;
         }
 
         string sql = @"
@@ -1814,21 +1543,27 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
             s.StudentId,
             (s.StudentLname + ' ' + s.StudentFname) AS StudentName
         FROM Student s
-        INNER JOIN StdtClass sc ON s.StudentId = sc.StdtId
-        INNER JOIN Class c ON c.ClassId = sc.ClassId
-        INNER JOIN Placement p ON p.StudentPersonalId = s.StudentId
-                               AND p.Location = c.ClassId
-                               AND p.EndDate IS NULL
-                               AND p.Status = 1
-        WHERE s.ActiveInd = 'A' AND sc.ActiveInd = 'A' AND c.ActiveInd = 'A'
-        " + filter + @"
-        ORDER BY StudentName, StudentId;
+        INNER JOIN StdtClass sc
+            ON s.StudentId = sc.StdtId
+        INNER JOIN Class c
+            ON c.ClassId = sc.ClassId
+        INNER JOIN Placement p
+            ON p.StudentPersonalId = s.StudentId
+           AND p.Location = c.ClassId
+           AND p.Status = 1
+        WHERE s.ActiveInd = 'A'
+          AND sc.ActiveInd = 'A'
+          AND c.ActiveInd = 'A'
+          " + filter + @"
+          AND p.StartDate <= '" + dateSql + @"'
+          AND (p.EndDate IS NULL OR p.EndDate >= '" + dateSql + @"')
+        ORDER BY StudentName, s.StudentId;
     ";
 
         DataTable dt = objData.ReturnDataTable(sql, false);
 
         ddlClient.Items.Clear();
-        ddlClient.Items.Add(new ListItem("-- All Clients --", ""));
+        ddlClient.Items.Add(new ListItem("-- All Students --", ""));
         if (dt != null)
         {
             var added = new HashSet<string>();
@@ -1837,7 +1572,11 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
                 string sid = Convert.ToString(r["StudentId"]);
                 if (added.Contains(sid)) continue;
                 added.Add(sid);
-                ddlClient.Items.Add(new ListItem(Convert.ToString(r["StudentName"]), sid));
+
+                ddlClient.Items.Add(new ListItem(
+                    Convert.ToString(r["StudentName"]),
+                    sid
+                ));
             }
         }
     }
@@ -1845,12 +1584,13 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
     protected void ddlLocation_SelectedIndexChanged(object sender, EventArgs e)
     {
         string selectedClass = ddlLocation.SelectedValue;
-        string selectedClient = ddlClient.SelectedValue;
-        if(selectedClient=="")
+
+        ddlClient.ClearSelection();
         BindClientDropdown(selectedClass);
 
         string param = (hidSetVal != null) ? (hidSetVal.Value ?? "") : "";
         fillStudent(param, true);
+        LoadAttendanceCodesToJS();
     }
     protected void ddlClient_SelectedIndexChanged(object sender, EventArgs e)
     {
@@ -1861,6 +1601,7 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
 
         string param = (hidSetVal != null) ? (hidSetVal.Value ?? "") : "";
         fillStudent(param, true);
+        LoadAttendanceCodesToJS();
     }
 
     protected void btnCloseCalendar_Click(object sender, EventArgs e)
@@ -1894,6 +1635,24 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
                 System.Diagnostics.Debug.WriteLine("btnEditPastDates_Click: pnlCalendar not found.");
                 return;
             }
+
+            DateTime selectedDate = DateTime.Today;
+
+            if (!string.IsNullOrEmpty(hidPastDate.Value))
+            {
+                DateTime parsed;
+                if (DateTime.TryParse(hidPastDate.Value, out parsed))
+                    selectedDate = parsed;
+            }
+
+            //RESET BEFORE APPLYING
+            calPast.SelectedDates.Clear();
+            calPast.SelectedDate = DateTime.MinValue;
+
+            //ONLY THIS (simple)
+            calPast.SelectedDate = selectedDate;
+            calPast.VisibleDate = selectedDate;
+            calPast.TodaysDate = DateTime.Today;
 
             // Show and prepare the *preferred* panel
             targetPanel.Style["display"] = "block";
@@ -1981,9 +1740,16 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
             // ensure calendar reflects selection
             if (calPast != null)
             {
+
+                //FULL RESET (fixes today ghost selection)
+                calPast.SelectedDates.Clear();
+                calPast.SelectedDate = DateTime.MinValue;
+
+                //SET NEW DATE
                 calPast.SelectedDate = selectedDate;
+
+                //SYNC VIEW
                 calPast.VisibleDate = selectedDate;
-                calPast.TodaysDate = DateTime.Today;
             }
 
             // --- 3) Bind grid for that date ---
@@ -2000,6 +1766,7 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
 
                 // existing logic: rebind grid for sel
                 fillStudent(hidSetVal.Value.ToString(), false);
+                LoadAttendanceCodesToJS();
 
                 // Update the UpdatePanel that contains the grid so client receives refreshed HTML.
                 if (upGrid != null) upGrid.Update();
@@ -2087,6 +1854,7 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
                 ScriptManager.RegisterStartupScript(upCalendar, upCalendar.GetType(), "cleanupAfterDateSelect", cleanupJs, true);
             else
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "cleanupAfterDateSelect", cleanupJs, true);
+
         }
         catch (Exception ex)
         {
@@ -2165,30 +1933,6 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
 
             if (upCalendar != null) upCalendar.Update();
 
-//            string js = @"
-//            try {
-//                // prefer hideCalendarPopup if present
-//                if (window.hideCalendarPopup) {
-//                    try { window.hideCalendarPopup(); }
-//                    catch(e){ console && console.log && console.log('hideCalendarPopup error', e); }
-//                } else if (window.findAndPruneDuplicates) {
-//                    try { window.findAndPruneDuplicates(); }
-//                    catch(e){ console && console.log && console.log('findAndPruneDuplicates error', e); }
-//                } else {
-//                    // last-resort: remove any .calendar-popup nodes except last
-//                    (function(){
-//                        var popups = document.querySelectorAll('.calendar-popup');
-//                        if (!popups || popups.length <= 1) return;
-//                        for (var i = 0; i < popups.length - 1; i++) {
-//                            try { popups[i].parentNode.removeChild(popups[i]); } catch(e){}
-//                        }
-//                        var last = popups[popups.length-1];
-//                        if (last) { last.style.display = 'block'; last.style.visibility = 'visible'; last.style.opacity = '1'; }
-//                    })();
-//                }
-//            } catch(e){ console && console.log && console.log('hide-calendar script error', e); }
-//        ";
-//            ScriptManager.RegisterStartupScript(this, this.GetType(), "hideCalendarAfterMonth", js, true);
 
             string script = @"
         try{
@@ -2235,32 +1979,17 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
 
     protected void grdGroup_DataBound(object sender, EventArgs e)
     {
-        DateTime selDate;
-        // Prefer the form value first (client may set it), then fallback to server hidden field if you rely on it.
-        string posted = Request.Form["hidPastDate"] ?? (hidPastDate != null ? hidPastDate.Value : null);
-
-        if (!string.IsNullOrEmpty(posted) &&
-            DateTime.TryParseExact(posted, new[] { "yyyy-MM-dd", "dd/MM/yyyy", "MM/dd/yyyy" },
-                CultureInfo.InvariantCulture, DateTimeStyles.None, out selDate))
+        try
         {
-            calPast.SelectedDate = selDate;
-            calPast.VisibleDate = selDate;
-            calPast.TodaysDate = DateTime.Today;
-        }
-        else
-        {
-            // Only set to Today's month on first load; avoid overwriting user navigation on postbacks
             if (!IsPostBack)
             {
-                calPast.SelectedDate = DateTime.MinValue;
                 calPast.VisibleDate = DateTime.Today;
                 calPast.TodaysDate = DateTime.Today;
             }
-            // else: do nothing — let ASP.NET preserve the calendar state from the request
-        }
 
-        // Update the calendar UpdatePanel once if available
-        try { if (upCalendar != null) upCalendar.Update(); }
+            if (upCalendar != null)
+                upCalendar.Update();
+        }
         catch { }
     }
 
@@ -2277,29 +2006,34 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
 
     protected void calPast_DayRender(object sender, DayRenderEventArgs e)
     {
-        // Highlight today's date
+        // disable future dates
+        if (e.Day.Date > DateTime.Today)
+        {
+            e.Day.IsSelectable = false;
+            e.Cell.ForeColor = System.Drawing.Color.Gray;
+            return;
+        }
+
+        // reset first
+        e.Cell.BackColor = System.Drawing.Color.Transparent;
+        e.Cell.ForeColor = System.Drawing.Color.Black;
+        e.Cell.Font.Bold = false;
+
+        // today
         if (e.Day.Date == DateTime.Today)
         {
             e.Cell.BackColor = System.Drawing.Color.LightSkyBlue;
             e.Cell.ForeColor = System.Drawing.Color.White;
             e.Cell.Font.Bold = true;
-            e.Cell.CssClass = (e.Cell.CssClass ?? "") + " cal-today";
         }
 
-        // Highlight selected date
-        if (calPast.SelectedDate != DateTime.MinValue && e.Day.Date == calPast.SelectedDate.Date)
+        // selected
+        if (calPast.SelectedDate != DateTime.MinValue &&
+            e.Day.Date == calPast.SelectedDate.Date)
         {
             e.Cell.BackColor = System.Drawing.Color.Silver;
             e.Cell.ForeColor = System.Drawing.Color.White;
             e.Cell.Font.Bold = true;
-            e.Cell.CssClass = (e.Cell.CssClass ?? "") + " cal-today";
-        }
-
-        // Disable future dates
-        if (e.Day.Date > DateTime.Today)
-        {
-            e.Day.IsSelectable = false;
-            e.Cell.ForeColor = System.Drawing.Color.Gray;
         }
     }
 
@@ -2308,37 +2042,57 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
     {
         try
         {
-            // get session values (school id and login id) from server session
             var sess = (clsSession)System.Web.HttpContext.Current.Session["UserSession"];
-            if (sess == null) return new { success = false, message = "Session expired" };
+            if (sess == null)
+                return new { success = false, message = "Session expired" };
 
-            int schoolId = sess.SchoolId;
+            DateTime targetDate = DateTime.Today;
 
-            // determine date condition (match CreatedOn date or CheckinTime date as per your existing logic)
-            string dateCondition;
-            if (!string.IsNullOrEmpty(dateIso))
+            if (!string.IsNullOrWhiteSpace(dateIso))
             {
-                // sanitize iso format assumption - you may validate here if needed
-                dateCondition = "AND CreatedOn >= CAST('" + dateIso + "' AS date) AND CreatedOn < DATEADD(day,1,CAST('" + dateIso + "' AS date))";
+                DateTime parsed;
+                if (!DateTime.TryParseExact(
+                        dateIso,
+                        "yyyy-MM-dd",
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.None,
+                        out parsed))
+                {
+                    return new { success = false, message = "Invalid date format for dateIso" };
+                }
+
+                targetDate = parsed.Date;
             }
-            else
-            {
-                dateCondition = "AND CreatedOn >= CAST(GETDATE() AS date) AND CreatedOn < DATEADD(day,1,CAST(GETDATE() AS date))";
-            }
+
+            var obj = new clsData();
+            clsData.blnTrans = true;
+            SqlConnection con = obj.Open();
 
             string sql = @"
             DELETE FROM StdtSessEvent
-            WHERE SchoolId = " + schoolId + @"
-              AND StudentId = " + studentId + @"
-              AND ClassId = " + classId + @"
+            WHERE SchoolId = @schoolId
+              AND StudentId = @studentId
+              AND ClassId = @classId
               AND EventType = 'CH'
-              " + dateCondition + @";
+              AND CAST(ISNULL(CheckinTime, EvntTs) AS date) = @targetDate;
         ";
 
-            var obj = new clsData();
-            obj.Execute(sql);
+            using (SqlCommand cmd = new SqlCommand(sql, con))
+            {
+                cmd.Parameters.Add("@schoolId", SqlDbType.Int).Value = sess.SchoolId;
+                cmd.Parameters.Add("@studentId", SqlDbType.Int).Value = studentId;
+                cmd.Parameters.Add("@classId", SqlDbType.Int).Value = classId;
+                cmd.Parameters.Add("@targetDate", SqlDbType.Date).Value = targetDate;
 
-            return new { success = true, message = "Deleted" };
+                cmd.CommandTimeout = 60;
+                int rows = cmd.ExecuteNonQuery();
+
+                return new
+                {
+                    success = true,
+                    message = rows > 0 ? "Deleted" : "No matching attendance found"
+                };
+            }
         }
         catch (Exception ex)
         {
@@ -2356,6 +2110,7 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
             //hidPastDate.Value = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
             //System.Diagnostics.Trace.WriteLine("btnRefreshGrid_Click invoked at " + DateTime.Now.ToString("o"));
             fillStudent("0", false);
+            LoadAttendanceCodesToJS();
             BindLocationDropdown();
             BindClientDropdown();
             pnlCalendar.Style["display"] = "none";
@@ -2512,20 +2267,19 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
 
             if (txt != null)
             {
-                txt.Enabled = false;
-                txt.Attributes["readonly"] = "readonly";
+                txt.Attributes["readonly"] = "readonly"; //instead of disabling
             }
             else if (ddl != null)
             {
-                ddl.Enabled = false;
+                ddl.Attributes["disabled"] = "disabled"; // keep dropdown disabled
             }
             else if (btn != null)
             {
-                btn.Enabled = false;
+                btn.Attributes["disabled"] = "disabled"; // use attribute instead
             }
             else if (chk != null)
             {
-                chk.Enabled = false;
+                chk.Attributes["disabled"] = "disabled";
             }
 
             if (c.HasControls())
@@ -2534,7 +2288,7 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
     }
 
     [System.Web.Services.WebMethod(EnableSession = true)]
-    public static object InsertCheckinForStudent(int studentId, int classId, string dateIso /* optional: "yyyy-MM-dd" or empty for today */)
+    public static object InsertCheckinForStudent(int studentId, int classId, string dateIso, int isPresent)
     {
         try
         {
@@ -2548,39 +2302,62 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
             if (!string.IsNullOrWhiteSpace(dateIso))
             {
                 DateTime parsed;
-                if (DateTime.TryParse(dateIso, out parsed))
+                if (DateTime.TryParseExact(
+                        dateIso,
+                        "yyyy-MM-dd",
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        System.Globalization.DateTimeStyles.None,
+                        out parsed))
+                {
                     dateFilter = parsed.Date;
+                }
                 else
+                {
                     return new { success = false, message = "Invalid date format for dateIso" };
+                }
             }
 
-                string sql = @"
-                -- use a single parameterized batch: check if a CH row exists for given date (by date only)
+            string sql = @"
                 IF EXISTS(
                     SELECT 1 FROM StdtSessEvent
                     WHERE SchoolId = @schoolId
                       AND StudentId = @studentId
                       AND ClassId = @classId
                       AND EventType = 'CH'
-                      AND CAST(CreatedOn AS date) = @date
+                      AND CAST(ISNULL(CheckinTime, EvntTs) AS date) = @date
                 )
                 BEGIN
                     UPDATE StdtSessEvent
-                    SET CheckStatus = 'True',
-                        IsPresent = 1,
+                    SET CheckStatus = CASE WHEN @isPresent = 1 THEN 'True' ELSE 'False' END,
+                        IsPresent = @isPresent,
                         ModifiedOn = GETDATE()
                     WHERE SchoolId = @schoolId
                       AND StudentId = @studentId
                       AND ClassId = @classId
                       AND EventType = 'CH'
-                      AND CAST(CreatedOn AS date) = @date;
+                      AND CAST(ISNULL(CheckinTime, EvntTs) AS date) = @date;
                 END
                 ELSE
                 BEGIN
                     INSERT INTO StdtSessEvent
-                        (SchoolId, StudentId, EvntTs, CheckStatus, IsPresent, ClassId, CreatedBy, CreatedOn, ModifiedOn, EventType, CheckinTime)
+                        (SchoolId, StudentId, EvntTs, CheckStatus, IsPresent, ClassId, CreatedBy, CreatedOn, EventType, CheckinTime)
                     VALUES
-                        (@schoolId, @studentId, GETDATE(), 'True', 1, @classId, @userId, GETDATE(), GETDATE(), 'CH', GETDATE());
+                    (
+                        @schoolId,
+                        @studentId,
+                        CAST(@date AS datetime) + CAST(CONVERT(time, GETDATE()) AS datetime), -- attendance datetime
+                        CASE WHEN @isPresent = 1 THEN 'True' ELSE 'False' END,
+                        @isPresent,
+                        @classId,
+                        @userId,
+                        GETDATE(), -- real insert time
+                        'CH',
+                        CASE 
+                            WHEN @isPresent = 1 
+                            THEN CAST(@date AS datetime) + CAST(CONVERT(time, GETDATE()) AS datetime)
+                            ELSE NULL
+                        END
+                    );
                 END
                 ";
                 using (var cmd = new System.Data.SqlClient.SqlCommand(sql, con))
@@ -2590,6 +2367,7 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
                     cmd.Parameters.AddWithValue("@classId", classId);
                     cmd.Parameters.AddWithValue("@userId", sess.LoginId);
                     cmd.Parameters.AddWithValue("@date", dateFilter);
+                    cmd.Parameters.AddWithValue("@isPresent", isPresent);
 
                     cmd.CommandTimeout = 60;
                     cmd.ExecuteNonQuery();
@@ -2604,6 +2382,177 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
         }
     }
 
+    private void EnableAllInputs(Control parent)
+    {
+        foreach (Control c in parent.Controls)
+        {
+            TextBox txt = c as TextBox;
+            DropDownList ddl = c as DropDownList;
+            Button btn = c as Button;
 
+            if (txt != null)
+            {
+                txt.Enabled = true;
+                txt.Attributes.Remove("readonly");
+            }
+            else if (ddl != null)
+            {
+                ddl.Enabled = true;
+                ddl.Attributes.Remove("disabled");
+            }
+            else if (btn != null)
+            {
+                btn.Enabled = true;
+                btn.Attributes.Remove("disabled");
+            }
+
+            if (c.HasControls())
+                EnableAllInputs(c);
+        }
+    }
+
+    private List<TimePair> BuildTimePairs(DateTime? mainIn,DateTime? mainOut,string mainCode,bool isPresent,List<string[]> parsedExtras,DateTime effectiveDate,bool includeMainAbsentRow)
+    {
+        var result = new List<TimePair>();
+
+
+        mainCode = (mainCode ?? "").Trim();
+
+        // MAIN ROW
+        if (!isPresent) // ABSENT
+        {
+            if (includeMainAbsentRow)
+            {
+                result.Add(new TimePair
+                {
+                    In = null,
+                    Out = null,
+                    Code = mainCode,   // blank here means: clear AttendanceCode
+                    IsPresent = false
+                });
+            }
+        }
+        else // PRESENT
+        {
+            if (mainIn.HasValue || mainOut.HasValue)
+            {
+                result.Add(new TimePair
+                {
+                    In = mainIn,
+                    Out = mainOut,
+                    Code = mainCode,   // blank here means: clear AttendanceCode
+                    IsPresent = true
+                });
+            }
+        }
+
+        // =========================
+        //EXTRAS
+        // =========================
+        if (parsedExtras == null) return result;
+
+        foreach (var arr in parsedExtras)
+        {
+            string inStr = arr.Length > 0 ? arr[0] : "";
+            string outStr = arr.Length > 1 ? arr[1] : "";
+            string codeStr = arr.Length > 2 ? arr[2] : "";
+
+            DateTime? inDt = ParseTimeToDate(inStr, effectiveDate);
+            DateTime? outDt = ParseTimeToDate(outStr, effectiveDate);
+
+            //Skip duplicate of main
+            bool isDuplicateMain =
+                (inDt.HasValue && mainIn.HasValue && inDt.Value.TimeOfDay == mainIn.Value.TimeOfDay)
+                &&
+                (outDt.HasValue && mainOut.HasValue && outDt.Value.TimeOfDay == mainOut.Value.TimeOfDay);
+
+            if (isDuplicateMain)
+                continue;
+
+            // =========================
+            //ABSENT
+            // =========================
+            if (!isPresent)
+            {
+                if (string.IsNullOrWhiteSpace(codeStr))
+                    continue;
+            }
+            else
+            {
+                // =========================
+                //PRESENT
+                // =========================
+                if (!inDt.HasValue && !outDt.HasValue)
+                    continue;
+            }
+
+            result.Add(new TimePair
+            {
+                In = inDt,
+                Out = outDt,
+                Code = codeStr,
+                IsPresent = isPresent
+            });
+        }
+
+        return result;
+    }
+
+    private void BindGridWithFilters()
+    {
+        int locationId = 0;
+        int clientId = 0;
+
+        if (ddlLocation.SelectedValue != "")
+            locationId = Convert.ToInt32(ddlLocation.SelectedValue);
+
+        if (ddlClient.SelectedValue != "")
+            clientId = Convert.ToInt32(ddlClient.SelectedValue);
+
+        DateTime? selectedDate = null;
+
+        if (!string.IsNullOrEmpty(hidPastDate.Value))
+        {
+            DateTime temp;
+            if (DateTime.TryParse(hidPastDate.Value, out temp))
+                selectedDate = temp;
+        }
+
+        fillStudent("0", false);
+        LoadAttendanceCodesToJS();
+    }
+
+    private DataTable _attendanceLookup = null;
+
+    private void LoadAttendanceCodesToJS()
+    {
+        if (_attendanceLookup == null)
+            _attendanceLookup = GetAttendanceCodeLookup();
+
+        if (_attendanceLookup == null || _attendanceLookup.Rows.Count == 0)
+            return;
+
+        var codesList = new List<object>();
+
+        foreach (DataRow r in _attendanceLookup.Rows)
+        {
+            codesList.Add(new
+            {
+                id = Convert.ToString(r["LookupId"]),
+                name = Convert.ToString(r["LookupName"])
+            });
+        }
+
+        var serializer = new JavaScriptSerializer();
+        string json = serializer.Serialize(codesList);
+
+        ScriptManager.RegisterStartupScript(
+            upGrid,
+            upGrid.GetType(),
+            "attendanceCodes",
+            "window.__attendanceCodes = " + json + ";",
+            true
+        );
+    }
 
 }
