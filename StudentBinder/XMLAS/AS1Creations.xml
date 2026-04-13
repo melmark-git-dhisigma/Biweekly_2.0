@@ -79,6 +79,14 @@
       <Mapping Column="NoOfTimes5" PlaceHolder="Plcnum5"/>
       <Mapping Column="NoOfTimes6" PlaceHolder="Plcnum6"/>
       <Mapping Column="NoOfTimes7" PlaceHolder="Plcnum7"/>
+		
+	  <Mapping Column="Mistrial1" PlaceHolder="Plcmis1"/>
+	  <Mapping Column="Mistrial2" PlaceHolder="Plcmis2"/>
+      <Mapping Column="Mistrial3" PlaceHolder="Plcmis3"/>
+	  <Mapping Column="Mistrial4" PlaceHolder="Plcmis4"/>
+	  <Mapping Column="Mistrial5" PlaceHolder="Plcmis5"/>
+	  <Mapping Column="Mistrial6" PlaceHolder="Plcmis6"/>
+	  <Mapping Column="Mistrial7" PlaceHolder="Plcmis7"/>
 
       <Mapping Column="Major" PlaceHolder="PlcMajor"/>
       <Mapping Column="Minor" PlaceHolder="PlcMinor"/>
