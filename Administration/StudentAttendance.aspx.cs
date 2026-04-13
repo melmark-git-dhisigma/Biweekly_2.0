@@ -24,6 +24,11 @@ public partial class Administration_StudentAttendance : System.Web.UI.Page
 
     protected void Page_Load(object sender, EventArgs e)
     {
+        if (Request.QueryString["export"] == "1")
+        {
+            btnExport_Click(null, null);
+            return;
+        }
         var sess = (clsSession)Session["UserSession"];
         if (sess == null)
         {
@@ -328,20 +333,6 @@ public partial class Administration_StudentAttendance : System.Web.UI.Page
 
     protected void btnExport_Click(object sender, EventArgs e)
     {
-        try
-        {
-            var token = Request.Form[hdnDownloadToken.UniqueID];
-            if (!string.IsNullOrEmpty(token))
-            {
-                var ck = new HttpCookie("downloadToken", token)
-                {
-                    Path = "/",
-                    Expires = DateTime.UtcNow.AddMinutes(5)
-                };
-                Response.Cookies.Add(ck);
-            }
-        }
-        catch {}
         var dt = ViewState["MPAReportDT"] as DataTable;
         if (dt == null || dt.Rows.Count == 0)
         {
@@ -596,7 +587,7 @@ public partial class Administration_StudentAttendance : System.Web.UI.Page
             htw.Write("</body></html>");
             Response.Write(sw.ToString());
         }
-
+        ScriptManager.RegisterStartupScript(this, GetType(), "hideLoader", "setTimeout(function(){ if(window.hideLoader) hideLoader(); },1000);", true);
         Response.Flush();
         Response.End();
     }
