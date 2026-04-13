@@ -588,6 +588,8 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         if ((oTemp != null) && (oDS != null))
             try
             {
+                oSession = (clsSession)Session["UserSession"];
+
                 bool updatestatus = false;
                 if (ViewState["StdtSessHdr"] != null)
                 {
@@ -623,6 +625,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     if (dtstps.Rows.Count == 0)
                     {
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('This set does not have any steps attached, please modify the lesson to assign steps...');", true);
+                    }
+                    int nextStepId = Convert.ToInt32(oData.FetchValue("SELECT NextStepId FROM StdtDSStat WHERE DSTempHdrId = " + oTemp.TemplateId));
+                    int stepCountTotal = Convert.ToInt32(oData.FetchValue("SELECT COUNT(DSTempStepId) FROM DSTempStep WHERE DSTempHdrId = " + oTemp.TemplateId + " AND DSTempSetId = " + oDS.CrntSet + " AND ActiveInd = 'A'"));
+                    if (nextStepId > stepCountTotal && stepCountTotal >0)
+                    {
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('This lesson has " + nextStepId + " as current step. But the step count for the current set is " + stepCountTotal + ". Please create a new version to continue.');", true);
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), "closewindow", "closeIframe1(" + oSession.StudentId + ");", true);
                     }
 
                     /// Code Added By Arun. Code Change is for Match-to-Sample teaching procedure automatically yields a “Positional
@@ -664,7 +673,6 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                             if (dtcstatus.Rows[0]["SessionStatusCd"].ToString() == "D")
                             {
                                 
-                                oSession = (clsSession)Session["UserSession"];
                                 string s1 = "SELECT TOP 1 * FROM StdtSessionHdr WHERE StudentId=" + oSession.StudentId + " AND SchoolId=" + oSession.SchoolId + /*" AND StdtClassId=" + oSession.Classid +*/ " AND DSTempHdrId=" + oTemp.TemplateId + " AND SessionStatusCd='D' AND IsMaintanace ='" + hdn_isMaintainance.Value + "' AND IOAInd='N' AND CurrentSetId = " + oDS.CrntSet;
                                 string s2 = "SELECT TOP 1 * FROM StdtSessionHdr WHERE StudentId=" + oSession.StudentId + " AND SchoolId=" + oSession.SchoolId + " AND DSTempHdrId=" + oTemp.TemplateId + " AND SessionStatusCd='D' AND IsMaintanace ='" + hdn_isMaintainance.Value + "' AND IOAInd='Y' AND CurrentSetId = " + oDS.CrntSet;
                                 DataTable dtHdrs = oData.ReturnDataTable(s1, false);
