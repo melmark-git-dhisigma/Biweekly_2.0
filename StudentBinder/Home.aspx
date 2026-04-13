@@ -945,7 +945,7 @@
                 $('#slider').css("top", '73%');
                 $('#dropper').removeAttr('onclick');
 
-                $('.checkPopUp').css("width", '800px');
+                $('.checkPopUp').css("width", '860px');
                 $('#A3').css('margin-left', '780px');
                 $('#A3').css('position', 'absolute');
                 $('#A3').css('top', '-24px');
@@ -1723,20 +1723,20 @@
             //PopupLessonPlans1('DatasheetTab');
             if (response.length <= 0) {
 
-                    selSubmenuforBehavior();
-                }
-                else {
-                    for (var i = 0; i < response.length; i++) {
-                        if (response[i].Url == "Graph" || response[i].Url == "Datasheet" || response[i].Url == "Lesson") {
-                            $("#ulsubmenu").append("<li class='alpha'><a id=" + response[i].Url + " ><span><span>" + response[i].Submenu +
-                                                        "</span></span> </a></li>");
-                        }
-                        else {
-                            $("#ulsubmenu").append("<li class='alpha'><a id=" + response[i].Url + " onclick='selSubmenu(this," + response[i].ID + "," + response[i].StudID + ");'><span><span>" + response[i].Submenu +
-                                                        "</span></span> </a></li>");
-                        }
+                selSubmenuforBehavior();
+            }
+            else {
+                for (var i = 0; i < response.length; i++) {
+                    if (response[i].Url == "Graph" || response[i].Url == "Datasheet" || response[i].Url == "Lesson") {
+                        $("#ulsubmenu").append("<li class='alpha'><a id=" + response[i].Url + " ><span><span>" + response[i].Submenu +
+                                                    "</span></span> </a></li>");
+                    }
+                    else {
+                        $("#ulsubmenu").append("<li class='alpha'><a id=" + response[i].Url + " onclick='selSubmenu(this," + response[i].ID + "," + response[i].StudID + ");'><span><span>" + response[i].Submenu +
+                                                    "</span></span> </a></li>");
                     }
                 }
+            }
             //}
 
         }
@@ -4737,8 +4737,8 @@
                         </li>
 
                         <li class="box3">
-                            <a href="#" onclick="ShowReminder();">CheckIn/CheckOut </a>
-                            <div class="checkPopUp" style="width:800px;">
+                            <a href="#" onclick="ShowReminder();">Attendance</a>
+                            <div class="checkPopUp" style="width:860px;">
                                 <hr />
 
                                 <asp:UpdatePanel ID="UpdatePanel3" runat="server">

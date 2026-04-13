@@ -188,13 +188,15 @@
 
         /* Grid rows layout - use grid for structure */
         .att-row {
-          display:grid;
+          display:table-row;
           grid-template-columns: 120px 160px 120px 34px 120px 70px; /* columns: Status|Client|In/Out|+|Code|Save */
           gap:8px;
           align-items:center;
           padding:6px 4px;
           border-bottom:1px solid rgba(0,0,0,0.06);
           box-sizing:border-box;
+          opacity: 1;
+          background-color: transparent;
         }
         .att-row.header {
           font-weight:700;
@@ -633,7 +635,7 @@
         /* Single header row — uses CSS Grid to align with grid body columns */
         .static-grid-row {
           display: grid;
-          grid-template-columns: 87px 223px 103px 103px 48px 79px 82px;
+          grid-template-columns: 147px 223px 103px 103px 48px 79px 82px;
           gap: 8px;
           align-items: center;
           font-weight: 700;
@@ -830,20 +832,12 @@
         }
 
         .row-absent {
-          opacity: 0.55;
-          background-color: #f3f4f6 !important;
-          color: #6b7280 !important;
-        }
-        .row-absent input[readonly],
-        .row-absent input[disabled],
-        .row-absent select[disabled],
-        .row-absent button[disabled] {
-          background-color: transparent !important;
-          color: inherit !important;
-          border-color: transparent !important;
-          cursor: not-allowed;
+            background-color: #fef2f2;
         }
 
+        input:disabled {
+           opacity: 0.6;
+        }
         .attendance-grid .table-wrapper {
           max-height: 420px;      /* change as needed */
           overflow: auto;
@@ -890,6 +884,89 @@
         .attendance-grid-table td:nth-child(5) { width: 15%; } /* Out Time */
         .attendance-grid-table th:nth-child(6),
         .attendance-grid-table td:nth-child(6) { width: 15%; } /* Actions */
+
+
+       .att-toggle{
+          display:flex;
+          gap:3px;
+          padding: 0.1px 2.1px;
+       }
+
+       .att-btn{
+          padding:6px 13px;
+          border-radius:16px;
+          font-size:12px;
+          font-weight:600;
+          cursor:pointer;
+          transition:all .2s ease;
+          opacity:1;
+          border:1px solid #d1d5db;
+       }
+
+       /* active states */
+       .att-btn.active{
+          opacity:1;
+          color:white;
+       }
+
+       .btn-present.active{
+          background:#16a34a;
+          border-color:#16a34a;
+       }
+
+       .btn-absent.active{
+          background:#ef4444;
+          border-color:#ef4444;
+       }
+
+       .active-row {
+          opacity: 1;
+          background-color: #ecfdf5;
+       }
+       .row-default {
+          opacity: 0.5;
+       }
+
+       .save-btn:disabled {
+          background: #d1d5db !important;
+          color: #6b7280 !important;
+          cursor: not-allowed;
+       }
+
+
+       .btn-present {
+          background: #ecfdf5;   /* ultra light green */
+          color: #065f46;
+          border-color: #d1fae5;
+          opacity: 0.7;          /* softer look */
+       }
+
+       .btn-absent {
+          background: #fef2f2;   /* ultra light red */
+          color: #7f1d1d;
+          border-color: #fecaca;
+          opacity: 0.7;          /* softer look */
+       }
+
+       /* ACTIVE (STRONG) */
+       .btn-present.active {
+          background: #16a34a;
+          color: #fff;
+          border-color: #16a34a;
+          opacity: 1;
+       }
+
+       .btn-absent.active {
+          background: #dc2626;
+          color: #fff;
+          border-color: #dc2626;
+          opacity: 1;
+       }
+
+       .att-btn:hover {
+          transform: scale(1.03);
+          opacity: 0.9;
+       }
 
     </style>
     <script type="text/javascript">
@@ -960,8 +1037,7 @@
 
         }
         function showLoaderAndPostBack(btn) {
-            document.getElementById('loader').style.display = 'block';
-            __doPostBack(btn.name, '');
+            return true;
         }
 
         function validateGo(btn) {
@@ -984,8 +1060,7 @@
                 if (inInputs.length === 0 && outInputs.length === 0) return true;
 
                 // collect possible code selects in the row (main + extras)
-                var codeSelects = Array.prototype.slice.call(row.querySelectorAll('select[id*="ddlCode"], select[id$="ddlCode"]'));
-
+                var codeSelects = row.querySelectorAll('.code-stack .code-pair select');
                 // helper: get lookup-code (like "LOA" / "SICK") for a given select element
                 function getLookupCodeFromSelect(sel) {
                     if (!sel) return null;
@@ -1013,17 +1088,29 @@
                     return null;
                 }
 
-                // normalize exempt set (case-insensitive)
-                var exemptCodes = { 'LOA': true, 'SICK': true };
 
-                var maxLen = Math.max(inInputs.length, outInputs.length);
+                var maxLen = inInputs.length;
+
                 for (var i = 0; i < maxLen; i++) {
-                    // try to pick corresponding code select:
-                    // prefer the select at the same index as inputs, otherwise fallback to first main select
-                    var codeSel = (i < codeSelects.length) ? codeSelects[i] : (codeSelects.length ? codeSelects[0] : null);
+
+                    var statusField = row.querySelector('input[type="hidden"][id$="hidStatus"]');
+                    var status = statusField ? statusField.value : "";
+                    var codeSel = codeSelects[i] || null;
                     var lookupCode = getLookupCodeFromSelect(codeSel);
-                    // normalize to upper for comparison
                     var lookupCodeNorm = lookupCode ? lookupCode.trim().toUpperCase() : null;
+                    //ABSENT LOGIC
+                    if (status === "0") {
+
+                        // if no reason selected → skip validation (keep old values)
+                        if (!lookupCodeNorm) {
+                            console.log("Absent with no reason → skipping save validation");
+                            continue;
+                        }
+
+                        // if reason selected → allow save without time
+                        console.log("Absent with reason → allow save");
+                        continue;
+                    }
 
                     var inEl = inInputs[i];
                     var outEl = outInputs[i];
@@ -1031,47 +1118,40 @@
                     var inVal = inEl ? (inEl.value || '').trim() : '';
                     var outVal = outEl ? (outEl.value || '').trim() : '';
 
-                    // If this pair is marked with an exempt code (LOA or SICK), skip validation for this pair
-                    if (lookupCodeNorm && exemptCodes[lookupCodeNorm]) {
-                        // skip validation for this index
-                        continue;
-                    }
-
-                    // existing validations
                     if (!inVal && !outVal) {
                         showGridBand('Please enter IN and/or OUT time.');
                         if (inEl) inEl.focus();
                         return false;
                     }
+
                     if (inVal && inVal.indexOf(':') === -1) {
                         if (inEl) inEl.focus();
                         showGridBand('Please enter a valid IN time (e.g. 09:30).');
                         return false;
                     }
+
                     if (outVal && outVal.indexOf(':') === -1) {
                         if (outEl) outEl.focus();
                         showGridBand('Please enter a valid OUT time (e.g. 17:00).');
                         return false;
                     }
 
-                    // Optional: validate OUT >= IN (simple lexicographic/time check)
-                    if (inVal && outVal && inVal.indexOf(':') !== -1 && outVal.indexOf(':') !== -1) {
-                        // parse HH:MM -> minutes since midnight
-                        function toMinutes(t) {
-                            var parts = t.split(':');
-                            if (parts.length < 2) return null;
-                            var hh = parseInt(parts[0], 10);
-                            var mm = parseInt(parts[1], 10);
-                            if (isNaN(hh) || isNaN(mm)) return null;
-                            return hh * 60 + mm;
-                        }
-                        var inM = toMinutes(inVal);
-                        var outM = toMinutes(outVal);
-                        if (inM !== null && outM !== null && outM < inM) {
-                            showGridBand('OUT time cannot be earlier than IN time.');
-                            if (outEl) outEl.focus();
-                            return false;
-                        }
+                    function toMinutes(t) {
+                        var parts = t.split(':');
+                        if (parts.length < 2) return null;
+                        var hh = parseInt(parts[0], 10);
+                        var mm = parseInt(parts[1], 10);
+                        if (isNaN(hh) || isNaN(mm)) return null;
+                        return hh * 60 + mm;
+                    }
+
+                    var inM = toMinutes(inVal);
+                    var outM = toMinutes(outVal);
+
+                    if (inM !== null && outM !== null && outM < inM) {
+                        showGridBand('OUT time cannot be earlier than IN time.');
+                        if (outEl) outEl.focus();
+                        return false;
                     }
                 }
 
@@ -1086,47 +1166,16 @@
 
         function showSaveLoader(btn) {
             try {
-                // ensure the selected date is preserved client-side before the postback
-                // prefer the helper if defined (server code registers setHiddenPastDateIso())
-                var hid = document.getElementById('<%= hidPastDate.ClientID %>');
-                if (typeof setHiddenPastDateIso === 'function') {
-                    // ensure server helper knows the iso ('' for today, otherwise yyyy-MM-dd)
-                    setHiddenPastDateIso(hid ? hid.value || '' : '');
-                } else if (hid && hid.value !== undefined) {
-                    // defensive fallback: keep the hidden field value as-is
-                    // (this keeps the selected date value available to server on postback)
+                if (btn && btn.disabled !== undefined) {
+                    btn.disabled = true;
                 }
-
-                // Use the new global loader function (preferred). If older helper exists, call it.
-                if (typeof showLoaderAndPostBack === 'function') {
-                    // some older code paths used showLoaderAndPostBack(btn)
-                    try { showLoaderAndPostBack(btn); } catch (e) { /* ignore */ }
-                } else if (typeof showLoader === 'function') {
-                    try { showLoader('Saving\u2026'); } catch (e) { /* ignore */ }
-                } else {
-                    // fallback: show an element with id 'globalLoader' if present
-                    var fallback = document.getElementById('globalLoader');
-                    if (fallback) fallback.style.display = 'block';
-                }
-
-                // disable button to avoid double click (optional)
-                try {
-                    if (btn && btn.disabled !== undefined) {
-                        btn.disabled = true;
-                        // keep attribute for server-side postback if required
-                        try { btn.setAttribute('data-save-disabled', '1'); } catch (e) { }
-                    }
-                } catch (e) { }
-
-                // allow the normal postback to proceed (return true in OnClientClick)
                 return true;
             } catch (e) {
-                console && console.log && console.log('showSaveLoader error', e);
-                return true; // do not block postback on loader error
+                return true;
             }
         }
 
-
+        var allowClockUpdate = true;
 
 
         (function () {
@@ -1141,7 +1190,6 @@
             }
 
             // showGridBand: shows the banner and schedules hideGridBand,
-            // and schedules hideLoader() AFTER the banner duration so loader stays until band finishes.
             window.showGridBand = function (msg, ms, kind) {
                 var delay = (typeof ms === 'number' && ms > 0) ? ms : 4000;
                 var band = document.getElementById('gridBand');
@@ -1165,12 +1213,6 @@
                     hideGridBand();
                 }, delay);
 
-                // hide loader after band duration + small buffer (so loader stays while the band is visible)
-                try {
-                    setTimeout(function () {
-                        if (typeof hideLoader === 'function') hideLoader();
-                    }, delay + 150);
-                } catch (e) { /* ignore */ }
             };
 
             window.hideGridBand = function () {
@@ -1183,6 +1225,7 @@
             // showLoader: show loader and start fallback timer (so loader eventually hides if server doesn't act)
             function showLoader(msg) {
                 try {
+                    if (window.__skipCalendarLoader) return;
                     var loader = document.getElementById('loader');
                     var msgEl = document.getElementById('loaderMsg');
                     if (!loader) {
@@ -1196,10 +1239,6 @@
                     // start a fallback: if nothing clears this, hide loader after X ms
                     clearLoaderFallback();
                     // fallback duration: 15 seconds (tune as needed)
-                    loaderFallbackTimer = setTimeout(function () {
-                        try { hideLoader(); } catch (e) { /* swallow */ }
-                        loaderFallbackTimer = null;
-                    }, 15000);
                 } catch (e) { console.warn('showLoader error', e); }
             }
 
@@ -1222,44 +1261,732 @@
             window.showLoader = showLoader;
             window.hideLoader = hideLoader;
 
-            // hide on full page load
-            if (document.readyState === 'complete') hideLoader();
-            else window.addEventListener('load', hideLoader);
 
-            // wire ASP.NET AJAX partial postbacks defensively
+
+            function initCalendarFix() {
+                try {
+                    if (!window.Sys || !Sys.WebForms || !Sys.WebForms.PageRequestManager) {
+                        return; //wait until available
+                    }
+
+                    var prm = Sys.WebForms.PageRequestManager.getInstance();
+                    if (!prm) return;
+
+                    prm.add_initializeRequest(function (sender, args) {
+                        try {
+                            var eventArg = document.getElementById("__EVENTARGUMENT");
+
+                            if (eventArg && eventArg.value && eventArg.value.indexOf("V") === 0) {
+                                //Month navigation → skip loader
+                                window.__skipCalendarLoader = true;
+
+                                if (window.hideLoader) hideLoader();
+                            } else {
+                                window.__skipCalendarLoader = false;
+                            }
+                        } catch (e) { }
+                    });
+
+                } catch (e) {
+                    console.log("Init error:", e);
+                }
+            }
+
+            //WAIT until ASP.NET AJAX is ready
+            if (window.Sys && Sys.Application) {
+                Sys.Application.add_load(initCalendarFix);
+            } else {
+                // fallback (if Sys not ready yet)
+                document.addEventListener("DOMContentLoaded", function () {
+                    setTimeout(initCalendarFix, 200);
+                });
+            }
+
+
+
+
+            function updateClock() {
+                if (window.__lockClock) return;
+                var hid = document.getElementById('hidPastDate') ||
+                          document.querySelector('input[name$="hidPastDate"]');
+
+                if (hid && hid.value) return;
+
+                if (!allowClockUpdate) return;
+
+                var now = new Date();
+
+                var dateStr = String(now.getDate()).padStart(2, '0') + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
+
+                var timeStr = now.toLocaleTimeString('en-US', { hour12: true })
+                    .replace(/([ap])m/, function (match) {
+                        return match.toUpperCase();
+                    });
+
+                var el = document.getElementById('currentDateTime');
+                if (el) el.textContent = dateStr + '  ' + timeStr;
+            }
+
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            var outsideClickHandler = null;
+            var calendarClickDelegationAttached = false;
+            var prMHooked = false;
+            var log = false;
+
+            function getPnl() {
+                try { return document.getElementById('<%= pnlCalendar.ClientID %>'); } catch (e) { return null; }
+            }
+            function getBtn() {
+                try { return document.getElementById('<%= btnEditPastDates.ClientID %>'); } catch (e) { return null; }
+            }
+
+            function isVisible(el) {
+                if (!el) return false;
+                try {
+                    var cs = window.getComputedStyle ? getComputedStyle(el) : null;
+                    if (cs) {
+                        if (cs.display === 'none' || cs.visibility === 'hidden' || cs.opacity === '0') return false;
+                        return el.offsetWidth > 0 && el.offsetHeight > 0;
+                    }
+                    return el.style && el.style.display !== 'none';
+                } catch (e) { return el && el.style && el.style.display !== 'none'; }
+            }
+
+            function loader() {
+                try { return document.getElementById('loader'); } catch (e) { return null; }
+            }
+
+            function showLoader() {
+                try {
+                    var l = loader();
+                    if (!l) return;
+                    l.style.display = 'block';
+                } catch (e) { if (console) console.log('showLoader error', e); }
+            }
+            function hideLoader() {
+                try {
+                    var l = loader();
+                    if (!l) return;
+                    try { l.style.setProperty('display', 'none', 'important'); } catch (e) { l.style.display = 'none'; }
+                } catch (e) { if (console) console.log('hideLoader error', e); }
+            }
+
+            function attachCalendarClickForExistingLoader() {
+                try {
+                    if (calendarClickDelegationAttached) return;
+                    var p = getPnl();
+                    if (!p) return;
+                    p.addEventListener('click', function (ev) {
+                        try {
+                            var t = ev.target || ev.srcElement;
+                            while (t && t !== p && t.tagName !== 'A') t = t.parentNode;
+                            if (!t || t === p) return;
+                            var txt = (t.textContent || t.innerText || '').trim();
+                            var hasNumeric = /^\d{1,2}$/.test(txt) || (t.querySelector && (function () {
+                                var s = t.querySelector('span,div');
+                                return s && /^\d{1,2}$/.test((s.textContent || s.innerText || '').trim());
+                            })());
+                            if (!hasNumeric) {
+                                return;
+                            }
+                        } catch (e) { if (console) console.log('calendar click delegation error', e); }
+                    }, true);
+                    calendarClickDelegationAttached = true;
+                } catch (e) { if (console) console.log('attachCalendarClickForExistingLoader failed', e); }
+            }
+
+            function removeOutsideClickHandler() {
+                try {
+                    if (outsideClickHandler) {
+                        document.removeEventListener('click', outsideClickHandler, false);
+                        outsideClickHandler = null;
+                    }
+                } catch (e) { }
+            }
+
+            function attachOutsideClickHandlerDelayed() {
+                removeOutsideClickHandler();
+                setTimeout(function () {
+                    outsideClickHandler = function (ev) {
+                        try {
+                            var pnl = getPnl();
+                            var btn = getBtn();
+                            var target = ev.target || ev.srcElement;
+                            if (!pnl || !target) return;
+                            if (pnl.contains(target)) return;
+                            if (btn && btn.contains(target)) return;
+                            // click outside -> hide
+                            try { window.hideCalendarPopup && window.hideCalendarPopup(); } catch (ex) { }
+                        } catch (err) { }
+                    };
+
+                    // attach in bubble phase so button's own click runs first
+                    document.addEventListener('click', outsideClickHandler, false);
+                }, 120);
+            }
+
+
+            // Initialize wiring (run now and also attempt wiring after partial updates)
+            function init() {
+                try {
+                    attachCalendarClickForExistingLoader();
+                    attachOutsideClickHandlerDelayed();
+                    hookPageRequestManagerOnce();
+                } catch (e) { }
+            }
+
+            // Run when DOM ready (supports interactive/complete)
+            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                init();
+            } else {
+                document.addEventListener('DOMContentLoaded', init);
+            }
+
+            // Re-run init after ASP.NET partial updates to reattach handlers if DOM nodes were replaced
             try {
                 if (window.Sys && Sys.WebForms && Sys.WebForms.PageRequestManager) {
-                    var prm = null;
-                    try { prm = Sys.WebForms.PageRequestManager.getInstance(); } catch (e) { prm = null; }
-                    if (prm) {
-                        // on begin, show loader immediately
-                        prm.add_beginRequest(function () { showLoader('Loading…'); });
-
-                        // on end: DO NOT hide the loader immediately.
-                        // Instead, wait briefly for any server-registered startup scripts to run,
-                        // and then only hide if the server did NOT display a gridBand.
-                        prm.add_endRequest(function () {
-                            try {
-                                setTimeout(function () {
-                                    try {
-                                        var band = document.getElementById('gridBand');
-                                        if (band && band.style && band.style.display && band.style.display.toLowerCase() !== 'none') {
-                                            // server has shown the band; do nothing — showGridBand will clear fallback and hide loader later
-                                            return;
-                                        }
-                                        // otherwise hide loader (short settle)
-                                        hideLoader();
-                                    } catch (inner) {
-                                        try { hideLoader(); } catch (ex) { /* swallow */ }
-                                    }
-                                }, 300); // small delay to allow server-registered scripts to run (adjust 300->500 if needed)
-                            } catch (e) {
-                                setTimeout(function () { try { hideLoader(); } catch (ex) { } }, 300);
-                            }
+                    var prm2 = Sys.WebForms.PageRequestManager.getInstance();
+                    if (prm2) {
+                        prm2.add_endRequest(function () {
+                            // small delay to allow DOM replacement to settle
+                            setTimeout(function () {
+                                // reattach (functions are defensive to avoid duplicates)
+                                attachCalendarClickForExistingLoader();
+                                attachOutsideClickHandlerDelayed();
+                            }, 60);
                         });
                     }
                 }
-            } catch (e) { console.warn('PageRequestManager wiring failed', e); }
+            } catch (e) { }
+
+
+            // Wire MS Ajax PRM once: show loader on beginRequest, cleanup on endRequest
+            (function hookPageRequestManager() {
+                try {
+                    if (prMHooked) return;
+                    if (typeof (Sys) !== 'undefined' && Sys && Sys.WebForms && Sys.WebForms.PageRequestManager) {
+                        var prm = Sys.WebForms.PageRequestManager.getInstance();
+                        if (!prm) return;
+                        prMHooked = true;
+                    }
+                } catch (ex) { if (console) console.log('page request manager hook failed', ex); }
+            })();
+
+            // ESC closes popup
+            document.addEventListener('keydown', function (ev) {
+                if (ev.key === 'Escape' || ev.keyCode === 27) {
+                    try { window.hideCalendarPopup && window.hideCalendarPopup(); } catch (e) { }
+                }
+            });
+
+            // Expose functions to be sure other code can call them if needed
+            if (!window.attachCalendarClickForExistingLoader) {
+                window.attachCalendarClickForExistingLoader = function () {
+                    // simplistic re-run (will be guarded by calendarClickDelegationAttached)
+                    try {
+                        calendarClickDelegationAttached = false;
+                        (function () {
+                            var p = document.getElementById('<%= pnlCalendar.ClientID %>');
+                            if (!p) return;
+                            p.addEventListener('click', function (ev) {
+                                try {
+                                    var t = ev.target || ev.srcElement;
+                                    while (t && t !== p && t.tagName !== 'A') t = t.parentNode;
+                                    if (!t || t === p) return;
+                                    //showLoader();
+                                } catch (e) { if (console) console.log('calendar click delegation error', e); }
+                            }, true);
+                            calendarClickDelegationAttached = true;
+                        })();
+                    } catch (e) { }
+                };
+            }
+
+
+
+            // helper: is this an anchor representing a calendar day number?
+            function isDayAnchor(a) {
+                if (!a) return false;
+                var txt = (a.textContent || a.innerText || '').trim();
+                if (/^\d{1,2}$/.test(txt)) return true;
+                // maybe the number is wrapped in a child span: <a><span>12</span></a>
+                var span = a.querySelector && a.querySelector('span');
+                if (span && /^\d{1,2}$/.test((span.textContent || span.innerText || '').trim())) return true;
+                return false;
+            }
+
+            // Extract __doPostBack args from a href like: "javascript:__doPostBack('ctl00$...','V123')"
+            function extractDoPostBackArgs(href) {
+                if (!href) return null;
+                // match __doPostBack('arg1','arg2') — allow optional "javascript:" prefix and whitespace
+                var m = href.match(/__doPostBack\(\s*'([^']*)'\s*,\s*'([^']*)'\s*\)/);
+                if (m) return { target: m[1], arg: m[2] };
+                return null;
+            }
+
+            function wireCal() {
+                var cal = document.getElementById('<%= calPast.ClientID %>');
+                if (!cal) return;
+
+                // Use capture to run before ASP.NET handlers
+                cal.addEventListener('click', function (ev) {
+                    try {
+                        var t = ev.target || ev.srcElement;
+                        while (t && t !== p && t.tagName !== 'A') t = t.parentNode;
+                        if (!t || t === p) return;
+
+                        // detect numeric day anchor (1-31) — supports <a>12</a> or <a><span>12</span></a>
+                        var txt = (t.textContent || t.innerText || '').trim();
+                        var span = t.querySelector && t.querySelector('span,div');
+                        var isDay = (/^\d{1,2}$/.test(txt)) || (span && /^\d{1,2}$/.test((span.textContent || span.innerText || '').trim()));
+                        if (!isDay) {
+                            return;
+                        }
+
+                        // prevent the default client-side anchor behavior that opens/toggles the calendar UI
+                        // BUT still perform the postback explicitly if href contains __doPostBack
+                        try {
+                            var href = t.getAttribute('href') || '';
+                            if (href.indexOf('__doPostBack') !== -1) {
+
+                                if (window.__justSaved) {
+                                    return;   //STOP SECOND RELOAD
+                                }
+
+                                ev.preventDefault();
+
+                                var m = href.match(/__doPostBack\(\s*'([^']*)'\s*,\s*'([^']*)'\s*\)/);
+                                if (m && typeof __doPostBack === 'function') {
+                                    __doPostBack(m[1], m[2]);
+                                }
+                            }
+                            else {
+                                // Try to find an inline onclick that calls __doPostBack
+                                var onclick = t.getAttribute('onclick') || '';
+                                var m2 = onclick.match(/__doPostBack\(\s*'([^']*)'\s*,\s*'([^']*)'\s*\)/);
+                                if (m2 && typeof __doPostBack === 'function') {
+                                    ev.preventDefault();
+                                    __doPostBack(m2[1], m2[2]);
+                                } else {
+                                    // If nothing found, do not prevent further — allow default (but we already called preventDefault())
+                                    // To be safe, attempt a synthetic click on the anchor after a tiny delay (so we don't re-open calendar synchronously)
+                                    setTimeout(function () {
+                                        try { if (t.click) t.click(); } catch (e) { }
+                                    }, 20);
+                                }
+                            }
+                        } catch (postEx) { }
+                    } catch (e) {
+                    }
+                }, true);
+            }
+
+            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                wireCal();
+            } else {
+                document.addEventListener('DOMContentLoaded', wireCal);
+            }
+
+            // optionally: ensure loader gets hidden after partial postbacks (if Sys.WebForms is present)
+            try {
+                if (window.Sys && Sys.WebForms && Sys.WebForms.PageRequestManager) {
+                    var prm = Sys.WebForms.PageRequestManager.getInstance();
+                    if (prm) {
+                    }
+                }
+            } catch (e) { /* ignore */ }
+
+
+
+            // CONFIG: set to your real IDs if different
+            window.__dateDisplayId = window.__dateDisplayId || 'currentDateTime';
+            window.__hidPastDateId = window.__hidPastDateId || 'hidPastDate';
+
+            // live clock control flag (used by existing code elsewhere)
+            window.allowClockUpdate = (typeof window.allowClockUpdate === 'boolean') ? window.allowClockUpdate : true;
+
+            // helper: find hidden input robustly (works across ASP.NET ClientID mangling)
+            function findHidden() {
+                var h = document.getElementById(window.__hidPastDateId);
+                if (h) return h;
+                h = document.querySelector('input[type=hidden][name$=\"hidPastDate\"]');
+                if (h) return h;
+                return document.querySelector('input[type=hidden][id*=\"hidPastDate\"], input[type=hidden][name*=\"hidPastDate\"]');
+            }
+
+            // main updater: sets the on-page timer/display according to hidden selected date or live clock
+            window.updateTimerFromHidden = function (force) {
+                try {
+                    var hid = findHidden();
+                    var iso = hid ? (hid.value || '').trim() : '';
+
+                    var el = document.getElementById(window.__dateDisplayId) ||
+                             document.querySelector('.current-date-display') || null;
+
+                    if (!el) return;
+
+                    //helper: safe LOCAL date parse
+                    function parseLocalDate(iso) {
+                        if (!iso) return new Date();
+
+                        var parts = iso.split('-');
+                        if (parts.length !== 3) return new Date();
+
+                        return new Date(
+                            parseInt(parts[0], 10),
+                            parseInt(parts[1], 10) - 1,
+                            parseInt(parts[2], 10)
+                        );
+                    }
+
+                    if (iso) {
+
+                        var parts = iso.split('-');
+
+                        var d = new Date(
+                            parseInt(parts[0], 10),
+                            parseInt(parts[1], 10) - 1,
+                            parseInt(parts[2], 10)
+                        );
+
+                        var fullDate = d.toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+
+                        el.innerHTML = fullDate;
+
+                        try { el.classList.add('past-selected-date'); } catch (e) { }
+                        try { el.style.color = 'red'; } catch (e) { }
+
+                        window.allowClockUpdate = false;
+
+                        window.__lockClock = true;
+
+                        window._lastSelectedIso = iso;
+                    }
+                    else {
+                        try { el.classList.remove('past-selected-date'); } catch (e) { }
+                        try { el.style.color = ''; } catch (e) { }
+
+                        window.allowClockUpdate = true;
+
+                        window.__lockClock = false;
+
+                        if (typeof refreshClockNow === 'function') {
+                            try { refreshClockNow(); }
+                            catch (e) { el.innerHTML = new Date().toLocaleString(); }
+                        } else {
+                            el.innerHTML = new Date().toLocaleString();
+                        }
+
+                        window._lastSelectedIso = null;
+                    }
+                } catch (err) {
+                    console && console.log && console.log('updateTimerFromHidden error', err);
+                }
+            };
+
+
+            // interval loop that updates clock if allowed
+            if (typeof window._clockInterval === 'undefined') {
+                window._clockInterval = setInterval(function () {
+                    try {
+                        if (window.allowClockUpdate !== false && typeof refreshClockNow === 'function') {
+                            refreshClockNow();
+                        }
+                    } catch (e) { }
+                }, 1000);
+            }
+
+            // allow server to set hidden + immediately update
+            window.setHiddenPastDateIso = function (iso) {
+                try {
+                    var hid = findHidden();
+                    if (hid) hid.value = iso || '';
+                    window.updateTimerFromHidden(true);
+                } catch (e) { console && console.log && console.log('setHiddenPastDateIso error', e); }
+            };
+
+            // On load run once
+            if (document.readyState !== 'loading') updateTimerFromHidden(true);
+            else document.addEventListener('DOMContentLoaded', function () { updateTimerFromHidden(true); }, false);
+
+            // cached last position
+            window._lastCalendarPosition = window._lastCalendarPosition || null;
+
+            // call when showing popup to remember its screen coords
+            window.rememberCalendarPosition = function () {
+                try {
+                    var cal = document.querySelector('.calendar-popup');
+                    if (!cal) return;
+                    var rect = cal.getBoundingClientRect();
+                    window._lastCalendarPosition = {
+                        left: Math.round(rect.left + window.pageXOffset),
+                        top: Math.round(rect.top + window.pageYOffset)
+                    };
+                } catch (e) { console && console.log && console.log('rememberCalendarPosition', e); }
+            };
+
+            // call after partial postback to apply saved coords to the (new) calendar popup
+            window.restoreCalendarPosition = function () {
+                try {
+                    if (!window._lastCalendarPosition) return;
+                    var cal = document.querySelector('.calendar-popup');
+                    if (!cal) return;
+                    // ensure cal is inside server form so postbacks work
+                    try {
+                        var pageForm = document.getElementById('<%= this.Form.ClientID %>') || document.forms[0] || document.body;
+                            if (cal.parentNode !== pageForm) pageForm.appendChild(cal);
+                        } catch (e) { /* ignore */ }
+
+                        cal.style.position = 'absolute';
+                        cal.style.left = '568px';
+                        cal.style.top = '68px';
+                        cal.style.zIndex = '30000';
+                    // show it (no visibility)
+                        try { cal.style.setProperty('display', 'block', 'important'); } catch (e) { cal.style.display = 'block'; }
+                        try { cal.style.setProperty('opacity', '1', 'important'); } catch (e) { cal.style.opacity = '1'; }
+                        try { cal.style.setProperty('pointer-events', 'auto', 'important'); } catch (e) { cal.style.pointerEvents = 'auto'; }
+                    } catch (e) { console && console.log && console.log('restoreCalendarPosition', e); }
+            };
+
+            // ensure restore runs after any UpdatePanel partial postback
+            try {
+                if (typeof Sys !== 'undefined' && Sys.WebForms && Sys.WebForms.PageRequestManager) {
+                    Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
+                        try { window.restoreCalendarPosition(); } catch (e) { }
+                    });
+                }
+            } catch (e) { }
+
+            var pnlId = '<%= pnlCalendar.ClientID %>';
+
+            function findPanel() {
+                return document.getElementById(pnlId) || document.querySelector('.calendar-popup');
+            }
+
+            window.showCalendarPopup = function () {
+                try {
+                    var pnl = findPanel();
+                    if (!pnl) return;
+                    pnl.style.display = 'block';
+                    pnl.style.visibility = 'visible';
+                    pnl.style.opacity = '1';
+                    pnl.style.left = '576px';
+                    if (pnl.dataset) pnl.dataset.calendarPersistVisible = '1';
+
+                    // attach one global outside-click handler (only once)
+                    if (!window._calendarOutsideHandlerAttached) {
+                        window._calendarOutsideHandlerAttached = true;
+                        document.addEventListener('click', function (ev) {
+                            try {
+                                var p = findPanel();
+                                if (!p) return;
+                                var tgt = ev.target || ev.srcElement;
+                                if (!tgt) return;
+                                if (p.contains && !p.contains(tgt) && tgt.id !== '<%= btnEditPastDates.ClientID %>') {
+                                    // clicked outside
+                                    try { window.hideCalendarPopup && window.hideCalendarPopup(); } catch (e) { }
+                                }
+                            } catch (e) { }
+                        }, true); // capture phase helps in some edge cases
+                    }
+                } catch (e) { console && console.log && console.log('showCalendarPopup error', e); }
+            };
+
+            window.hideCalendarPopup = function () {
+                try {
+                    var pnl = findPanel();
+                    if (!pnl) return;
+                    pnl.style.display = 'none';
+                    pnl.style.visibility = 'hidden';
+                    pnl.style.opacity = '0';
+                    if (pnl.dataset) pnl.dataset.calendarPersistVisible = '0';
+                } catch (e) { console && console.log && console.log('hideCalendarPopup error', e); }
+            };
+
+            window.toggleCalendarPopup = function () {
+                try {
+                    var pnl = findPanel();
+                    if (!pnl) return;
+                    var isVisible = (pnl.dataset && pnl.dataset.calendarPersistVisible === '1') ||
+                                    (pnl.style && (pnl.style.display === 'block' || pnl.style.visibility === 'visible'));
+                    if (isVisible) window.hideCalendarPopup();
+                    else window.showCalendarPopup();
+                } catch (e) { console && console.log && console.log('toggleCalendarPopup error', e); }
+            };
+
+
+            function applyCalendarSelection() {
+                try {
+                    // calendar table id: find element by server-side ClientID pattern
+                    var cal = document.getElementById('<%= calPast.ClientID %>');
+                    var hid = document.getElementById('<%= hidPastDate.ClientID %>');
+                    if (!cal) return;
+
+                    // clear previous selected cells
+                    var sel = cal.querySelectorAll('td.cal-selected');
+                    for (var i = 0; i < sel.length; i++) { sel[i].classList.remove('cal-selected'); }
+
+                    // determine target date string (yyyy-MM-dd) or empty for today
+                    var iso = hid && hid.value ? hid.value : '';
+
+                    // if empty -> target is today
+                    function parseIsoLocal(iso) {
+                        if (!iso) return new Date();
+                        var p = iso.split("-");
+                        return new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
+                    }
+
+                    var target = iso ? parseIsoLocal(iso) : new Date();
+                    // normalize to midnight
+                    target.setHours(0, 0, 0, 0);
+
+                    // calendar renders day number inside anchors or spans - do robust match
+                    var cells = cal.getElementsByTagName('td');
+                    for (var i = 0; i < cells.length; i++) {
+                        var td = cells[i];
+                        var text = (td.innerText || td.textContent || '').trim();
+                        if (!text) continue;
+                        // text could be "1", "2" etc. Compare day number and month context:
+                        var dayNum = parseInt(text, 10);
+                        if (!isNaN(dayNum)) {
+                            // attempt to get month/year from visible header (best-effort)
+                            if (td.classList && td.className.indexOf('other-month') !== -1) continue;
+                            // build candidate date using visible month from calendar
+                            var header = cal.querySelector('.monthYear') || cal.querySelector('caption') || null;
+                            var visYear = null, visMonth = null;
+                            if (header) {
+                                var htxt = header.innerText || header.textContent;
+                                var parts = (htxt || '').trim().split(' ');
+                                if (parts.length >= 2) {
+                                    visMonth = parts[0];
+                                    visYear = parseInt(parts[1], 10);
+                                }
+                            }
+                            // fallback: assume target is in the month already visible
+                            var cand = new Date(target.getFullYear(), target.getMonth(), dayNum);
+                            cand.setHours(0, 0, 0, 0);
+                            if (cand.getTime() === target.getTime()) {
+                                td.classList.add('cal-selected');
+                            }
+                        }
+                    }
+                } catch (e) { console && console.log && console.log('applyCalendarSelection error', e); }
+            }
+
+            // Wire to MS AJAX endRequest if present (UpdatePanel partial postbacks)
+            if (typeof (Sys) !== 'undefined' && Sys.WebForms && Sys.WebForms.PageRequestManager) {
+                var prm = Sys.WebForms.PageRequestManager.getInstance();
+                if (prm) {
+                }
+            }
+
+            // also run on initial load
+            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                applyCalendarSelection();   //NO setTimeout
+            } else {
+                window.addEventListener('DOMContentLoaded', function () {
+                    applyCalendarSelection();   //NO setTimeout
+                });
+            }
+
+            function initPRM() {
+                if (typeof Sys !== "undefined" &&
+                    Sys.WebForms &&
+                    Sys.WebForms.PageRequestManager) {
+
+                    var prm = Sys.WebForms.PageRequestManager.getInstance();
+
+                    if (window.__prmHooked) return;
+                    window.__prmHooked = true;
+
+                    prm.add_beginRequest(function () {
+                        if (window.showLoader)
+                            showLoader("Loading...");
+                    });
+
+                    prm.add_endRequest(function (sender, args) {
+
+                        if (args.get_error()) {
+                            console.error("ASYNC ERROR:", args.get_error().message);
+                            args.set_errorHandled(true);
+                        }
+
+                        try {
+                            safeInit();
+
+                            if (typeof normalizeAllExtras === "function")
+                                normalizeAllExtras();
+
+                            if (typeof applyAttendanceUI === "function")
+                                applyAttendanceUI();
+
+                            if (typeof applyAttendanceHighlight === "function")
+                                applyAttendanceHighlight();
+
+                            if (typeof applyCalendarSelection === "function")
+                                applyCalendarSelection();
+
+                            if (typeof updateTimerFromHidden === "function")
+                                updateTimerFromHidden(true);
+
+                        } catch (e) {
+                            console.log("PRM endRequest error", e);
+                        }
+
+                        if (window.hideLoader)
+                            setTimeout(hideLoader, 150);
+                    });
+
+                } else {
+                    setTimeout(initPRM, 100);
+                }
+            }
+
+            initPRM();
+
+
+            function safeInit() {
+                try {
+                    if (typeof initAttendanceButtons === "function") {
+                        initAttendanceButtons();
+                    }
+                } catch (e) {
+                    console.error("initAttendanceButtons error:", e);
+                }
+
+                try {
+                    if (typeof renderAllExtras === "function") {
+                        renderAllExtras();
+                    }
+                } catch (e) {
+                    console.error("renderAllExtras error:", e);
+                }
+            }
+
+            // Initial load
+            document.addEventListener("DOMContentLoaded", function () {
+                safeInit();
+            });
+
+
+
+
+
+
+
+
+
+
+
+
+
         })();
 
 
@@ -1339,7 +2066,7 @@
             return false;
         }
 
-        function addExtraRow(btn, studentId, codeVal) {
+        function addExtraRow(btn, studentId, classId, codeVal) {
             try {
                 if (!btn) return;
                 var row = btn.closest('tr') || btn.closest('.att-row') || btn.parentNode;
@@ -1451,48 +2178,7 @@
                 codeSelect.name = 'ddlCode_extra_' + studentId + '_' + newIndex;
                 codeSelect.id = 'ddlCode_extra_' + studentId + '_' + newIndex;
 
-                // default option
-                var defaultOpt = document.createElement('option');
-                defaultOpt.value = '';
-                defaultOpt.textContent = '---Select---';
-                codeSelect.appendChild(defaultOpt);
-
-                // read lookup array
-                var codes = (window.__attendanceCodes && window.__attendanceCodes.length) ? window.__attendanceCodes : [];
-
-                for (var ci = 0; ci < codes.length; ci++) {
-                    try {
-                        var opt = document.createElement('option');
-                        // support different key names gracefully
-                        var val = (codes[ci].id !== undefined) ? codes[ci].id : (codes[ci].LookupId !== undefined ? codes[ci].LookupId : (codes[ci].value !== undefined ? codes[ci].value : ''));
-                        var name = (codes[ci].name !== undefined) ? codes[ci].name : (codes[ci].text !== undefined ? codes[ci].text : String(val));
-                        opt.value = val;
-                        opt.textContent = name;
-                        codeSelect.appendChild(opt);
-                    } catch (ex) {
-                        // ignore malformed entries
-                    }
-                }
-
-                // If server provided a code value (e.g. when rendering from existing extras), ensure it's present and selected
-                if (typeof codeVal === 'undefined' || codeVal === null) codeVal = '';
-
-                if (codeVal !== '') {
-                    var found = false;
-                    try {
-                        var opts = codeSelect.options;
-                        for (var z = 0; z < opts.length; z++) {
-                            if (String(opts[z].value) === String(codeVal)) { found = true; break; }
-                        }
-                    } catch (er) { found = false; }
-                    if (!found) {
-                        var extraOpt = document.createElement('option');
-                        extraOpt.value = codeVal;
-                        extraOpt.textContent = String(codeVal);
-                        codeSelect.appendChild(extraOpt);
-                    }
-                    try { codeSelect.value = codeVal; } catch (ee) { /* ignore */ }
-                }
+                populateCodeDropdown(codeSelect, codeVal);
 
                 // assemble new pairs
                 newInPair.appendChild(inInput);
@@ -1506,13 +2192,13 @@
 
                 // attach listeners (your existing helper)
                 if (typeof attachInputListenersToInput === 'function') {
-                    attachInputListenersToInput(inInput, row, studentId);
-                    attachInputListenersToInput(outInput, row, studentId);
-                    attachInputListenersToInput(codeSelect, row, studentId);
+                    attachInputListenersToInput(inInput, row, studentId,classId);
+                    attachInputListenersToInput(outInput, row, studentId,classId);
+                    attachInputListenersToInput(codeSelect, row, studentId,classId);
                 }
 
                 // serialize now and sync
-                if (typeof serializeExtraTimesForRow === 'function') serializeExtraTimesForRow(row, studentId);
+                if (typeof serializeExtraTimesForRow === 'function') serializeExtraTimesForRow(row, studentId,classId);
                 if (typeof syncRowPairs === 'function') syncRowPairs(row);
 
                 inInput.focus();
@@ -1525,56 +2211,108 @@
             }
         }
 
+        function setSelectedDate(dateStr) {
+            var parts = dateStr.split('-');
 
+            selectedDateOverride = new Date(
+                parseInt(parts[0]),       // year
+                parseInt(parts[1]) - 1,   // month
+                parseInt(parts[2])        // day
+            );
 
-        function safeAttachInputListeners(el, row, studentId) {
-            try {
-                if (typeof attachInputListenersToInput === 'function') {
-                    attachInputListenersToInput(el, row, studentId);
-                    return;
-                }
-                // fallback: add basic listeners to re-serialize extras on change
-                el.addEventListener('change', function () { serializeExtraTimesForRow(row, studentId); });
-                el.addEventListener('input', function () { serializeExtraTimesForRow(row, studentId); });
-            } catch (e) { console && console.warn && console.warn('attach listeners', e); }
+            allowClockUpdate = false;
         }
-        var allowClockUpdate = true;
-        (function () {
-            (function () {
-                function updateClock() {
-                    if (!allowClockUpdate) return;
-                    var now = new Date();
 
-                    var dateStr = (now.getMonth() + 1) + '/' + now.getDate() + '/' + now.getFullYear();
+        function resetToToday() {
+            allowClockUpdate = true;
+            selectedDateOverride = null;
+        }
 
-                    var timeStr = now.toLocaleTimeString('en-US', { hour12: true })
-                                     .replace(/([ap])m/, function (match) {
-                                         return match.toUpperCase();
-                                     });
+        function parseLocalDate(iso) {
+            if (!iso) return new Date();
 
-                    var el = document.getElementById('currentDateTime');
-                    if (el) el.textContent = dateStr + '  ' + timeStr;
-                }
-                updateClock();
-                setInterval(updateClock, 1000);
-            })();
-        })();
+            var parts = iso.split('-');
+            if (parts.length !== 3) return new Date();
+
+            return new Date(
+                parseInt(parts[0]),
+                parseInt(parts[1]) - 1,
+                parseInt(parts[2])
+            );
+        }
 
         function renderAllExtras() {
-            // pick each row - grid rows usually have CSS class or are tr in the grid
-            var rows = document.querySelectorAll('#' + '<%= grdGroup.ClientID %> tr'); // ensure server GridView ID used
-            if (!rows || rows.length === 0) {
-                // fallback: any tr inside .attendance-grid-wrap with data-studentid attribute
-                rows = document.querySelectorAll('.attendance-grid-wrap tr, .att-row, .att-grid tr');
+            try {
+
+                var hfs = document.querySelectorAll("input[id^='hidExtraTimes_']");
+                if (!hfs) return;
+
+                hfs.forEach(function (hf) {
+
+                    try {
+
+                        if (!hf || !hf.id) return;
+
+                        var parts = hf.id.split("_");
+                        if (parts.length < 3) return;
+
+                        var studentId = parts[1];
+                        var classId = parts[2];
+
+                        var row = document.querySelector(
+                            "tr[data-studentid='" + studentId + "'][data-classid='" + classId + "']"
+                        );
+
+                        if (!row) return;
+
+                        var val = hf.value;
+                        if (!val) return;
+
+                        if (row.__extrasRendered) return;
+                        row.__extrasRendered = true;
+
+                        //CLEAR OLD
+                        row.querySelectorAll(".extra-row").forEach(function (el) {
+                            el.remove();
+                        });
+
+                        val.split(";").forEach(function (p) {
+
+                            if (!p) return;
+
+                            try {
+
+                                var parts2 = p.split("|").map(function (x) {
+                                    try { return decodeURIComponent(x); } catch (e) { return x || ""; }
+                                });
+
+                                createExtraPairNodes(row, studentId, classId, {
+                                    inVal: parts2[0] || "",
+                                    outVal: parts2[1] || "",
+                                    codeValue: parts2[2] || ""
+                                });
+
+                            } catch (e) {
+                                console.error("Pair error:", e);
+                            }
+
+                        });
+
+                    } catch (e) {
+                        console.error("HF loop error:", e);
+                    }
+
+                });
+
+            } catch (e) {
+                console.error("renderAllExtras crash:", e);
             }
-            Array.prototype.forEach.call(rows, function (r) {
-                try { renderExtrasForRow(r); } catch (e) { console && console.error && console.error('renderExtrasForRow', e); }
-            });
         }
 
-        //document.addEventListener('DOMContentLoaded', function () {
-        //    try { renderAllExtras(); } catch (e) { console && console.warn && console.warn(e); }
-        //});
+        function safeRenderExtras() {
+            if (!window.__isPostBackDone) return;   //WAIT until real render
+            try { renderAllExtras(); } catch (e) { console.warn(e); }
+        }
 
 
         function parseExtrasString(raw) {
@@ -1632,7 +2370,7 @@
             } catch (e) { console.error('syncRowPairs', e); }
         }
 
-        window.createExtraPairNodes = function (rowOrBtnOrSelector, studentId, opts) {
+        window.createExtraPairNodes = function (rowOrBtnOrSelector, studentId,classId, opts) {
             opts = opts || {};
             var inVal = (typeof opts.inVal !== 'undefined' && opts.inVal !== null) ? String(opts.inVal) : '';
             var outVal = (typeof opts.outVal !== 'undefined' && opts.outVal !== null) ? String(opts.outVal) : '';
@@ -1775,35 +2513,34 @@
             try { outInput.value = outVal || ''; } catch (e) { /* ignore setting */ }
 
             // Build code select: default + codes from window.__attendanceCodes (expected [{id,name},...])
-            var codeSelect = document.createElement('select'); codeSelect.className = 'extra-code code-select';
-            var defaultOpt = document.createElement('option'); defaultOpt.value = ''; defaultOpt.textContent = '---Select---'; codeSelect.appendChild(defaultOpt);
+            var baseSelect = codeCell.querySelector('select');
 
-            var codes = (window.__attendanceCodes && window.__attendanceCodes.length) ? window.__attendanceCodes : [];
-            for (var ci = 0; ci < codes.length; ci++) {
-                try {
-                    var opt = document.createElement('option');
-                    opt.value = codes[ci].id;
-                    opt.textContent = codes[ci].name;
-                    codeSelect.appendChild(opt);
-                } catch (ex) { /* ignore malformed */ }
+            var codeSelect;
+
+            if (baseSelect) {
+                codeSelect = baseSelect.cloneNode(true);   //copies all options
+                codeSelect.className = 'extra-code code-select';
+
+                // reset selection
+                codeSelect.selectedIndex = 0;
+            } else {
+                // fallback
+                codeSelect = document.createElement('select');
+                codeSelect.className = 'extra-code code-select';
+
+                var defaultOpt = document.createElement('option');
+                defaultOpt.value = '';
+                defaultOpt.textContent = '---Select---';
+                codeSelect.appendChild(defaultOpt);
             }
 
-            // If server provided a code value not in the list, append it
-            if (codeVal !== '') {
-                var found = false;
-                try {
-                    var opts = codeSelect.options;
-                    for (var z = 0; z < opts.length; z++) {
-                        if (String(opts[z].value) === String(codeVal)) { found = true; break; }
-                    }
-                } catch (er) { found = false; }
-                if (!found) {
-                    var extraOpt = document.createElement('option');
-                    extraOpt.value = codeVal;
-                    extraOpt.textContent = codeVal;
-                    codeSelect.appendChild(extraOpt);
+            codeVal = codeVal ? String(codeVal).trim() : '';
+
+            for (var i = 0; i < codeSelect.options.length; i++) {
+                if (String(codeSelect.options[i].value) === codeVal) {
+                    codeSelect.selectedIndex = i;
+                    break;
                 }
-                try { codeSelect.value = codeVal; } catch (ee) { /* ignore */ }
             }
 
             // === Add name attributes for POST (unique deterministic names) ===
@@ -1834,7 +2571,7 @@
             }
 
             // Serialize & sync hidden value so server sees the latest extras
-            try { if (typeof serializeExtraTimesForRow === 'function') serializeExtraTimesForRow(row, studentId); } catch (e) { console.warn('serializeExtraTimesForRow failed', e); }
+            try { if (typeof serializeExtraTimesForRow === 'function') serializeExtraTimesForRow(row, studentId,classId); } catch (e) { console.warn('serializeExtraTimesForRow failed', e); }
             try { if (typeof syncRowPairs === 'function') syncRowPairs(row); } catch (e) { /* optional sync */ }
 
             return {
@@ -1848,7 +2585,7 @@
             };
         };
 
-        window.serializeExtraTimesForRow = function (rowOrBtnOrSelector, studentId) {
+        window.serializeExtraTimesForRow = function (rowOrBtnOrSelector, studentId,classId) {
             // Resolve row same as createExtraPairNodes
             var row = null;
             if (rowOrBtnOrSelector && rowOrBtnOrSelector.nodeType) {
@@ -1941,373 +2678,118 @@
 
             // Write to hidden input: id = hidExtraTimes_<studentId>
             if (studentId) {
-                var hid = document.getElementById('hidExtraTimes_' + studentId) || row.querySelector('input[type=hidden][id^="hidExtraTimes_"]') || row.querySelector('input[type=hidden][name^="hidExtraTimes_"]');
+                var hid = null;
+
+                if (studentId && classId) {
+                    hid = document.getElementById('hidExtraTimes_' + studentId + '_' + classId);
+                }
+
+                if (!hid) {
+                    console.error("Hidden field not found for:", studentId, classId);
+                    return result;
+                }
                 if (hid) {
                     hid.value = result;
                 } else {
-                    // optionally create a hidden input in the row if not present
-                    try {
-                        var newH = document.createElement('input');
-                        newH.type = 'hidden';
-                        newH.id = 'hidExtraTimes_' + studentId;
-                        newH.name = 'hidExtraTimes_' + studentId;
-                        newH.value = result;
-                        // append to row (prefer last td)
-                        var lastTd = row.querySelector('td:last-child') || row;
-                        lastTd.appendChild(newH);
-                    } catch (e) { /* ignore creation failure */ }
                 }
             }
 
             return result;
         };
 
-        /* -- renderExtrasForRow (also global) -- */
-        window.renderExtrasForRow = function (rowOrBtnOrId, studentId) {
-            // Resolve row
-            var row = null;
-            if (rowOrBtnOrId && rowOrBtnOrId.nodeType) {
-                row = (rowOrBtnOrId.tagName && rowOrBtnOrId.tagName.toLowerCase() === 'tr') ?
-                    rowOrBtnOrId : (rowOrBtnOrId.closest ? (rowOrBtnOrId.closest('tr') || rowOrBtnOrId.closest('.att-row')) : null);
-            }
-            if (!row && typeof rowOrBtnOrId === 'string') row = document.querySelector(rowOrBtnOrId) || document.getElementById(rowOrBtnOrId);
-            if (!row && studentId) {
-                row = document.querySelector('[data-studentid="' + studentId + '"]') ||
-                      document.getElementById('row_' + studentId) ||
-                      (document.getElementById('hidExtraTimes_' + studentId) && document.getElementById('hidExtraTimes_' + studentId).closest ? document.getElementById('hidExtraTimes_' + studentId).closest('tr') : null);
-            }
-            if (!row) {
-                console.warn('renderExtrasForRow: row not found for', rowOrBtnOrId, studentId);
-                return;
-            }
 
-            // find hidden field (try canonical client id first, then server hidden field in row)
-            var hid = document.getElementById('hidExtraTimes_' + studentId) ||
-                      document.querySelector('input[type=hidden][name="hidExtraTimes_' + studentId + '"]') ||
-                      row.querySelector('input[id$="_hidExtraTimes"], input[id*="hidExtraTimes"], input[type=hidden][name*="hidExtraTimes"]');
-
-            var raw = hid ? (hid.value || '') : '';
-
-            // Clean existing extra-pairs (preserve the first main pair)
-            try {
-                var inStacks = row.querySelectorAll('.time-stack');
-                if (inStacks && inStacks.length > 0) {
-                    // first time-stack is main (in/out pairs for IN); subsequent stacked .time-pair.extra-pair are extras
-                    var inStack = inStacks[0];
-                    var extras = Array.prototype.slice.call(inStack.querySelectorAll('.time-pair.extra-pair'));
-                    extras.forEach(function (n) { n.parentNode.removeChild(n); });
-                    // remove extra out-pairs (if second .time-stack exists)
-                    var outStack = (inStacks.length > 1) ? inStacks[1] : null;
-                    if (outStack) {
-                        var extrasOut = Array.prototype.slice.call(outStack.querySelectorAll('.time-pair.extra-pair'));
-                        extrasOut.forEach(function (n) { n.parentNode.removeChild(n); });
-                    }
-                }
-                var codeStack = row.querySelector('.code-stack');
-                if (codeStack) {
-                    var extrasCode = Array.prototype.slice.call(codeStack.querySelectorAll('.code-pair.extra-code-pair'));
-                    extrasCode.forEach(function (n) { n.parentNode.removeChild(n); });
-                }
-            } catch (e) { console.warn('renderExtrasForRow cleanup failed', e); }
-
-            if (!raw) return;
-
-            // helper: safe decode a component (handles %3A and +)
-            function safeDecode(s) {
-                if (s == null) return '';
-                s = String(s).trim();
-                if (s === '') return '';
-                try {
-                    // replace + with space (in case form encoding used +)
-                    var alt = s.replace(/\+/g, ' ');
-                    // decodeURIComponent fails on strings with stray % sequences, so try-catch
-                    return decodeURIComponent(alt);
-                } catch (ex) {
-                    // fallback: try unescape (old) or return original
-                    try { return unescape(s); } catch (e) { return s; }
-                }
-            }
-
-            // helper: normalize time to HH:MM substring for comparison (07:45:00 -> 07:45)
-            function normTime(t) {
-                if (!t) return '';
-                var v = String(t).trim();
-                // if includes seconds like 07:45:00 -> take first 5 chars
-                if (v.length >= 5 && v.indexOf(':') >= 0) return v.substr(0, 5);
-                return v;
-            }
-
-            // get main pair to avoid duplication
-            var mainInEl = row.querySelector('.time-stack .time-pair:not(.extra-pair) input.in-time');
-            var mainOutEl = row.querySelector('.time-stack .time-pair:not(.extra-pair) input.out-time');
-            var mainInVal = mainInEl ? normTime(mainInEl.value || mainInEl.getAttribute('value') || '') : '';
-            var mainOutVal = mainOutEl ? normTime(mainOutEl.value || mainOutEl.getAttribute('value') || '') : '';
-
-            // parse: support JSON or semicolon delim "In|Out|Code;..."
-            var entries = [];
-
-            var trimmed = raw.trim();
-            // try JSON
-            if (trimmed.charAt(0) === '[') {
-                try {
-                    var arr = JSON.parse(trimmed);
-                    if (Array.isArray(arr)) {
-                        arr.forEach(function (item) {
-                            if (!item) return;
-                            if (typeof item === 'string') {
-                                var parts = item.split('|');
-                                entries.push([parts[0] || '', parts[1] || '', parts[2] || '']);
-                            } else if (typeof item === 'object') {
-                                // tolerant key picks
-                                var inv = item.In || item.in || item.Start || item.From || '';
-                                var outv = item.Out || item.out || item.End || '';
-                                var codev = item.Code || item.code || item.LookupId || '';
-                                entries.push([inv, outv, codev]);
-                            }
-                        });
-                    }
-                } catch (e) {
-                    // fallback to semicolon parsing if JSON.parse fails
-                    trimmed = trimmed.replace(/^\s*;|;\s*$/g, '');
-                }
-            }
-
-            // if no JSON-derived entries, do semicolon parsing
-            if (entries.length === 0) {
-                // normalize stray semicolons and remove empty segments
-                trimmed = trimmed.replace(/^\s*;|;\s*$/g, '');
-                var parts = trimmed.split(';');
-                for (var i = 0; i < parts.length; i++) {
-                    var item = (parts[i] || '').trim();
-                    if (!item) continue;
-                    var pieces = item.split('|');
-                    // decode each piece but push raw (we'll decode before create)
-                    entries.push([pieces[0] || '', pieces[1] || '', pieces[2] || '']);
-                }
-            }
-
-            // Now create nodes but skip duplicates of the main pair
-            for (var j = 0; j < entries.length; j++) {
-                var p = entries[j];
-                var inRaw = p[0] || '';
-                var outRaw = p[1] || '';
-                var codeRaw = p[2] || '';
-
-                var inDecoded = safeDecode(inRaw);
-                var outDecoded = safeDecode(outRaw);
-                var codeDecoded = safeDecode(codeRaw);
-
-                // normalize for comparison and skip if duplicates the main pair
-                if (normTime(inDecoded) === mainInVal && normTime(outDecoded) === mainOutVal) {
-                    // if it's first entry and duplicates main, skip it
-                    continue;
-                }
-
-                // skip completely empty pairs
-                if (!inDecoded && !outDecoded) continue;
-
-                // create nodes, pass decoded values
-                var nodes = null;
-                try {
-                    nodes = window.createExtraPairNodes(row, studentId, {
-                        inVal: inDecoded,
-                        outVal: outDecoded,
-                        codeValue: codeDecoded
-                    });
-                } catch (e) {
-                    console.warn('renderExtrasForRow: createExtraPairNodes threw', e, studentId, inDecoded, outDecoded, codeDecoded);
-                }
-                if (!nodes) {
-                    console.warn('renderExtrasForRow: createExtraPairNodes failed for', studentId, inDecoded, outDecoded, codeDecoded);
-                }
-            }
-        };
-
-        function attachInputListenersToInput(el, row, studentId) {
+        function attachInputListenersToInput(el, row, studentId,classId) {
             if (!el) return;
             if (el.__hasAttachListener) return;
             el.__hasAttachListener = true;
-            el.addEventListener('change', function () { try { serializeExtraTimesForRow(row, studentId); } catch (e) { } });
+            el.addEventListener('change', function () { try { serializeExtraTimesForRow(row, studentId,classId); } catch (e) { } });
             if (el.tagName && el.tagName.toLowerCase() === 'input') {
-                el.addEventListener('input', function () { try { serializeExtraTimesForRow(row, studentId); } catch (e) { } });
+                el.addEventListener('input', function () { try { serializeExtraTimesForRow(row, studentId,classId); } catch (e) { } });
             }
         }
 
 
-        function getHiddenExtrasEl(studentId, row) {
-            var hid = null;
-            if (row) hid = row.querySelector('#hidExtraTimes_' + studentId) || row.querySelector('input[type=hidden][name^="hidExtraTimes_"]');
-            if (!hid) hid = document.getElementById('hidExtraTimes_' + studentId);
-            // fallback to grid hidden with numeric id pattern if present
-            if (!hid) hid = document.querySelector('input[id^="grdGroup_ctl"][id$="hidExtraTimes"]');
-            return hid;
-        }
 
-        function buildExtrasStringEncoded(arrayOfTokens) {
-            var segs = [];
-            for (var i = 0; i < arrayOfTokens.length; i++) {
-                var t = arrayOfTokens[i];
-                // we still include empty parts to preserve positions: encode each
-                var a = encodeURIComponent(t.in || '');
-                var b = encodeURIComponent(t.out || '');
-                var c = encodeURIComponent(t.code || '');
-                segs.push(a + '|' + b + '|' + c);
-            }
-            return segs.join(';');
-        }
-
-        function renderExtrasForRowCanonical(rowOrBtnOrId, studentId) {
-            // resolve row same as your other helpers
-            var row = null;
-            if (rowOrBtnOrId && rowOrBtnOrId.nodeType) {
-                row = (rowOrBtnOrId.tagName && rowOrBtnOrId.tagName.toLowerCase() === 'tr') ? rowOrBtnOrId :
-                      (rowOrBtnOrId.closest ? (rowOrBtnOrId.closest('tr') || rowOrBtnOrId.closest('.att-row')) : null);
-            }
-            if (!row && typeof rowOrBtnOrId === 'string') {
-                row = document.querySelector(rowOrBtnOrId) || document.getElementById(rowOrBtnOrId);
-                if (row && !(row.tagName && row.tagName.toLowerCase() === 'tr')) {
-                    row = (row.closest ? (row.closest('tr') || row.closest('.att-row')) : row);
-                }
-            }
-            if (!row && studentId) {
-                row = document.querySelector('[data-studentid="' + studentId + '"]') || document.getElementById('row_' + studentId);
-                if (!row) {
-                    var hidGuess = document.getElementById('hidExtraTimes_' + studentId);
-                    if (hidGuess && hidGuess.closest) row = hidGuess.closest('tr');
-                }
-            }
-            if (!row) { console.warn('renderExtrasForRowCanonical: row not found', rowOrBtnOrId, studentId); return; }
-
-            // resolve studentId if not provided
-            if (!studentId) {
-                var ds = row.getAttribute('data-studentid');
-                if (ds) studentId = ds;
-                else {
-                    var hG = row.querySelector('input[type=hidden][id^="hidExtraTimes_"]');
-                    if (hG) studentId = (hG.id || '').replace(/^hidExtraTimes_/, '');
-                }
-            }
-            if (!studentId) { console.warn('renderExtrasForRowCanonical: studentId unknown'); return; }
-
-            var hid = getHiddenExtrasEl(studentId, row);
-            var raw = hid ? (hid.value || '') : '';
-            // Parse/normalize
-            var tokens = parseExtrasString(raw);
-
-            // Determine main values to skip duplicates (main controls in row)
-            var mainInEl = row.querySelector('input.in-time, input[id$="txtInTime"]');
-            var mainOutEl = row.querySelector('input.out-time, input[id$="txtOutTime"]');
-            var mainCodeEl = row.querySelector('select[id$="ddlCode"], select.code-select');
-            var mainIn = mainInEl && mainInEl.value ? (mainInEl.value || '').trim() : '';
-            var mainOut = mainOutEl && mainOutEl.value ? (mainOutEl.value || '').trim() : '';
-            var mainCode = mainCodeEl && mainCodeEl.value ? (mainCodeEl.value || '').trim() : '';
-
-            // Cleanup existing extra pairs (only extra-pair nodes) before re-adding
-            try {
-                var inStack = row.querySelector('.time-stack');
-                if (inStack) {
-                    var extras = Array.prototype.slice.call(inStack.querySelectorAll('.time-pair.extra-pair'));
-                    extras.forEach(function (n) { n.parentNode && n.parentNode.removeChild(n); });
-                }
-                var outStacks = row.querySelectorAll('.time-stack');
-                var outStack = (outStacks && outStacks.length > 1) ? outStacks[1] : outStacks[0];
-                if (outStack) {
-                    var extrasOut = Array.prototype.slice.call(outStack.querySelectorAll('.time-pair.extra-pair'));
-                    extrasOut.forEach(function (n) { n.parentNode && n.parentNode.removeChild(n); });
-                }
-                var codeStack = row.querySelector('.code-stack');
-                if (codeStack) {
-                    var extrasCode = Array.prototype.slice.call(codeStack.querySelectorAll('.code-pair.extra-code-pair'));
-                    extrasCode.forEach(function (n) { n.parentNode && n.parentNode.removeChild(n); });
-                }
-            } catch (e) { console.warn('renderExtrasForRowCanonical cleanup failed', e); }
-
-            // Build filtered list to re-render: skip entries equal to main and skip fully empty
-            var filtered = [];
-            for (var i = 0; i < tokens.length; i++) {
-                var t = tokens[i];
-                // compare raw strings after trimming
-                var tIn = (t.in || '').trim();
-                var tOut = (t.out || '').trim();
-                var tCode = (t.code || '').trim();
-                // skip empty
-                if (!tIn && !tOut && !tCode) continue;
-                // skip if equals main
-                if (tIn === mainIn && tOut === mainOut && tCode === mainCode) continue;
-                filtered.push({ in: tIn, out: tOut, code: tCode });
-            }
-
-            // Render each filtered token into the row using createExtraPairNodes
-            for (var k = 0; k < filtered.length; k++) {
-                var item = filtered[k];
-                try {
-                    // createExtraPairNodes expects raw values (HH:mm) and will create inputs + select
-                    if (typeof window.createExtraPairNodes === 'function') {
-                        window.createExtraPairNodes(row, studentId, { inVal: item.in, outVal: item.out, codeValue: item.code });
-                    } else {
-                        // fallback: create a simple li (if you used fallback renderer earlier)
-                        var extraDiv = document.getElementById('extraRow_' + studentId);
-                        if (extraDiv) {
-                            var li = document.createElement('li');
-                            li.textContent = (item.in || '-') + ' — ' + (item.out || '-') + ' (code: ' + (item.code || '-') + ')';
-                            extraDiv.appendChild(li);
-                        }
-                    }
-                } catch (ex) {
-                    console.error('renderExtrasForRowCanonical: createExtraPairNodes failed', ex, item);
-                }
-            }
-
-            // Optional: rewrite canonical encoded hidden to avoid mixed formats later
-            try {
-                var canonical = buildExtrasStringEncoded(filtered);
-                if (hid) hid.value = canonical;
-                else {
-                    // create hidden if not present
-                    var newH = document.createElement('input');
-                    newH.type = 'hidden';
-                    newH.id = 'hidExtraTimes_' + studentId;
-                    newH.name = 'hidExtraTimes_' + studentId;
-                    newH.value = canonical;
-                    // append to last cell
-                    var lastTd = row.querySelector('td:last-child') || row;
-                    lastTd.appendChild(newH);
-                }
-            } catch (e) {
-                console.warn('renderExtrasForRowCanonical could not rewrite hidden', e);
-            }
-        }
 
         function normalizeAllExtras() {
-            var hidEls = document.querySelectorAll('input[type=hidden][id^="hidExtraTimes_"]');
-            hidEls = Array.prototype.slice.call(hidEls);
-            hidEls.forEach(function (h) {
-                var studentId = (h.id || '').replace(/^hidExtraTimes_/, '');
-                if (!studentId) return;
-                var raw = h.value || '';
-                if (!raw) return;
-                var parts = raw.split(';');
-                var normalized = [];
-                parts.forEach(function (p) {
-                    var seg = p || '';
-                    try { seg = decodeURIComponent(seg); } catch (e) { /* ignore */ }
-                    var arr = seg.split('|'); while (arr.length < 3) arr.push('');
-                    // trim
-                    arr = arr.map(function (x) { return (x || '').trim(); });
-                    if (!arr[0] && !arr[1] && !arr[2]) return; // skip empty
-                    // skip token if matches main inputs (avoid duplicate)
-                    var row = document.querySelector('[data-studentid="' + studentId + '"]') || document.getElementById('row_' + studentId);
-                    var mainIn = row && row.querySelector('input.in-time') ? (row.querySelector('input.in-time').value || '').trim() : '';
-                    var mainOut = row && row.querySelector('input.out-time') ? (row.querySelector('input.out-time').value || '').trim() : '';
-                    var mainCode = row && row.querySelector('select[id$=\"ddlCode\"]') ? (row.querySelector('select[id$=\"ddlCode\"]').value || '').trim() : '';
-                    if (arr[0] === mainIn && arr[1] === mainOut && arr[2] === mainCode) return;
-                    normalized.push(encodeURIComponent(arr[0]) + '|' + encodeURIComponent(arr[1]) + '|' + encodeURIComponent(arr[2]));
+
+            if (window.__extrasRunning) return;
+            window.__extrasRunning = true;
+
+            try {
+
+                var rows = document.querySelectorAll("tr[data-extras]");
+
+                rows.forEach(function (row) {
+
+                    var studentId = row.getAttribute("data-studentid");
+                    var classId = row.getAttribute("data-classid");
+
+                    if (!studentId || !classId) return;
+
+                    //CLEAR container FIRST
+                    var container = row.querySelector(".extras-container");
+                    if (container) {
+                        container.innerHTML = "";
+                    }
+
+                    //FIND corresponding hidden field
+                    var hid = document.getElementById("hidExtraTimes_" + studentId + "_" + classId);
+                    if (!hid) return;
+
+                    var raw = hid.value || "";
+                    if (!raw) return;
+
+                    var parts = raw.split(';');
+                    var normalized = [];
+
+                    //GET MAIN VALUES (NO optional chaining)
+                    var inEl = row.querySelector('input.in-time');
+                    var outEl = row.querySelector('input.out-time');
+                    var codeEl = row.querySelector('select[id$="ddlCode"]');
+
+                    var mainIn = inEl ? (inEl.value || '').trim() : '';
+                    var mainOut = outEl ? (outEl.value || '').trim() : '';
+                    var mainCode = codeEl ? (codeEl.value || '').trim() : '';
+
+                    parts.forEach(function (p) {
+
+                        var seg = p || '';
+
+                        try { seg = decodeURIComponent(seg); } catch (e) { }
+
+                        var arr = seg.split('|');
+                        while (arr.length < 3) arr.push('');
+
+                        arr = arr.map(function (x) { return (x || '').trim(); });
+
+                        // skip empty
+                        if (!arr[0] && !arr[1] && !arr[2]) return;
+
+                        //SKIP duplicate of main row
+                        if (arr[0] === mainIn && arr[1] === mainOut && arr[2] === mainCode) return;
+
+                        normalized.push(
+                            encodeURIComponent(arr[0]) + '|' +
+                            encodeURIComponent(arr[1]) + '|' +
+                            encodeURIComponent(arr[2])
+                        );
+                    });
+
+                    //SAVE CLEANED DATA
+                    hid.value = normalized.join(';');
                 });
-                var canonical = normalized.join(';');
-                h.value = canonical;
-                // call your renderer to re-create UI (it will decode)
-                try { window.renderExtrasForRow && window.renderExtrasForRow(null, studentId); } catch (e) { console.error(e); }
-            });
+
+                //CALL RENDER ONLY ONCE (VERY IMPORTANT)
+                if (typeof renderAllExtras === "function") {
+                    renderAllExtras();
+                }
+
+            } catch (e) {
+                console.error("normalizeAllExtras error", e);
+            }
+
+            window.__extrasRunning = false;
         }
 
         if (document.readyState !== 'loading') {
@@ -2358,260 +2840,6 @@
 
 
 
-        (function () {
-            // state kept inside the closure
-            var outsideClickHandler = null;
-            var calendarClickDelegationAttached = false;
-            var prMHooked = false;
-            var log = false; // set to true while debugging
-
-            function getPnl() {
-                try { return document.getElementById('<%= pnlCalendar.ClientID %>'); } catch (e) { return null; }
-    }
-            function getBtn() {
-                try { return document.getElementById('<%= btnEditPastDates.ClientID %>'); } catch (e) { return null; }
-    }
-
-            function isVisible(el) {
-                if (!el) return false;
-                try {
-                    var cs = window.getComputedStyle ? getComputedStyle(el) : null;
-                    if (cs) {
-                        if (cs.display === 'none' || cs.visibility === 'hidden' || cs.opacity === '0') return false;
-                        return el.offsetWidth > 0 && el.offsetHeight > 0;
-                    }
-                    return el.style && el.style.display !== 'none';
-                } catch (e) { return el && el.style && el.style.display !== 'none'; }
-            }
-
-            function loader() {
-                try { return document.getElementById('loader'); } catch (e) { return null; }
-            }
-
-            function showLoader() {
-                try {
-                    var l = loader();
-                    if (!l) return;
-                    l.style.display = 'block';
-                } catch (e) { if (console) console.log('showLoader error', e); }
-            }
-            function hideLoader() {
-                try {
-                    var l = loader();
-                    if (!l) return;
-                    try { l.style.setProperty('display', 'none', 'important'); } catch (e) { l.style.display = 'none'; }
-                } catch (e) { if (console) console.log('hideLoader error', e); }
-            }
-
-            // Delegate clicks inside the calendar panel to show the loader before a postback.
-            function attachCalendarClickForExistingLoader() {
-                try {
-                    if (calendarClickDelegationAttached) return;
-                    var p = getPnl();
-                    if (!p) return;
-                    p.addEventListener('click', function (ev) {
-                        try {
-                            var t = ev.target || ev.srcElement;
-                            while (t && t !== p && t.tagName !== 'A') t = t.parentNode;
-                            if (!t || t === p) return;
-
-                            // only show loader for numeric day anchors (avoid month nav)
-                            var txt = (t.textContent || t.innerText || '').trim();
-                            var hasNumeric = /^\d{1,2}$/.test(txt) || (t.querySelector && (function () {
-                                var s = t.querySelector('span,div');
-                                return s && /^\d{1,2}$/.test((s.textContent || s.innerText || '').trim());
-                            })());
-                            if (!hasNumeric) {
-                                return;
-                            }
-
-                            // show the existing page loader before the postback
-                            showLoader();
-                        } catch (e) { if (console) console.log('calendar click delegation error', e); }
-                    }, true);
-                    calendarClickDelegationAttached = true;
-                } catch (e) { if (console) console.log('attachCalendarClickForExistingLoader failed', e); }
-            }
-
-            function removeOutsideClickHandler() {
-                try {
-                    if (outsideClickHandler) {
-                        document.removeEventListener('click', outsideClickHandler, false);
-                        outsideClickHandler = null;
-                    }
-                } catch (e) { }
-            }
-
-            function attachOutsideClickHandlerDelayed() {
-                removeOutsideClickHandler();
-                setTimeout(function () {
-                    outsideClickHandler = function (ev) {
-                        try {
-                            var pnl = getPnl();
-                            var btn = getBtn();
-                            var target = ev.target || ev.srcElement;
-                            if (!pnl || !target) return;
-                            if (pnl.contains(target)) return;
-                            if (btn && btn.contains(target)) return;
-                            // click outside -> hide
-                            try { window.hideCalendarPopup && window.hideCalendarPopup(); } catch (ex) { }
-                        } catch (err) { }
-                    };
-
-                    // attach in bubble phase so button's own click runs first
-                    document.addEventListener('click', outsideClickHandler, false);
-                }, 120);
-            }
-
-            // Hook into MS AJAX PageRequestManager if present, but do it safely and only once.
-            function hookPageRequestManagerOnce() {
-                try {
-                    if (prMHooked) {  }
-                    if (window.Sys && Sys.WebForms && Sys.WebForms.PageRequestManager) {
-                        var prm = Sys.WebForms.PageRequestManager.getInstance();
-                        if (prm) {
-                            prm.add_beginRequest(function () {
-                                try { showLoader(); } catch (e) { }
-                            });
-                            prm.add_endRequest(function () {
-                                try { setTimeout(function () { hideLoader(); }, 200); } catch (e) { }
-                            });
-                            prMHooked = true;
-                        }
-                    }
-                } catch (e) { }
-            }
-
-            // Initialize wiring (run now and also attempt wiring after partial updates)
-            function init() {
-                try {
-                    attachCalendarClickForExistingLoader();
-                    attachOutsideClickHandlerDelayed();
-                    hookPageRequestManagerOnce();
-                } catch (e) {  }
-            }
-
-            // Run when DOM ready (supports interactive/complete)
-            if (document.readyState === 'complete' || document.readyState === 'interactive') {
-                init();
-            } else {
-                document.addEventListener('DOMContentLoaded', init);
-            }
-
-            // Re-run init after ASP.NET partial updates to reattach handlers if DOM nodes were replaced
-            try {
-                if (window.Sys && Sys.WebForms && Sys.WebForms.PageRequestManager) {
-                    var prm2 = Sys.WebForms.PageRequestManager.getInstance();
-                    if (prm2) {
-                        prm2.add_endRequest(function () {
-                            // small delay to allow DOM replacement to settle
-                            setTimeout(function () {
-                                // reattach (functions are defensive to avoid duplicates)
-                                attachCalendarClickForExistingLoader();
-                                attachOutsideClickHandlerDelayed();
-                            }, 60);
-                        });
-                    }
-                }
-            } catch (e) { }
-
-
-
-
-            function removeOutsideClickHandler() {
-                if (outsideClickHandler) {
-                    try {
-                        document.removeEventListener('click', outsideClickHandler, false);
-                    } catch (e) { }
-                    outsideClickHandler = null;
-                }
-            }
-
-            // Wire MS Ajax PRM once: show loader on beginRequest, cleanup on endRequest
-            (function hookPageRequestManager() {
-                try {
-                    if (prMHooked) return;
-                    if (typeof (Sys) !== 'undefined' && Sys && Sys.WebForms && Sys.WebForms.PageRequestManager) {
-                        var prm = Sys.WebForms.PageRequestManager.getInstance();
-                        if (!prm) return;
-                        prm.add_beginRequest(function () {
-                            try { showLoader(); } catch (e) { }
-                        });
-                        prm.add_endRequest(function () {
-                            try {
-                                // hide loader and clean up handlers: server may have re-rendered panel/button nodes
-                                try { hideLoader(); } catch (e) { }
-                                removeOutsideClickHandler();
-                                // If server re-rendered the panel/button, re-attach calendar click delegation on the new node
-                                try { calendarClickDelegationAttached = false; /* force re-attach if needed */ } catch (e) { }
-                                // Re-enable the Edit Past Dates button (ASP.NET sometimes leaves it disabled after async postback)
-                                try {
-                                    var b = getBtn();
-                                    if (b) { b.disabled = false; b.removeAttribute && b.removeAttribute('disabled'); }
-                                } catch (e) { }
-                                // Ensure popup hidden (server may have processed selection)
-                                try { window.hideCalendarPopup && window.hideCalendarPopup(); } catch (e) { }
-                            } catch (ex) { }
-                        });
-                        prMHooked = true;
-                    }
-                } catch (ex) { if (console) console.log('page request manager hook failed', ex); }
-            })();
-
-            // ESC closes popup
-            document.addEventListener('keydown', function (ev) {
-                if (ev.key === 'Escape' || ev.keyCode === 27) {
-                    try { window.hideCalendarPopup && window.hideCalendarPopup(); } catch (e) { }
-                }
-            });
-
-            // Expose functions to be sure other code can call them if needed
-            // (optional) ensure we don't overwrite existing implementations if present
-            if (!window.attachCalendarClickForExistingLoader) {
-                window.attachCalendarClickForExistingLoader = function () {
-                    // simplistic re-run (will be guarded by calendarClickDelegationAttached)
-                    try {
-                        calendarClickDelegationAttached = false;
-                        (function () {
-                            var p = document.getElementById('<%= pnlCalendar.ClientID %>');
-                      if (!p) return;
-                      p.addEventListener('click', function (ev) {
-                          try {
-                              var t = ev.target || ev.srcElement;
-                              while (t && t !== p && t.tagName !== 'A') t = t.parentNode;
-                              if (!t || t === p) return;
-                              showLoader();
-                          } catch (e) { if (console) console.log('calendar click delegation error', e); }
-                      }, true);
-                      calendarClickDelegationAttached = true;
-                  })();
-            } catch (e) { }
-        };
-    }             })();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        function setFixedDate(dateStr) {
-            // store it in a global so your clock display knows what date to show
-            window.fixedDate = dateStr;
-        }
-
-
-
-
-
 
 
 
@@ -2647,126 +2875,6 @@
         }
 
 
-        function syncCalendarFromInput() {
-            try {
-                var input = document.getElementById('<%= hidPastDate.ClientID %>');
-                var cal = document.getElementById('<%= calPast.ClientID %>'); // if you use client calendar
-                if (!input) return;
-                var v = input.value; // expected 'yyyy-mm-dd'
-                if (!v) return;
-                // convert 'yyyy-mm-dd' to Date object
-                var parts = v.split('-');
-                if (parts.length === 3) {
-                    var d = new Date(parts[0], parts[1] - 1, parts[2]);
-                    // call your client calendar API to set visible date/selected date
-                    if (typeof setClientCalendarDate === 'function') {
-                        setClientCalendarDate(d);
-                    }
-                    // or set a data attribute for server-side scripts
-                    input.dataset.synced = '1';
-                }
-            } catch (e) { console && console.log && console.log('syncCalendarFromInput', e); }
-        }
-
-
-        (function () {
-            // helper: is this an anchor representing a calendar day number?
-            function isDayAnchor(a) {
-                if (!a) return false;
-                var txt = (a.textContent || a.innerText || '').trim();
-                if (/^\d{1,2}$/.test(txt)) return true;
-                // maybe the number is wrapped in a child span: <a><span>12</span></a>
-                var span = a.querySelector && a.querySelector('span');
-                if (span && /^\d{1,2}$/.test((span.textContent || span.innerText || '').trim())) return true;
-                return false;
-            }
-
-            // Extract __doPostBack args from a href like: "javascript:__doPostBack('ctl00$...','V123')"
-            function extractDoPostBackArgs(href) {
-                if (!href) return null;
-                // match __doPostBack('arg1','arg2') — allow optional "javascript:" prefix and whitespace
-                var m = href.match(/__doPostBack\(\s*'([^']*)'\s*,\s*'([^']*)'\s*\)/);
-                if (m) return { target: m[1], arg: m[2] };
-                return null;
-            }
-
-            function wireCal() {
-                var cal = document.getElementById('<%= calPast.ClientID %>');
-      if (!cal) return;
-
-      // Use capture to run before ASP.NET handlers
-      cal.addEventListener('click', function (ev) {
-          try {
-              var t = ev.target || ev.srcElement;
-              while (t && t !== p && t.tagName !== 'A') t = t.parentNode;
-              if (!t || t === p) return;
-
-              // detect numeric day anchor (1-31) — supports <a>12</a> or <a><span>12</span></a>
-              var txt = (t.textContent || t.innerText || '').trim();
-              var span = t.querySelector && t.querySelector('span,div');
-              var isDay = (/^\d{1,2}$/.test(txt)) || (span && /^\d{1,2}$/.test((span.textContent || span.innerText || '').trim()));
-              if (!isDay) {
-                  return;
-              }
-
-              // show loader immediately
-              try { showLoader(); } catch (e) {}
-
-              // prevent the default client-side anchor behavior that opens/toggles the calendar UI
-              // BUT still perform the postback explicitly if href contains __doPostBack
-              try {
-                  var href = t.getAttribute('href') || '';
-                  if (href.indexOf('__doPostBack') !== -1) {
-                      ev.preventDefault(); // stop default navigation / calendar UI toggle
-                      var m = href.match(/__doPostBack\(\s*'([^']*)'\s*,\s*'([^']*)'\s*\)/);
-                      if (m && typeof __doPostBack === 'function') {
-                          __doPostBack(m[1], m[2]);
-                      } else {
-                          // fallback: eval only if parsing failed
-                          try { eval(href); } catch (ex) { }
-                      }
-                  }
-                      // If href does not contain __doPostBack, we still prevented default; but we want the postback.
-                      // Try to find onclick that triggers postback or let the normal flow continue:
-                  else {
-                      // Try to find an inline onclick that calls __doPostBack
-                      var onclick = t.getAttribute('onclick') || '';
-                      var m2 = onclick.match(/__doPostBack\(\s*'([^']*)'\s*,\s*'([^']*)'\s*\)/);
-                      if (m2 && typeof __doPostBack === 'function') {
-                          ev.preventDefault();
-                          __doPostBack(m2[1], m2[2]);
-                      } else {
-                          // If nothing found, do not prevent further — allow default (but we already called preventDefault())
-                          // To be safe, attempt a synthetic click on the anchor after a tiny delay (so we don't re-open calendar synchronously)
-                          setTimeout(function () {
-                              try { if (t.click) t.click(); } catch (e) { }
-                          }, 20);
-                      }
-                  }
-              } catch (postEx) {  }
-          } catch (e) {
-          }
-      }, true);
-  }
-
-            if (document.readyState === 'complete' || document.readyState === 'interactive') {
-                wireCal();
-            } else {
-                document.addEventListener('DOMContentLoaded', wireCal);
-            }
-
-            // optionally: ensure loader gets hidden after partial postbacks (if Sys.WebForms is present)
-            try {
-                if (window.Sys && Sys.WebForms && Sys.WebForms.PageRequestManager) {
-                    var prm = Sys.WebForms.PageRequestManager.getInstance();
-                    if (prm) {
-                        prm.add_endRequest(function () { try { setTimeout(function () { if (window.hideLoader) hideLoader(); }, 200); } catch (e) { } });
-                    }
-                }
-            } catch (e) { /* ignore */ }
-
-
-        })();
 
         
 
@@ -2774,355 +2882,6 @@
 
 
 
-
-
-
-        (function () {
-            // CONFIG: set to your real IDs if different
-            window.__dateDisplayId = window.__dateDisplayId || 'currentDateTime';
-            window.__hidPastDateId = window.__hidPastDateId || 'hidPastDate';
-
-            // live clock control flag (used by existing code elsewhere)
-            window.allowClockUpdate = (typeof window.allowClockUpdate === 'boolean') ? window.allowClockUpdate : true;
-
-            // helper: find hidden input robustly (works across ASP.NET ClientID mangling)
-            function findHidden() {
-                var h = document.getElementById(window.__hidPastDateId);
-                if (h) return h;
-                h = document.querySelector('input[type=hidden][name$=\"hidPastDate\"]');
-                if (h) return h;
-                return document.querySelector('input[type=hidden][id*=\"hidPastDate\"], input[type=hidden][name*=\"hidPastDate\"]');
-            }
-
-            // format date nicely for display
-            function fmtIso(iso) {
-                try {
-                    if (!iso) return '';
-                    var d = new Date(iso);
-                    if (isNaN(d)) return iso;
-                    return d.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: '2-digit' });
-                } catch (e) { return iso; }
-            }
-
-            // main updater: sets the on-page timer/display according to hidden selected date or live clock
-            window.updateTimerFromHidden = function (force) {
-                try {
-                    var hid = findHidden();
-                    var iso = hid ? (hid.value || '').trim() : '';
-                    var el = document.getElementById(window.__dateDisplayId) || document.querySelector('.current-date-display') || null;
-                    if (!el) return;
-
-                    if (iso) {
-                        // if a past date is selected, show the selected date and stop live clock
-                        el.innerHTML = fmtIso(iso);
-                        try { el.classList.add('past-selected-date'); } catch (e) { }
-                        try { el.style.color = 'red'; } catch (e) { }
-                        window.allowClockUpdate = false;
-                        // also cache last selected
-                        window._lastSelectedIso = iso;
-                    } else {
-                        // no past date selected -> resume live clock
-                        try { el.classList.remove('past-selected-date'); } catch (e) { }
-                        try { el.style.color = ''; } catch (e) { }
-                        window.allowClockUpdate = true;
-                        // if there's a refreshClockNow function use it; otherwise write current local time
-                        if (typeof refreshClockNow === 'function') {
-                            try { refreshClockNow(); } catch (e) { el.innerHTML = new Date().toLocaleString(); }
-                        } else {
-                            el.innerHTML = new Date().toLocaleString();
-                        }
-                        window._lastSelectedIso = null;
-                    }
-                } catch (err) {
-                    console && console.log && console.log('updateTimerFromHidden error', err);
-                }
-            };
-
-            //window.refreshClockNow = window.refreshClockNow || function () {
-            //    try {
-            //        if (window.allowClockUpdate === false) return;
-            //        var el = document.getElementById(window.__dateDisplayId || 'currentDateTime');
-            //        if (!el) return;
-            //        var now = new Date();
-            //        var formatted = now.toLocaleString(undefined, {
-            //            weekday: 'long', year: 'numeric', month: 'long', day: '2-digit',
-            //            hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
-            //        });
-            //        el.innerHTML = formatted;
-            //    } catch (e) { console && console.log && console.log('refreshClockNow error', e); }
-            //};
-
-            // interval loop that updates clock if allowed
-            if (typeof window._clockInterval === 'undefined') {
-                window._clockInterval = setInterval(function () {
-                    try {
-                        if (window.allowClockUpdate !== false && typeof refreshClockNow === 'function') {
-                            refreshClockNow();
-                        }
-                    } catch (e) { }
-                }, 1000);
-            }
-
-            // allow server to set hidden + immediately update
-            window.setHiddenPastDateIso = function (iso) {
-                try {
-                    var hid = findHidden();
-                    if (hid) hid.value = iso || '';
-                    window.updateTimerFromHidden(true);
-                } catch (e) { console && console.log && console.log('setHiddenPastDateIso error', e); }
-            };
-
-            // On load run once
-            if (document.readyState !== 'loading') updateTimerFromHidden(true);
-            else document.addEventListener('DOMContentLoaded', function () { updateTimerFromHidden(true); }, false);
-
-            // Ensure update runs after every MS AJAX UpdatePanel partial postback
-            try {
-                if (typeof Sys !== 'undefined' && Sys.WebForms && Sys.WebForms.PageRequestManager) {
-                    Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
-                        try { updateTimerFromHidden(true); } catch (e) { console && console.log && console.log('endRequest updateTimer error', e); }
-                    });
-                }
-            } catch (e) { /* ignore */ }
-
-            // Also if you have a periodic client clock loop, make it respect window.allowClockUpdate
-            // Example replacement for such a loop (if you already have one, adapt it):
-            if (typeof window._clockInterval === 'undefined') {
-                window._clockInterval = setInterval(function () {
-                    try {
-                        if (window.allowClockUpdate !== false && typeof refreshClockNow === 'function') {
-                            refreshClockNow();
-                        }
-                    } catch (e) { }
-                }, 1000);
-            }
-        })();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        if (!window.__studentCheckinHelpersInstalled) (function () {
-            window.__studentCheckinHelpersInstalled = true;
-
-            // CONFIG - id of the element that displays the current date/time
-            window.__dateDisplayId = window.__dateDisplayId || 'currentDateTime';
-
-            // ----- Loader helpers -----
-            // showLoader('Loading...') and hideLoader()
-            window.__loaderFallbackTimeout = null;
-
-            window.showLoader = window.showLoader || function (msg) {
-                try {
-                    var id = 'globalPageLoader';
-                    var el = document.getElementById(id);
-                    if (!el) {
-                        el = document.createElement('div');
-                        el.id = id;
-                        el.style.position = 'fixed';
-                        el.style.left = '0';
-                        el.style.top = '0';
-                        el.style.right = '0';
-                        el.style.bottom = '0';
-                        el.style.zIndex = '65535';
-                        el.style.display = 'flex';
-                        el.style.alignItems = 'center';
-                        el.style.justifyContent = 'center';
-                        el.style.background = 'rgba(0,0,0,0.35)';
-                        el.style.fontFamily = 'Segoe UI, Arial, sans-serif';
-                        el.style.color = '#fff';
-                        el.style.fontSize = '14px';
-
-                        var inner = document.createElement('div');
-                        inner.style.background = 'rgba(0,0,0,0.6)';
-                        inner.style.padding = '12px 18px';
-                        inner.style.borderRadius = '6px';
-                        inner.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
-                        inner.style.display = 'flex';
-                        inner.style.alignItems = 'center';
-                        inner.style.gap = '12px';
-
-                        var spinner = document.createElement('div');
-                        spinner.className = 'simple-loader-spinner';
-                        spinner.style.width = '18px';
-                        spinner.style.height = '18px';
-                        spinner.style.border = '3px solid rgba(255,255,255,0.2)';
-                        spinner.style.borderTopColor = '#fff';
-                        spinner.style.borderRadius = '50%';
-                        spinner.style.animation = 'spin 1s linear infinite';
-
-                        var msgEl = document.createElement('div');
-                        msgEl.className = 'loader-msg';
-                        msgEl.textContent = msg || 'Loading…';
-
-                        inner.appendChild(spinner);
-                        inner.appendChild(msgEl);
-                        el.appendChild(inner);
-
-                        // minimal spinner CSS (insert once)
-                        var style = document.createElement('style');
-                        style.id = 'globalLoaderStyle';
-                        style.appendChild(document.createTextNode(
-                          '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }'
-                        ));
-                        document.head.appendChild(style);
-
-                        document.body.appendChild(el);
-                    } else {
-                        var msgEl = el.querySelector('.loader-msg');
-                        if (msgEl) msgEl.textContent = msg || 'Loading…';
-                        el.style.display = 'flex';
-                    }
-
-                    // safety fallback: auto-hide after 20s to avoid indefinite stuck loader
-                    if (window.__loaderFallbackTimeout) clearTimeout(window.__loaderFallbackTimeout);
-                    window.__loaderFallbackTimeout = setTimeout(function () {
-                        try { window.hideLoader && window.hideLoader(); } catch (e) { }
-                    }, 20000);
-                } catch (e) { console && console.log && console.log('showLoader error', e); }
-            };
-
-            window.hideLoader = window.hideLoader || function () {
-                try {
-                    var el = document.getElementById('globalPageLoader');
-                    if (el) {
-                        el.style.display = 'none';
-                    }
-                    if (window.__loaderFallbackTimeout) {
-                        clearTimeout(window.__loaderFallbackTimeout);
-                        window.__loaderFallbackTimeout = null;
-                    }
-                } catch (e) { console && console.log && console.log('hideLoader error', e); }
-            };
-
-            // ----- Clock helper -----
-            // exact format: M/d/yyyy h:mm:ss tt  (e.g. 9/19/2025 8:36:00 PM)
-            //window.refreshClockNow = window.refreshClockNow || function () {
-            //    try {
-            //        // don't update if paused for a past-date view
-            //        if (window.allowClockUpdate === false) return;
-
-            //        var id = window.__dateDisplayId || 'currentDateTime';
-            //        var el = document.getElementById(id);
-            //        if (!el) return;
-
-            //        var now = new Date();
-
-            //        function pad(v, len) {
-            //            v = String(v); while (v.length < (len || 2)) v = '0' + v; return v;
-            //        }
-
-            //        var month = now.getMonth() + 1; // 1-12
-            //        var day = now.getDate(); // 1-31
-            //        var year = now.getFullYear();
-
-            //        var hour24 = now.getHours();
-            //        var ampm = hour24 >= 12 ? 'PM' : 'AM';
-            //        var hour12 = hour24 % 12;
-            //        if (hour12 === 0) hour12 = 12;
-
-            //        var minute = pad(now.getMinutes(), 2);
-            //        var second = pad(now.getSeconds(), 2);
-
-            //        var formatted = month + '/' + day + '/' + year + ' ' + hour12 + ':' + minute + ':' + second + ' ' + ampm;
-
-            //        el.innerHTML = formatted;
-            //    } catch (e) { console && console.log && console.log('refreshClockNow error', e); }
-            //};
-
-            // small tick loop that respects window.allowClockUpdate
-            if (typeof window.__clockIntervalId === 'undefined') {
-                window.__clockIntervalId = setInterval(function () {
-                    try {
-                        if (window.allowClockUpdate !== false) refreshClockNow();
-                    } catch (e) { }
-                }, 1000);
-            }
-
-            // small helper used by server scripts to set hid + update immediately
-            window.setHiddenPastDateIso = window.setHiddenPastDateIso || function (iso) {
-                try {
-                    var hid = document.getElementById('hidPastDate') || document.querySelector('input[type=hidden][name$=\"hidPastDate\"]');
-                    if (hid) hid.value = iso || '';
-                    // if iso empty -> resume clock immediately
-                    if (!iso) {
-                        window.allowClockUpdate = true;
-                        if (typeof refreshClockNow === 'function') refreshClockNow();
-                    } else {
-                        // if iso present, show date (server often uses separate script to display date text)
-                        window.allowClockUpdate = false;
-                    }
-                } catch (e) { console && console.log && console.log('setHiddenPastDateIso error', e); }
-            };
-
-            // run once to initialize display
-            try { refreshClockNow(); } catch (e) { }
-        })();
-
-        (function () {
-            // cached last position
-            window._lastCalendarPosition = window._lastCalendarPosition || null;
-
-            // call when showing popup to remember its screen coords
-            window.rememberCalendarPosition = function () {
-                try {
-                    var cal = document.querySelector('.calendar-popup');
-                    if (!cal) return;
-                    var rect = cal.getBoundingClientRect();
-                    window._lastCalendarPosition = {
-                        left: Math.round(rect.left + window.pageXOffset),
-                        top: Math.round(rect.top + window.pageYOffset)
-                    };
-                } catch (e) { console && console.log && console.log('rememberCalendarPosition', e); }
-            };
-
-            // call after partial postback to apply saved coords to the (new) calendar popup
-            window.restoreCalendarPosition = function () {
-                try {
-                    if (!window._lastCalendarPosition) return;
-                    var cal = document.querySelector('.calendar-popup');
-                    if (!cal) return;
-                    // ensure cal is inside server form so postbacks work
-                    try {
-                        var pageForm = document.getElementById('<%= this.Form.ClientID %>') || document.forms[0] || document.body;
-            if (cal.parentNode !== pageForm) pageForm.appendChild(cal);
-        } catch (e) { /* ignore */ }
-
-        cal.style.position = 'absolute';
-        cal.style.left = '568px';
-        cal.style.top = '68px';
-        cal.style.zIndex = '30000';
-        // show it (no visibility)
-        try { cal.style.setProperty('display', 'block', 'important'); } catch (e) { cal.style.display = 'block'; }
-        try { cal.style.setProperty('opacity', '1', 'important'); } catch (e) { cal.style.opacity = '1'; }
-        try { cal.style.setProperty('pointer-events', 'auto', 'important'); } catch (e) { cal.style.pointerEvents = 'auto'; }
-    } catch (e) { console && console.log && console.log('restoreCalendarPosition', e); }
-  };
-
-            // ensure restore runs after any UpdatePanel partial postback
-            try {
-                if (typeof Sys !== 'undefined' && Sys.WebForms && Sys.WebForms.PageRequestManager) {
-                    Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
-                        try { window.restoreCalendarPosition(); } catch (e) { }
-                    });
-                }
-            } catch (e) { }
-
-            // make showCalendarPopup call rememberCalendarPosition() before moving/positioning
-            // (if you already have showCalendarPopup, add a call to rememberCalendarPosition() near top)
-        })();
 
 
 
@@ -3191,56 +2950,9 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-        window.showSaveLoader = window.showSaveLoader || function (msg) {
-            try {
-                // Prefer a save-specific overlay if your app uses one
-                if (typeof showSaveOverlay === 'function') {
-                    showSaveOverlay(msg);
-                    return;
-                }
-                // otherwise fall back to the existing generic showLoader
-                if (typeof showLoader === 'function') {
-                    showLoader(msg);
-                    return;
-                }
-                // minimal fallback: set a small inline element if present
-                var el = document.getElementById('saveLoaderFallback');
-                if (!el) {
-                    el = document.createElement('div');
-                    el.id = 'saveLoaderFallback';
-                    el.style.position = 'fixed';
-                    el.style.left = '50%';
-                    el.style.top = '40%';
-                    el.style.transform = 'translate(-50%, -50%)';
-                    el.style.zIndex = '99999';
-                    el.style.padding = '12px 18px';
-                    el.style.borderRadius = '6px';
-                    el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.25)';
-                    el.style.background = 'white';
-                    el.style.fontFamily = 'sans-serif';
-                    el.style.fontSize = '13px';
-                    document.body.appendChild(el);
-                }
-                el.textContent = msg || 'Saving…';
-                el.style.display = 'block';
-            } catch (e) { console && console.log && console.log('showSaveLoader error', e); }
-        };
-
         window.hideSaveLoader = window.hideSaveLoader || function () {
             try {
                 if (typeof hideSaveOverlay === 'function') { hideSaveOverlay(); return; }
-                if (typeof hideLoader === 'function') { hideLoader(); return; }
                 var el = document.getElementById('saveLoaderFallback');
                 if (el) el.style.display = 'none';
             } catch (e) { console && console.log && console.log('hideSaveLoader error', e); }
@@ -3293,66 +3005,10 @@
     }
 }
 
-            // calendar selection handler — set hidPastDate and call fillStudent
-    function onCalendarDateSelected(dateObj) {
-        try {
-            // dateObj can be a Date or an ISO string 'yyyy-mm-dd'
-            var iso;
-            if (!dateObj) {
-                iso = (new Date()).toISOString().slice(0, 10);
-            } else if (typeof dateObj === 'string') {
-                iso = dateObj;
-            } else {
-                iso = (dateObj.getFullYear() + '-' +
-                      ('0' + (dateObj.getMonth() + 1)).slice(-2) + '-' +
-                      ('0' + dateObj.getDate()).slice(-2));
-            }
-
-            var hf = document.getElementById('<%= hidPastDate.ClientID %>') || document.getElementById('hidPastDate');
-            if (hf) {
-                // clear the hidden field for today's selection to preserve the original "today" semantics
-                if (iso === (new Date()).toISOString().slice(0, 10)) hf.value = '';
-                else hf.value = iso;
-            }
-
-            // reload grid for selected date
-            if (typeof fillStudent === 'function') fillStudent(iso);
-        } catch (e) {
-            console && console.log && console.log('onCalendarDateSelected error', e);
-        }
-    }
-
-            // showSaveLoader fallback (defensive)
-    window.showSaveLoader = window.showSaveLoader || function (msg) {
-        try {
-            if (typeof showSaveOverlay === 'function') { showSaveOverlay(msg); return; }
-            if (typeof showLoader === 'function') { showLoader(msg); return; }
-            var el = document.getElementById('saveLoaderFallback');
-            if (!el) {
-                el = document.createElement('div');
-                el.id = 'saveLoaderFallback';
-                el.style.position = 'fixed';
-                el.style.left = '50%';
-                el.style.top = '40%';
-                el.style.transform = 'translate(-50%, -50%)';
-                el.style.zIndex = '99999';
-                el.style.padding = '12px 18px';
-                el.style.borderRadius = '6px';
-                el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.25)';
-                el.style.background = 'white';
-                el.style.fontFamily = 'sans-serif';
-                el.style.fontSize = '13px';
-                document.body.appendChild(el);
-            }
-            el.textContent = msg || 'Saving…';
-            el.style.display = 'block';
-        } catch (e) { console && console.log && console.log('showSaveLoader error', e); }
-    };
 
     window.hideSaveLoader = window.hideSaveLoader || function () {
         try {
             if (typeof hideSaveOverlay === 'function') { hideSaveOverlay(); return; }
-            if (typeof hideLoader === 'function') { hideLoader(); return; }
             var el = document.getElementById('saveLoaderFallback');
             if (el) el.style.display = 'none';
         } catch (e) { console && console.log && console.log('hideSaveLoader error', e); }
@@ -3369,264 +3025,36 @@
 
 
 
-        (function () {
-            // Replace with server-side client ID
-            var pnlId = '<%= pnlCalendar.ClientID %>';
-
-            function findPanel() {
-                return document.getElementById(pnlId) || document.querySelector('.calendar-popup');
-            }
-
-            window.showCalendarPopup = function () {
-                try {
-                    var pnl = findPanel();
-                    if (!pnl) return;
-                    pnl.style.display = 'block';
-                    pnl.style.visibility = 'visible';
-                    pnl.style.opacity = '1';
-                    pnl.style.left = '576px';
-                    if (pnl.dataset) pnl.dataset.calendarPersistVisible = '1';
-
-                    // attach one global outside-click handler (only once)
-                    if (!window._calendarOutsideHandlerAttached) {
-                        window._calendarOutsideHandlerAttached = true;
-                        document.addEventListener('click', function (ev) {
-                            try {
-                                var p = findPanel();
-                                if (!p) return;
-                                var tgt = ev.target || ev.srcElement;
-                                if (!tgt) return;
-                                if (p.contains && !p.contains(tgt) && tgt.id !== '<%= btnEditPastDates.ClientID %>') {
-                            // clicked outside
-                            try { window.hideCalendarPopup && window.hideCalendarPopup(); } catch (e) { }
-                        }
-                    } catch (e) { }
-                }, true); // capture phase helps in some edge cases
-            }
-        } catch (e) { console && console.log && console.log('showCalendarPopup error', e); }
-    };
-
-            window.hideCalendarPopup = function () {
-                try {
-                    var pnl = findPanel();
-                    if (!pnl) return;
-                    pnl.style.display = 'none';
-                    pnl.style.visibility = 'hidden';
-                    pnl.style.opacity = '0';
-                    if (pnl.dataset) pnl.dataset.calendarPersistVisible = '0';
-                } catch (e) { console && console.log && console.log('hideCalendarPopup error', e); }
-            };
-
-            window.toggleCalendarPopup = function () {
-                try {
-                    var pnl = findPanel();
-                    if (!pnl) return;
-                    var isVisible = (pnl.dataset && pnl.dataset.calendarPersistVisible === '1') ||
-                                    (pnl.style && (pnl.style.display === 'block' || pnl.style.visibility === 'visible'));
-                    if (isVisible) window.hideCalendarPopup();
-                    else window.showCalendarPopup();
-                } catch (e) { console && console.log && console.log('toggleCalendarPopup error', e); }
-            };
-
-            // helper: when an UpdatePanel replaces the calendar markup the old element is gone;
-            // any code that wants to show popup after async update should call showCalendarPopup(),
-            // which will re-query the element and succeed (server also registers showCalendarPopup() calls).
-        })();
-
-
-        (function () {
-            function applyCalendarSelection() {
-                try {
-                    // calendar table id: find element by server-side ClientID pattern
-                    var cal = document.getElementById('<%= calPast.ClientID %>');
-            var hid = document.getElementById('<%= hidPastDate.ClientID %>');
-            if (!cal) return;
-
-            // clear previous selected cells
-            var sel = cal.querySelectorAll('td.cal-selected');
-            for (var i = 0; i < sel.length; i++) { sel[i].classList.remove('cal-selected'); }
-
-            // determine target date string (yyyy-MM-dd) or empty for today
-            var iso = hid && hid.value ? hid.value : '';
-
-            // if empty -> target is today
-            var target = iso ? new Date(iso) : new Date();
-            // normalize to midnight
-            target.setHours(0, 0, 0, 0);
-
-            // calendar renders day number inside anchors or spans - do robust match
-            var cells = cal.getElementsByTagName('td');
-            for (var i = 0; i < cells.length; i++) {
-                var td = cells[i];
-                var text = (td.innerText || td.textContent || '').trim();
-                if (!text) continue;
-                // text could be "1", "2" etc. Compare day number and month context:
-                // attempt to read data-date attribute if you render it; else fallback to matching number
-                var dayNum = parseInt(text, 10);
-                if (!isNaN(dayNum)) {
-                    // attempt to get month/year from visible header (best-effort)
-                    // fallback: if day cell contains class for other month, skip (ASP.NET calendar adds other-month styling)
-                    if (td.classList && td.className.indexOf('other-month') !== -1) continue;
-                    // build candidate date using visible month from calendar (parse header)
-                    // simple heuristic: find visible month/year in calendar header
-                    var header = cal.querySelector('.monthYear') || cal.querySelector('caption') || null;
-                    var visYear = null, visMonth = null;
-                    if (header) {
-                        // try to parse "August 2025" style — best-effort, not bulletproof
-                        var htxt = header.innerText || header.textContent;
-                        var parts = (htxt || '').trim().split(' ');
-                        if (parts.length >= 2) {
-                            visMonth = parts[0];
-                            visYear = parseInt(parts[1], 10);
-                        }
-                    }
-                    // fallback: assume target is in the month already visible (best-effort)
-                    var cand = new Date(target.getFullYear(), target.getMonth(), dayNum);
-                    cand.setHours(0, 0, 0, 0);
-                    if (cand.getTime() === target.getTime()) {
-                        td.classList.add('cal-selected');
-                    }
-                }
-            }
-        } catch (e) { console && console.log && console.log('applyCalendarSelection error', e); }
-    }
-
-            // Wire to MS AJAX endRequest if present (UpdatePanel partial postbacks)
-            if (typeof (Sys) !== 'undefined' && Sys.WebForms && Sys.WebForms.PageRequestManager) {
-                var prm = Sys.WebForms.PageRequestManager.getInstance();
-                if (prm) {
-                    prm.add_endRequest(function () { applyCalendarSelection(); });
-                }
-            }
-
-            // also run on initial load
-            if (document.readyState === 'complete' || document.readyState === 'interactive') {
-                setTimeout(applyCalendarSelection, 10);
-            } else {
-                window.addEventListener('DOMContentLoaded', function () { setTimeout(applyCalendarSelection, 10); });
-            }
-        })();
 
 
 
 
-
-
-
-
-
-
-        function onPresenceToggle(elToggle, studentId, classId) {
-            try {
-                // determine current state
-                var currentPresent = true;
-                try {
-                    var hid = document.getElementById('hidStatus_' + studentId);
-                    if (hid && hid.value !== '') {
-                        currentPresent = (hid.value === '1' || hid.value.toLowerCase() === 'true');
-                    } else {
-                        currentPresent = elToggle.classList.contains('att-sw-present');
-                    }
-                } catch (e) {
-                    currentPresent = elToggle.classList.contains('att-sw-present');
-                }
-
-                var targetPresent = !currentPresent;
-                var row = findClosestRow(elToggle);
-
-                // pick date value safely
-                var dateIso = '';
-                try {
-                    var hidDate = document.getElementById('hidPastDate');
-                    if (hidDate && hidDate.value)
-                        dateIso = hidDate.value.split('|')[0];
-                } catch (e) { dateIso = ''; }
-
-                if (!targetPresent) {
-                    // ---------- Switch to ABSENT ----------
-                    if (row) disableRowExceptAttendance(row);
-                    setRowAbsentVisual(elToggle, studentId);
-
-                    // determine dateIso as usual
-                    var dateIso = (document.getElementById('hidPastDate') && document.getElementById('hidPastDate').value) ? document.getElementById('hidPastDate').value.split('|')[0] : '';
-
-                    // show confirm when needed then delete
-                    confirmThenDelete(elToggle, studentId, classId, row, dateIso);
-                } else {
-                    // ---------- Switch to PRESENT ----------
-                    // don’t mark present until server confirms
-                    try { if (typeof showLoader === 'function') showLoader('Saving...'); } catch (e) { }
-
-                    callWebMethod('InsertCheckinForStudent',
-                        { studentId: parseInt(studentId, 10), classId: parseInt(classId, 10), dateIso: dateIso },
-                        function (res) {
-                            try { if (typeof hideLoader === 'function') hideLoader(); } catch (e) { }
-
-                            if (res && res.success) {
-                                // rebind grid to get hidden fields for Add/Save
-                                triggerServerRefresh();
-                            } else {
-                                console.error('Insert failed', res);
-                                if (row) disableRowExceptAttendance(row);
-                                setRowAbsentVisual(elToggle, studentId);
-                                alert('Failed to mark present: ' + (res && res.message ? res.message : 'Unknown error'));
-                                triggerServerRefresh();
-                            }
-                        });
-                }
-            } catch (ex) {
-                console.error('onPresenceToggle unexpected error', ex);
-                triggerServerRefresh();
-            }
+        function localTodayIso() {
+            var d = new Date();
+            return d.getFullYear() + "-" +
+                   String(d.getMonth() + 1).padStart(2, "0") + "-" +
+                   String(d.getDate()).padStart(2, "0");
         }
+
+
 
         function getSelectedDateIso() {
             try {
-                var hf = document.getElementById('hidPastDate') || document.querySelector('input[id*="hidPastDate"]');
-                if (hf && hf.value && hf.value.trim() !== '') {
-                    var d = new Date(hf.value);
-                    if (!isNaN(d)) return d.toISOString().slice(0, 10);
-                    if (/^\d{4}-\d{2}-\d{2}$/.test(hf.value.trim())) return hf.value.trim();
+                var hf = document.getElementById('<%= hidPastDate.ClientID %>') ||
+                         document.getElementById('hidPastDate') ||
+                         document.querySelector('input[id*="hidPastDate"], input[name$="hidPastDate"]');
+
+                var iso = hf && hf.value ? hf.value.trim() : "";
+                if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) {
+                    return iso;   // IMPORTANT: return as-is
                 }
-                var cal = document.querySelector('input[id*="selectedDate"], input[id*="hfSelectedDate"], input[id*="calPast"]');
-                if (cal && cal.value && /^\d{4}-\d{2}-\d{2}$/.test(cal.value.trim())) return cal.value.trim();
-                var t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
-            } catch (e) { var t2 = new Date(); return t2.getFullYear() + '-' + String(t2.getMonth() + 1).padStart(2, '0') + '-' + String(t2.getDate()).padStart(2, '0'); }
+
+                return localTodayIso();
+            } catch (e) {
+                return localTodayIso();
+            }
         }
 
-
-        function deleteCheckinAndRefresh(studentId, classId, dateIso) {
-            try { if (typeof showLoader === 'function') showLoader('Deleting...'); } catch (e) { }
-
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', 'StudentCheckin.aspx/DeleteCheckinForStudent', true);
-            xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState !== 4) return;
-                try { if (typeof hideLoader === 'function') hideLoader(); } catch (e) { }
-
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    var res = null;
-                    try { res = JSON.parse(xhr.responseText); } catch (e) { console.error('parse error', e); }
-                    var data = (res && res.d) ? res.d : res;
-                    if (data && data.success) {
-                        // server confirmed delete -> now request server to rebind full grid
-                        triggerServerRefresh();
-                    } else {
-                        alert('Delete failed: ' + (data && data.message ? data.message : 'Unknown error'));
-                        // revert optimistic UI if necessary (full refresh next)
-                        triggerServerRefresh();
-                    }
-                } else {
-                    alert('Delete failed (HTTP ' + xhr.status + ')');
-                    triggerServerRefresh();
-                }
-            };
-
-            var payload = JSON.stringify({ studentId: studentId, classId: classId, dateIso: dateIso || '' });
-            xhr.send(payload);
-        }
 
         function triggerServerRefresh() {
             try {
@@ -3637,53 +3065,9 @@
             } catch (e) { console.error('triggerServerRefresh error', e); }
         }
 
-        function findClosestRow(el) {
-            var cur = el;
-            while (cur) {
-                if (cur.tagName && cur.tagName.toLowerCase() === 'tr') return cur;
-                cur = cur.parentElement;
-            }
-            return null;
-        }
-
-        function markRowAbsentVisual(row) {
-            try {
-                // add class and disable inputs/buttons in this row
-                row.classList.add('row-absent');
-                var inputs = row.querySelectorAll('input, select, button, textarea');
-                inputs.forEach(function (i) {
-                    // do not disable the presence toggle itself (so user can toggle back)
-                    if (i.classList && (i.classList.contains('att-switch') || i.classList.contains('att-sw-present') || i.classList.contains('att-sw-absent'))) return;
-                    try { i.disabled = true; } catch (e) { }
-                    try { i.setAttribute('readonly', 'readonly'); } catch (e) { }
-                });
-            } catch (e) { console.warn('markRowAbsentVisual', e); }
-        }
 
 
-        function enableRowInputs(row) {
-            if (!row) return;
-            row.classList.remove('row-absent');
-            var ctrls = row.querySelectorAll('input, select, button, textarea');
-            for (var i = 0; i < ctrls.length; i++) {
-                var c = ctrls[i];
-                if (typeof c.closest === 'function' && c.closest('.att-switch')) continue;
-                try { c.disabled = false; } catch (e) { }
-                try { c.removeAttribute('readonly'); } catch (e) { }
-            }
-        }
 
-
-        function setRowPresentVisual(elToggle, studentId) {
-            try { elToggle.classList.remove('att-sw-absent'); elToggle.classList.add('att-sw-present'); } catch (e) { }
-            var hid = document.getElementById('hidStatus_' + studentId);
-            if (hid) hid.value = '1';
-        }
-        function setRowAbsentVisual(elToggle, studentId) {
-            try { elToggle.classList.remove('att-sw-present'); elToggle.classList.add('att-sw-absent'); } catch (e) { }
-            var hid = document.getElementById('hidStatus_' + studentId);
-            if (hid) hid.value = '0';
-        }
         function callWebMethod(methodName, payloadObj, cb) {
             var xhr = new XMLHttpRequest();
             xhr.open('POST', 'StudentCheckin.aspx/' + methodName, true);
@@ -3698,189 +3082,548 @@
             xhr.send(JSON.stringify(payloadObj));
         }
 
-        function disableRowExceptAttendance(row) {
-            if (!row) return;
-            var ctrls = row.querySelectorAll('input, select, button, textarea');
-            for (var i = 0; i < ctrls.length; i++) {
-                var c = ctrls[i];
-                if (typeof c.closest === 'function' && c.closest('.att-switch')) continue;
-                try { c.disabled = true; } catch (e) { }
-                try { c.setAttribute('readonly', 'readonly'); } catch (e) { }
-            }
-            row.classList.add('row-absent');
-        }
 
         function rowHasCheckinData(row, studentId) {
             try {
                 if (!row) return false;
 
-                // 1) Check time inputs (class names used in your ASPX: .in-time, .out-time)
-                var timeInputs = row.querySelectorAll('input.time-input, input.in-time, input.out-time, input[type="time"], input[type="text"]');
-                for (var i = 0; i < timeInputs.length; i++) {
-                    var v = (timeInputs[i].value || '').trim();
-                    if (v.length > 0) {
-                        // ignore empty placeholder like "--:--" if you have one; adapt if needed
-                        if (v !== '--:--') return true;
-                    }
+                //0. CHECK STATUS FIRST
+                if (row.classList.contains("active-row") || row.classList.contains("row-absent")) {
+                    return true; //EVEN WITHOUT TIME → DATA EXISTS IN DB
                 }
 
-                // 2) Check any hidden extras field named 'hidExtraTimes_<studentid>' or 'hidExtraTimes'
-                try {
-                    var hidName = 'hidExtraTimes_' + studentId;
-                    var hid = document.getElementById(hidName);
-                    if (hid && hid.value && hid.value.trim().length > 0) return true;
-                    var generic = row.querySelector('input[id^="hidExtraTimes"], input[name^="hidExtraTimes"]');
-                    if (generic && generic.value && generic.value.trim().length > 0) return true;
-                } catch (e) { /* ignore */ }
+                //1. Check IN/OUT inputs
+                var inInputs = row.querySelectorAll('input.in-time, input[id$="txtInTime"]');
+                var outInputs = row.querySelectorAll('input.out-time, input[id$="txtOutTime"]');
 
-                // 3) Check any other visible inputs in the row (text/select) for non-empty values
-                var inputs = row.querySelectorAll('input[type="text"], select, textarea');
-                for (var j = 0; j < inputs.length; j++) {
-                    var el = inputs[j];
-                    if (el.closest && el.closest('.att-switch')) continue; // skip toggle area
-                    var val = (el.value || '').trim();
-                    if (val.length > 0) return true;
+                for (var i = 0; i < inInputs.length; i++) {
+                    if ((inInputs[i].value || "").trim() !== "") return true;
                 }
-            } catch (ex) {
-                console.error('rowHasCheckinData error', ex);
+
+                for (var j = 0; j < outInputs.length; j++) {
+                    if ((outInputs[j].value || "").trim() !== "") return true;
+                }
+
+                //2. CHECK EXTRAS
+                var extras = row.getAttribute("data-extras");
+                if (extras && extras.trim() !== "") {
+                    return true;
+                }
+
+                //3. CHECK CODE DROPDOWN
+                var codeSelects = row.querySelectorAll('select.code-select, select.extra-code');
+
+                for (var k = 0; k < codeSelects.length; k++) {
+                    if ((codeSelects[k].value || "").trim() !== "") return true;
+                }
+
+                return false;
+
+            } catch (e) {
+                console.error("rowHasCheckinData error:", e);
+                return false;
             }
-            return false;
         }
 
-        function confirmThenDelete(elToggle, studentId, classId, row, dateIso) {
+        function confirmThenDelete(elToggle, studentId, classId, row, dateIso, callback) {
+
             try {
                 var hasData = rowHasCheckinData(row, studentId);
 
-                // If there's data, ask confirmation. If not, proceed without confirm.
                 if (hasData) {
-                    var msg = "Check-in data already entered. Okay to delete?";
-                    // Use native confirm for reliability. Replace with custom modal if desired.
-                    var ok = window.confirm(msg);
-                    if (!ok) {
-                        // user cancelled: revert UI to Present and do NOT call delete
-                        try {
-                            // restore visual and inputs
-                            enableRowInputs(row);
-                            setRowPresentVisual(elToggle, studentId);
-                        } catch (e) { console.error('revert after cancel error', e); }
-                        return; // stop here
+                    if (!confirm("Attendance data already entered. Okay to delete?")) {
+                        callback && callback(false);
+                        return;
                     }
-                    // if ok -> fall through to delete
                 }
 
-                // proceed to delete (no confirm or user confirmed)
                 callWebMethod('DeleteCheckinForStudent',
-                    { studentId: parseInt(studentId, 10), classId: parseInt(classId, 10), dateIso: dateIso },
-                    function (res) {
-                        if (res && res.success) {
-                            // server confirmed delete -> full grid rebind
-                            triggerServerRefresh();
-                        } else {
-                            console.error('Delete failed', res);
-                            // restore UI so user isn't left in inconsistent state
-                            try { enableRowInputs(row); setRowPresentVisual(elToggle, studentId); } catch (e) { }
-                            alert('Failed to delete check-in: ' + (res && res.message ? res.message : 'Unknown'));
-                            triggerServerRefresh();
-                        }
-                    });
+                {
+                    studentId: parseInt(studentId, 10),
+                    classId: parseInt(classId, 10),
+                    dateIso: dateIso || ""
+                },
+                function (res) {
+
+                    console.log("DELETE RESPONSE:", res);
+
+                    var data = (res && res.d) ? res.d : res;
+
+                    if (data && data.success) {
+                        callback && callback(true);
+                    } else {
+                        alert("Delete failed");
+                        callback && callback(false);
+                    }
+                });
+
             } catch (ex) {
                 console.error('confirmThenDelete error', ex);
-                // fallback: do not delete; rebind to ensure canonical state
-                triggerServerRefresh();
+                callback && callback(false);
             }
         }
 
-        function parseTimeToMinutes(t) {
-            if (!t) return null;
-            t = (t + '').trim();
-            if (t.length === 0) return null;
 
-            // normalize AM/PM
-            var m = t.match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*([ap]m)?$/i);
-            if (!m) {
-                // try Date parse fallback (last resort)
-                var d = new Date('1970-01-01 ' + t);
-                if (!isNaN(d.getTime())) return d.getHours() * 60 + d.getMinutes();
-                return null;
+
+        
+        function toggleAttendance(el, val) {
+
+            var row = el.closest("tr");
+            var container = el.closest(".att-toggle");
+
+            var hidden = container.querySelector("input[id*='hidStatus']");
+            if (!hidden) return;
+
+            var presentBtn = container.querySelector(".btn-present");
+            var absentBtn = container.querySelector(".btn-absent");
+
+            var current = hidden.value;
+
+            //CASE 1: FIRST TIME SELECT (-1 → 1/0)
+            if (current === "-1" || current === "") {
+
+                //APPLY UI IMMEDIATELY
+                applySelection(val);
+
+                insertAttendanceToServer(row, val, function (success){
+
+                    if (success) {
+                        hidden.value = val.toString(); // set AFTER success
+                        triggerServerRefresh();
+                    } else {
+                        alert("Failed to save");
+                    }
+                });
+
+                return;
             }
-            var hh = parseInt(m[1], 10);
-            var mm = parseInt(m[2], 10);
-            var ampm = m[3];
-            if (ampm) {
-                var a = ampm.toLowerCase();
-                if (a === 'pm' && hh < 12) hh += 12;
-                if (a === 'am' && hh === 12) hh = 0;
+
+            //CASE 2: SAME CLICK (REMOVE)
+            if (current == val.toString()) {
+                handleDeleteAndUpdate(null);
+                return;
             }
-            if (hh < 0 || hh > 23 || mm < 0 || mm > 59) return null;
-            return hh * 60 + mm;
-        }
 
-        function markRowInvalid(row) {
-            try {
-                row.classList.add('row-invalid');
-                // scroll into view a little
-                if (typeof row.scrollIntoView === 'function') row.scrollIntoView({ block: 'center', behavior: 'smooth' });
-            } catch (e) { }
-        }
+            //CASE 3: SWITCH
+            if (current !== val.toString()) {
+                handleDeleteAndUpdate(val);
+                return;
+            }
 
-        function clearRowInvalid(row) {
-            try { row.classList.remove('row-invalid'); } catch (e) { }
-        }
+            function applySelection(v) {
 
-        function onCheckinClick(ev) {
-            if (ev && ev.preventDefault) ev.preventDefault();
-            if (handled) return;
-            handled = true;
+                hidden.value = v;
 
-            // show loader and disable UI if you have them
-            showGlobalLoader && showGlobalLoader();
+                presentBtn.classList.remove("active");
+                absentBtn.classList.remove("active");
 
-            if (typeof PageMethods !== 'undefined' && typeof PageMethods.setCheckInn === 'function') {
-                PageMethods.setCheckInn(studId,
-                    function (result) { // success callback from server
-                        try {
-                            // PageMethods returns the raw return value from the WebMethod
-                            var res = (typeof result === "string") ? result : (result && result.d) ? result.d : result;
+                //REMOVE OLD ROW STATES
+                row.classList.remove("active-row", "row-absent", "row-default");
 
-                            cleanup(); // remove popup etc.
+                if (v == 1) {
+                    presentBtn.classList.add("active");
+                    row.classList.add("active-row");   //ADD THIS
+                    enableRow(row);
+                } else {
+                    absentBtn.classList.add("active");
+                    row.classList.add("row-absent");   //ADD THIS
+                    handleAbsent(row);
+                }
+            }
 
-                            if (res === "OK") {
-                                // success — continue to lesson/datasheet
-                                onFinish && onFinish();
-                            } else if (res && res.indexOf("ERR:SessionExpired") === 0) {
-                                // session expired — force reload to login
-                                alert("Session expired. Please login again.");
-                                window.location = "/Administration/Error.aspx?Error=Your session has expired. Please log-in again";
-                            } else {
-                                // server returned an error — show to user and DO NOT proceed
-                                alert("Check-in failed: " + (res || "Unknown error"));
-                                // do not call onFinish so we avoid the infinite loader/datasheet failure
-                            }
-                        } catch (ex) {
-                            console.error("onCheckinClick success handler error", ex);
-                            cleanup();
-                            alert("Unexpected error. Please try again.");
-                        } finally {
-                            hideGlobalLoader && hideGlobalLoader();
-                        }
-                    },
-                    function (err) { // failure callback (network/exception)
-                        try {
-                            cleanup();
-                            hideGlobalLoader && hideGlobalLoader();
-                            // Show a friendly error
-                            alert("Unable to perform check-in. Please try again.");
-                            // do not proceed to onFinish because check-in didn't succeed
-                        } catch (ex) {
-                            console.error("onCheckinClick failure handler error", ex);
+            function handleDeleteAndUpdate(newVal) {
+
+                var oldVal = hidden.value;
+
+                // disable clicks
+                presentBtn.style.pointerEvents = "none";
+                absentBtn.style.pointerEvents = "none";
+
+                var studentId = row.getAttribute("data-studentid");
+                var classId = row.getAttribute("data-classid");
+                var dateIso = getSelectedDateIso();
+
+                confirmThenDelete(el, studentId, classId, row, dateIso, function (success) {
+
+                    presentBtn.style.pointerEvents = "";
+                    absentBtn.style.pointerEvents = "";
+
+                    if (success) {
+
+                        if (newVal !== null) {
+
+                            //INSERT NEW VALUE (Present or Absent)
+                            insertAttendanceToServer(row, newVal, function (insertSuccess) {
+
+                                if (insertSuccess) {
+
+                                    //Update UI after insert
+                                    applySelection(newVal);
+
+                                    //Refresh grid
+                                    triggerServerRefresh();
+
+                                } else {
+                                    alert("Failed to insert attendance");
+                                }
+                            });
+
+                        } else {
+                            // Only delete (no new selection)
+                            triggerServerRefresh();
                         }
                     }
-                );
-            } else {
-                cleanup();
-                hideGlobalLoader && hideGlobalLoader();
-                onFinish && onFinish();
+                    else {
+                        //RESTORE OLD STATE
+                        hidden.value = oldVal;
+
+                        presentBtn.classList.remove("active");
+                        absentBtn.classList.remove("active");
+
+                        if (oldVal == "1") {
+                            presentBtn.classList.add("active");
+                            enableRow(row);
+                        }
+                        else if (oldVal == "0") {
+                            absentBtn.classList.add("active");
+                            handleAbsent(row);
+                        }
+                    }
+                });
             }
+
+            Sys.Application.add_load(function () {
+                console.log("Grid reloaded - UI reapplied");
+            });
+        }
+        function initAttendanceButtons() {
+
+            document.querySelectorAll(".att-toggle").forEach(function (t) {
+
+                var hidden = t.querySelector("input[id$='hidStatus']");
+                if (!hidden) return;
+
+                var val = (hidden.value || "").toString().trim().toLowerCase();
+                var row = t.closest("tr");
+
+                var presentBtn = t.querySelector(".btn-present");
+                var absentBtn = t.querySelector(".btn-absent");
+
+                presentBtn.classList.remove("active");
+                absentBtn.classList.remove("active");
+
+                if (val === "1" || val === "true") {
+                    hidden.value = "1";
+                    presentBtn.classList.add("active");
+                    enableRow(row);
+                }
+                else if (val === "0" || val === "false") {
+                    hidden.value = "0";
+                    absentBtn.classList.add("active");
+                    handleAbsent(row);
+                }
+                else {
+                    hidden.value = "-1";
+                    disableRow(row);
+                }
+            });
+        }
+
+
+        
+
+        function enableRow(row) {
+            if (!row) return;
+
+            row.classList.remove("row-default", "row-absent");
+            row.classList.add("active-row");
+
+            row.querySelectorAll("input, select, button").forEach(function (el) {
+
+                if (el.closest(".att-toggle")) return;
+
+                //REMOVE ALL DISABLES
+                el.disabled = false;
+                el.removeAttribute("disabled");
+                el.removeAttribute("readonly");
+            });
+            row.querySelectorAll(".save-btn").forEach(function (el) {
+                el.disabled = false;
+                el.removeAttribute("disabled");
+            });
+        }
+        function handleAbsent(row) {
+            if (!row) return;
+
+            row.classList.remove("active-row", "row-default");
+            row.classList.add("row-absent");
+
+            row.querySelectorAll("input, select, button").forEach(function (el) {
+
+                if (el.closest(".att-toggle")) return;
+
+                el.disabled = true;
+                el.setAttribute("disabled", "disabled");
+            });
+
+            //ONLY enable Code + Save
+            row.querySelectorAll("select[id*='ddlCode']").forEach(function (el) {
+                el.disabled = false;
+                el.removeAttribute("disabled");
+            });
+
+            row.querySelectorAll("input[id*='btnSave'], .save-btn").forEach(function (el) {
+                el.disabled = false;
+                el.removeAttribute("disabled");
+            });
+        }
+
+        function disableRow(row) {
+            if (!row) return;
+
+            // add visual state
+            row.classList.add("row-disabled");
+
+            // disable all inputs
+            row.querySelectorAll("input, select, button").forEach(function (el) {
+                el.disabled = true;
+            });
+        }
+
+        function applyAttendanceUI() {
+
+            document.querySelectorAll("#<%= grdGroup.ClientID %> tr").forEach(function (row) {
+
+                var hidden = row.querySelector("input[id$='hidStatus']");
+                if (!hidden) return;
+
+                var val = hidden.value;
+
+                var presentBtn = row.querySelector(".btn-present");
+                var absentBtn = row.querySelector(".btn-absent");
+
+                if (!presentBtn || !absentBtn) return;
+
+                // reset
+                presentBtn.classList.remove("active");
+                absentBtn.classList.remove("active");
+
+                // apply
+                if (val === "1") {
+                    presentBtn.classList.add("active");
+                }
+                else if (val === "0") {
+                    absentBtn.classList.add("active");
+                }
+            });
+        }
+
+        if (window.Sys && Sys.WebForms && Sys.WebForms.PageRequestManager) {
+
+            var prm = Sys.WebForms.PageRequestManager.getInstance();
+        }
+
+        function insertAttendanceToServer(row, val, callback) {
+
+            var studentId = row.getAttribute("data-studentid");
+            var classId = row.getAttribute("data-classid");
+            var dateIso = getSelectedDateIso();
+
+            callWebMethod('InsertCheckinForStudent',
+            {
+                studentId: parseInt(studentId, 10),
+                classId: parseInt(classId, 10),
+                dateIso: dateIso || "",
+                isPresent: parseInt(val, 10)
+            },
+            function (res) {
+                try {
+                    var data = (res && res.d) ? res.d : res;
+
+                    if (data && data.success) {
+                        callback(true);
+                    } else {
+                        console.error("Insert failed response:", data);
+                        alert("Insert failed");
+                        callback(false);
+                    }
+                } catch (e) {
+                    console.error("Insert exception:", e);
+                    alert("Unexpected error");
+                    callback(false);
+                }
+            });
+        }
+
+        function updateRowUI(toggleBtn) {
+            var row = toggleBtn.closest("tr");
+
+            // remove all states
+            row.classList.remove("active-row", "row-absent", "row-default");
+
+            if (toggleBtn.classList.contains("present-active")) {
+                row.classList.add("active-row");
+            } else {
+                row.classList.add("row-absent");
+            }
+        }
+
+
+
+        function renderExtrasFromData() {
+
+            document.querySelectorAll('tr[data-extras]').forEach(function (row) {
+
+                var extras = row.getAttribute('data-extras');
+                if (!extras) return;
+
+                var studentId = row.getAttribute('data-studentid');
+                var classId = row.getAttribute('data-classid');
+
+                var items = extras.split(';');
+
+                items.forEach(function (item) {
+
+                    if (!item) return;
+
+                    var parts = item.split('|');
+
+                    var exIn = decodeURIComponent(parts[0] || '');
+                    var exOut = decodeURIComponent(parts[1] || '');
+                    var exCode = decodeURIComponent(parts[2] || '');
+
+                    addExtraRow(
+                        row.querySelector('.add-btn'),
+                        studentId,
+                        classId,
+                        exCode
+                    );
+
+                    var codeSelects = row.querySelectorAll('.code-stack .code-pair select');
+                    var lastCode = codeSelects[codeSelects.length - 1];
+
+                    // store value for later
+                    lastCode.setAttribute("data-selected", exCode);
+
+                    // delay population
+                    setTimeout(function () {
+                        populateCodeDropdown(lastCode, exCode);
+                    }, 150);
+
+                    var inInputs = row.querySelectorAll('.in-stack .extra-pair input');
+                    var outInputs = row.querySelectorAll('.out-stack .extra-pair input');
+
+                    var last = inInputs.length - 1;
+
+                    if (inInputs[last]) inInputs[last].value = exIn;
+                    if (outInputs[last]) outInputs[last].value = exOut;
+                });
+            });
+        }
+
+        function logExtrasFromGrid() {
+
+            document.querySelectorAll('tr[data-extras]').forEach(function (row) {
+
+                var studentId = row.getAttribute('data-studentid');
+                var classId = row.getAttribute('data-classid');
+                var extras = row.getAttribute('data-extras');
+
+                console.log("Row:", studentId, classId);
+                console.log("Extras RAW:", extras);
+
+                if (extras) {
+                    var parsed = extras.split(';').map(function (item) {
+                        var parts = item.split('|');
+                        return {
+                            in: parts[0] || "",
+                            out: parts[1] || "",
+                            code: parts[2] || ""
+                        };
+                    });
+
+                    console.log("Parsed Extras:", parsed);
+                }
+
+                console.log("-----------------------------");
+            });
+        }
+
+
+        function debugHidden(studentId, classId) {
+            var hid = document.getElementById("hidExtraTimes_" + studentId + "_" + classId);
+            console.log("Hidden Value:", hid ? hid.value : "NOT FOUND");
+        }
+
+        document.addEventListener("change", function (e) {
+
+            if (e.target.matches('.time-input, .code-select')) {
+
+                var row = e.target.closest('tr');
+
+                var studentId = row.getAttribute('data-studentid');
+                var classId = row.getAttribute('data-classid');
+
+                serializeExtraTimesForRow(row, studentId, classId);
+            }
+        });
+
+
+        function populateCodeDropdown(select, selectedValue, retryCount) {
+
+            if (!select) return;
+
+            retryCount = retryCount || 0;
+
+            console.log("populateCodeDropdown called");
+            console.log("Codes inside dropdown:", window.__attendanceCodes);
+
+            //wait for codes (with safety limit)
+            if (!window.__attendanceCodes || window.__attendanceCodes.length === 0) {
+
+                if (retryCount > 10) {
+                    console.error("Codes not loaded after retries");
+                    return;
+                }
+
+                setTimeout(function () {
+                    populateCodeDropdown(select, selectedValue, retryCount + 1);
+                }, 100);
+
+                return;
+            }
+
+            //rebuild dropdown
+            select.innerHTML = '<option value="">---Select---</option>';
+
+            window.__attendanceCodes.forEach(function (c) {
+
+                var opt = document.createElement("option");
+
+                opt.value = String(c.id);
+                opt.text = c.name;
+
+                select.appendChild(opt);
+            });
+
+            //apply selection AFTER options added
+            if (selectedValue !== undefined && selectedValue !== null && selectedValue !== "") {
+                select.value = String(selectedValue);
+
+                //fallback if value not found in options
+                if (select.value !== String(selectedValue)) {
+                    console.warn("Value not found in dropdown, adding fallback:", selectedValue);
+
+                    var extraOpt = document.createElement("option");
+                    extraOpt.value = String(selectedValue);
+                    extraOpt.text = String(selectedValue);
+                    select.appendChild(extraOpt);
+
+                    select.value = String(selectedValue);
+                }
+            }
+
+            console.log("Final selected:", select.value);
         }
 
 
@@ -3959,6 +3702,7 @@
       <Triggers>
         <asp:AsyncPostBackTrigger ControlID="calPast" EventName="SelectionChanged" />
           <asp:AsyncPostBackTrigger ControlID="btnRefreshGrid" EventName="Click" />
+          <asp:AsyncPostBackTrigger ControlID="grdGroup" EventName="RowCommand" />
       </Triggers>
     </asp:UpdatePanel>
   </div> 
@@ -3971,6 +3715,7 @@
 <asp:Calendar ID="calPast" runat="server"
     ClientIDMode="Static"
     OnSelectionChanged="calPast_SelectionChanged"
+    SelectionMode="Day"
     OnVisibleMonthChanged="calPast_VisibleMonthChanged"
     OnDayRender="calPast_DayRender"
     ShowNextPrevMonth="true" />
@@ -3994,7 +3739,7 @@
             </tr>--%>
             <tr>
                 <td>
-                    <div class="setBox" style="width:800px;">
+                    <div class="setBox" style="width:860px;">
 
                         <div id="set" style="padding: 5px 5px 5px 5px;">
 
@@ -4036,18 +3781,17 @@
                                     OnRowDataBound="grdGroup_RowDataBound" OnDataBound="grdGroup_DataBound" OnRowCommand="grdGroup_RowCommand">
                                   <Columns>
                                     <asp:TemplateField HeaderText="Attendance">
-                                    <HeaderStyle Width="90px" HorizontalAlign="Center" />
-                                    <ItemStyle Width="90px" HorizontalAlign="Center" />
+                                    <HeaderStyle Width="150px" HorizontalAlign="Center" />
+                                    <ItemStyle Width="150px" HorizontalAlign="Center" />
                                       <ItemTemplate>
-                                        <div class="att-switch <%# (Convert.ToBoolean(Eval("IsPresent")) ? "att-sw-present" : "att-sw-absent") %>"
-       onclick="onPresenceToggle(this, '<%# Eval("StudentId") %>', '<%# Eval("ClassId") %>')"
-       data-student='<%# Eval("StudentId") %>'>
-                                          <span class="switch-knob"></span>
-                                          <span class="label-right">Present</span>
-                                          <span class="label-left">Absent</span>
+                                        <div class="att-toggle">
+                                            <span class="att-btn btn-present"
+                                                  onclick="toggleAttendance(this,1)">Present</span>
+
+                                            <span class="att-btn btn-absent"
+                                                  onclick="toggleAttendance(this,0)">Absent</span>
+                                            <asp:HiddenField ID="hidStatus" runat="server" Value='<%# GetStatusHidden(Eval("IsPresent")) %>' />
                                         </div>
-                                          <asp:HiddenField ID="hidExtraTimes" runat="server" Value='<%# Eval("Extras") %>' />
-                                        <asp:HiddenField ID="hidStatus" runat="server" Value='<%# GetStatusHidden(Eval("IsPresent")) %>' />
                                       </ItemTemplate>
                                     </asp:TemplateField>
 
@@ -4068,7 +3812,7 @@
                                     <asp:TemplateField HeaderText="Out">
                                       <ItemTemplate>
                                         <asp:TextBox ID="txtOutTime" runat="server" CssClass="time-input out-time" Text='<%# BindTime(Eval("OutTime")) %>' />
-                                        <input type="hidden" name="hidExtraTimes_<%# Eval("studentid") %>" id='hidExtraTimes_<%# Eval("studentid") %>' value='<%# Eval("Extras") %>' />
+                                        <input type="hidden" name="hidExtraTimes_<%# Eval("studentid") %>_<%# Eval("ClassId") %>" id='hidExtraTimes_<%# Eval("studentid") %>_<%# Eval("ClassId") %>' value='<%# Eval("Extras") %>' />
                                       </ItemTemplate>
                                     </asp:TemplateField>
 
@@ -4078,7 +3822,7 @@
                                       <ItemTemplate>
                                         <asp:Button ID="btnAddTime" runat="server" Text="+"
                                           CssClass="add-btn"
-                                          OnClientClick='<%# "try{ addExtraRow(this, " + Eval("studentid") + "); } catch(e){ console.error(e); } return false;" %>'
+                                          OnClientClick='<%# "try{ addExtraRow(this, " + Eval("studentid") + ", " + Eval("ClassId") + "); } catch(e){ console.error(e); } return false;" %>'
                                           UseSubmitBehavior="false" CausesValidation="false" />
                                       </ItemTemplate>
                                     </asp:TemplateField>
@@ -4094,8 +3838,8 @@
                                         <ItemStyle HorizontalAlign="Center" />
                                       <ItemTemplate>
                                         <asp:Button ID="btnSave" runat="server" Text="Save" CssClass="save-btn"
-                                          CommandName="Save" CommandArgument='<%# Eval("studentid") %>'
-                                          OnClientClick="if(!validateGo(this)) return false; return showSaveLoader(this);" CausesValidation="false" UseSubmitBehavior="false" />
+                                          CommandName="Save" CommandArgument='<%# Eval("studentid") + "|" + Eval("Classid") %>'
+                                          OnClientClick="if(!validateGo(this)) return false;var row = this.closest('tr');var studentId = row.getAttribute('data-studentid');var classId = row.getAttribute('data-classid');serializeExtraTimesForRow(row, studentId, classId);debugHidden(studentId, classId);" CausesValidation="false" UseSubmitBehavior="false" />
                                       </ItemTemplate>
                                     </asp:TemplateField>
                                   </Columns>
@@ -4119,6 +3863,67 @@
             </tr>
         </table>
 
+        <script type="text/javascript">
+
+            function applyAttendanceHighlight() {
+                var grid = document.getElementById("<%= grdGroup.ClientID %>");
+                if (!grid) return;
+
+                grid.querySelectorAll("tr").forEach(function (row) {
+
+                    var hidden = row.querySelector("input[id*='hidStatus']");
+                    if (!hidden) return;
+
+                    var val = hidden.value ? hidden.value.trim() : "";
+
+                    var presentBtn = row.querySelector(".btn-present");
+                    var absentBtn = row.querySelector(".btn-absent");
+
+                    // RESET EVERYTHING
+                    row.classList.remove("active-row", "row-absent", "row-default");
+
+                    if (presentBtn) presentBtn.classList.remove("active");
+                    if (absentBtn) absentBtn.classList.remove("active");
+
+                    // APPLY STATE
+                    if (val === "1") {
+                        row.classList.add("active-row");
+                        if (presentBtn) presentBtn.classList.add("active");
+                    }
+                    else if (val === "0") {
+                        row.classList.add("row-absent");
+                        if (absentBtn) absentBtn.classList.add("active");
+                    }
+                    else {
+                        row.classList.add("row-default");
+                    }
+                });
+            }
+
+            //FIRST LOAD
+            document.addEventListener("DOMContentLoaded", function () {
+                applyAttendanceHighlight();
+            });
+
+            //AFTER UPDATE PANEL
+            if (window.Sys && Sys.WebForms) {
+            }
+
+
+
+            var prm = Sys.WebForms.PageRequestManager.getInstance();
+
+            if (prm) {
+
+                prm.add_beginRequest(function () {
+                    try {
+                        if (window.showSaveLoader)
+                            showSaveLoader("Saving...");
+                    } catch (e) {}
+                });
+            }
+
+</script>
 
     </form>
 </body>
