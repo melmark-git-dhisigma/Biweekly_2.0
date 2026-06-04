@@ -83,18 +83,31 @@ public partial class Administration_Facesheet : System.Web.UI.Page
     {
         try
         {
-            FileInfo file = new FileInfo(path);
-            if (file.Exists)
+            string filePath = path;
+
+            if (File.Exists(filePath))
             {
-                Response.ContentType = "application/msword";
-                Response.AddHeader("Content-Disposition", "Attachment; filename= Facesheet.doc");
-                Response.AddHeader("Content-Length", file.Length.ToString());
-                Response.TransmitFile(file.FullName);
+                HttpResponse response = HttpContext.Current.Response;
+                response.Clear();
+                response.ClearContent();
+                response.ClearHeaders();
+                response.Buffer = true;
+                response.ContentType ="application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+                response.AddHeader("Content-Disposition", "attachment; filename=\"Facesheet.docx\"");
+                byte[] data = File.ReadAllBytes(filePath);
+                response.BinaryWrite(data);
+                response.Flush();
+                response.End();
+                
             }
+           
         }
         catch (Exception ex)
         {
-            throw ex;
+            ClsErrorLog errlog = new ClsErrorLog();
+            errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\n" + ex.ToString());
+            throw ex;         
+
         }
     }
 
