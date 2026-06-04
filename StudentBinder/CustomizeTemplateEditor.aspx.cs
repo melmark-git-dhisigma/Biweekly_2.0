@@ -23230,7 +23230,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
     private void LogPostBackDetails(IPostBackEventHandler sourceControl, string eventArgument)
     {
-        string logFilePath = HttpContext.Current.Server.MapPath("~/ErrorLog/DataLog.txt");
+        string logFilePath = HttpContext.Current.Server.MapPath("~/ErrorLog/DataLog_" + DateTime.Now.ToString("yyyyMMdd") + ".txt");
         string sourceControlId = sourceControl is Control ? ((Control)sourceControl).ID : "Unknown";
 
         string logMessage = string.Format("[{0}] PostBack Source ID: {1}, Event Argument: {2}{3}",
@@ -23243,7 +23243,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
     {
         sess = (clsSession)Session["UserSession"];
         
-        string errorLogFilePath = HttpContext.Current.Server.MapPath("~/ErrorLog/log.txt");
+        string errorLogFilePath = HttpContext.Current.Server.MapPath("~/ErrorLog/log_" + DateTime.Now.ToString("yyyy_MMMM") + ".txt");
         string errorLogMessage = string.Format("[{0}]\nError: {1}\n{2}\n{3}\n{4}",
             DateTime.Now, errorMessage,"StudentId = " + sess.StudentId, "DSTempHdrId = ", Environment.NewLine);
 
@@ -23253,7 +23253,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
     {
         if (ex.ToString().Contains("Invalid postback or callback argument."))
         {
-            string errorLogFilePath = HttpContext.Current.Server.MapPath("~/ErrorLog/log.txt");
+            string errorLogFilePath = HttpContext.Current.Server.MapPath("~/ErrorLog/log_" + DateTime.Now.ToString("yyyy_MMMM") + ".txt");
             string errorLogMessage = string.Format("[{0}]\nError: {1}\n{2}\n{3}\n{4}",
             DateTime.Now, ex.Message, "StudentId = " + sess.StudentId, "DSTempHdrId = " + hdrId, "LessonPlanId = " + LPId, Environment.NewLine);
             File.AppendAllText(errorLogFilePath, errorLogMessage);

@@ -15,7 +15,7 @@ public class ClsSessionSwpLog
 	{
 	}
     public static string strPath = AppDomain.CurrentDomain.BaseDirectory;
-    public static string strLogFilePath = strPath + @"ErrorLog\SessionSwplog.csv";
+    public static string strLogFilePath = strPath + @"ErrorLog\SessionSwplog_" + DateTime.Now.ToString("yyyy_MMMM") + ".csv";
 
 
     public void WriteToLog(string msg)

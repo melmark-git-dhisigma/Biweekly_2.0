@@ -16,7 +16,7 @@ public class ClsErrorLog
 		
 	}
         public static string strPath = AppDomain.CurrentDomain.BaseDirectory;
-        public static string strLogFilePath = strPath + @"ErrorLog\log.txt";
+        public static string strLogFilePath = strPath + @"ErrorLog\log_" + DateTime.Now.ToString("yyyy_MMMM") + ".txt";
 
 
         public void WriteToLog(string msg)
@@ -129,14 +129,14 @@ public class ClsErrorLog
             {
                 string strPath = AppDomain.CurrentDomain.BaseDirectory;
 
-                if (System.IO.File.Exists(strPath + @"ErrorLog/log.txt"))
+                if (System.IO.File.Exists(strPath + @"ErrorLog/log_" + DateTime.Now.ToString("yyyy_MMMM") + ".txt"))
                 {
 
                 }
                 else
                 {
 
-                    System.IO.File.Create(strPath + @"ErrorLog/log.txt");
+                    System.IO.File.Create(strPath + @"ErrorLog/log_" + DateTime.Now.ToString("yyyy_MMMM") + ".txt");
                 }
 
             }
