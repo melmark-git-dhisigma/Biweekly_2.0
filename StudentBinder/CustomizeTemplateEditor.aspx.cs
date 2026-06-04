@@ -16204,7 +16204,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         else
         {
             GetStatus(TemplateId);
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('Do you want to replace the lesson plan " + chkver + " with a lower version? Please note that you cannot run more than one version of the same lesson. If you need to have a duplicate of this lesson please use the copy command.');", true);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('This lesson is an outdated version of the lesson plan " + chkver + ". Multiple versions of the same lesson cannot be activated concurrently.Please make the Approved/Maintenance version inactive and try again, or use the copy command to duplicate this old version to a new lesson.');", true);
         }
                    
         }
@@ -18031,7 +18031,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
          else
          {
              GetStatus(TemplateId);
-             ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('Do you want to replace the lesson plan " + Chkver + " with a lower version? Please note that you cannot run more than one version of the same lesson. If you need to have a duplicate of this lesson please use the copy command.');", true);
+             ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('This lesson is an outdated version of the lesson plan " + Chkver + ". Multiple versions of the same lesson cannot be activated concurrently.Please make the Approved/Maintenance version inactive and try again, or use the copy command to duplicate this old version to a new lesson.');", true);
          }
     }
         catch (Exception Ex)
