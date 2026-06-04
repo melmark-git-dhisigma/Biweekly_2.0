@@ -37,7 +37,7 @@
                 <% System.Data.DataTable Dt = getStudentDetailsNE("SM");
                    if (Dt.Rows.Count > 0 && Dt != null)
                    {
-
+                       
                        for (int i = 0; i < Dt.Rows.Count; i++)
                        {
                            //tdCapitalName.InnerText = Dt.Rows[0]["LastName"] + "," + Dt.Rows[0]["FirstName"] + "," + Dt.Rows[0]["MiddleName"].ToString();
@@ -135,9 +135,21 @@
                     <td colspan="2" class="righ" id="tdEducationSurrogate"><%=Dt.Rows[0]["EducationalSurrogate"] %></td>
                 </tr>
 
-                <%}
+                <tr>
+                    <td colspan="2">Primary Nurse</td>
+                    <td colspan="2" class="righ" id="td1"><%=Dt.Rows[0]["PrimaryNurseMT"] %></td>
+                </tr>
+
+                <tr>
+                    <td colspan="2">Wellness Check Status</td>
+                    <td colspan="2" class="righ" id="td2"><%=Dt.Rows[0]["WellnessCheckStatusMT"] %></td>
+                </tr>
+                <% }
+                   
                     } %>
-            </table>
+                
+
+                </table>
             <h2>Emergency Contacts – Personal</h2>
 
             <table border="0" cellpadding="0" cellspacing="0" class="inr">
@@ -251,13 +263,13 @@
                 <tr>
                     <td rowspan="2" class="top bgClr">Primary Physician</td>
                     <td class="top">Full Name </td>
-                    <td class="top"><% =Dt.Rows[i]["Name"]%></td>
+                    <td class="top"><% =Dt.Rows[i]["PCPNameMT"]%></td>
                     <td class="top">Office Phone</td>
-                    <td class="top righ"><% =Dt.Rows[i]["OfficePhone"]%></td>
+                    <td class="top righ"><% =Dt.Rows[i]["PCPPhoneMT"]%></td>
                 </tr>
                 <tr>
                     <td>Address</td>
-                    <td><% =Dt.Rows[i]["Address"]%></td>
+                    <td><% =Dt.Rows[i]["PCPAddressMT"]%></td>
                     <td></td>
                     <td class="righ"></td>
                 </tr>
@@ -351,29 +363,29 @@
                 </tr>
                 <tr>
                     <td>Self Preservation Ability</td>
-                    <td class="righ"><% =Dt.Rows[i]["SelfPreservationAbility"]%>.</td>
+                    <td class="righ"><% =Dt.Rows[i]["SelfPreservationAbilityGT"]%>.</td>
                 </tr>
                 <tr>
                     <td>Significant Behavior Characteristics</td>
-                    <td class="righ"><% =Dt.Rows[i]["SignificantBehaviorCharacteristics"]%></td>
+                    <td class="righ"><% =Dt.Rows[i]["SignificantBehavioralCharacteristicsGT"]%></td>
                 </tr>
                 <tr>
                     <td rowspan="3">Relevant Capabilities, Limitations, and Preferences</td>
                     <td class="righ">
                         <h3>Capabilities</h3>
-                        <% =Dt.Rows[i]["Capabilities"]%>.
+                        <% =Dt.Rows[i]["CapabilitiesGT"]%>.
                     </td>
                 </tr>
                 <tr>
                     <td class="righ">
                         <h3>Limitations</h3>
-                        <% =Dt.Rows[i]["Limitations"]%>.
+                        <% =Dt.Rows[i]["LimitationsGT"]%>.
                     </td>
                 </tr>
                 <tr>
                     <td class="righ">
                         <h3>Preferences</h3>
-                        <% =Dt.Rows[i]["Preferances"]%>.
+                        <% =Dt.Rows[i]["PreferencesGT"]%>.
                     </td>
                 </tr>
 
@@ -556,7 +568,7 @@
                     <td class="righ"><%=Dt.Rows[0]["LocationAfterDischarge"] %></td>
                 </tr>
                 <tr>
-                    <td>Melmark New England’s Follow Up Responsibility</td>
+                    <td>Melmark's Follow Up Responsibility</td>
                     <td class="righ"><%=Dt.Rows[0]["MelmarkNewEnglandsFollowUpResponsibilities"] %></td>
                 </tr>
 

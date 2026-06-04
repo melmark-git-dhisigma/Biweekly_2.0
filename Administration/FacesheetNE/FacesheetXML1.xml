@@ -56,6 +56,8 @@
       
       <Mapping Column="template" PlaceHolder="plcPhotodate"/>      
       <Mapping Column="template" PlaceHolder="plcEducationalSurrogate"/>
+      <Mapping Column="template" PlaceHolder="plcPrimaryNurse"/>
+      <Mapping Column="template" PlaceHolder="plcWellnessCheckStatus"/>
       
       
       
