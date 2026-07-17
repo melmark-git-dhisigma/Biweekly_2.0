@@ -13951,6 +13951,28 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                                   "WHERE DSTempHdrId='" + TemplateId + "'";
         objData.Execute(UpdateAppr);
 
+        string strQuery = "SELECT LessonPlanId FROM DSTempHdr WHERE DSTempHdrId = " + TemplateId;
+        int lessonPlanId = Convert.ToInt32(objData.FetchValue(strQuery));
+        string lessonName = clsGeneral.convertQuotes(txtLessonName.Text.Trim());
+        int GoalApproved = Convert.ToInt32(objData.FetchValue("SELECT GoalId FROM StdtLessonPlan WHERE StdtLessonPlanId=(SELECT StdtLessonPlanId FROM DSTempHdr WHERE DSTempHdrId=" + TemplateId + ")"));
+
+        string strCheckLPName = "SELECT DSTemplateName FROM DSTempHdr inner join LookUp lu on lu.LookupId=DSTempHdr.StatusId WHERE  RTRIM(LTRIM(LOWER(DSTemplateName)))= RTRIM(LTRIM(LOWER('" + lessonName + "'))) " +
+            "and lu.LookupName <> 'Deleted' AND StudentId=" + sess.StudentId + " AND (SELECT GoalId FROM StdtLessonPlan WHERE StdtLessonPlanId=DSTempHdr.StdtLessonplanId)=" + GoalApproved + " and LessonPlanId <> " + lessonPlanId;
+        DataTable dtless = objData.ReturnDataTable(strCheckLPName, false);
+        if (dtless.Rows.Count > 0)
+        {
+            ScriptManager.RegisterStartupScript(
+           this,
+           this.GetType(),
+           "studentvalidation",
+           "alert('Lesson plan name already exist. Please enter another name');",
+           true);
+            return;
+        }
+
+
+
+
         string qString = "select DSTempSetId from DSTempSet where DSTempHdrId=" + TemplateId + " and ActiveInd='A'";        //get set ids
         DataTable dtSetId = objData.ReturnDataTable(qString, false);
 
@@ -18725,7 +18747,20 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                             DataTable dt = objData.ReturnDataTable(strCheckLPName, false);
                             if (dt.Rows.Count > 0)
                             {
-                                ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "MsgLPNameAlreadyExists();", true);
+
+                            string UpdateDSTemphdr = "";
+                            if (lessonSDate.Text == "" && lessonEDate.Text == "")
+                            {
+                                UpdateDSTemphdr = "UPDATE DSTempHdr SET NoofTimesTried='" + txtNoofTimesTried.Text + "',NoofTimesTriedPer='" + noofTimesTriedPer.SelectedValue + "',LessonPlanGoal='" + clsGeneral.convertQuotes(txtLessonPlanGoal.Text.Trim()) + "',FrameandStrand='" + clsGeneral.convertQuotes(txtFramework.Text.Trim()) + "',SpecStandard='" + clsGeneral.convertQuotes(txtSpecStandrd.Text.Trim()) + "',SpecEntryPoint='" + clsGeneral.convertQuotes(txtSpecEntrypoint.Text.Trim()) + "',PreReq='" + clsGeneral.convertQuotes(txtPreSkills.Text.Trim()) + "',Materials='" + clsGeneral.convertQuotes(txtMaterials.Text.Trim()) + "',deletessn = '" + dsessn + "' ,LessonSDate= NULL,LessonEDate= NULL WHERE DSTempHdrId='" + HeaderId + "'";
+                            }
+                            else if (lessonSDate.Text == "" && lessonEDate.Text != "")
+                                UpdateDSTemphdr = "UPDATE DSTempHdr SET NoofTimesTried='" + txtNoofTimesTried.Text + "',NoofTimesTriedPer='" + noofTimesTriedPer.SelectedValue + "',LessonPlanGoal='" + clsGeneral.convertQuotes(txtLessonPlanGoal.Text.Trim()) + "',FrameandStrand='" + clsGeneral.convertQuotes(txtFramework.Text.Trim()) + "',SpecStandard='" + clsGeneral.convertQuotes(txtSpecStandrd.Text.Trim()) + "',SpecEntryPoint='" + clsGeneral.convertQuotes(txtSpecEntrypoint.Text.Trim()) + "',PreReq='" + clsGeneral.convertQuotes(txtPreSkills.Text.Trim()) + "',Materials='" + clsGeneral.convertQuotes(txtMaterials.Text.Trim()) + "',deletessn = '" + dsessn + "' ,LessonSDate= NULL,LessonEDate=  '" + lessonEDate.Text + "' WHERE DSTempHdrId='" + HeaderId + "'";
+                            else if (lessonEDate.Text == "" && lessonSDate.Text != "")
+                                UpdateDSTemphdr = "UPDATE DSTempHdr SET NoofTimesTried='" + txtNoofTimesTried.Text + "',NoofTimesTriedPer='" + noofTimesTriedPer.SelectedValue + "',LessonPlanGoal='" + clsGeneral.convertQuotes(txtLessonPlanGoal.Text.Trim()) + "',FrameandStrand='" + clsGeneral.convertQuotes(txtFramework.Text.Trim()) + "',SpecStandard='" + clsGeneral.convertQuotes(txtSpecStandrd.Text.Trim()) + "',SpecEntryPoint='" + clsGeneral.convertQuotes(txtSpecEntrypoint.Text.Trim()) + "',PreReq='" + clsGeneral.convertQuotes(txtPreSkills.Text.Trim()) + "',Materials='" + clsGeneral.convertQuotes(txtMaterials.Text.Trim()) + "',deletessn = '" + dsessn + "' ,LessonSDate= '" + lessonSDate.Text + "',LessonEDate= NULL WHERE DSTempHdrId='" + HeaderId + "'";
+                            else
+                                UpdateDSTemphdr = "UPDATE DSTempHdr SET DSTemplateName='" + lessonName + "',NoofTimesTried='" + txtNoofTimesTried.Text + "',NoofTimesTriedPer='" + noofTimesTriedPer.SelectedValue + "',LessonPlanGoal='" + clsGeneral.convertQuotes(txtLessonPlanGoal.Text.Trim()) + "',FrameandStrand='" + clsGeneral.convertQuotes(txtFramework.Text.Trim()) + "',SpecStandard='" + clsGeneral.convertQuotes(txtSpecStandrd.Text.Trim()) + "',SpecEntryPoint='" + clsGeneral.convertQuotes(txtSpecEntrypoint.Text.Trim()) + "',PreReq='" + clsGeneral.convertQuotes(txtPreSkills.Text.Trim()) + "',Materials='" + clsGeneral.convertQuotes(txtMaterials.Text.Trim()) + "',deletessn = '" + dsessn + "' ,LessonSDate= '" + lessonSDate.Text + "' ,LessonEDate= '" + lessonEDate.Text + "' WHERE DSTempHdrId='" + HeaderId + "'";
+                            objData.Execute(UpdateDSTemphdr);
+                            ScriptManager.RegisterClientScriptBlock(this, typeof(Page), Guid.NewGuid().ToString(), "MsgLPNameAlreadyExists();", true);
                             }
                             else
                             {
@@ -19019,16 +19054,16 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             if (sess != null)
             {
                 string insLP = "";
-                if (TypeofLP == "Temp")
-                {
+                //if (TypeofLP == "Temp")
+                //{
                     insLP = "insert into LessonPlan(SchoolId,[PreReq],[BaselineProc],[Materials],[FrameandStrand],[SpecStandard],[SpecEntryPoint],ActiveInd,LessonPlanName,CreatedBy,CreatedOn,[Baseline],[Objective],LessonSDate,LessonEDate) " +
                     "SELECT " + sess.SchoolId + ",[PreReq],[BaselineProc],[Materials],[FrameandStrand],[SpecStandard],[SpecEntryPoint],'A','" + LpName + "'," + sess.LoginId + ",GETDATE(),[Baseline],[Objective],LessonSDate,LessonEDate FROM DSTempHdr WHERE DSTempHdrId=" + DSTempId;
-                }
-                else
-                {
-                    insLP = "insert into LessonPlan(SchoolId,[PreReq],[TeacherSD],[TeacherInst],[Consequence],[BaselineProc],[PostCheckProc],[ImageURL],[Materials],[FrameandStrand],[SpecStandard],[SpecEntryPoint],ActiveInd,LessonPlanName,CreatedBy,CreatedOn,[Baseline],[Objective],LessonSDate,LessonEDate) " +
-                    "SELECT " + sess.SchoolId + ",[PreReq],[TeacherSD],[TeacherInst],[Consequence],[BaselineProc],[PostCheckProc],[ImageURL],[Materials],[FrameandStrand],[SpecStandard],[SpecEntryPoint],'A','" + LpName + "'," + sess.LoginId + ",GETDATE(),[Baseline],[Objective],LessonSDate,LessonEDate FROM [dbo].[LessonPlan] WHERE LessonPlanId=" + oldLp;
-                }
+                //}
+                //else
+                //{
+                //    insLP = "insert into LessonPlan(SchoolId,[PreReq],[TeacherSD],[TeacherInst],[Consequence],[BaselineProc],[PostCheckProc],[ImageURL],[Materials],[FrameandStrand],[SpecStandard],[SpecEntryPoint],ActiveInd,LessonPlanName,CreatedBy,CreatedOn,[Baseline],[Objective],LessonSDate,LessonEDate) " +
+                //    "SELECT " + sess.SchoolId + ",[PreReq],[TeacherSD],[TeacherInst],[Consequence],[BaselineProc],[PostCheckProc],[ImageURL],[Materials],[FrameandStrand],[SpecStandard],[SpecEntryPoint],'A','" + LpName + "'," + sess.LoginId + ",GETDATE(),[Baseline],[Objective],LessonSDate,LessonEDate FROM [dbo].[LessonPlan] WHERE LessonPlanId=" + oldLp;
+                //}
 
                 LPid = objData.ExecuteWithScopeandConnection(insLP, con, trans);
                 if (LPid > 0)
@@ -21062,7 +21097,38 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             string txtcommentPromptP = txtcommentPrompt.Text.Trim().Replace("'", "''");
             string txtcommentLessonProcedureP = txtcommentLessonProcedure.Text.Trim().Replace("'", "''");
 
-            string qString = "select DSTempSetId from DSTempSet where DSTempHdrId=" + TemplateId + " and ActiveInd='A'";        //get set ids
+        string UpdateAppr = "UPDATE DSTempHdr SET ApprNoteLessonInfo='" + txtCommentLessonInfoP + "'," +
+                                                  "ApprNoteTypeInstruction='" + txtCommentTypeofInstrP + "'," +
+                                                  "ApprNoteMeasurement='" + txtMeasurementSystemsP + "'," +
+                                                  "ApprNoteSet='" + txtcommentsetP + "'," +
+                                                  "ApprNoteStep='" + txtcommentStepP + "'," +
+                                                  "ApprNotePrompt='" + txtcommentPromptP + "'," +
+                                                  "ApprNoteLessonProc='" + txtcommentLessonProcedureP + "' " +
+                                                  "WHERE DSTempHdrId='" + TemplateId + "'";
+        objData.Execute(UpdateAppr);
+
+
+
+        string strQuery = "SELECT LessonPlanId FROM DSTempHdr WHERE DSTempHdrId = " + TemplateId;
+        int lessonPlanId = Convert.ToInt32(objData.FetchValue(strQuery));
+        string lessonName = clsGeneral.convertQuotes(txtLessonName.Text.Trim());
+        int GoalApproved = Convert.ToInt32(objData.FetchValue("SELECT GoalId FROM StdtLessonPlan WHERE StdtLessonPlanId=(SELECT StdtLessonPlanId FROM DSTempHdr WHERE DSTempHdrId=" + TemplateId + ")"));
+
+        string strCheckLPName = "SELECT DSTemplateName FROM DSTempHdr inner join LookUp lu on lu.LookupId=DSTempHdr.StatusId WHERE  RTRIM(LTRIM(LOWER(DSTemplateName)))= RTRIM(LTRIM(LOWER('" + lessonName + "'))) " +
+            "and lu.LookupName <> 'Deleted' AND StudentId=" + sess.StudentId + " AND (SELECT GoalId FROM StdtLessonPlan WHERE StdtLessonPlanId=DSTempHdr.StdtLessonplanId)=" + GoalApproved + " and LessonPlanId <> " + lessonPlanId;
+        DataTable dtless = objData.ReturnDataTable(strCheckLPName, false);
+        if (dtless.Rows.Count > 0)
+        {
+            ScriptManager.RegisterStartupScript(
+           this,
+           this.GetType(),
+           "studentvalidation",
+           "alert('Lesson plan name already exist. Please enter another name');",
+           true);
+            return;
+        }
+
+        string qString = "select DSTempSetId from DSTempSet where DSTempHdrId=" + TemplateId + " and ActiveInd='A'";        //get set ids
             DataTable dtSetId = objData.ReturnDataTable(qString, false);
             objData = new clsData();
             string strQry2 = "select DSTemplateName,LessonSDate,LessonEDate from DSTempHdr where DSTempHdrId= " + TemplateId + "";

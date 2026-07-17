@@ -9,6 +9,7 @@
     <script type="text/javascript" src="../StudentBinder/jsScripts/eye.js"></script>
     <script type="text/javascript" src="../StudentBinder/jsScripts/layout.js"></script>
     <script src="../Administration/JS/jquery-1.8.0.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
     <link href="../StudentBinder/CustomLessons.css" rel="stylesheet" />
     <script src="JS/ajaxfileupload.js"></script>
@@ -47,6 +48,7 @@
             background-size: 14px 17px !important;
             background-position-x: 97%!important;
         }
+
         .ddchkLessonYear {
             width:150px;
             Height:300px;
@@ -77,10 +79,226 @@
         .web_dialog {
             display:none;
         }
+
+        .popupOverlay
+{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.3);
+    z-index:9999;
+}
+
+.popupBox
+{
+    position:absolute;
+    top:150px;
+    left:50%;
+    transform:translateX(-50%);
+    width:500px;
+    background:#f2f2f2;
+    border:4px solid #9cc1ba;
+    padding:25px;
+    box-shadow:0px 0px 10px #666;
+}
+
+.closeBtn
+{
+    float:right;
+    font-size:20px;
+    cursor:pointer;
+    color:red;
+}
+
+.popupTextbox
+{
+    width:220px;
+    height:25px;
+}
+
+.searchIcon
+{
+    width:24px;
+    cursor:pointer;
+    vertical-align:middle;
+    margin-left:5px;
+}
+
+.bottomLogo
+{
+    position:absolute;
+    bottom:10px;
+    right:15px;
+    width:120px;
+}
+.popup-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 600px;
+    max-width: 90%;
+
+    max-height: 80vh;   /* important */
+    overflow-y: auto;   /* scroll enabled */
+
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.4);
+
+    z-index: 9999;
+}
+
+/* Header */
+.popup-header {
+    position: sticky;   /* stays visible while scrolling */
+    top: 0;
+    background: #f5f5f5;
+
+    padding: 10px;
+    text-align: right;
+
+    border-bottom: 1px solid #ddd;
+    z-index: 1;
+}
+
+/* Close Button */
+.close-btn {
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #444;
+}
+
+.close-btn:hover {
+    color: red;
+}
+
+/* Content */
+.popup-content {
+    padding: 20px;
+}
+/* Overlay */
+.loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 99999;
+}
+
+/* Loader Box */
+.loader-box {
+    background: white;
+    padding: 25px 35px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 18px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+}
+
+/* Spinner */
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #ddd;
+    border-top: 5px solid #0078d7;
+    border-radius: 50%;
+
+    margin: auto;
+    margin-bottom: 15px;
+
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
         </style>
   
     <script type="text/javascript">
-                
+        <%--window.onfocus = function () {
+            //if (document.getElementById("loaderOverlay")) {
+            //    hideLoader();
+            //}
+            if (document.getElementById('<%= exportstatus.ClientID %>').value == "1") {
+                hideLoader();
+                document.getElementById('<%= exportstatus.ClientID %>').value = "";
+            }
+        };--%>
+        function templateChanged(chk) {
+            if (chk.checked) {
+                document.getElementById('lblCopyTo').style.display = 'none';
+                document.getElementById('<%= txtIndividualName.ClientID %>').style.display = 'none';
+                document.getElementById('imgSearch').style.display = 'none';
+                document.getElementById('<%=DlStudent.ClientID %>').style.display = 'none';
+                document.getElementById('lblSelectedStudent').style.display = 'none';
+                checkJson('3');
+            }
+            else {
+                document.getElementById('lblCopyTo').style.display = 'block';
+                document.getElementById('<%= txtIndividualName.ClientID %>').style.display = 'block';
+                document.getElementById('imgSearch').style.display = 'block';
+                document.getElementById('lblCopyTo').style.display = 'block';
+                document.getElementById('lblSelectedStudent').style.display = 'block';
+
+
+                checkJson('2');
+
+            }
+        }
+        function hideButton() {
+            var txt2 = document.getElementById('<%= btnUploadJson.ClientID %>');
+            txt2.style.display = "none";
+            var txt = document.getElementById('<%= txtlessname.ClientID %>');
+            txt.style.display = "none";
+        }
+        function clearHiddenField(e) {
+            if (e.key === "Backspace") {
+                document.getElementById('<%= txtIndividualName.ClientID %>').value = "";
+                document.getElementById('<%= hfSelectedStudentId.ClientID %>').value = "";
+                document.getElementById('lblSelectedStudent').innerHTML = "";
+                var txt2 = document.getElementById('<%= btnUploadJson.ClientID %>');
+                txt2.style.display = "none";
+                checkJson('2');
+            }
+            if (e.key === "Enter") {
+                //e.preventDefault(); 
+                //e.stopPropagation();
+                searchIndividual();
+                return false;
+            }
+        }
+        function downloadJsonFile(jsonData) {
+
+            try {
+
+                var blob = new Blob(
+                    [jsonData],
+                    { type: "application/json;charset=utf-8" }
+                );
+
+                saveAs(blob, "lessonexport.json");
+            }
+            finally {
+
+                hideLoader();
+            }
+        }
         function LoadAdminLPs() {            
             $('#ifrmAdminLps').attr('src', '../StudentBinder/CustomizeTemplateEditor.aspx?admin=true');
             $('#divLoadClpToAdmin').fadeIn();
@@ -215,6 +433,237 @@
             else
                 el.value = "Show";
         }
+        function showbeforeExportPopup() {
+            var txt2 = document.getElementById('<%= btnUploadJson.ClientID %>');
+            txt2.style.display = "none";
+            document.getElementById('lblSelectedStudent').innerHTML = "";
+            document.getElementById('<%= txtIndividualName.ClientID %>').value = "";
+            var resultBox =
+                document.getElementById('<%=DlStudent.ClientID %>');
+            resultBox.style.display = 'none';
+            var txt3 = document.getElementById('<%= lesscount.ClientID %>');
+            txt3.style.display = "none";
+            document.getElementById(
+                        '<%= hfSelectedStudentId.ClientID %>'
+            ).value = "";
+            document.getElementById('<%= chkTemplate.ClientID %>').checked = false;
+            document.getElementById('<%= fileJsonUpload.ClientID %>').value = '';
+            document.getElementById('<%= lblUploadStatus.ClientID %>').value = '';
+            document.getElementById('<%= lesscount.ClientID %>').value = '';
+            showExportPopup()
+        }
+
+            function showExportPopup()
+            {
+                document.getElementById("exportPopup").style.display = "block";
+            }
+
+            function closeExportPopup()
+            {
+                document.getElementById("exportPopup").style.display = "none";
+            }
+        function searchIndividual() {
+
+            var name =
+                document.getElementById('<%= txtIndividualName.ClientID %>').value;
+
+
+            if (name.length < 4)
+                return;
+
+            $.ajax({
+
+                type: "POST",
+
+                url: "LessonPlanTemplate.aspx/GetIndividualNames",
+
+                data: JSON.stringify({ searchText: name }),
+
+                contentType: "application/json; charset=utf-8",
+
+                dataType: "json",
+
+                success: function (response) {
+                    var data = response.d;
+
+                    var resultBox =
+                        document.getElementById('<%=DlStudent.ClientID %>');
+
+    resultBox.innerHTML = "";
+
+    if (!data || data.length === 0) {
+        var div = document.createElement("div");
+        div.innerHTML = "Student not found";
+        div.style.color = "red";
+        div.style.padding = "5px";
+
+        resultBox.appendChild(div);
+        resultBox.style.display = "block";
+        return;
+    }
+
+    var lbl = document.createElement("div");
+    lbl.innerHTML = "<strong>Choose Name:</strong>";
+    lbl.style.padding = "5px";
+    resultBox.appendChild(lbl);
+
+    data.forEach(function (item) {
+        var div = document.createElement("div");
+
+        div.innerHTML = item.Name;
+
+        div.onclick = function () {
+            document.getElementById('<%= txtIndividualName.ClientID %>').value = item.Name;
+
+            selectStudentId(item.Id, item.Name);
+
+            resultBox.style.display = "none";
+        };
+
+        resultBox.appendChild(div);
+    });
+
+                  resultBox.style.display = "block";
+              }
+
+            });
+        }
+        function selectStudentId(studentId,studname) {
+            document.getElementById(
+        '<%= hfSelectedStudentId.ClientID %>'
+            ).value = studentId;
+            document.getElementById('lblSelectedStudent').innerHTML =
+                'Selected student is: ' + studname;
+            checkJson('2');
+        }
+        function showDuplicatePopup() {
+                var modal = document.getElementById("duplicateModal");
+                if (modal) {
+                    modal.style.display = "block";
+                }
+            
+        }
+
+        function continueProcess() {
+            document.getElementById("duplicateModal").style.display = "none";
+            showLoader();
+            __doPostBack('ContinueProcess', '');
+
+        }
+
+        function cancelProcess() {
+            document.getElementById("duplicateModal").style.display = "none";
+        }
+
+        function showLoader() {
+
+            document.getElementById("loaderOverlay").style.display = "flex";
+        }
+        function hideLoader() {
+
+            document.getElementById("loaderOverlay").style.display = "none";
+        }
+
+        function checkJson(numb) {
+            if (numb == "1") {
+                var fileInput = document.getElementById('<%= fileJsonUpload.ClientID %>');
+
+                if (!fileInput || fileInput.files.length === 0) {
+                    alert("Please select a JSON file");
+                    return;
+                }
+                document.getElementById('<%= lesscount.ClientID %>').innerText = "";
+                var txt = document.getElementById('<%= txtlessname.ClientID %>');
+                txt.style.display = "none";
+                txt.value = "";
+
+                var file = fileInput.files[0];
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    try {
+                        var jsonData = JSON.parse(e.target.result);
+
+                        var lesson = jsonData.LessonNameAndGoal;
+
+                        if (jsonData && lesson) {
+
+                            var length = jsonData.LessonNameAndGoal.length;
+
+                            if (length == 1) {
+
+                                jsonData.LessonNameAndGoal.forEach(function (item, index) {
+                                    var txt = document.getElementById('<%= txtlessname.ClientID %>');
+                                    txt.style.display = "block";
+                                    txt.value = item.DSTemplateName;
+
+                                });
+                            }
+                            else {
+                                document.getElementById('<%= lesscount.ClientID %>').style.display = 'block';
+                                document.getElementById('<%= lesscount.ClientID %>').innerText = length + '  Lessons selected.Continue?';
+
+                            }
+                            if (document.getElementById('<%= hfSelectedStudentId.ClientID %>').value != "") {
+                                var txt2 = document.getElementById('<%= btnUploadJson.ClientID %>');
+                                txt2.style.display = "block";
+                            }
+                            else {
+                                var chk = document.getElementById('<%= chkTemplate.ClientID %>');
+
+                                if (chk.checked) {
+                                    var txt2 = document.getElementById('<%= btnUploadJson.ClientID %>');
+                                    txt2.style.display = "block";
+                                }
+
+                            }
+
+                        } else {
+                            alert("LessonNameAndGoal not found ");
+                            var txt2 = document.getElementById('<%= btnUploadJson.ClientID %>');
+                            txt2.style.display = "none";
+                        } 
+
+                    } catch (err) {
+                        alert("Invalid JSON file");
+                        var txt2 = document.getElementById('<%= btnUploadJson.ClientID %>');
+                        txt2.style.display = "none";
+                    }
+                };
+
+                reader.readAsText(file);
+            }
+            else {
+                if (numb == "2") {
+                    var fileInput = document.getElementById('<%= fileJsonUpload.ClientID %>');
+                    if (fileInput && fileInput.files.length > 0) {
+                        if (document.getElementById('<%= hfSelectedStudentId.ClientID %>').value != "") {
+                            var txt2 = document.getElementById('<%= btnUploadJson.ClientID %>');
+                            txt2.style.display = "block";
+                        }
+                    }
+
+                }
+                if (numb == "3") {
+                    var fileInput = document.getElementById('<%= fileJsonUpload.ClientID %>');
+                    if (fileInput && fileInput.files.length > 0) {
+         var txt2 = document.getElementById('<%= btnUploadJson.ClientID %>');
+         txt2.style.display = "block";
+     
+ }
+                }
+            }
+        }
+
+        function showLessonsDiv() {
+
+            document.getElementById("lessonPopup").style.display = "block";
+        }
+
+        function closeLessonsDiv() {
+
+            document.getElementById("lessonPopup").style.display = "none";
+        }
     </script>
     
 </asp:Content>
@@ -296,73 +745,176 @@
     </div>
 
     <br /><br />
+ <table style="width: 100%;">
 
-    <table style="width: 100%;">
-         <tr>
-             <td id="tdMsg" colspan="6" runat="server" style="width: 75%"></td>
-             <td> <asp:HiddenField ID="hdnLessonName" runat="server" /></td>
-         </tr>
-        <tr>
-            <td colspan="4"><b> Filter: </b></td>
-            <td><p id= "iepPtag" runat="server"><%--<b> IEP Start Year: </b>--%></p></td>
-            <td></td>
-            <td><b> Search Lesson Name: </b></td>
-        </tr>
-        <tr>
-            <td>
-                <asp:DropDownList ID="ddlClientName" runat="server" CssClass="drpClass" Height="26px" Width="150px"  OnSelectedIndexChanged="ddlClientName_SelectedIndexChanged"
-                     AutoPostBack="true">
-                </asp:DropDownList>
-            </td>
-            <td>
-                <asp:DropDownList ID="ddlGoal" runat="server" CssClass="drpClass" Height="26px" Width="150px"  
-                    OnSelectedIndexChanged="ddlGoal_SelectedIndexChanged" AutoPostBack="true">
-                </asp:DropDownList>
-            </td>
+    <tr>
+        <td id="tdMsg" colspan="6" runat="server" style="width:75%"></td>
+        <td>
+            <asp:HiddenField ID="hdnLessonName" runat="server" />
+        </td>
+    </tr>
 
-            <td>
-                <asp:DropDownList ID="ddlLesson" runat="server" CssClass="drpClass" Height="26px" Width="150px" AutoPostBack="true"
-                    OnSelectedIndexChanged="ddlLesson_SelectedIndexChanged">
-                </asp:DropDownList>
-            </td>
-            <td>
-                <asp:DropDownList ID="ddlTeachingMethod" runat="server" CssClass="drpClass" Height="26px" Width="150px" AutoPostBack="true" 
-                    OnSelectedIndexChanged="ddlTeachingMethod_SelectedIndexChanged">
-                </asp:DropDownList>
-            </td>
-            <td>
-                <%--<asp:DropDownList ID="ddlIepYear" runat="server" CssClass="drpClass" Height="26px" Width="150px" AutoPostBack="true" 
-                    OnSelectedIndexChanged="ddlIepYear_SelectedIndexChanged">
-                </asp:DropDownList>--%>
-                <asp:DropDownCheckBoxes ID="ddlIepYear" runat="server" CssClass="ddchkLessonYear" UseButtons="false" UseSelectAllNode="false" Height="26px" Width="150px" AutoPostBack="true" 
-                    OnSelectedIndexChanged="ddlIepYear_SelectedIndexChanged">
-                    <Texts SelectBoxCaption="IEP Start Year"/>
-                </asp:DropDownCheckBoxes>
-            </td>
-            <td>
-                <asp:DropDownCheckBoxes ID="ddlLessonStatus" runat="server" UseButtons="false" UseSelectAllNode="false" CssClass="ddchkLessonStatus" 
-                    AutoPostBack="true" AddJQueryReference="False" 
-                    OnSelectedIndexChanged="ddlLessonStatus_SelectedIndexChanged" >  
-                    <Texts SelectBoxCaption="Status"/>
-                    <Items>
-                        <asp:ListItem Text="Approved" Value="1"></asp:ListItem>
-                        <asp:ListItem Text="Pending Approval" Value="2"></asp:ListItem>
-                        <asp:ListItem Text="In Progress" Value="3"></asp:ListItem>
-                        <asp:ListItem Text="Rejected" Value="4"></asp:ListItem>
-                        <asp:ListItem Text="Maintenance" Value="5"></asp:ListItem>
-                        <asp:ListItem Text="Inactive" Value="6"></asp:ListItem>
-                    </Items>
-                </asp:DropDownCheckBoxes>
-            </td>
-            <td>
-                <asp:TextBox ID="txtLessonName" runat="server" CssClass="textClass" ></asp:TextBox>
-            </td>
-            <td><asp:Button ID="btnGo" runat="server" Text="Go"  BorderStyle="None" Visible="true" CssClass="NFButton" width="25px" style="margin-left: 3px;" OnClick="btnGo_Click"/></td>
-            <td><asp:Button ID="btnPDF" runat="server" Text="Export to PDF"  BorderStyle="None" Visible="true" CssClass="NFButton" OnClick="btnPDF_Click" /></td>
-            <td><asp:Button ID="btnExcel" runat="server" Text="Export to Excel"  BorderStyle="None" Visible="true" CssClass="NFButton" OnClick="btnExcel_Click" /></td>
-            <td><asp:Button ID="btnAdd" runat="server" Text="Add New"  BorderStyle="None" Visible="true" CssClass="NFButton" OnClick="btnAdd_Click" /></td>
-        </tr>
-    </table>
+    <!-- Filter Row -->
+    <tr>
+        <td colspan="4">
+            <b>Filter:</b>
+        </td>
+
+        <td>
+            <p id="iepPtag" runat="server"></p>
+        </td>
+
+        <td></td>
+
+        <td>
+            <b>Search Lesson Name:</b>
+        </td>
+
+        <td>
+            <input type="button"
+                id="btnimpMEDS"
+                runat="server"
+                value="Import LPs"
+                class="NFButton"
+                visible="false"
+                onclick="showbeforeExportPopup();" />
+        </td>
+
+        <td>
+            <asp:Button
+                ID="btnexp"
+                runat="server"
+                Text="Export LPs"
+                Visible="false"
+                CssClass="NFButton"
+                OnClientClick="showLoader()"
+                OnClick="buttonexp_Click" />
+        </td>
+
+        <td colspan="2"></td>
+    </tr>
+
+    <!-- Controls Row -->
+    <tr>
+        <td>
+            <asp:DropDownList ID="ddlClientName" runat="server"
+                CssClass="drpClass"
+                Height="26px"
+                Width="150px"
+                AutoPostBack="true"
+                OnSelectedIndexChanged="ddlClientName_SelectedIndexChanged">
+            </asp:DropDownList>
+        </td>
+
+        <td>
+            <asp:DropDownList ID="ddlGoal" runat="server"
+                CssClass="drpClass"
+                Height="26px"
+                Width="150px"
+                AutoPostBack="true"
+                OnSelectedIndexChanged="ddlGoal_SelectedIndexChanged">
+            </asp:DropDownList>
+        </td>
+
+        <td>
+            <asp:DropDownList ID="ddlLesson" runat="server"
+                CssClass="drpClass"
+                Height="26px"
+                Width="150px"
+                AutoPostBack="true"
+                OnSelectedIndexChanged="ddlLesson_SelectedIndexChanged">
+            </asp:DropDownList>
+        </td>
+
+        <td>
+            <asp:DropDownList ID="ddlTeachingMethod" runat="server"
+                CssClass="drpClass"
+                Height="26px"
+                Width="150px"
+                AutoPostBack="true"
+                OnSelectedIndexChanged="ddlTeachingMethod_SelectedIndexChanged">
+            </asp:DropDownList>
+        </td>
+
+        <td>
+            <asp:DropDownCheckBoxes ID="ddlIepYear" runat="server"
+                CssClass="ddchkLessonYear"
+                UseButtons="false"
+                UseSelectAllNode="false"
+                Height="26px"
+                Width="150px"
+                AutoPostBack="true"
+                OnSelectedIndexChanged="ddlIepYear_SelectedIndexChanged">
+                <Texts SelectBoxCaption="IEP Start Year" />
+            </asp:DropDownCheckBoxes>
+        </td>
+
+        <td>
+            <asp:DropDownCheckBoxes ID="ddlLessonStatus" runat="server"
+                CssClass="ddchkLessonStatus"
+                UseButtons="false"
+                UseSelectAllNode="false"
+                AutoPostBack="true"
+                AddJQueryReference="False"
+                OnSelectedIndexChanged="ddlLessonStatus_SelectedIndexChanged">
+                <Texts SelectBoxCaption="Status" />
+                <Items>
+                    <asp:ListItem Text="Approved" Value="1"></asp:ListItem>
+                    <asp:ListItem Text="Pending Approval" Value="2"></asp:ListItem>
+                    <asp:ListItem Text="In Progress" Value="3"></asp:ListItem>
+                    <asp:ListItem Text="Rejected" Value="4"></asp:ListItem>
+                    <asp:ListItem Text="Maintenance" Value="5"></asp:ListItem>
+                    <asp:ListItem Text="Inactive" Value="6"></asp:ListItem>
+                </Items>
+            </asp:DropDownCheckBoxes>
+        </td>
+
+        <td>
+            <asp:TextBox ID="txtLessonName" runat="server"
+                CssClass="textClass">
+            </asp:TextBox>
+        </td>
+
+        <!-- All action buttons together -->
+        <td colspan="4" style="white-space:nowrap;">
+            <asp:Button ID="btnGo" runat="server"
+                Text="Go"
+                BorderStyle="None"
+                CssClass="NFButton"
+                Width="25px"
+                Style="margin-left:3px;"
+                OnClick="btnGo_Click" />
+
+            <asp:Button ID="btnPDF" runat="server"
+                Text="Export to PDF"
+                BorderStyle="None"
+                CssClass="NFButton"
+                OnClick="btnPDF_Click" />
+
+            <asp:Button ID="btnExcel" runat="server"
+                Text="Export to Excel"
+                BorderStyle="None"
+                CssClass="NFButton"
+                OnClick="btnExcel_Click" />
+
+            <asp:Button ID="btnAdd" runat="server"
+                Text="Add New"
+                BorderStyle="None"
+                CssClass="NFButton"
+                OnClick="btnAdd_Click" />
+        </td>
+    </tr>
+
+</table>
+
+
+<asp:HiddenField ID="hfSelectedStudentId" runat="server" />
+<asp:HiddenField ID="hdnPopupValue" runat="server" />
+<asp:HiddenField ID="hfpopupshow" runat="server" ClientIDMode="Static" />
+<asp:HiddenField ID="exportparameter1" runat="server" />
+<asp:HiddenField ID="exportparameter2" runat="server" />
+<asp:HiddenField ID="exportparameter3" runat="server" />
+
 
     <div style="visibility:visible">
         <asp:GridView ID="grdDatabankView" runat="server" AutoGenerateColumns="False" Width="100%"
@@ -440,7 +992,7 @@
                 <br />
         <asp:GridView ID="grdClientView" runat="server" AutoGenerateColumns="False" Width="100%"
             GridLines="None" CellPadding="4" ForeColor="#333333" EmptyDataText="No Data Found....."
-            Visible="true" AllowPaging="True" OnPageIndexChanging="grdClientView_PageIndexChanging" OnRowCommand="grdClientView_RowCommand">
+            Visible="true" AllowPaging="True" OnPageIndexChanging="grdClientView_PageIndexChanging" OnRowCommand="grdClientView_RowCommand" OnRowDataBound="grdClientView_RowDataBound">
             <HeaderStyle CssClass="HeaderStyle" Font-Bold="True" ForeColor="White" />
             <RowStyle CssClass="RowStyle" />
             <FooterStyle CssClass="FooterStyle" Font-Bold="True" ForeColor="White" />
@@ -475,6 +1027,16 @@
                                 <ItemStyle HorizontalAlign="Center"></ItemStyle>
                             </ItemTemplate>
                 </asp:TemplateField>
+                 <asp:TemplateField HeaderText="MEDS Export" ItemStyle-HorizontalAlign="Center" HeaderStyle-HorizontalAlign="Center">
+     <ItemTemplate>
+         <asp:ImageButton ID="lb_clnt_exprtmds" CommandName="MEDS Export" runat="server" Width="30px" Style="margin-top:3px;"
+             ImageUrl="~/Administration/Images/logoexp.png"      
+             CommandArgument='<%# Eval("LessonPlanId")+","+Eval("DSTempHdrId")+","+Eval("StudentId") %>' >
+         </asp:ImageButton>
+     </ItemTemplate>
+     <HeaderStyle HorizontalAlign="Center" />
+     <ItemStyle HorizontalAlign="Center"></ItemStyle>
+ </asp:TemplateField>
                 <asp:TemplateField HeaderText="Export" ItemStyle-HorizontalAlign="Center" HeaderStyle-HorizontalAlign="Center">
                     <ItemTemplate>
                         <asp:ImageButton ID="lb_clnt_exprt" CommandName="Export" runat="server" Width="30px" Style="margin-top:3px;"
@@ -547,6 +1109,141 @@
             <img src="../Administration/images/clb.PNG" style="float: right; margin-right: 0px; margin-top: 0px; z-index: 300" width="25" height="25" alt="" />
         </a>
        <iframe id="ifrmAdminLps" style="width: 100%; height: 670px; overflow-y: auto; border:none"></iframe>
+
+        
+
     </div>  
-                         
+           <div id="exportPopup"  class="popupOverlay">
+
+    <div class="popupBox">
+
+        <!-- CLOSE BUTTON -->
+        <span class="closeBtn" onclick="closeExportPopup()">×</span>
+
+        <br />
+
+        <label>
+            <input type="checkbox" id="chkTemplate" runat="server" onchange="templateChanged(this);"/>
+            Copy Lesson Plan as Template
+        </label>
+
+        <br /><br />
+
+       <div id="copyContainer" style="display:flex; align-items:center; gap:8px;">
+    <label id="lblCopyTo">Copy Lesson Plan to</label>
+
+    <input type="text"
+           id="txtIndividualName"
+           runat="server"
+           class="popupTextbox"
+           placeholder="Please enter at least 4 characters."
+           autocomplete="off"
+           onkeyup="clearHiddenField(event);"
+         onkeydown="if(event.keyCode==13) return false;"/>
+
+    <img id="imgSearch"
+         src="images/ex.png"
+         class="searchIcon"
+         onclick="searchIndividual()" />
+</div>
+
+       <div id="DlStudent" class="searchDropdown" runat="server"></div>
+        <br />
+        <span id="lblSelectedStudent" style="color:green;"></span>
+        <br />
+
+    <!-- JSON FILE UPLOAD CONTROL -->
+    <asp:FileUpload ID="fileJsonUpload"
+        runat="server"
+        CssClass="popupTextbox" onchange="hideButton();" />
+        <asp:Button ID="btnCheckJson" runat="server"
+    Text="Verify File"
+                    CssClass="NFButton"
+    OnClientClick="checkJson('1'); return false;" />
+    <br /><br />
+         <asp:Label ID="lesscount"
+     runat="server"
+     ForeColor="Green" />
+         <br /><br />
+
+
+      <input type="text"
+ id="txtlessname"
+ runat="server"
+ style="display:none;"
+ class="popupTextbox"
+ placeholder="Lesson Name" />
+         <br /><br />
+
+    <!-- UPLOAD BUTTON -->
+    <asp:Button ID="btnUploadJson"
+        runat="server"
+        Text="Import"
+         style="display:none;"
+        OnClientClick="showLoader()"
+        CssClass="NFButton"
+        OnClick="btnUploadJson_Click" />
+
+    <br /><br />
+
+    <!-- STATUS LABEL -->
+    <asp:Label ID="lblUploadStatus"
+        runat="server"
+        ForeColor="Red" />
+
+        <!-- BOTTOM RIGHT LOGO -->
+        <img src="images/ex2.png"
+             class="bottomLogo" />
+
+    </div>
+               </div>              
+
+
+             <div id="duplicateModal" 
+     style="display:none; position:fixed; top:50%; left:50%;
+            transform:translate(-50%, -50%);
+            background:white; padding:20px;
+            border:1px solid #ccc; border-radius:8px;
+            box-shadow:0 0 10px rgba(0,0,0,0.3);
+            z-index:9999; width:300px;">
+
+    <h3>⚠ Warning</h3>
+    <p>This lesson name already exists. Do you want to continue?</p>
+
+    <a href="javascript:void(0);" onclick="showLessonsDiv()">
+    Click here to see existing lessons
+</a>
+
+
+    <br /><br />
+
+    <button onclick="continueProcess()" class="NFButton">OK</button>
+    <button onclick="cancelProcess()"    class="NFButton">Cancel</button>
+</div>
+          <div id="lessonPopup" class="popup-box" style="display:none;">
+
+    <div class="popup-header">
+        <span class="close-btn" onclick="closeLessonsDiv()">×</span>
+    </div>
+
+    <!-- Dynamic Content Area -->
+    <div class="popup-content" id="lesslist" runat="server">
+    </div>
+
+</div>
+  <div id="loaderOverlay" class="loader-overlay" style="display:none;">
+    
+    <div class="loader-box">
+        <div class="spinner"></div>
+        <div>Please wait...</div>
+    </div>
+
+</div>
+       <asp:Button ID="btnExport"
+    runat="server"
+    Text="Export"
+    CssClass="NFButton"
+    OnClick="btnExport_Click"
+    Style="display:none;" />
+
 </asp:Content>
