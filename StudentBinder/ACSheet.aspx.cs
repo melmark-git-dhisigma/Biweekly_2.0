@@ -2061,7 +2061,7 @@ public partial class StudentBinder_ACSheet : System.Web.UI.Page
     {
         //btnUpdateNew.Visible = false;
         txtEdate.Text = DateTime.Now.Date.ToString("MM'/'dd'/'yyyy");
-        DateTime Sdate = DateTime.Now.Date.AddDays(-98);
+        DateTime Sdate = DateTime.Now.Date.AddDays(-97);
         txtSdate.Text = Sdate.Date.ToString("MM'/'dd'/'yyyy");
         string popup = " $(document).ready(function () { $('#overlay').fadeIn('fast',function () { $('#dialog').css('top', '5%'); $('#dialog').show(); }); $('#CancalGen').click(function () { $('#dialog').animate({ top: '-300%' }, function () { $('#overlay').fadeOut('slow'); }); }); });";
         ScriptManager.RegisterClientScriptBlock(this, typeof(System.Web.UI.Page), Guid.NewGuid().ToString(), popup, true);

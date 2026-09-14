@@ -235,7 +235,7 @@
                      var today = new Date();
                      var startDate = $(this).datepicker('getDate');
                      //add 98 days to selected date
-                     startDate.setDate(startDate.getDate() + 98);
+                     startDate.setDate(startDate.getDate() + 97);
                      var minDate = dt2.datepicker('getDate');
                      //if (new Date(today) < new Date(startDate)) {
                      //    dt2.datepicker('setDate', today);
@@ -249,12 +249,12 @@
              //Upadte start date after end date change
              $('#txtEdate').datepicker({
                  dateFormat: "mm/dd/yy",
-                 maxDate: +98,
+                 maxDate: +97,
                  onSelect: function () {
                      var dt1 = $('#txtSdate');
                      var endDate = $(this).datepicker('getDate');
                      //add 30 days to selected date
-                     endDate.setDate(endDate.getDate() - 98);
+                     endDate.setDate(endDate.getDate() - 97);
                      var minDate = $(this).datepicker('getDate');
                      //minDate of dt2 datepicker = dt1 selected day
                      dt1.datepicker('setDate', endDate);
