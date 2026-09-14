@@ -20,6 +20,7 @@ using PdfSharp;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
+using System.Diagnostics;
 
 public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
 {
@@ -1440,6 +1441,11 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
 
     private void fillGraphhighchart(string AllLesson, string LessonName)
     {
+        Stopwatch sw = Stopwatch.StartNew();
+        clsReportExecutionLog csrplog = new clsReportExecutionLog();
+        try
+        {
+            csrplog.StartTime = DateTime.Now;
         DateTime dtst = new DateTime();
         DateTime dted = new DateTime();
         dtst = DateTime.ParseExact(txtSdate.Text.Trim().Replace("-", "/"), "MM/dd/yyyy", CultureInfo.InvariantCulture);
@@ -1448,6 +1454,18 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
         string enddate = dted.ToString("yyyy-MM-dd");
 
         int studid = Convert.ToInt32(Request.QueryString["studid"].ToString());
+
+            csrplog.ReportName = "Session-Based Report";
+            csrplog.UserId = sess.LoginId;
+            csrplog.ClassId = sess.Classid;
+            csrplog.StudentId = sess.StudentId;
+            csrplog.ServerID = Environment.MachineName;
+            csrplog.Parameters =
+                                    "StudentId=" + studid +
+                                    "&SchoolId=" + sess.SchoolId +
+                                    "&StartDate=" + StartDate +
+                                    "&EndDate=" + enddate;
+
         string TrendType = "NotNeed";
         if (Convert.ToBoolean(chkreptrend.Checked))
         {
@@ -1565,7 +1583,20 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
             lname = lname.Replace("'", "**");
             string script = @"setTimeout(function() {loadchart('" + sDate + "', '" + eDate + "','" + sid + "','" + lid + "','" + scid + "','" + evnt + "','" + trend + "','" + ioa + "','" + cls + "','" + med + "','" + lpstatus + "','" + medno + "','" + reptype + "','" + inctype + "','" + clsGeneral.convertQuotes(lname) + "');}, 500);";
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ShowMessageWithParamsScript", script, true);
-        
+        }
+        catch (Exception ex)
+        {
+            csrplog.Status = "Failed";
+            csrplog.ErrorMessage = ex.Message;
+            throw;
+        }
+        finally
+        {
+            sw.Stop();
+            csrplog.EndTime = DateTime.Now;
+            csrplog.DurationMs = sw.ElapsedMilliseconds;
+            ReportLogger.Save(csrplog);
+        }
 
     }
 
@@ -1869,6 +1900,10 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
     
         private void GenerateHighchartMaintenanceReport()
     {
+        Stopwatch sw = Stopwatch.StartNew();
+        clsReportExecutionLog csrplog = new clsReportExecutionLog();
+        try {
+            csrplog.StartTime = DateTime.Now;
         ObjData = new clsData();
         int studid = Convert.ToInt32(Request.QueryString["studid"].ToString());
         int templateId = Convert.ToInt32(Request.QueryString["pageid"].ToString());
@@ -1885,6 +1920,19 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
         string AllLesson = "";
         string SetId = drpSetname.SelectedValue;
         RV_LPReport.Visible = false;
+
+            csrplog.ReportName = "Maintenance Graph";
+            csrplog.UserId = sess.LoginId;
+            csrplog.ClassId = sess.Classid;
+            csrplog.StudentId = sess.StudentId;
+            csrplog.ServerID = Environment.MachineName;
+            csrplog.Parameters =
+                                    "StudentId=" + sess.StudentId +
+                                    "&SchoolId=" + sess.SchoolId +
+                                    "&TemplateId=" + templateId.ToString() +
+                                    "&StartDate=" + StartDate+
+                                    "&EndDate=" + enddate;
+
         AllLesson = Convert.ToString(ObjData.FetchValue("SELECT LessonPlanId FROM DSTempHdr WHERE DSTempHdrId=" + ObjTempSess.TemplateId));
         Session["AcademicLessons"] = AllLesson;
         if (AllLesson == "")
@@ -1942,7 +1990,22 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
             deftxt.Visible = true;
             string script = @"setTimeout(function() {loadMchart('" + StartDate.ToString() + "', '" + enddate.ToString() + "','" + studid.ToString() + "','" + templateId.ToString() + "','" + sess.SchoolId.ToString() + "','" + Events + "','" + TrendType + "','" + Convert.ToBoolean(chkioa.Checked).ToString() + "','" + rbtnLsnClassType.SelectedValue + "','" + SetId + "','" + reptype + "','" + inctype + "');}, 500);";
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ShowMessageWithParamsScript2", script, true);
+            csrplog.Status = "Success";
         }
+        catch (Exception ex)
+        {
+            csrplog.Status = "Failed";
+            csrplog.ErrorMessage = ex.Message;
+            throw;
+        }
+        finally
+        {
+            sw.Stop();
+            csrplog.EndTime = DateTime.Now;
+            csrplog.DurationMs = sw.ElapsedMilliseconds;
+            ReportLogger.Save(csrplog);
+        }
+    } 
 
     protected void btnMaintenanceGraph_Click(object sender, EventArgs e)
     {
@@ -2085,9 +2148,22 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public static string getmedAcademicReport(string StartDate, string enddate, int studid, int SchoolId)
     {
+        Stopwatch sw = Stopwatch.StartNew();
+        clsReportExecutionLog csrplog = new clsReportExecutionLog();
+        
+        try
+        {
+            csrplog.StartTime = DateTime.Now;
         objData = new clsData();
         List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
         Dictionary<string, object> row;
+            csrplog.ReportName = "Session-Based Report";
+            csrplog.StartTime = DateTime.Now;
+            csrplog.Parameters =
+                                    "StudentId=" + studid +
+                                    "&SchoolId=" + SchoolId +
+                                    "&StartDate=" + StartDate +
+                                    "&EndDate=" + enddate;
         string squery = "SELECT * FROM (SELECT        SchoolId, StudentId, EventName, StdtSessEventType, Comment, EvntTs,CASE WHEN ( CASE WHEN EndTime='1900-01-01 00:00:00.000'  THEN NULL ELSE EndTime END) IS NULL THEN DATEADD(DAY,1, '" + enddate + "') ELSE EndTime END AS EndTime, EventType FROM            StdtSessEvent WHERE        (StdtSessEventType = 'Medication') AND  SchoolId = " + SchoolId + "   AND StudentId =" + studid + ") MEDICATION WHERE EvntTs BETWEEN  '" + StartDate + "'  AND '" + enddate + "' OR EndTime BETWEEN '" + StartDate + "' AND  '" + enddate + "' OR (EvntTs <= '" + StartDate + "' AND EndTime >= '" + enddate + "')";
         DataTable dt = objData.ReturnDataTable(squery, false);
         foreach (DataRow dr in dt.Rows)
@@ -2099,8 +2175,25 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
             }
             rows.Add(row);
         }
+            csrplog.RowCount = dt.Rows.Count;
+            csrplog.Status = "Success";
+
         JavaScriptSerializer json = new JavaScriptSerializer();
         return json.Serialize(rows);
+        }
+        catch (Exception ex)
+        {
+            csrplog.Status = "Failed";
+            csrplog.ErrorMessage = ex.Message;
+            throw;
+        }
+        finally
+        {
+            sw.Stop();
+            csrplog.EndTime = DateTime.Now;
+            csrplog.DurationMs = sw.ElapsedMilliseconds;
+            ReportLogger.Save(csrplog);
+        }
 
     }
     [WebMethod]
@@ -2183,13 +2276,27 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public static string getMaintreport(string startdate, string enddate, int studid,string lessid,int schoolid,string events,string trend, string checkioa,string classtype,string setid)
     {
+        Stopwatch sw = Stopwatch.StartNew();
+        clsReportExecutionLog csrplog = new clsReportExecutionLog();
+        try
+        {
+            csrplog.StartTime = DateTime.Now;
         objData = new clsData();
 
         List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
         Dictionary<string, object> row;
         String proc = "[dbo].[MaintenanceReport]";
-
+            csrplog.ReportName = "Maintenance Graph - getMaintReport";
+            csrplog.StudentId = studid;
+            csrplog.ServerID = Environment.MachineName;
+            csrplog.Parameters =
+                                    "StudentId=" + studid +
+                                    "&SchoolId=" + schoolid +
+                                    "&LessonId=" + lessid +
+                                    "&StartDate=" + startdate +
+                                    "&EndDate=" + enddate;
         DataTable dt = objData.ReturnMainttable(proc, startdate, enddate, studid, lessid, schoolid, events, trend, checkioa, classtype, setid);
+            csrplog.RowCount = dt.Rows.Count;
 
         foreach (DataRow dr in dt.Rows)
         {
@@ -2203,7 +2310,22 @@ public partial class StudentBinder_AcademicSessionReport : System.Web.UI.Page
         }
 
         JavaScriptSerializer json = new JavaScriptSerializer();
+            csrplog.Status = "Success";
         return json.Serialize(rows);
+    }
+        catch (Exception ex)
+        {
+            csrplog.Status = "Failed";
+            csrplog.ErrorMessage = ex.Message;
+            throw;
+        }
+        finally
+        {
+            sw.Stop();
+            csrplog.EndTime = DateTime.Now;
+            csrplog.DurationMs = sw.ElapsedMilliseconds;
+            ReportLogger.Save(csrplog);
+        }
     }
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]

@@ -9,6 +9,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Data.SqlClient;
 using System.Drawing;
@@ -149,6 +150,11 @@ public partial class StudentBinder_ProgressSummaryReportClinical : System.Web.UI
     }
     private void GenerateReportHighchart()
     {
+        Stopwatch sw = Stopwatch.StartNew();
+        clsReportExecutionLog csrplog = new clsReportExecutionLog();
+        try
+        {
+            csrplog.StartTime = DateTime.Now;
         ObjData = new clsData();
         tdMsg.InnerHtml = "";
         sess = (clsSession)Session["UserSession"];
@@ -159,14 +165,39 @@ public partial class StudentBinder_ProgressSummaryReportClinical : System.Web.UI
         dted = DateTime.ParseExact(txtrepEdate.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
         string StartDate = dtst.ToString("yyyy-MM-dd");
         string enddate = dted.ToString("yyyy-MM-dd");
+            csrplog.ReportName = "Clinical Progress Summary Report";
+            csrplog.UserId = sess.LoginId;
+            csrplog.ClassId = sess.Classid;
+            csrplog.StudentId = sess.StudentId;
+            csrplog.ServerID = Environment.MachineName;
+            csrplog.Parameters =
+                                    "StudentId=" + sess.StudentId +
+                                    "&SchoolId=" + sess.SchoolId +
+                                    "&StartDate=" + dtst +
+                                    "&EndDate=" + dted;
         //CreateDataTable();
-        getAllclassicViewData(StartDate, enddate,sess.StudentId,sess.SchoolId);
+            csrplog.RowCount = getAllclassicViewData(StartDate, enddate, sess.StudentId, sess.SchoolId);
         ClassicLoadBehaviors();
         clsview.Visible = true;
         Gvclsbehadate.Visible = true;
+            csrplog.Status = "Success";
+    }
+        catch (Exception ex)
+        {
+            csrplog.Status = "Failed";
+            csrplog.ErrorMessage = ex.Message;
+            throw;
+        }
+        finally
+        {
+            sw.Stop();
+            csrplog.EndTime = DateTime.Now;
+            csrplog.DurationMs = sw.ElapsedMilliseconds;
+            ReportLogger.Save(csrplog);
+        }
     }
 
-    public void getAllclassicViewData(String Sdate,String Edate,int studid, int schoolid)
+    public int getAllclassicViewData(String Sdate,String Edate,int studid, int schoolid)
     {
         SqlCommand cmd = null;
         SqlConnection con = ObjData.Open();
@@ -183,6 +214,7 @@ public partial class StudentBinder_ProgressSummaryReportClinical : System.Web.UI
             da = new SqlDataAdapter(cmd);
             da.Fill(allclsviewdata);
             countforrowsize();
+            return allclsviewdata.Rows.Count;
         }
         catch (Exception ex)
         {
@@ -190,6 +222,7 @@ public partial class StudentBinder_ProgressSummaryReportClinical : System.Web.UI
            
             ClsErrorLog errlog = new ClsErrorLog();
             errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\n StudentId ID = " + studid + "\n" + ex.ToString());
+            return -1;
         }
         finally
         {

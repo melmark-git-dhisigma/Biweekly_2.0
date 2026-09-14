@@ -21,6 +21,7 @@ using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
 using System.Text;
+using System.Diagnostics;
 
 
 
@@ -875,6 +876,11 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
     private void fillGraphhighchart(string AllLesson)
     {
         ObjData = new clsData();
+        Stopwatch sw = Stopwatch.StartNew();
+        clsReportExecutionLog csrplog = new clsReportExecutionLog();
+        try
+        {
+            csrplog.StartTime = DateTime.Now;
         int studid = Convert.ToInt32(Request.QueryString["studid"].ToString());
         DateTime dtst = new DateTime();
         DateTime dted = new DateTime();
@@ -882,6 +888,17 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
         dted = DateTime.ParseExact(txtEdate.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
         string StartDate = dtst.ToString("yyyy-MM-dd");
         string enddate = dted.ToString("yyyy-MM-dd");
+            csrplog.ReportName = "Academic Graph";
+            csrplog.UserId = sess.LoginId;
+            csrplog.ClassId = sess.Classid;
+            csrplog.StudentId = sess.StudentId;
+            csrplog.ServerID = Environment.MachineName;
+            csrplog.Parameters =
+                                    "StudentId=" + sess.StudentId +
+                                    "&SchoolId=" + sess.SchoolId +
+                                    "&StartDate=" + dtst +
+                                    "&EndDate=" + dted +
+                                    "&LessonID=" + AllLesson;
 
         string TrendType = "NotNeed";
         if (Convert.ToBoolean(chktrend.Checked))
@@ -993,8 +1010,22 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
                 //string script = "loadchart('" + sDate + "', '" + eDate + "','"+sid+"','"+lid+"','"+scid+"','"+evnt+"','"+trend+"','"+ioa+"','"+cls+"','"+med+"','"+lpstatus+"','"+medno+"','"+reptype+"','"+inctype+"');";
                 string script = @"setTimeout(function() {loadchart('" + sDate + "', '" + eDate + "','" + sid + "','" + lid + "','" + scid + "','" + evnt + "','" + trend + "','" + ioa + "','" + cls + "','" + med + "','" + lpstatus + "','" + medno + "','" + reptype + "','" + inctype + "');}, 500);";
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ShowMessageWithParamsScript", script, true);
+            csrplog.Status = "Success";
     }
-  
+        catch (Exception ex)
+        {
+            csrplog.Status = "Failed";
+            csrplog.ErrorMessage = ex.Message;
+            throw;
+        }
+        finally
+        {
+            sw.Stop();
+            csrplog.EndTime = DateTime.Now;
+            csrplog.DurationMs = sw.ElapsedMilliseconds;
+            ReportLogger.Save(csrplog);
+        }
+  }
     private void GenerateLessonPlanReport()
     {
 
@@ -2011,13 +2042,26 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public static string getAcademicReportOther(string lplan, int studid,string lpstatus)
     {
+        Stopwatch sw = Stopwatch.StartNew();
+        clsReportExecutionLog csrplog = new clsReportExecutionLog();
+        try
+        {
+
+            csrplog.StartTime = DateTime.Now;
+            csrplog.ReportName = "Academic - getAcademicReportOther";
+            csrplog.StudentId = studid;
+            csrplog.ServerID = Environment.MachineName;
+            csrplog.Parameters =
+                                    "StudentId=" + studid +
+                                    "&LPId=" + lplan +
+                                    "&lpstatus" + lpstatus;
         objData = new clsData();
         List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
         Dictionary<string, object> row;
         String proc = "[dbo].[BiweeklyAcademicReport_Trendline]";
         DataTable dt = objData.ReturnAcademicTableNext(proc, lplan, studid,lpstatus);
         int i = dt.Rows.Count;
-       
+            csrplog.RowCount = i;
             foreach (DataRow dr in dt.Rows)
             {
                 row = new Dictionary<string, object>();
@@ -2028,18 +2072,47 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
                 rows.Add(row);
             }
             JavaScriptSerializer json = new JavaScriptSerializer();
+            csrplog.Status = "Success";
             return json.Serialize(rows);
         
     }
+        catch (Exception ex)
+        {
+            csrplog.Status = "Failed";
+            csrplog.ErrorMessage = ex.Message;
+            throw;
+        }
+        finally
+        {
+            sw.Stop();
+            csrplog.EndTime = DateTime.Now;
+            csrplog.DurationMs = sw.ElapsedMilliseconds;
+            ReportLogger.Save(csrplog);
+        }
+
+        }
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public static string getmedAcademicReport(string StartDate, string enddate, int studid, int SchoolId)
     {
+        Stopwatch sw = Stopwatch.StartNew();
+        clsReportExecutionLog csrplog = new clsReportExecutionLog();
+        try
+        {
+            csrplog.StartTime = DateTime.Now;
+            csrplog.ReportName = "Academic - getmedAcademicReport";
+            csrplog.StudentId = studid;
+            csrplog.ServerID = Environment.MachineName;
+            csrplog.Parameters =
+                                    "StudentId=" + studid +
+                                    "&StartDate=" + StartDate +
+                                    "&EndDate" + enddate;
         objData = new clsData();
         List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
         Dictionary<string, object> row;
         string squery = "SELECT * FROM (SELECT        SchoolId, StudentId, EventName, StdtSessEventType, Comment, EvntTs,CASE WHEN ( CASE WHEN EndTime='1900-01-01 00:00:00.000'  THEN NULL ELSE EndTime END) IS NULL THEN DATEADD(DAY,1, '" + enddate + "') ELSE EndTime END AS EndTime, EventType FROM            StdtSessEvent WHERE        (StdtSessEventType = 'Medication') AND  SchoolId = " + SchoolId + "   AND StudentId =" + studid + ") MEDICATION WHERE EvntTs BETWEEN  '" + StartDate + "'  AND '" + enddate + "' OR EndTime BETWEEN '" + StartDate + "' AND  '" + enddate + "' OR (EvntTs <= '" + StartDate + "' AND EndTime >= '" + enddate + "')";
         DataTable dt = objData.ReturnDataTable(squery, false);
+            csrplog.RowCount = dt.Rows.Count;
         foreach (DataRow dr in dt.Rows)
         {
             row = new Dictionary<string, object>();
@@ -2050,7 +2123,22 @@ public partial class StudentBinder_LessonReportsWithPaging : System.Web.UI.Page
             rows.Add(row);
         }
         JavaScriptSerializer json = new JavaScriptSerializer();
+            csrplog.Status = "Success";
         return json.Serialize(rows);
+        }
+        catch (Exception ex)
+        {
+            csrplog.Status = "Failed";
+            csrplog.ErrorMessage = ex.Message;
+            throw;
+        }
+        finally
+        {
+            sw.Stop();
+            csrplog.EndTime = DateTime.Now;
+            csrplog.DurationMs = sw.ElapsedMilliseconds;
+            ReportLogger.Save(csrplog);
+        }
 
     }
     [WebMethod]

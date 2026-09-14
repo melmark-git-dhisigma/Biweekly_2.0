@@ -9,6 +9,7 @@ using System.Configuration;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.Web.UI.HtmlControls;
+using System.Diagnostics;
 
 public partial class Administration_StudentAttendance : System.Web.UI.Page
 {
@@ -53,8 +54,11 @@ public partial class Administration_StudentAttendance : System.Web.UI.Page
 
     protected void btnGenerate_Click(object sender, EventArgs e)
     {
+        Stopwatch sw = Stopwatch.StartNew();
+        clsReportExecutionLog csrplog = new clsReportExecutionLog();
         try
         {
+            csrplog.StartTime = DateTime.Now;
             clsData oData = new clsData();
             oSession = (clsSession)Session["UserSession"];
 
@@ -73,6 +77,10 @@ public partial class Administration_StudentAttendance : System.Web.UI.Page
 
             reportMonth = new DateTime(reportMonth.Year, reportMonth.Month, 1);
             txtMonth.Text = reportMonth.ToString("yyyy-MM");
+            csrplog.ReportName = "Attendance Report";
+            csrplog.UserId = sess.LoginId;
+            csrplog.ServerID = Environment.MachineName;
+            csrplog.Parameters = "ReportMonth=" + reportMonth.ToString();
 
             using (var con = new SqlConnection(oData.ConnectionString))
             using (var cmd = new SqlCommand("[dbo].[usp_MPA_SchoolAttendanceSheet_Pivot]", con))
@@ -93,11 +101,14 @@ public partial class Administration_StudentAttendance : System.Web.UI.Page
 
                 if (dt == null || dt.Rows.Count == 0)
                 {
+                    csrplog.RowCount = dt.Rows.Count;
                     noDataBox.Visible = true;
                     gvReport.Visible = false;
                     DeferHideLoader("hideLoader_NoData");
                     return;
                 }
+                else
+                    csrplog.RowCount = -1;
 
                 noDataBox.Visible = false;
                 gvReport.Visible = true;
@@ -315,12 +326,15 @@ public partial class Administration_StudentAttendance : System.Web.UI.Page
 
                 // done: hide loader after successful bind/render
                 DeferHideLoader("hideLoader_Ok");
+                csrplog.Status = "Success";
             }
         }
         catch (Exception ex)
         {
             noDataBox.Visible = true;
             gvReport.Visible = false;
+            csrplog.Status = "Failed";
+            csrplog.ErrorMessage = ex.Message;
             //ScriptManager.RegisterStartupScript(this, GetType(), "errToast",
                 //"console.error('Generate failed: " + DateTime.Now.Ticks + "');", true);
         }
@@ -328,6 +342,10 @@ public partial class Administration_StudentAttendance : System.Web.UI.Page
         {
             // ALWAYS hide the loader, even on early returns/errors
             DeferHideLoader("hideLoader_Finally");
+            sw.Stop();
+            csrplog.EndTime = DateTime.Now;
+            csrplog.DurationMs = sw.ElapsedMilliseconds;
+            ReportLogger.Save(csrplog);
         }
     }
 

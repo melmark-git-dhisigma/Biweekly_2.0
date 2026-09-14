@@ -8,6 +8,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
+using System.Diagnostics;
 public partial class StudentBinder_Event : System.Web.UI.Page
 {
     clsData objData = null;
@@ -267,10 +268,23 @@ public partial class StudentBinder_Event : System.Web.UI.Page
 
     private void LoadGroup()
     {
+        Stopwatch sw = Stopwatch.StartNew();
+        clsReportExecutionLog csrplog = new clsReportExecutionLog();
+        try
+        {
+            csrplog.StartTime = DateTime.Now;
         objData = new clsData();
         sess = (clsSession)Session["UserSession"];
         if (sess != null)
         {
+                csrplog.ReportName = "Event Tracker";
+                csrplog.UserId = sess.LoginId;
+                csrplog.ClassId = sess.Classid;
+                csrplog.StudentId = sess.StudentId;
+                csrplog.ServerID = Environment.MachineName;
+                csrplog.Parameters =
+                                        "StudentId=" + sess.StudentId +
+                                        "&SchoolId=" + sess.SchoolId;
             ///select query to include Academic IOA events AND Behavior IOA events to Event Tracker
             ///
             //DataTable Dt = objData.ReturnDataTable("Select StdtSessEvent.LessonPlanId,StdtSessEvent.MeasurementId,StdtSessEvent.StdtSessEventId,StdtSessEvent.EventName," +
@@ -348,6 +362,7 @@ public partial class StudentBinder_Event : System.Web.UI.Page
 
             if (Dt != null)
             {
+                    csrplog.RowCount = Dt.Rows.Count;
                 for (int i = 0; i < Dt.Rows.Count; i++)
                 {
                     if (Dt.Rows[i]["LessonPlanId"].ToString() == "0")
@@ -362,6 +377,21 @@ public partial class StudentBinder_Event : System.Web.UI.Page
             }
             grdGroup.DataSource = Dt;
             grdGroup.DataBind();
+                csrplog.Status = "Success";
+        }
+    }
+        catch (Exception ex)
+        {
+            csrplog.Status = "Failed";
+            csrplog.ErrorMessage = ex.Message;
+            throw;
+        }
+        finally
+        {
+            sw.Stop();
+            csrplog.EndTime = DateTime.Now;
+            csrplog.DurationMs = sw.ElapsedMilliseconds;
+            ReportLogger.Save(csrplog);
         }
     }
 
