@@ -16,7 +16,7 @@ public class ClsListLog
 	}
 
     public static string strPath = AppDomain.CurrentDomain.BaseDirectory;
-    public static string strLogFilePath = strPath + @"ErrorLog\SessionClsListlog_" + DateTime.Now.ToString("yyyy_MMMM") + ".txt";
+    public static string strLogFilePath = strPath + @"ErrorLog\SessionClsListLog\SessionClsListlog_" + DateTime.Now.ToString("yyyy_MMMM") + ".txt";
 
 
     public void WriteToLog(string msg)
@@ -25,6 +25,13 @@ public class ClsListLog
         {
             try
             {
+                string logDirectory = Path.GetDirectoryName(strLogFilePath);
+
+                if (!Directory.Exists(logDirectory))
+                {
+                    Directory.CreateDirectory(logDirectory);
+                }
+
                 if (!File.Exists(strLogFilePath))
                 {
                     File.Create(strLogFilePath).Close();

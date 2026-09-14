@@ -16,7 +16,7 @@ public class ClsScoreErrorlog
     }
 
     public static string strLogPath = AppDomain.CurrentDomain.BaseDirectory;
-    public static string strScoreLogFilePath = strLogPath + @"ErrorLog\Scorelog_" + DateTime.Now.ToString("yyyyMMdd") + ".csv";
+    public static string strScoreLogFilePath = strLogPath + @"ErrorLog\ScoreLog\Scorelog_" + DateTime.Now.ToString("yyyyMMdd") + ".csv";
 
 
     public void WriteToLog(string msg)
@@ -25,6 +25,13 @@ public class ClsScoreErrorlog
         {
             try
             {
+                string logDirectory = Path.GetDirectoryName(strScoreLogFilePath);
+
+                if (!Directory.Exists(logDirectory))
+                {
+                    Directory.CreateDirectory(logDirectory);
+                }
+
                 if (!File.Exists(strScoreLogFilePath))
                 {
                     File.Create(strScoreLogFilePath).Close();
