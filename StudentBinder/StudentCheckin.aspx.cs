@@ -821,7 +821,13 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
                 //else if (txtSearch == null)
                 //    nullVariable = "txtSearch";
 
-                string errorLogFilePath = HttpContext.Current.Server.MapPath("~/ErrorLog/log_" + DateTime.Now.ToString("yyyy_MMMM") + ".txt");
+                string errorLogFilePath = HttpContext.Current.Server.MapPath("~/ErrorLog/ErrorLog/log_" + DateTime.Now.ToString("yyyy_MMMM") + ".txt");
+                string logDirectory = Path.GetDirectoryName(errorLogFilePath);
+
+                if (!Directory.Exists(logDirectory))
+                {
+                    Directory.CreateDirectory(logDirectory);
+                }
                 string errorLogMessage = string.Format("[{0}]\nError: {1}\n{2}\n{3}\n{4}\n{5}",
                 DateTime.Now,"StudentCheckin Null Reference Log", ex.Message, "Null Variable = " + nullVariable,"StudentId = " + studId, Environment.NewLine);
                 File.AppendAllText(errorLogFilePath, errorLogMessage);

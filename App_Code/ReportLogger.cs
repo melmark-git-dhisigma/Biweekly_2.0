@@ -12,7 +12,7 @@ public static class ReportLogger
     {
         try
         {
-            string path = HttpContext.Current.Server.MapPath("~/ErrorLog");
+            string path = HttpContext.Current.Server.MapPath("~/ErrorLog/Reports");
 
             if (!Directory.Exists(path))
             {
