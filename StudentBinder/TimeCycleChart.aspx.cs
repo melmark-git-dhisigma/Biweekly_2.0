@@ -146,7 +146,12 @@ public partial class StudentBinder_TimeCycleChart : System.Web.UI.Page
         bool stat = validation();
         if (stat == true)
         {
-           ViewState["Starttime"]= ddlStartTime.SelectedIndex;
+            Stopwatch sw = Stopwatch.StartNew();
+            clsReportExecutionLog csrplog = new clsReportExecutionLog();
+            try
+            {
+                csrplog.StartTime = DateTime.Now;
+                ViewState["Starttime"] = ddlStartTime.SelectedIndex;
             ViewState["Endtime"] = ddlEndTime.SelectedIndex;
             string script = "showOverlay();";
             ScriptManager.RegisterStartupScript(this, this.GetType(), "showOverlay", script, true);
@@ -184,6 +189,18 @@ public partial class StudentBinder_TimeCycleChart : System.Web.UI.Page
 
                             }
                         }
+                        DateTime dtst = DateTime.ParseExact(txtStartDate.Text.Trim().Replace("-", "/"), "yyyy/MM/dd", CultureInfo.InvariantCulture);
+                        DateTime dted = DateTime.ParseExact(txtEndDate.Text.Trim().Replace("-", "/"), "yyyy/MM/dd", CultureInfo.InvariantCulture);
+                        csrplog.ReportName = "Time Cycle Chart";
+                        csrplog.UserId = sess.LoginId;
+                        csrplog.ClassId = sess.Classid;
+                        csrplog.StudentId = sess.StudentId;
+                        csrplog.ServerID = Environment.MachineName;
+                        csrplog.Parameters =
+                                                "StudentId=" + sess.StudentId +
+                                                "&SchoolId=" + sess.SchoolId +
+                                                "&StartDate=" + dtst +
+                                                "&EndDate=" + dted;
                         ddlLessonplan.DataSource = selectedTable;
                         ddlLessonplan.DataTextField = "Name";
                         ddlLessonplan.DataValueField = "Id";
@@ -195,6 +212,7 @@ public partial class StudentBinder_TimeCycleChart : System.Web.UI.Page
 
                     if (Dt != null && Dt.Rows.Count > 0)
                     {
+                        csrplog.RowCount = dt.Rows.Count;
                         bool allSelected = Dt.Rows.Count == selectedIds.Length;
                         
                         string allChecked = allSelected ? "checked" : "";
@@ -217,7 +235,7 @@ public partial class StudentBinder_TimeCycleChart : System.Web.UI.Page
                     }
                     string scripta = "updateTimeFields();";
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "updateTimeFields", scripta, true);
-                    
+                    csrplog.Status = "Success";
             }
 
 
@@ -226,6 +244,20 @@ public partial class StudentBinder_TimeCycleChart : System.Web.UI.Page
             string script2 = "hideOverlay();";
             ScriptManager.RegisterStartupScript(this, this.GetType(), "hideOverlay", script2, true);
 
+        }
+            catch (Exception ex)
+            {
+                csrplog.Status = "Failed";
+                csrplog.ErrorMessage = ex.Message;
+                throw;
+    }
+            finally
+            {
+                sw.Stop();
+                csrplog.EndTime = DateTime.Now;
+                csrplog.DurationMs = sw.ElapsedMilliseconds;
+                ReportLogger.Save(csrplog);
+            }
         }
     }
     protected bool validation()

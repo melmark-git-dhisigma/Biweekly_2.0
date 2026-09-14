@@ -471,6 +471,12 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
     {
         if (Validate() == true)
         {
+            Stopwatch sw = Stopwatch.StartNew();
+            clsReportExecutionLog csrplog = new clsReportExecutionLog();
+            try
+            {
+                csrplog.StartTime = DateTime.Now;
+
             objData = new clsData();
             int studid = Convert.ToInt32(Request.QueryString["studid"].ToString());
             hfPopUpValue.Value = "true";
@@ -499,7 +505,17 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
             string StartDate = dtst.ToString("yyyy-MM-dd");
             string enddate = dted.ToString("yyyy-MM-dd");
             int IncludeRateGraph;
-           
+                csrplog.ReportName = "Clinical Graph";
+                csrplog.UserId = sess.LoginId;
+                csrplog.ClassId = sess.Classid;
+                csrplog.StudentId = sess.StudentId;
+                csrplog.ServerID = Environment.MachineName;
+                csrplog.Parameters =
+                                        "StudentId=" + sess.StudentId +
+                                        "&SchoolId=" + sess.SchoolId +
+                                        "&StartDate=" + dtst +
+                                        "&EndDate=" + dted +
+                                        "&behaviourId=" + AllLesson;
             string TrendType = "NotNeed";
             if (Convert.ToBoolean(chkreptrend.Checked))
             {
@@ -597,7 +613,22 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
 
                 string script = @"setTimeout(function() {loadchart('" + sdate + "', '" + edate + "','" + sid + "','" + behid + "','" + scid + "','" + events + "','" + trend + "','" + ioa + "','" + clstype + "','" + med + "','" + gategraph + "','" + medno + "','" + reptype + "','" + inctype + "','" + stname + "');}, 500);";
             ScriptManager.RegisterStartupScript(this, this.GetType(), "showgraph", script, true);
+                csrplog.Status = "Success";
             }
+            catch (Exception ex)
+            {
+                csrplog.Status = "Failed";
+                csrplog.ErrorMessage = ex.Message;
+                throw;
+            }
+            finally
+            {
+                sw.Stop();
+                csrplog.EndTime = DateTime.Now;
+                csrplog.DurationMs = sw.ElapsedMilliseconds;
+                ReportLogger.Save(csrplog);
+            }
+        }
 
         
         else
@@ -1526,6 +1557,21 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public static string getClinicalcReport(string StartDate, string enddate, int studid, string Behav, int SchoolId, string Events, string Trendtype, string Clstype)
     {
+        Stopwatch sw = Stopwatch.StartNew();
+        clsReportExecutionLog csrplog = new clsReportExecutionLog();
+        try
+        {
+            csrplog.StartTime = DateTime.Now;
+            csrplog.ReportName = "Clinical Graph - getClinicalcReport";
+            csrplog.StudentId = studid;
+            csrplog.ServerID = Environment.MachineName;
+            csrplog.Parameters =
+                                    "StudentId=" + studid+
+                                    "&SchoolId=" + SchoolId +
+                                    "&BehaviourId=" + Behav +
+                                    "&SchoolId=" + SchoolId +
+                                    "&StartDate=" + StartDate +
+                                    "&EndDate=" + enddate;
         ObjData = new clsData();
         List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
         Dictionary<string, object> row;
@@ -1548,8 +1594,24 @@ public partial class StudentBinder_BiweeklyBehaviorGraph : System.Web.UI.Page
             }
             rows.Add(row);
         }
+            csrplog.RowCount = dt.Rows.Count;
         JavaScriptSerializer json = new JavaScriptSerializer();
+            csrplog.Status = "Success";
         return json.Serialize(rows);
+    }
+        catch (Exception ex)
+        {
+            csrplog.Status = "Failed";
+            csrplog.ErrorMessage = ex.Message;
+            throw;
+        }
+        finally
+        {
+            sw.Stop();
+            csrplog.EndTime = DateTime.Now;
+            csrplog.DurationMs = sw.ElapsedMilliseconds;
+            ReportLogger.Save(csrplog);
+        }
     }
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]

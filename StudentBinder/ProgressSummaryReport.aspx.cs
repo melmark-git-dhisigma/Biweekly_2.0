@@ -16,6 +16,7 @@ using System.Text.RegularExpressions;
 using System.Drawing;
 using System.Web.Script.Serialization;
 using System.IO.Compression;
+using System.Diagnostics;
 
 
 
@@ -131,6 +132,12 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
 
     private void GenerateReportHighchart()
     {
+        Stopwatch sw = Stopwatch.StartNew();
+        clsReportExecutionLog csrplog = new clsReportExecutionLog();
+        try
+        {
+            csrplog.ReportName = "Progress Summary Report";
+            csrplog.StartTime = DateTime.Now;
         ObjData = new clsData();
         tdMsg.InnerHtml = "";
         RV_ExcelReport.Visible = false;
@@ -151,7 +158,17 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
                 LessonId += item.Value + ",";
             }
         }
-        LessonId = LessonId.Substring(0, (LessonId.Length - 1));
+        LessonId = LessonId.TrimEnd(',');
+            csrplog.UserId = sess.LoginId;
+            csrplog.ClassId = sess.Classid;
+            csrplog.StudentId = sess.StudentId;
+            csrplog.ServerID = Environment.MachineName;
+            csrplog.Parameters =
+                                    "StudentId=" + sess.StudentId +
+                                    "&SchoolId=" + sess.SchoolId +
+                                    "&StartDate=" + dtst+
+                                    "&EndDate=" + dted +
+                                    "&LessonID=" + LessonId;
 
         string LPStatus = "";
         foreach (ListItem item in chkStatus.Items)
@@ -180,7 +197,7 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
         {
             StatusId += LPStat.Rows[i]["LookupId"].ToString() + ",";
         }
-        getAllclassicViewData(StartDate, enddate, sess.StudentId, LessonId, StatusId);
+        csrplog.RowCount = getAllclassicViewData(StartDate, enddate, sess.StudentId, LessonId, StatusId);
         getDSSessionData(sess.StudentId.ToString(), StartDate, enddate, LessonId);
         getDSEventSessionZero(sess.StudentId.ToString(), StartDate, enddate, LessonId);
         getDSScore(sess.StudentId.ToString(), StartDate, enddate, LessonId);
@@ -193,12 +210,16 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
         //ViewState["Score"] = DSScoredt;
         //ViewState["ScoreZero"] = DSScoreZerodt;
 
+            if (csrplog.RowCount < 0)
+                csrplog.Status = "Failed";
+            else
+                csrplog.Status = "Success";
         ViewState["alldata"] = DataTableToJson(allclsviewdata);
-         ViewState["SessionData"] = DataTableToJson(DSSessionDatadt);
-        ViewState["SessionDataZero"]  = DataTableToJson(DSSessionDataZerodt);
+        ViewState["SessionData"] = DataTableToJson(DSSessionDatadt);
+        ViewState["SessionDataZero"] = DataTableToJson(DSSessionDataZerodt);
         ViewState["EventSessionZero"] = DataTableToJson(DSEventSessionZerodt);
-         ViewState["Score"] = DataTableToJson(DSScoredt);
-         ViewState["ScoreZero"] = DataTableToJson(DSScoreZerodt);
+        ViewState["Score"] = DataTableToJson(DSScoredt);
+        ViewState["ScoreZero"] = DataTableToJson(DSScoreZerodt);
 
         int[] lessonids = allclsviewdata.AsEnumerable()
                     .Select(row => row.Field<int>("LessonPlanId"))
@@ -209,10 +230,23 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
         clsLoadRptLesson(lessonids);
         clsview.Visible = true;
         Gvclsdate.Visible = true;
-        
+    }
+        catch (Exception ex)
+        {
+            csrplog.Status = "Failed";
+            csrplog.ErrorMessage = ex.Message;
+            throw;
+        }
+        finally
+        {
+            sw.Stop();
+            csrplog.EndTime = DateTime.Now;
+            csrplog.DurationMs = sw.ElapsedMilliseconds;
+            ReportLogger.Save(csrplog);
+        }
 
     }
-    public void getAllclassicViewData(String Sdate, String Edate, int studid, string lessonid,string lpstatus)
+    public int getAllclassicViewData(String Sdate, String Edate, int studid, string lessonid,string lpstatus)
     {
         SqlCommand cmd = null;
         SqlConnection con = ObjData.Open();
@@ -229,7 +263,7 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
             cmd.Parameters.AddWithValue("@LPStatus", lpstatus);
             da = new SqlDataAdapter(cmd);
             da.Fill(allclsviewdata);
-            
+            return allclsviewdata.Rows.Count;
         }
         catch (Exception ex)
         {
@@ -237,6 +271,7 @@ public partial class StudentBinder_ProgressSummaryReport : System.Web.UI.Page
 
             ClsErrorLog errlog = new ClsErrorLog();
             errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\n StudentId ID = " + studid + "\n" + ex.ToString());
+            return -1;
         }
         finally
         {

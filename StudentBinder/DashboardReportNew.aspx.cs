@@ -816,17 +816,45 @@ public partial class Graph : System.Web.UI.Page
         }
         else
         {
+            Stopwatch sw = Stopwatch.StartNew();
+            clsReportExecutionLog csrplog = new clsReportExecutionLog();
+            try
+            {
+                csrplog.StartTime = DateTime.Now;
             RV_DBReport.Visible = false;
             graphContainerAcademic.Visible = true;
             graphContainerAcademicStaff.Visible = true;
             graphContainerClinical.Visible = true;
             graphContainerClinicalStaff.Visible = true;
+                csrplog.ReportName = "Dashboard Client Academic Graph";
+                csrplog.UserId = sess.LoginId;
+                csrplog.ClassId = sess.Classid;
+                csrplog.ServerID = Environment.MachineName;
+                csrplog.Parameters =
+                                        "StudentId=" + CAgraphStudid +
+                                        "&ClassId=" + CAgraphClassid +
+                                        "&SchoolId=" + sess.SchoolId;
             //graphcontainer.Visible = true;
             //lblNoData.Text = "";
             string script1 = "loadWait();";
             //ScriptManager.RegisterStartupScript(this, this.GetType(), "show", script1, true);
             string script = @"setTimeout(function() {loadAcbyClient('" + CAgraphClassid + "', '" + CAgraphStudid + "','" + CAgraphMistrial + "');}, 500);";
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ShowMessageWithParamsScript", script, true);
+                csrplog.Status = "Success";
+            }
+            catch (Exception ex)
+            {
+                csrplog.Status = "Failed";
+                csrplog.ErrorMessage = ex.Message;
+                throw;
+            }
+            finally
+            {
+                sw.Stop();
+                csrplog.EndTime = DateTime.Now;
+                csrplog.DurationMs = sw.ElapsedMilliseconds;
+                ReportLogger.Save(csrplog);
+            }
 
     }
      
@@ -857,12 +885,25 @@ public partial class Graph : System.Web.UI.Page
     }
         else
         {
+            Stopwatch sw = Stopwatch.StartNew();
+            clsReportExecutionLog csrplog = new clsReportExecutionLog();
+            try
+            {
+                csrplog.StartTime = DateTime.Now;
             CAgraphClassid = ddlClassrooms.SelectedValue;
             RV_DBReport.Visible = false;
             graphContainerAcademic.Visible = false;
             graphContainerAcademicStaff.Visible = false;
             graphContainerClinical.Visible = true;
             graphContainerClinicalStaff.Visible = false;
+                csrplog.ReportName = "Dashboard Client Academic Percentage Graph";
+                csrplog.UserId = sess.LoginId;
+                csrplog.ClassId = sess.Classid;
+                csrplog.ServerID = Environment.MachineName;
+                csrplog.Parameters =
+                                        "StudentId=" + CAgraphStudid +
+                                        "&ClassId=" + CAgraphClassid +
+                                        "&SchoolId=" + sess.SchoolId;
             //graphcontainer.Visible = true;
             //lblNoData.Text = "";
             
@@ -870,6 +911,22 @@ public partial class Graph : System.Web.UI.Page
             ScriptManager.RegisterStartupScript(this, this.GetType(), "show3", script1, true);
             string script = @"setTimeout(function() {loadAcbyClientPerc('" + CAgraphClassid + "', '" + CAgraphStudid + "');}, 500);";
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ShowMessageWithParamsScript3", script, true);
+                csrplog.Status = "Success";
+        }
+            catch (Exception ex)
+            {
+                csrplog.Status = "Failed";
+                csrplog.ErrorMessage = ex.Message;
+                throw;
+    }
+            finally
+            {
+                sw.Stop();
+                csrplog.EndTime = DateTime.Now;
+                csrplog.DurationMs = sw.ElapsedMilliseconds;
+                ReportLogger.Save(csrplog);
+
+            }
         }
     }
 
@@ -909,6 +966,11 @@ public partial class Graph : System.Web.UI.Page
         }
         else
         {
+            Stopwatch sw = Stopwatch.StartNew();
+            clsReportExecutionLog csrplog = new clsReportExecutionLog();
+            try
+            {
+                csrplog.StartTime = DateTime.Now;
             string script1 = "loadWait();";
             //ScriptManager.RegisterStartupScript(this, this.GetType(), "showload", script1, true);
             RV_DBReport.Visible = false;
@@ -932,6 +994,15 @@ public partial class Graph : System.Web.UI.Page
             SqlConnection con = ObjData.Open();
             if (Userids == "")
                 Userids = null;
+
+                csrplog.ReportName = "Dashboard Staff Academic Graph";
+                csrplog.UserId = sess.LoginId;
+                csrplog.ClassId = sess.Classid;
+                csrplog.ServerID = Environment.MachineName;
+                csrplog.Parameters =
+                                        "StudentId=" + Studids +
+                                        "&SchoolId=" + sess.SchoolId +
+                                        "&ClassIds=" + Classids;
             try
             {
                 SqlDataAdapter da = new SqlDataAdapter();
@@ -975,6 +1046,20 @@ public partial class Graph : System.Web.UI.Page
             string script = string.Format("setTimeout(function() {{ loadAcademicbyStaff('{0}'); }}, 300);", jsonString);
             ScriptManager.RegisterStartupScript(this, this.GetType(), "loadAcademicbyStaff", script, true);
         }
+            catch (Exception ex)
+            {
+                csrplog.Status = "Failed";
+                csrplog.ErrorMessage = ex.Message;
+                throw;
+    }
+            finally
+            {
+                sw.Stop();
+                csrplog.EndTime = DateTime.Now;
+                csrplog.DurationMs = sw.ElapsedMilliseconds;
+                ReportLogger.Save(csrplog);
+            }
+        }
     }
 
     private void LoadDashBoardClientClinicalGraph(string CCgraphClassid, string CCgraphStudid)
@@ -1000,17 +1085,44 @@ public partial class Graph : System.Web.UI.Page
         RV_DBReport.ServerReport.Refresh();
     }
         else {
+            Stopwatch sw = Stopwatch.StartNew();
+            clsReportExecutionLog csrplog = new clsReportExecutionLog();
+            try
+            {
+                csrplog.StartTime = DateTime.Now;
             RV_DBReport.Visible = false;
             graphContainerAcademic.Visible = true;
             graphContainerAcademicStaff.Visible = true;
             graphContainerClinical.Visible = true;
             graphContainerClinicalStaff.Visible = true;
+                csrplog.ReportName = "Dashboard Client Clinical Graph";
+                csrplog.UserId = sess.LoginId;
+                csrplog.ClassId = sess.Classid;
+                csrplog.ServerID = Environment.MachineName;
+                csrplog.Parameters =
+                                        "StudentId=" + CCgraphStudid +
+                                        "&ClassId=" + CCgraphClassid +
+                                        "&SchoolId=" + sess.SchoolId;
             //graphcontainer.Visible = true;
             //lblNoData.Text = "";
             string script1 = "loadWait();";
             //ScriptManager.RegisterStartupScript(this, this.GetType(), "show1", script1, true);
             string script = @"setTimeout(function() {loadClinicbyClient('" + CCgraphClassid + "', '" + CCgraphStudid + "');}, 500);";
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ShowMessageWithParamsScript2", script, true);
+    }
+            catch (Exception ex)
+            {
+                csrplog.Status = "Failed";
+                csrplog.ErrorMessage = ex.Message;
+                throw;
+            }
+            finally
+            {
+                sw.Stop();
+                csrplog.EndTime = DateTime.Now;
+                csrplog.DurationMs = sw.ElapsedMilliseconds;
+                ReportLogger.Save(csrplog);
+            }
     }
         
     }
@@ -1043,6 +1155,11 @@ public partial class Graph : System.Web.UI.Page
         }
         else
         {
+            Stopwatch sw = Stopwatch.StartNew();
+            clsReportExecutionLog csrplog = new clsReportExecutionLog();
+            try
+            {
+                csrplog.StartTime = DateTime.Now;
             RV_DBReport.Visible = false;
             graphContainerAcademic.Visible = true;
             graphContainerAcademicStaff.Visible = true;
@@ -1065,6 +1182,14 @@ public partial class Graph : System.Web.UI.Page
             DataTable Dt = new DataTable();
             clsData ObjData = new clsData();
             SqlConnection con = ObjData.Open();
+                csrplog.ReportName = "Dashboard Staff Clinical Graph";
+                csrplog.UserId = sess.LoginId;
+                csrplog.ClassId = sess.Classid;
+                csrplog.ServerID = Environment.MachineName;
+                csrplog.Parameters =
+                                        "StudentId=" + SCgraphStudid +
+                                        "&SchoolId=" + sess.SchoolId +
+                                        "&ClassId=" + SCgraphClassid;
             try
             {
                 SqlDataAdapter da = new SqlDataAdapter();
@@ -1164,7 +1289,21 @@ public partial class Graph : System.Web.UI.Page
             string jsonString = HttpUtility.JavaScriptStringEncode(json.Serialize(rows));
             string script = string.Format("setTimeout(function() {{ loadClinicalbyStaff('{0}'); }}, 300);", jsonString);
             ScriptManager.RegisterStartupScript(this, this.GetType(), "loadClinicalbyStaff", script, true);
-         
+                csrplog.Status = "Success";
+        }
+            catch (Exception ex)
+            {
+                csrplog.Status = "Failed";
+                csrplog.ErrorMessage = ex.Message;
+                throw;
+    }
+            finally
+            {
+                sw.Stop();
+                csrplog.EndTime = DateTime.Now;
+                csrplog.DurationMs = sw.ElapsedMilliseconds;
+                ReportLogger.Save(csrplog);
+            }
         }
     }
 
@@ -1502,14 +1641,21 @@ public partial class Graph : System.Web.UI.Page
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public static string getAClient(string classid, string studentid, string mistrial)
     {
+        Stopwatch sw = Stopwatch.StartNew();
+        clsReportExecutionLog csrplog = new clsReportExecutionLog();
+        try
+        {
+            csrplog.StartTime = DateTime.Now;
         clsData objdata = new clsData();
         List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
         Dictionary<string, object> row;
         //String proc = "[dbo].[DashboardClientAcademic]";
-
+            csrplog.ReportName = "Dashboard Client Academic - getAClient";
+            csrplog.ServerID = Environment.MachineName;
+            csrplog.Parameters =
+                                    "StudentId=" + studentid +
+                                    "&ClassId=" + classid;
         //DataTable dt = objdata.ReturnNewAcademicTable(proc, classid, studentid, mistrial);
-        try
-        {
             SqlCommand cmd = null;
             DataTable dt = new DataTable();
             SqlConnection con = objdata.Open();
@@ -1534,9 +1680,10 @@ public partial class Graph : System.Web.UI.Page
                 rows.Add(row);
 
             }
-
+            csrplog.RowCount = dt.Rows.Count;
             JavaScriptSerializer json = new JavaScriptSerializer();
             string dat = json.Serialize(rows);
+            csrplog.Status = "Success";
             return json.Serialize(rows);
         }
         catch (Exception ex)
@@ -1544,21 +1691,37 @@ public partial class Graph : System.Web.UI.Page
             ClsErrorLog errlog = new ClsErrorLog();
             errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\nStored Procedure: DashboardClientAcademic" +
                 "\nStudentId ID = " + studentid + "\n" + ex.ToString());
+            csrplog.Status = "Failed";
+            csrplog.ErrorMessage = ex.Message;
             return null;
         }
+        finally
+        {
+            sw.Stop();
+            csrplog.EndTime = DateTime.Now;
+            csrplog.DurationMs = sw.ElapsedMilliseconds;
+            ReportLogger.Save(csrplog);
             }
+    }
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public static string getAClientPerc(string classid, string studentid)
         {
+        Stopwatch sw = Stopwatch.StartNew();
+        clsReportExecutionLog csrplog = new clsReportExecutionLog();
+        try
+        {
+            csrplog.StartTime = DateTime.Now;
         clsData objdata = new clsData();
         List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
         Dictionary<string, object> row;
         //String proc = "[dbo].[DashboardClientAcademicPercentage]";
-
+            csrplog.ReportName = "Dashboard Client Academic Percentage - getAClientPerc";
+            csrplog.ServerID = Environment.MachineName;
+            csrplog.Parameters =
+                                    "StudentId=" + studentid +
+                                    "&ClassId=" + classid;
         //DataTable dt = objdata.ReturnNewAcademicTablePerc(proc, classid, studentid);
-        try
-        {
             SqlCommand cmd = null;
             DataTable dt = new DataTable();
             SqlConnection con = objdata.Open();
@@ -1591,24 +1754,40 @@ public partial class Graph : System.Web.UI.Page
             ClsErrorLog errlog = new ClsErrorLog();
             errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\nStored Procedure: DashboardClientAcademicPercentage" +
                 "\nStudentId ID = " + studentid + "\n" + ex.ToString());
+            csrplog.Status = "Failed";
+            csrplog.ErrorMessage = ex.Message;
             return null;
         }
+        finally
+        {
+            sw.Stop();
+            csrplog.EndTime = DateTime.Now;
+            csrplog.DurationMs = sw.ElapsedMilliseconds;
+            ReportLogger.Save(csrplog);
+    }
     }
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public static string getClientClinic(string cid, string sid)
             {
+        Stopwatch sw = Stopwatch.StartNew();
+        clsReportExecutionLog csrplog = new clsReportExecutionLog();
+        try
+        {
+            csrplog.StartTime = DateTime.Now;
         clsData objData = new clsData();
         string str = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
         SqlConnection cn = new SqlConnection(str);
         cn.Open();
-        try
-        {
             List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
             Dictionary<string, object> row;
             //String proc = "[dbo].[DashboardClientClinicalNew]";
-
+            csrplog.ReportName = "Dashboard Client Clinical - getClientClinical";
+            csrplog.ServerID = Environment.MachineName;
+            csrplog.Parameters =
+                                    "StudentId=" + sid +
+                                    "&ClassId=" + cid;
             //DataTable dt = objData.ReturnNewTableClinicClient(proc, cid, sid);
             SqlCommand cmd = null;
             DataTable dt = new DataTable();
@@ -1688,10 +1867,11 @@ public partial class Graph : System.Web.UI.Page
                 }
                 rows.Add(row);
             }
-
+            csrplog.RowCount = dt.Rows.Count;
             JavaScriptSerializer json = new JavaScriptSerializer();
             string dat = json.Serialize(rows);
             Debug.WriteLine(dat);
+            csrplog.Status = "Success";
             return json.Serialize(rows);
         }
         catch (Exception ex)
@@ -1699,13 +1879,27 @@ public partial class Graph : System.Web.UI.Page
             ClsErrorLog errlog = new ClsErrorLog();
             errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\nStored Procedure: DashboardClientClinicalNew" +
                 "\nStudentId ID = " + sid + "\n" + ex.ToString());
+            csrplog.Status = "Failed";
+            csrplog.ErrorMessage = ex.Message;
             return null;
         }
+        finally
+        {
+            sw.Stop();
+            csrplog.EndTime = DateTime.Now;
+            csrplog.DurationMs = sw.ElapsedMilliseconds;
+            ReportLogger.Save(csrplog);
+    }
     }
 
 
     protected void ButtonGo_Click(object sender, EventArgs e)
     {
+        Stopwatch sw = Stopwatch.StartNew();
+        clsReportExecutionLog csrplog = new clsReportExecutionLog();
+        try
+        {
+            csrplog.StartTime = DateTime.Now;
         RV_DBReport.Visible = false;
         String Classids = Convert.ToString(Txt_Clasid.Text);
         String Studids = Convert.ToString(Txt_Studid.Text);
@@ -1728,7 +1922,16 @@ public partial class Graph : System.Web.UI.Page
         DataTable Dt = new DataTable();
         clsData ObjData = new clsData();
         SqlConnection con = ObjData.Open();
-        
+            csrplog.ReportName = "Dashboard Table";
+            csrplog.UserId = sess.LoginId;
+            csrplog.ClassId = sess.Classid;
+            csrplog.ServerID = Environment.MachineName;
+            csrplog.Parameters =
+                                    "StudentId=" + Studids +
+                                    "&SchoolId=" + sess.SchoolId +
+                                    "&classId=" + Classids +
+                                    "&StartDate=" + startDate +
+                                    "&EndDate=" + endDate;
         try
         {
             gvProgramsByClient.Columns.Clear();
@@ -1761,6 +1964,7 @@ public partial class Graph : System.Web.UI.Page
                 cmdAcademic.Parameters.AddWithValue("@ClassIds", Classids);
                 SqlDataAdapter daAcademic = new SqlDataAdapter(cmdAcademic);
                 daAcademic.Fill(DtAcademic);
+                    csrplog.RowCount = DtAcademic.Rows.Count;
 
                 DataTable dtAcademicStaff = PivotDataTableStaff(DtAcademic);
                 DtAcademic = PivotDataTableClient(DtAcademic);
@@ -1834,7 +2038,7 @@ public partial class Graph : System.Web.UI.Page
             ScriptManager.RegisterStartupScript(this, this.GetType(), "setDate", script2, true);
             string script1 = "TableView();";
             ScriptManager.RegisterStartupScript(this, this.GetType(), "Table", script1, true);
-            
+                csrplog.Status = "Success";
         }
         catch (Exception ex)
         {
@@ -1850,6 +2054,20 @@ public partial class Graph : System.Web.UI.Page
             ScriptManager.RegisterStartupScript(this, this.GetType(), "hide", script1, true);
         }
 
+    }
+        catch (Exception ex)
+        {
+            csrplog.Status = "Failed";
+            csrplog.ErrorMessage = ex.Message;
+            throw;
+        }
+        finally
+        {
+            sw.Stop();
+            csrplog.EndTime = DateTime.Now;
+            csrplog.DurationMs = sw.ElapsedMilliseconds;
+            ReportLogger.Save(csrplog);
+        }
     }
     static DataTable addCountPerDate(DataTable dt)
     {

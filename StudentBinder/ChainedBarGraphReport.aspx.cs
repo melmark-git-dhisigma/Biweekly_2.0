@@ -18,6 +18,7 @@ using PdfSharp;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
+using System.Diagnostics;
 
 public partial class StudentBinder_ChainedBarGraphReport : System.Web.UI.Page
 {
@@ -256,14 +257,46 @@ public partial class StudentBinder_ChainedBarGraphReport : System.Web.UI.Page
             }
             else
             {
-             lid=Convert.ToInt32(AllLesson);
-             prompttype=RbtnPloatType.SelectedValue;
-             sid=studid;
-             scid=sess.SchoolId;
-             sdate=StartDate.ToString();
-             edate=enddate.ToString();
-             tempid=templateId;
+                Stopwatch sw = Stopwatch.StartNew();
+                clsReportExecutionLog csrplog = new clsReportExecutionLog();
+                try
+                {
+                    csrplog.StartTime = DateTime.Now;
+                    lid = Convert.ToInt32(AllLesson);
+                    prompttype = RbtnPloatType.SelectedValue;
+                    sid = studid;
+                    scid = sess.SchoolId;
+                    sdate = StartDate.ToString();
+                    edate = enddate.ToString();
+                    tempid = templateId;
              classtype = rbtnClassType.SelectedValue;
+                    csrplog.ReportName = "Chain Graph";
+                    csrplog.UserId = sess.LoginId;
+                    csrplog.ClassId = sess.Classid;
+                    csrplog.StudentId = sess.StudentId;
+                    csrplog.ServerID = Environment.MachineName;
+                    csrplog.Parameters =
+                                            "StudentId=" + sess.StudentId +
+                                            "&SchoolId=" + sess.SchoolId +
+                                            "&StartDate=" + dtst +
+                                            "&EndDate=" + dted +
+                                            "&tempID=" + tempid +
+                                            "&classtype=" + classtype +
+                                            "&prompttype=" + prompttype;
+            }
+                catch (Exception ex)
+                {
+                    csrplog.Status = "Failed";
+                    csrplog.ErrorMessage = ex.Message;
+                    throw;
+                }
+                finally
+                {
+                    sw.Stop();
+                    csrplog.EndTime = DateTime.Now;
+                    csrplog.DurationMs = sw.ElapsedMilliseconds;
+                    ReportLogger.Save(csrplog);
+                }
             }
 
         }
@@ -497,6 +530,11 @@ public partial class StudentBinder_ChainedBarGraphReport : System.Web.UI.Page
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public static string getChainedBarReport(string StartDate, string enddate, int studid, int AllLesson, int SchoolId, int Templateid, string PromptType, string Clstype)
     {
+        Stopwatch sw = Stopwatch.StartNew();
+        clsReportExecutionLog csrplog = new clsReportExecutionLog();
+        try
+        {
+            csrplog.StartTime = DateTime.Now;
         objData = new clsData();
         string str = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
         SqlConnection cn = new SqlConnection(str);
@@ -518,9 +556,35 @@ public partial class StudentBinder_ChainedBarGraphReport : System.Web.UI.Page
             rows.Add(row);
 
         }
-
+            csrplog.ReportName = "Chain Graph - getChainedBarReport";
+            csrplog.StudentId = studid;
+            csrplog.ServerID = Environment.MachineName;
+            csrplog.Parameters =
+                                    "StudentId=" + studid +
+                                    "&SchoolId=" + SchoolId +
+                                    "&AllLessonId=" + AllLesson +
+                                    "&LessonId=" + Templateid +
+                                    "&StartDate=" + StartDate +
+                                    "&EndDate=" + enddate;
+            csrplog.RowCount = dt.Rows.Count;
         JavaScriptSerializer json = new JavaScriptSerializer();
+            csrplog.Status = "Success";
         return json.Serialize(rows);
+    }
+        catch (Exception ex)
+        {
+            csrplog.Status = "Failed";
+            csrplog.ErrorMessage = ex.Message;
+            throw;
+        }
+        finally
+        {
+            sw.Stop();
+            csrplog.EndTime = DateTime.Now;
+            csrplog.DurationMs = sw.ElapsedMilliseconds;
+            ReportLogger.Save(csrplog);
+        }
+
     }
     [WebMethod]
     public static string[] getgraphs(string base64, string chartId)

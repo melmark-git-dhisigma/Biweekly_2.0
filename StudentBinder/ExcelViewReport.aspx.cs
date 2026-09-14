@@ -14,6 +14,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
 using System.Drawing;
+using System.Diagnostics;
 
 public partial class StudentBinder_ExcelViewReport : System.Web.UI.Page
 {
@@ -107,6 +108,12 @@ public partial class StudentBinder_ExcelViewReport : System.Web.UI.Page
 
     private void GenerateReportHighchart()
     {
+        Stopwatch sw = Stopwatch.StartNew();
+        clsReportExecutionLog csrplog = new clsReportExecutionLog();
+        try
+        {
+            csrplog.StartTime = DateTime.Now;
+
         ObjData = new clsData();
         RV_ExcelReport.Visible = false;
         tdMsg.InnerHtml = "";
@@ -120,7 +127,16 @@ public partial class StudentBinder_ExcelViewReport : System.Web.UI.Page
         dted = DateTime.ParseExact(txtrepEdate.Text.Trim(), "MM/dd/yyyy", CultureInfo.InvariantCulture);
         string StartDate = dtst.ToString("yyyy-MM-dd");
         string enddate = dted.ToString("yyyy-MM-dd");
-
+            csrplog.ReportName = "Excel View";
+            csrplog.UserId = sess.LoginId;
+            csrplog.ClassId = sess.Classid;
+            csrplog.StudentId = sess.StudentId;
+            csrplog.ServerID = Environment.MachineName;
+            csrplog.Parameters =
+                                    "StudentId=" + sess.StudentId +
+                                    "&SchoolId=" + sess.SchoolId +
+                                    "&StartDate=" + dtst +
+                                    "&EndDate=" + dted;
         string DisplayType = "";
         if (Convert.ToBoolean(chkLP.Checked) && Convert.ToBoolean(chkBehavior.Checked))
         {
@@ -141,11 +157,26 @@ public partial class StudentBinder_ExcelViewReport : System.Web.UI.Page
         else
         { FilterColumnIndex = 0; }
 
-        getAllData(sess.StudentId.ToString(), StartDate.ToString(), enddate.ToString(), DisplayType, sess.SchoolId.ToString(), FilterColumnIndex.ToString());
+            csrplog.RowCount = getAllData(sess.StudentId.ToString(), StartDate.ToString(), enddate.ToString(), DisplayType, sess.SchoolId.ToString(), FilterColumnIndex.ToString());
         clsLoadRptLesson();
         clsview.Visible = true;
         Gvclsdate.Visible = true;
         divLesson.Visible = false;
+            csrplog.Status = "Success";
+        }
+        catch (Exception ex)
+        {
+            csrplog.Status = "Failed";
+            csrplog.ErrorMessage = ex.Message;
+            throw;
+        }
+        finally
+        {
+            sw.Stop();
+            csrplog.EndTime = DateTime.Now;
+            csrplog.DurationMs = sw.ElapsedMilliseconds;
+            ReportLogger.Save(csrplog);
+        }
 
     }
 
@@ -239,7 +270,7 @@ public partial class StudentBinder_ExcelViewReport : System.Web.UI.Page
 
     }
 
-    public void getAllData(string sid, string sdate, string edate, string DisplayType, string scid, string FilterColumnIndex)
+    public int getAllData(string sid, string sdate, string edate, string DisplayType, string scid, string FilterColumnIndex)
     {
         SqlCommand cmd = null;
         SqlConnection con = ObjData.Open();
@@ -257,6 +288,7 @@ public partial class StudentBinder_ExcelViewReport : System.Web.UI.Page
             cmd.Parameters.AddWithValue("@FilterColumn", FilterColumnIndex);
             da = new SqlDataAdapter(cmd);
             da.Fill(alldata);
+            return alldata.Rows.Count;
 
         }
         catch (Exception ex)
@@ -265,6 +297,7 @@ public partial class StudentBinder_ExcelViewReport : System.Web.UI.Page
 
             ClsErrorLog errlog = new ClsErrorLog();
             errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\n StudentId ID = " + scid + "\n" + ex.ToString());
+            return -1;
         }
         finally
         {

@@ -11,6 +11,7 @@ using System.Web.UI.WebControls;
 using System.Data;
 using System.IO;
 using System.Data.SqlClient;
+using System.Diagnostics;
 
 public partial class StudentBinder_TextBased : System.Web.UI.Page
 {
@@ -491,6 +492,11 @@ public partial class StudentBinder_TextBased : System.Web.UI.Page
 
     protected DataSet LoadData()
     {
+        Stopwatch sw = Stopwatch.StartNew();
+        clsReportExecutionLog csrplog = new clsReportExecutionLog();
+        try
+        {
+            csrplog.StartTime = DateTime.Now;
         sess = (clsSession)Session["UserSession"];
         oData_ov = new clsData();
         string LPStatus = "";
@@ -499,7 +505,11 @@ public partial class StudentBinder_TextBased : System.Web.UI.Page
         Dt = new System.Data.DataTable();
         ObjData = new clsData();
 
-      
+            csrplog.ReportName = "Step/Trial Data";
+            csrplog.UserId = sess.LoginId;
+            csrplog.ClassId = sess.Classid;
+            csrplog.StudentId = sess.StudentId;
+            csrplog.ServerID = Environment.MachineName;
 
         foreach (ListItem item in chkStatus.Items)
         {
@@ -550,12 +560,33 @@ public partial class StudentBinder_TextBased : System.Web.UI.Page
         }
         LessonId = LessonId.Substring(0, (LessonId.Length - 1));
 
+            csrplog.Parameters =
+                                    "StudentId=" + sess.StudentId +
+                                    "&SchoolId=" + sess.SchoolId +
+                                    "&LessonId=" + LessonId;
+
         string sqlStr = "SELECT *," + APqry + ap_end + " AS LessonName " +
             "FROM (SELECT LessonPlanId,LessonOrder,studentid FROM DSTempHdr DS INNER JOIN LookUp LU ON DS.StatusId=LU.LookupId WHERE DS.StudentId=" + sess.StudentId + " AND DS.SchoolId=" + sess.SchoolId + " AND " +
             "LU.LookupName IN (" + LPStatus + ") AND DS.LessonPlanId IN ( " + LessonId + ") GROUP BY   DS.StudentId,DS.LessonPlanId,DS.LessonOrder) LSN ORDER BY LessonOrder";
                
         DataSet ds = oData_ov.ReturnDataSet(sqlStr, false);
+            csrplog.RowCount = ds.Tables[0].Rows.Count;
+            csrplog.Status = "Success";
         return ds;
     }
-
+        catch (Exception ex)
+        {
+            csrplog.Status = "Failed";
+            csrplog.ErrorMessage = ex.Message;
+            throw;
+        }
+        finally
+        {
+            sw.Stop();
+            csrplog.EndTime = DateTime.Now;
+            csrplog.DurationMs = sw.ElapsedMilliseconds;
+            ReportLogger.Save(csrplog);
+        }
+    }
+    
 }
