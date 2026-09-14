@@ -853,6 +853,31 @@ public class clsData
             return retval;
         }
     }
+    public int ExecuteWithTransLog(string sql, SqlConnection con, SqlTransaction Transs)
+    {
+        int retval = 0;
+
+        using (cmd = new SqlCommand(sql, con))
+        {
+            cmd.Transaction = Transs;
+            try
+            {
+
+                cmd.Connection = con;
+                retval = cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                RollBackTransation(Transs, con);
+                Close(con);
+                ClsErrorLog errlog = new ClsErrorLog();
+                errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\n Query: " + sql + "\n" + ex.ToString());
+                throw;
+
+            }
+            return retval;
+        }
+    }
     public int Execute(string sql)
     {
         int retval = 0;

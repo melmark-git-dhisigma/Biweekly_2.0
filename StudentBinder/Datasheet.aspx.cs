@@ -3887,12 +3887,38 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                     if (drColmn["ColTypeCd"].ToString() != "Prompt" && colt != "true")
                                     {
                                         string updStpDtls = "UPDATE StdtSessionDtl SET CurrentPrompt='" + crntPrmpt + "' WHERE StdtSessionStepId=" + drStep["SessStepID"] + " AND DSTempSetColId=" + drColmn["DSTempSetColId"].ToString() + "";
-                                        oData.ExecuteWithTrans(updStpDtls, con, trans);
+                                        try
+                                        {
+                                            oData.ExecuteWithTransLog(updStpDtls, con, trans);
                                     }
+                                        catch (Exception ex)
+                                        {
+                                            ClsErrorLog log = new ClsErrorLog();
+
+                                            StringBuilder sb = new StringBuilder();
+                                            sb.AppendLine("Exception in updateDatas() - Total Task CurrentPrompt Update");
+                                            sb.AppendLine("StudentId: " + oSession.StudentId);
+                                            sb.AppendLine("SessionHdrId: " + sessHdrId);
+                                            sb.AppendLine("TemplateId: " + oTemp.TemplateId);
+                                            sb.AppendLine("SessStepID: " + (drStep["SessStepID"] == DBNull.Value ? "DBNull" : "'" + drStep["SessStepID"] + "'"));
+                                            sb.AppendLine("DSTempStepId: " + drStep["DSTempStepId"]);
+                                            sb.AppendLine("DSTempSetColId: " + drColmn["DSTempSetColId"]);
+                                            sb.AppendLine("CurrentPrompt: " + crntPrmpt);
+                                            sb.AppendLine("dtSteps: " + (dtsteps == null ? "NULL" : "NOT NULL"));
+                                            sb.AppendLine("dtSteps RowCount: " + (dtsteps == null ? "N/A" : dtsteps.Rows.Count.ToString()));
+                                            sb.AppendLine("Query: " + updStpDtls);
+                                            sb.AppendLine("Exception:");
+                                            sb.AppendLine(ex.ToString());
+
+                                            log.WriteToLog(sb.ToString());
+
+                                            throw;
                                 }
                             }
                         }
                     }
+                }
+            }
                 }
             }
 
