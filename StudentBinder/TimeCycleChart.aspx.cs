@@ -567,6 +567,7 @@ public partial class StudentBinder_TimeCycleChart : System.Web.UI.Page
             }
             else
             {
+            string dataFlag = "";
                 if (dt != null && dt.Rows.Count > 0)
         {
     var chartList = new List<object>();
@@ -668,6 +669,7 @@ public partial class StudentBinder_TimeCycleChart : System.Web.UI.Page
                        
                         if (dtFiltered != null && dtFiltered.Rows.Count > 0)
                         {
+                        dataFlag = "True";
                             bool isfreq = Convert.ToBoolean(dtFiltered.Rows[0]["IsFrequency"]);
                             bool isdur = Convert.ToBoolean(dtFiltered.Rows[0]["IsDuration"]);
                             bool isyesno = Convert.ToBoolean(dtFiltered.Rows[0]["IsYesNo"]);
@@ -749,14 +751,18 @@ public partial class StudentBinder_TimeCycleChart : System.Web.UI.Page
 
                             });
                         }
+                    else
+                    {
+                        if (dataFlag == "")
+                            dataFlag = "False";
                     }
+                }
+                if (dataFlag != "False")
+                {
                             JavaScriptSerializer serializer1 = new JavaScriptSerializer();
                             string json = serializer1.Serialize(chartList);
                             string script = "var jsonChartData = " + json + "; renderMultipleCharts(jsonChartData);";
                             ScriptManager.RegisterStartupScript(this, this.GetType(), "renderCharts", script, true);
-                        
-                        
-                    
                 }
             else
             {
@@ -772,6 +778,20 @@ public partial class StudentBinder_TimeCycleChart : System.Web.UI.Page
             }
 
             }
+            else
+            {
+                hdnFlag.Value = "1";
+                ScriptManager.RegisterStartupScript(
+                    this,
+                    this.GetType(),
+                    "alertMessage",
+                    "alert('No Data available to export');",
+                    true
+                );
+                Loaddata(ddlLessonplan.Items[0].Value, false);
+    }
+
+        }
     }
     private DateTime RoundToNearestHalfHour(DateTime dt)
     {
