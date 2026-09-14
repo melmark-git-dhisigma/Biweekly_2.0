@@ -9,6 +9,10 @@ using System.Configuration;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.Web.UI.HtmlControls;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
+using System.IO;
+using NPOI.SS.Util;
 using System.Diagnostics;
 
 public partial class Administration_StudentAttendance : System.Web.UI.Page
@@ -25,11 +29,6 @@ public partial class Administration_StudentAttendance : System.Web.UI.Page
 
     protected void Page_Load(object sender, EventArgs e)
     {
-        if (Request.QueryString["export"] == "1")
-        {
-            btnExport_Click(null, null);
-            return;
-        }
         var sess = (clsSession)Session["UserSession"];
         if (sess == null)
         {
@@ -352,48 +351,20 @@ public partial class Administration_StudentAttendance : System.Web.UI.Page
     protected void btnExport_Click(object sender, EventArgs e)
     {
         var dt = ViewState["MPAReportDT"] as DataTable;
-        if (dt == null || dt.Rows.Count == 0)
-        {
-            ScriptManager.RegisterStartupScript(this, GetType(), "expNoData",
-                "if(window.hideLoader) hideLoader();", true);
-            return;
-        }
+        if (dt == null || dt.Rows.Count == 0) return;
 
-        Func<System.Drawing.Color, string> ToHtml = c =>
-        {
-            if (c.IsEmpty) return "";
-            return System.Drawing.ColorTranslator.ToHtml(System.Drawing.Color.FromArgb(c.R, c.G, c.B));
-        };
-        Action<TableCell, string> PaintBg = (cell, hex) =>
-        {
-            if (string.IsNullOrEmpty(hex)) return;
-            string style = cell.Attributes["style"] ?? "";
-            if (style.IndexOf("background-color", StringComparison.OrdinalIgnoreCase) < 0)
-                cell.Attributes["style"] = style + ";background-color:" + hex + " !important;";
-            cell.Attributes["bgcolor"] = hex;
-        };
-        Action<TableCell, string> AddStyle = (cell, extra) =>
-        {
-            string style = cell.Attributes["style"] ?? "";
-            cell.Attributes["style"] = style + ";" + extra;
-        };
-        Action<TableCell, int> SetWidth = (cell, px) =>
-            AddStyle(cell, string.Format("width:{0}px;min-width:{0}px;max-width:{0}px;", px));
+        string filename = "MPA_School_Attendance_" +
+                          (txtMonth.Text ?? DateTime.Today.ToString("yyyy-MM")) + ".xlsx";
 
-        Action<TableCell> Center = cell =>
-        {
-            cell.HorizontalAlign = HorizontalAlign.Center;
-            cell.Attributes["align"] = "center";
-            string s = cell.Attributes["style"] ?? "";
-            cell.Attributes["style"] = s + ";text-align:center;vertical-align:middle;";
-        };
-        Action<TableCell> LeftAlign = cell =>
-        {
-            cell.HorizontalAlign = HorizontalAlign.Left;
-            cell.Attributes["align"] = "left";
-            string s = cell.Attributes["style"] ?? "";
-            cell.Attributes["style"] = s + ";text-align:left;vertical-align:middle;";
-        };
+        string token = hidExportToken.Value;
+
+        ExportAttendanceToExcel(dt, filename, Response, token);
+    }
+
+    private void ExportAttendanceToExcel(DataTable dt, string filename, HttpResponse response, string token)
+    {
+        IWorkbook workbook = new XSSFWorkbook();
+        ISheet sheet = workbook.CreateSheet("Attendance");
 
         string cDayHdr = "#DEEAF6";
         string cPresent = "#C5E0B3";
@@ -403,211 +374,274 @@ public partial class Administration_StudentAttendance : System.Web.UI.Page
         string cTotalDays = "#D0CECE";
         string cNeutralDay = "#A5A5A5";
 
-        var leftWidths = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase) {
-        { "Student", 220 }, { "Staffing", 110 }, { "Program", 120 },
-        { "4010", 80 }, { "1306", 80 }, { "District", 120 },
-        { "LEA Representative", 160 }, { "Send Email", 120 }, { "Room", 90 }
-    };
-        int dayWidth = 40;
-        int sumWidth = 80;
-
         var leftAlignedHeaders = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {
         "Student", "Staffing", "Program"
     };
-
-        var gv = new GridView
-        {
-            AutoGenerateColumns = true,
-            ShowHeader = true,
-            EnableViewState = false
-        };
-        gv.DataSource = dt;
-        gv.DataBind();
-
-        gv.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
-        gv.RowStyle.HorizontalAlign = HorizontalAlign.Center;
 
         DateTime reportMonth;
         var raw = (txtMonth.Text ?? "").Trim();
         if (raw.Length == 7 && raw[4] == '-') raw += "-01";
         if (!DateTime.TryParseExact(raw,
             new[] { "yyyy-MM-dd", "MM/dd/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "MM-yyyy", "MM/yyyy" },
-            System.Globalization.CultureInfo.InvariantCulture,
-            DateTimeStyles.None, out reportMonth))
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.None,
+            out reportMonth))
             reportMonth = DateTime.Today;
+
         reportMonth = new DateTime(reportMonth.Year, reportMonth.Month, 1);
         int daysInMonth = DateTime.DaysInMonth(reportMonth.Year, reportMonth.Month);
 
-        var table = gv.HeaderRow != null ? (gv.HeaderRow.Parent as System.Web.UI.WebControls.Table) : null;
-        if (table != null)
+        var title1Style = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, true, (short)14, NPOI.SS.UserModel.BorderStyle.None, null, false);
+        var title2Style = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, true, (short)12, NPOI.SS.UserModel.BorderStyle.None, null, false);
+
+        var blankHdrStyle = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, false, (short)10, NPOI.SS.UserModel.BorderStyle.Medium, null, false);
+
+        var dowDayStyle = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, true, (short)10, NPOI.SS.UserModel.BorderStyle.Medium, "#DEEAF6", false);
+
+        var headerFixedStyle = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, true, (short)10, NPOI.SS.UserModel.BorderStyle.Medium, "#BDD7EE", false);
+
+        var headerDayStyle = CreateStyle( workbook, HorizontalAlignment.Center, VerticalAlignment.Center, true, (short)10, NPOI.SS.UserModel.BorderStyle.Medium, "#BDD7EE", false );
+
+        var secPresentStyle = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, true, (short)10, NPOI.SS.UserModel.BorderStyle.Medium, "#C5E0B3", false);
+        var secAbsentStyle = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, true, (short)10, NPOI.SS.UserModel.BorderStyle.Medium, "#F7CAAC", false);
+        var secDaysStyle = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, true, (short)10, NPOI.SS.UserModel.BorderStyle.Medium, "#D0CECE", false);
+
+        var headerLeftStyle = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, true, (short)10,
+            NPOI.SS.UserModel.BorderStyle.Medium, "#DEEAF6", false);
+
+        var headerCenterStyle = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, true, (short)10,
+            NPOI.SS.UserModel.BorderStyle.Medium, "#DEEAF6", false);
+
+        var headerPresentStyle = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, true, (short)10, NPOI.SS.UserModel.BorderStyle.Medium, "#C5E0B3", false);
+        var headerTardyStyle = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, true, (short)10, NPOI.SS.UserModel.BorderStyle.Medium, "#E2EFD9", false);
+        var headerTotalPTStyle = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, true, (short)10, NPOI.SS.UserModel.BorderStyle.Medium, "#C5E0B3", false);
+
+        var headerAbsentStyle = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, true, (short)10,
+            NPOI.SS.UserModel.BorderStyle.Medium, "#F7CAAC", false);
+
+        var headerDaysStyle = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, true, (short)10,
+            NPOI.SS.UserModel.BorderStyle.Medium, "#D0CECE", false);
+
+        var dataLeftStyle = CreateStyle(workbook, HorizontalAlignment.Left, VerticalAlignment.Center, false, (short)10, NPOI.SS.UserModel.BorderStyle.Thin, null, false);
+        var dataCenterStyle = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, false, (short)10, NPOI.SS.UserModel.BorderStyle.Thin, null, false);
+        var dayPresentStyle = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, false, (short)10, NPOI.SS.UserModel.BorderStyle.Thin, "#C5E0B3", false);
+        var dayTardyStyle = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, false, (short)10, NPOI.SS.UserModel.BorderStyle.Thin, "#E2EFD9", false);
+        var dayAbsentStyle = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, false, (short)10, NPOI.SS.UserModel.BorderStyle.Thin, "#F7CAAC", false);
+        var dayNeutralStyle = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, false, (short)10, NPOI.SS.UserModel.BorderStyle.Thin, "#A5A5A5", false);
+        var dataPresentStyle = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, false, (short)10, NPOI.SS.UserModel.BorderStyle.Thin, "#C5E0B3", false);
+        var dataTardyStyle = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, false, (short)10, NPOI.SS.UserModel.BorderStyle.Thin, "#E2EFD9", false);
+        var dataTotalPTStyle = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, false, (short)10, NPOI.SS.UserModel.BorderStyle.Thin, "#C5E0B3", false);
+        var dataAbsentSumStyle = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, false, (short)10, NPOI.SS.UserModel.BorderStyle.Thin, "#F7CAAC", false);
+        var dataDaysStyle = CreateStyle(workbook, HorizontalAlignment.Center, VerticalAlignment.Center, false, (short)10, NPOI.SS.UserModel.BorderStyle.Thin, "#D0CECE", false);
+
+        int rowIndex = 0;
+
+        IRow titleRow1 = sheet.CreateRow(rowIndex++);
+        titleRow1.HeightInPoints = 22f;
+        for (int i = 0; i < dt.Columns.Count; i++)
         {
-            int headerColCount = gv.HeaderRow.Cells.Count;
+            ICell c = titleRow1.CreateCell(i);
+            c.CellStyle = title1Style;
+        }
+        titleRow1.GetCell(0).SetCellValue("Melmark School Attendance");
+        sheet.AddMergedRegion(new CellRangeAddress(titleRow1.RowNum, titleRow1.RowNum, 0, dt.Columns.Count - 1));
 
-            var titleRow1 = new GridViewRow(0, 0, DataControlRowType.Header, DataControlRowState.Normal);
-            var title1 = new TableCell { Text = "Melmark School Attendance", ColumnSpan = headerColCount };
-            AddStyle(title1, "font-weight:bold;font-size:14pt;");
-            Center(title1);
-            titleRow1.Cells.Add(title1);
-            table.Controls.AddAt(0, titleRow1);
+        IRow titleRow2 = sheet.CreateRow(rowIndex++);
+        titleRow2.HeightInPoints = 20f;
 
-            var titleRow2 = new GridViewRow(0, 0, DataControlRowType.Header, DataControlRowState.Normal);
-            var title2 = new TableCell { Text = reportMonth.ToString("MMMM yyyy"), ColumnSpan = headerColCount };
-            AddStyle(title2, "font-weight:bold;font-size:12pt;");
-            Center(title2);
-            titleRow2.Cells.Add(title2);
-            table.Controls.AddAt(1, titleRow2);
+        ICellStyle title2CenteredStyle = workbook.CreateCellStyle();
+        title2CenteredStyle.CloneStyleFrom(title2Style);
+        title2CenteredStyle.Alignment = HorizontalAlignment.CenterSelection;
 
-            int summaryCols = 5;
-            int fixedCols = headerColCount - daysInMonth - summaryCols;
-            if (fixedCols < 0) fixedCols = 0;
-
-            var dowRow = new GridViewRow(0, 0, DataControlRowType.Header, DataControlRowState.Normal);
-
-            for (int i = 0; i < fixedCols; i++)
-            {
-                var blank = new TableCell { Text = string.Empty };
-                AddStyle(blank, "border:1.5pt solid #6b7280;padding:5px 7px;");
-                Center(blank);
-                dowRow.Cells.Add(blank);
-            }
-
-            for (int d = 1; d <= daysInMonth; d++)
-            {
-                var dt2 = new DateTime(reportMonth.Year, reportMonth.Month, d);
-                var cell = new TableCell { Text = dt2.ToString("ddd") };
-                PaintBg(cell, cDayHdr);
-                AddStyle(cell, "border:1.5pt solid #6b7280;padding:5px 7px;font-weight:bold;white-space:nowrap;");
-                SetWidth(cell, dayWidth);
-                Center(cell);
-                dowRow.Cells.Add(cell);
-            }
-
-            var secPresent = new TableCell { Text = "Present", ColumnSpan = 3 };
-            PaintBg(secPresent, cPresent);
-            AddStyle(secPresent, "border:1.5pt solid #6b7280;padding:5px 7px;font-weight:bold;white-space:nowrap;");
-            Center(secPresent);
-            dowRow.Cells.Add(secPresent);
-
-            var secAbsent = new TableCell { Text = "Absent", ColumnSpan = 1 };
-            PaintBg(secAbsent, cAbsent);
-            AddStyle(secAbsent, "border:1.5pt solid #6b7280;padding:5px 7px;font-weight:bold;white-space:nowrap;");
-            Center(secAbsent);
-            dowRow.Cells.Add(secAbsent);
-
-            var secDays = new TableCell { Text = "Total", ColumnSpan = 1 };
-            PaintBg(secDays, cTotalDays);
-            AddStyle(secDays, "border:1.5pt solid #6b7280;padding:5px 7px;font-weight:bold;white-space:nowrap;");
-            Center(secDays);
-            dowRow.Cells.Add(secDays);
-
-            table.Controls.AddAt(2, dowRow);
+        for (int i = 0; i < dt.Columns.Count; i++)
+        {
+            ICell c = titleRow2.CreateCell(i);
+            c.CellStyle = title2CenteredStyle;
         }
 
-        Func<string, bool> IsTwoDigitDay = s =>
+        titleRow2.GetCell(0).SetCellValue(reportMonth.ToString("MMMM yyyy"));
+
+        int summaryCols = 5;
+        int fixedCols = dt.Columns.Count - daysInMonth - summaryCols;
+        if (fixedCols < 0) fixedCols = 0;
+
+        IRow dowRow = sheet.CreateRow(rowIndex++);
+        dowRow.HeightInPoints = 20f;
+
+        int col = 0;
+
+        // fixed left columns
+        for (int i = 0; i < fixedCols; i++, col++)
         {
-            if (string.IsNullOrEmpty(s)) return false;
-            s = System.Web.HttpUtility.HtmlDecode(s).Trim();
-            if (s.Length != 2) return false;
+            ICell cell = dowRow.CreateCell(col);
+            cell.SetCellValue("");
+            cell.CellStyle = blankHdrStyle;
+        }
+
+        // day wording row: Mon Tue Wed...
+        for (int d = 1; d <= daysInMonth; d++, col++)
+        {
+            ICell cell = dowRow.CreateCell(col);
+            cell.SetCellValue(new DateTime(reportMonth.Year, reportMonth.Month, d).ToString("ddd"));
+            cell.CellStyle = dowDayStyle;
+        }
+
+        // Present block spans 3 columns visually without merge
+        int presentStart = col;
+
+        ICellStyle secPresentCenteredStyle = workbook.CreateCellStyle();
+        secPresentCenteredStyle.CloneStyleFrom(secPresentStyle);
+        secPresentCenteredStyle.Alignment = HorizontalAlignment.CenterSelection;
+
+        for (int i = 0; i < 3 && col < dt.Columns.Count; i++, col++)
+        {
+            ICell cell = dowRow.CreateCell(col);
+            cell.CellStyle = secPresentCenteredStyle;
+        }
+
+        dowRow.GetCell(presentStart).SetCellValue("Present");
+
+        // Absent block
+        if (col < dt.Columns.Count)
+        {
+            ICell cell = dowRow.CreateCell(col++);
+            cell.SetCellValue("Absent");
+            cell.CellStyle = secAbsentStyle;
+        }
+
+        // Total block
+        if (col < dt.Columns.Count)
+        {
+            ICell cell = dowRow.CreateCell(col++);
+            cell.SetCellValue("Total");
+            cell.CellStyle = secDaysStyle;
+        }
+
+        IRow headerRow = sheet.CreateRow(rowIndex++);
+        headerRow.HeightInPoints = 22;
+
+        for (int i = 0; i < dt.Columns.Count; i++)
+        {
+            string header = dt.Columns[i].ColumnName;
+            ICell cell = headerRow.CreateCell(i);
+            cell.SetCellValue(header);
+
             int n;
-            return int.TryParse(s, out n) && n >= 1 && n <= 31;
-        };
+            bool isDay = int.TryParse(header, out n) && header.Length == 2 && n >= 1 && n <= 31;
 
-        if (gv.HeaderRow != null)
+            if (isDay)
+                cell.CellStyle = headerDayStyle;
+            else if (header.Equals("Present", StringComparison.OrdinalIgnoreCase) ||
+                     header.Equals("Total P/T", StringComparison.OrdinalIgnoreCase))
+                cell.CellStyle = secPresentStyle;
+            else if (header.Equals("Tardy", StringComparison.OrdinalIgnoreCase))
+                cell.CellStyle = headerTardyStyle;
+            else if (header.Equals("Absent", StringComparison.OrdinalIgnoreCase))
+                cell.CellStyle = headerAbsentStyle;
+            else if (header.Equals("Days", StringComparison.OrdinalIgnoreCase))
+                cell.CellStyle = headerDaysStyle;
+            else
+                cell.CellStyle = headerFixedStyle;
+        }
+
+        for (int i = 0; i < dt.Rows.Count; i++)
         {
-            for (int i = 0; i < gv.HeaderRow.Cells.Count; i++)
+            IRow row = sheet.CreateRow(rowIndex++);
+            row.HeightInPoints = 18;
+
+            for (int j = 0; j < dt.Columns.Count; j++)
             {
-                var hc = gv.HeaderRow.Cells[i];
-                string text = System.Web.HttpUtility.HtmlDecode(hc.Text ?? "").Trim();
+                string header = dt.Columns[j].ColumnName;
+                string value = dt.Rows[i][j] == DBNull.Value ? "" : dt.Rows[i][j].ToString();
 
-                if (leftAlignedHeaders.Contains(text)) LeftAlign(hc); else Center(hc);
+                ICell cell = row.CreateCell(j);
+                cell.SetCellValue(value);
 
-                if (IsTwoDigitDay(text))
-                {
-                    SetWidth(hc, dayWidth); PaintBg(hc, cDayHdr);
-                }
-                else if (text.Equals("Present", StringComparison.OrdinalIgnoreCase))
-                {
-                    SetWidth(hc, sumWidth); PaintBg(hc, cPresent);
-                }
-                else if (text.Equals("Tardy", StringComparison.OrdinalIgnoreCase))
-                {
-                    SetWidth(hc, sumWidth); PaintBg(hc, cTardy);
-                }
-                else if (text.Equals("Total P/T", StringComparison.OrdinalIgnoreCase))
-                {
-                    SetWidth(hc, sumWidth); PaintBg(hc, cTotalPT);
-                }
-                else if (text.Equals("Absent", StringComparison.OrdinalIgnoreCase))
-                {
-                    SetWidth(hc, sumWidth); PaintBg(hc, cAbsent);
-                }
-                else if (text.Equals("Days", StringComparison.OrdinalIgnoreCase))
-                {
-                    SetWidth(hc, sumWidth); PaintBg(hc, cTotalDays);
-                }
-                else
-                {
-                    int w; if (!leftWidths.TryGetValue(text, out w)) w = 140;
-                    SetWidth(hc, w);
-                }
+                int n;
+                bool isDay = int.TryParse(header, out n) && header.Length == 2 && n >= 1 && n <= 31;
 
-                AddStyle(hc, "border:1.5pt solid #6b7280;padding:5px 7px;font-weight:bold;white-space:nowrap;");
+                if (isDay)
+                {
+                    string v = value.Trim().ToUpperInvariant();
+                    if (v == "P" || v == "PR" || v == "PRESENT") cell.CellStyle = dayPresentStyle;
+                    else if (v == "T" || v == "TR" || v == "TARDY") cell.CellStyle = dayTardyStyle;
+                    else if (v == "A" || v == "ABSENT") cell.CellStyle = dayAbsentStyle;
+                    else cell.CellStyle = dayNeutralStyle;
+                }
+                else if (header.Equals("Present", StringComparison.OrdinalIgnoreCase)) cell.CellStyle = dataPresentStyle;
+                else if (header.Equals("Tardy", StringComparison.OrdinalIgnoreCase)) cell.CellStyle = dataTardyStyle;
+                else if (header.Equals("Total P/T", StringComparison.OrdinalIgnoreCase)) cell.CellStyle = dataTotalPTStyle;
+                else if (header.Equals("Absent", StringComparison.OrdinalIgnoreCase)) cell.CellStyle = dataAbsentSumStyle;
+                else if (header.Equals("Days", StringComparison.OrdinalIgnoreCase)) cell.CellStyle = dataDaysStyle;
+                else if (leftAlignedHeaders.Contains(header)) cell.CellStyle = dataLeftStyle;
+                else cell.CellStyle = dataCenterStyle;
             }
         }
 
-        foreach (GridViewRow r in gv.Rows)
+        for (int i = 0; i < dt.Columns.Count; i++)
         {
-            for (int i = 0; i < r.Cells.Count; i++)
+            string colName = dt.Columns[i].ColumnName;
+
+            int maxLength = colName.Length;
+
+            for (int r = 0; r < dt.Rows.Count; r++)
             {
-                var c = r.Cells[i];
-                AddStyle(c, "height:22px;");
-
-                string headerText = gv.HeaderRow != null
-                    ? System.Web.HttpUtility.HtmlDecode((gv.HeaderRow.Cells[i].Text ?? "")).Trim()
-                    : "";
-                string val = (c.Text ?? "").Trim().ToUpperInvariant();
-
-                if (leftAlignedHeaders.Contains(headerText)) LeftAlign(c); else Center(c);
-
-                if (IsTwoDigitDay(headerText))
-                {
-                    if (val == "P" || val == "PR" || val == "PRESENT") PaintBg(c, cPresent);
-                    else if (val == "T" || val == "TR" || val == "TARDY") PaintBg(c, cTardy);
-                    else if (val == "A" || val == "ABSENT") PaintBg(c, cAbsent);
-                    else PaintBg(c, cNeutralDay);
-                }
-                else if (headerText.Equals("Present", StringComparison.OrdinalIgnoreCase)) PaintBg(c, cPresent);
-                else if (headerText.Equals("Tardy", StringComparison.OrdinalIgnoreCase)) PaintBg(c, cTardy);
-                else if (headerText.Equals("Total P/T", StringComparison.OrdinalIgnoreCase)) PaintBg(c, cTotalPT);
-                else if (headerText.Equals("Absent", StringComparison.OrdinalIgnoreCase)) PaintBg(c, cAbsent);
-                else if (headerText.Equals("Days", StringComparison.OrdinalIgnoreCase)) PaintBg(c, cTotalDays);
-
-                AddStyle(c, "border:1pt solid #9aa0a6;padding:4px 6px;white-space:nowrap;mso-number-format:\"@\";");
+                string cellValue = dt.Rows[r][i] == DBNull.Value ? "" : dt.Rows[r][i].ToString();
+                if (cellValue.Length > maxLength)
+                    maxLength = cellValue.Length;
             }
+
+            int width = (maxLength + 2) * 256;
+
+            if (colName == "Student") width = Math.Max(width, 25 * 256);
+            else if (colName == "Staffing") width = Math.Max(width, 15 * 256);
+            else if (colName == "Program") width = Math.Max(width, 18 * 256);
+            else if (colName == "4010" || colName == "1306") width = Math.Max(width, 10 * 256);
+            else if (colName == "District") width = Math.Max(width, 16 * 256);
+            else if (colName == "LEA Representative") width = Math.Max(width, 20 * 256);
+            else if (colName == "Send Email") width = Math.Max(width, 18 * 256);
+            else if (colName == "Room") width = Math.Max(width, 10 * 256);
+            else if (colName == "Present" || colName == "Tardy" || colName == "Total P/T" || colName == "Absent" || colName == "Days")
+                width = Math.Max(width, 12 * 256);
+            else
+                width = Math.Max(width, 8 * 256);
+
+            if (width > 60 * 256)
+                width = 60 * 256;
+
+            sheet.SetColumnWidth(i, width);
         }
 
-        Response.Clear();
-        Response.Buffer = true;
-        Response.Charset = "utf-8";
-        Response.ContentEncoding = System.Text.Encoding.UTF8;
-        Response.ContentType = "application/vnd.ms-excel";
-        string fname = "MPA_School_Attendance_" + (txtMonth.Text ?? DateTime.Today.ToString("yyyy-MM")) + ".xls";
-        Response.AddHeader("Content-Disposition", "attachment;filename=" + fname);
+        sheet.CreateFreezePane(0, 4);
 
-        using (var sw = new System.IO.StringWriter())
-        using (var htw = new HtmlTextWriter(sw))
+        response.Clear();
+        response.ClearContent();
+        response.ClearHeaders();
+        response.Buffer = true;
+        response.Charset = "";
+        response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+        if (!string.IsNullOrWhiteSpace(token))
         {
-            htw.Write("<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>");
-            htw.Write("<style>table{border-collapse:collapse}th,td{white-space:nowrap;text-align:center;vertical-align:middle;mso-number-format:\"@\"}</style>");
-            htw.Write("</head><body>");
-            gv.RenderControl(htw);
-            htw.Write("</body></html>");
-            Response.Write(sw.ToString());
+            response.AppendHeader("Set-Cookie", "ExportDone=" + token + "; path=/; SameSite=Lax");
         }
-        ScriptManager.RegisterStartupScript(this, GetType(), "hideLoader", "setTimeout(function(){ if(window.hideLoader) hideLoader(); },1000);", true);
-        Response.Flush();
-        Response.End();
+
+        response.AddHeader("Content-Disposition", "attachment; filename=" + Server.UrlEncode(filename));
+        response.Cache.SetCacheability(HttpCacheability.NoCache);
+        response.Cache.SetNoStore();
+
+        byte[] fileBytes;
+        using (MemoryStream ms = new MemoryStream())
+        {
+            workbook.Write(ms);
+            fileBytes = ms.ToArray();
+        }
+
+        response.BinaryWrite(fileBytes);
+        response.Flush();
+        response.SuppressContent = true;
+        HttpContext.Current.ApplicationInstance.CompleteRequest();
     }
 
     public override void VerifyRenderingInServerForm(Control control)
@@ -634,5 +668,52 @@ public partial class Administration_StudentAttendance : System.Web.UI.Page
           + "})();";
         ScriptManager.RegisterStartupScript(this, GetType(), key, js, true);
     }
+
+
+    private ICellStyle CreateStyle(
+    IWorkbook wb,
+    HorizontalAlignment hAlign,
+    VerticalAlignment vAlign,
+    bool bold,
+    short fontSize,
+    NPOI.SS.UserModel.BorderStyle border,
+    string hexFill = null,
+    bool wrap = false)
+    {
+        ICellStyle style = wb.CreateCellStyle();
+        style.Alignment = hAlign;
+        style.VerticalAlignment = vAlign;
+        style.BorderBottom = border;
+        style.BorderTop = border;
+        style.BorderLeft = border;
+        style.BorderRight = border;
+        style.WrapText = wrap;
+
+        if (!string.IsNullOrEmpty(hexFill))
+        {
+            XSSFCellStyle xstyle = (XSSFCellStyle)style;
+            xstyle.SetFillForegroundColor(MakeColor(hexFill));
+            style.FillPattern = FillPattern.SolidForeground;
+        }
+
+        IFont font = wb.CreateFont();
+        font.IsBold = bold;
+        font.FontHeightInPoints = fontSize;
+        style.SetFont(font);
+
+        return style;
+    }
+
+    private XSSFColor MakeColor(string hex)
+    {
+        hex = hex.Replace("#", "");
+        return new XSSFColor(new byte[]
+    {
+        Convert.ToByte(hex.Substring(0, 2), 16),
+        Convert.ToByte(hex.Substring(2, 2), 16),
+        Convert.ToByte(hex.Substring(4, 2), 16)
+    });
+    }
+
 
 }

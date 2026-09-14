@@ -39,10 +39,12 @@
             CausesValidation="false"
             UseSubmitBehavior="true"
             OnClientClick="return startExport();" />
+
+              <asp:HiddenField ID="hidExportToken" runat="server" />
+
         </div>
       </div>
     </asp:Panel>
-    <iframe id="downloadMonitor" style="display:none;"></iframe>
     <style>
 
     .sheet { 
@@ -271,7 +273,6 @@
    </div>
     <script type="text/javascript">
         (function () {
-            // Ensure the loader element exists; create it if missing
             function ensureLoaderEl() {
                 var el = document.getElementById('pageLoader');
                 if (!el) {
@@ -297,45 +298,77 @@
                 return el;
             }
 
-            // Expose globals used by OnClientClick and server scripts
             window.showLoader = function () {
                 var el = ensureLoaderEl();
                 el.style.display = 'block';
-                return true; // keep postback going
+                return true;
             };
+
             window.hideLoader = function () {
                 var el = document.getElementById('pageLoader');
                 if (el) el.style.display = 'none';
             };
 
-            // If UpdatePanel is present, wire PRM events
             if (window.Sys && Sys.WebForms && Sys.WebForms.PageRequestManager) {
                 var prm = Sys.WebForms.PageRequestManager.getInstance();
                 prm.add_initializeRequest(function () { window.showLoader(); });
                 prm.add_endRequest(function () { window.hideLoader(); });
             }
 
-            // Safety: hide after full load
             window.addEventListener('load', function () { window.hideLoader(); });
         })();
 
-        function startExport() {
-
-            if (window.showLoader)
-                showLoader();
-
-            var monitor = document.getElementById("downloadMonitor");
-
-            // detect when server response finishes
-            monitor.onload = function () {
-                if (window.hideLoader)
-                    hideLoader();
-            };
-
-            // request a small completion ping
-            monitor.src = "DownloadMonitor.aspx?t=" + new Date().getTime();
-
-            return true; // allow export postback
+        function getCookieValue(name) {
+            var cookies = document.cookie ? document.cookie.split(';') : [];
+            for (var i = 0; i < cookies.length; i++) {
+                var c = cookies[i].replace(/^\s+|\s+$/g, '');
+                if (c.indexOf(name + '=') === 0) {
+                    return c.substring((name + '=').length);
+                }
+            }
+            return null;
         }
+
+        function startExport() {
+            if (window.showLoader) {
+                window.showLoader();
+            }
+
+            document.cookie = "ExportDone=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+            var token = new Date().getTime().toString();
+            var tokenField = document.getElementById("<%= hidExportToken.ClientID %>");
+        if (tokenField) {
+            tokenField.value = token;
+        }
+
+        var attempts = 0;
+        var maxAttempts = 120;
+
+        var timer = window.setInterval(function () {
+            attempts++;
+
+            var cookieValue = getCookieValue("ExportDone");
+            if (cookieValue === token) {
+                window.clearInterval(timer);
+
+                document.cookie = "ExportDone=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+                if (window.hideLoader) {
+                    window.hideLoader();
+                }
+                return;
+            }
+
+            if (attempts >= maxAttempts) {
+                window.clearInterval(timer);
+                if (window.hideLoader) {
+                    window.hideLoader();
+                }
+            }
+        }, 500);
+
+        return true;
+    }
     </script>
 </asp:Content>
