@@ -77,7 +77,7 @@ public partial class Administration_StudentAttendance : System.Web.UI.Page
             reportMonth = new DateTime(reportMonth.Year, reportMonth.Month, 1);
             txtMonth.Text = reportMonth.ToString("yyyy-MM");
             csrplog.ReportName = "Attendance Report";
-            csrplog.UserId = sess.LoginId;
+            csrplog.UserId = oSession.LoginId;
             csrplog.ServerID = Environment.MachineName;
             csrplog.Parameters = "ReportMonth=" + reportMonth.ToString();
 
