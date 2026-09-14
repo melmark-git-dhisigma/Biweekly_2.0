@@ -4737,7 +4737,7 @@
                         </li>
 
                         <li class="box3">
-                            <a href="#" onclick="ShowReminder();">Attendance</a>
+                            <a href="#" onclick="ShowReminder(); loadCheckInIfNeeded();">Attendance</a>
                             <div class="checkPopUp" style="width:860px;">
                                 <hr />
 
@@ -4746,7 +4746,16 @@
                                         <div id="Div3">
                                             <a id="A3" class="close sprited" href="#">
                                                 <img onclick="javascript: $('.checkPopUp').slideToggle('slow');" src="../Administration/images/closebtn.png" style="border: 0px;" width="24px" /></a>
-                                            <iframe id="stCheckIn" src="StudentCheckin.aspx" height="380px" width="100%" scrolling="no" frameborder="0"></iframe>
+                                            <div id="stCheckInLoader" style="display:none; text-align:center; padding:40px 0;">
+											    <div style="display:inline-block; border:4px solid #ddd; border-top:4px solid #0D668E;
+											                border-radius:50%; width:36px; height:36px; animation:checkinSpin 0.8s linear infinite;"></div>
+											    <p style="margin-top:10px; color:#0D668E; font-family:Arial; font-size:13px;">Loading Attendance...</p>
+											</div>
+											<style>
+											    @keyframes checkinSpin { to { transform: rotate(360deg); } }
+											</style>
+											<iframe id="stCheckIn" src="" height="380px" width="100%"
+											        scrolling="no" frameborder="0" style="display:none;"></iframe>
                                             <div style="text-align: right;">
                                             </div>
                                         </div>
@@ -4886,9 +4895,30 @@
          
                 }
                 }
-)();
+                )();
+
+
+                var checkInLoaded = false;
+
+			    function loadCheckInIfNeeded() {
+			        if (checkInLoaded) return; // Already loaded — do nothing
+
+			        var iframe = document.getElementById('stCheckIn');
+			        var loader = document.getElementById('stCheckInLoader');
+
+			        loader.style.display = 'block'; // Show spinner
+			        iframe.style.display = 'none';  // Hide iframe until ready
+
+			        iframe.onload = function () {
+			            loader.style.display = 'none';  // Hide spinner
+			            iframe.style.display = 'block'; // Show iframe
+			            checkInLoaded = true;           // Never reload again
+			        };
+
+			        iframe.src = 'StudentCheckin.aspx'; // Trigger load NOW
+			    }
  
- </script>
+            </script>
             <!-- dashboard container panel -->
             <div id="db-container">
                 <!-- header -->
