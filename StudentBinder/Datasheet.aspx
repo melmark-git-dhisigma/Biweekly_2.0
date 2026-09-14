@@ -990,7 +990,7 @@
                  var ahr = parseInt(hrvalue);                
                 var amin = parseInt(minvalue);
                 var asec = parseInt(secvalue);
-                if ((ahr > 24) || (amin > 59) || (asec > 59))                    
+                if ((ahr > 23) || (amin > 59) || (asec > 59))                    
                      {
                     alert("Keep Time Format");
                     return;
@@ -1446,7 +1446,7 @@
                 var ahr = parseInt(hrvalue);
                 var amin = parseInt(minvalue);
                 var asec = parseInt(secvalue);
-                if ((ahr > 24) || (amin > 59) || (asec > 59)) {
+                if ((ahr > 23) || (amin > 59) || (asec > 59)) {
                     alert("Keep Time Format");
                     return;
                 }

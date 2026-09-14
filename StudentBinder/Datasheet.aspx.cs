@@ -66,13 +66,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         Session["promptid"] = 0;
 
         Prevsess = (clsSession)Session["PreSession"];
-        preid = Convert.ToInt16(Session["Spreid"]);
+        preid = ToInt16WithLog(Session["Spreid"], "Session[\"Spreid\"]");
         preuser = Session["Spreuser"].ToString();
-        SessStudentid = Convert.ToInt16(Session["Sprestid"]);
-        PreClassid = Convert.ToInt16(Session["SpreClsid"]);
+        SessStudentid = ToInt16WithLog(Session["Sprestid"], "Session[\"Sprestid\"]");
+        PreClassid = ToInt16WithLog(Session["SpreClsid"], "Session[\"SpreClsid\"]");
         Sessstname = Session["Sprestname"].ToString();
 
-        int printid = Convert.ToInt32(Request.QueryString["printid"]);
+        int printid = ToInt32WithLog(Request.QueryString["printid"], "Request.QueryString[\"printid\"]");
         if (printid == 1)
         {
             btnPriorSessn.Visible = false;
@@ -98,7 +98,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
             Session["totalcorrectincorrect"] = "";
             if (Request.QueryString["pageid"] != null)
             {
-                oTemp.TemplateId = Convert.ToInt32(Request.QueryString["pageid"]);
+                oTemp.TemplateId = ToInt32WithLog(Request.QueryString["pageid"], "Request.QueryString[\"pageid\"]");
             }
             else
             {
@@ -137,7 +137,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 object objSessHdrID = oData.FetchValue(strqry);
                 if (objSessHdrID != null)
                 {
-                    oTemp.TemplateId = Convert.ToInt32(objSessHdrID);
+                    oTemp.TemplateId = ToInt32WithLog(objSessHdrID, "objSessHdrID");
 
                 }
 
@@ -161,18 +161,18 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     }
                     if (loadtime != null)
                     {
-                        if (loadtime.ContainsKey((Convert.ToInt32(ViewState["StdtSessHdr"]))))
+                        if (loadtime.ContainsKey((ToInt32WithLog(ViewState["StdtSessHdr"], "ViewState[\"StdtSessHdr\"]1"))))
                         {
-                            loadtime[(Convert.ToInt32(ViewState["StdtSessHdr"]))] = modifieddate;
+                            loadtime[(ToInt32WithLog(ViewState["StdtSessHdr"], "ViewState[\"StdtSessHdr\"]2"))] = modifieddate;
                         }
                         else {
-                            loadtime.Add((Convert.ToInt32(ViewState["StdtSessHdr"])), modifieddate);
+                            loadtime.Add((ToInt32WithLog(ViewState["StdtSessHdr"], "ViewState[\"StdtSessHdr\"]3")), modifieddate);
                         }
                     }
                     else
                     {
                         loadtime = new Dictionary<int, string>();
-                        loadtime.Add((Convert.ToInt32(ViewState["StdtSessHdr"])), modifieddate);
+                        loadtime.Add((ToInt32WithLog(ViewState["StdtSessHdr"], "ViewState[\"StdtSessHdr\"]4")), modifieddate);
 
                     }
                     Session["HdrModifiedDate"] = loadtime;
@@ -182,7 +182,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 DatasheetKey = "DataSht_Sess-" + hdnTemplateId.Value.ToString();
                 Session[DatasheetKey] = oDS;
                 ViewState["IsHistory"] = true;
-                ViewState["StdtSessHdr"] = Convert.ToInt32(Request.QueryString["SessHdrID"]);
+                ViewState["StdtSessHdr"] = ToInt32WithLog(Request.QueryString["SessHdrID"], "Request.QueryString[\"SessHdrID\"]1");
                 object objIOAInd = oData.FetchValue("SELECT IOAInd FROM StdtSessionHdr WHERE StdtSessionHdrId=" + Request.QueryString["SessHdrID"].ToString());
                 if (objIOAInd != null)
                 {
@@ -207,7 +207,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                     setTempData(Request.QueryString["SessHdrID"]);
 
                     //generateSheet();                   
-                    LoadData(Convert.ToInt32(Request.QueryString["SessHdrID"]), false);
+                    LoadData(ToInt32WithLog(Request.QueryString["SessHdrID"], "Request.QueryString[\"SessHdrID\"]2"), false);
 
                     loadSetsOverride();
 
@@ -268,7 +268,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         {
             bool ContrlEnable = true;
             DatasheetKey = "DataSht_Sess-" + hdnTemplateId.Value.ToString();
-            oTemp.TemplateId = Convert.ToInt32(hdnTemplateId.Value);
+            oTemp.TemplateId = ToInt32WithLog(hdnTemplateId.Value, "hdnTemplateId.Value");
             oDS = (clsDataSheet)Session[DatasheetKey];
             if (oDS != null)
                 if (oDS.dtColumns != null)
@@ -394,7 +394,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         hdnSessionHdr.Value = Convert.ToString(ViewState["StdtSessHdr"]);
 
         string sqlStrchk = "SELECT isnull(Bannerstatus,2) from DSTempHdr WHERE StudentId= " + oSession.StudentId + " AND DSTempHdrId = " + oTemp.TemplateId;
-        int chk = Convert.ToInt32(oData.FetchValue(sqlStrchk));
+        int chk = ToInt32WithLog(oData.FetchValue(sqlStrchk), "oData.FetchValue(sqlStrchk)");
         if (chk == 1)
         {
             banner.Visible = true;
@@ -433,7 +433,60 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         oSession = clsGeneralSchk.sessioncheck(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, PreClassid, Sessstname, Pagepath);
                 
     }
+    private int ToInt32WithLog(object value, string parameterName)
+    {
+        try
+        {
+            return Convert.ToInt32(value);
+        }
+        catch (Exception ex)
+        {
+            try
+            {
+                ClsErrorLog log = new ClsErrorLog();
 
+                log.WriteToLog(
+                    "Datasheet Convert.ToInt32 Exception" +
+                    "\r\nParameter: " + parameterName +
+                    "\r\nValue: '" + Convert.ToString(value) + "'" +
+                    "\r\nURL: " + Request.Url +
+                    "\r\nQueryString: " + Request.QueryString +
+                    "\r\nException: " + ex.ToString());
+            }
+            catch
+            {
+            }
+
+            throw;
+        }
+    }
+    private short ToInt16WithLog(object value, string parameterName)
+    {
+        try
+        {
+            return Convert.ToInt16(value);
+        }
+        catch (Exception ex)
+        {
+            try
+            {
+                ClsErrorLog log = new ClsErrorLog();
+
+                log.WriteToLog(
+                    "Datasheet Convert.ToInt16 Exception" +
+                    "\r\nParameter: " + parameterName +
+                    "\r\nValue: '" + Convert.ToString(value) + "'" +
+                    "\r\nURL: " + Request.Url +
+                    "\r\nQueryString: " + Request.QueryString +
+                    "\r\nException: " + ex.ToString());
+            }
+            catch
+            {
+            }
+
+            throw;
+        }
+    }
     public string getFormulae(string calId)
     {
 
