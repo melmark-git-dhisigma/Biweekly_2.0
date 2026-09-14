@@ -533,6 +533,16 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
         {
 
             sess = (clsSession)Session["UserSession"];
+            if (sess == null)
+            {
+                string errorLogFilePath = HttpContext.Current.Server.MapPath("~/ErrorLog/log.txt");
+                string errorLogMessage = string.Format("[{0}]\nError: {1}\n{2}\n{3}\n{4}",
+                DateTime.Now, "StudentCheckin Null Reference Log", "Null Session", "Null Variable = null ", Environment.NewLine);
+                File.AppendAllText(errorLogFilePath, errorLogMessage);
+                ScriptManager.RegisterStartupScript(this, this.GetType(),"redirect",
+                    "window.top.location = '/Administration/Error.aspx?Error=Session expired';",true);
+                return;
+            }
             objData = new clsData();
             string DayNRes = (type == "1") ? " OR c.ResidenceInd='0' " : "";
             string hidVal = (hidSetVal != null) ? (hidSetVal.Value ?? "") : "";
