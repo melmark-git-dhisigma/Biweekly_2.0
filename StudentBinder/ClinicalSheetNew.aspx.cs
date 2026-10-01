@@ -331,105 +331,105 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
         //System.Data.DataTable dtNew5;
         //System.Data.DataTable dtNew6;
 
-        String Beh = "", Evnt = "", concatStrng = "";
-        //foreach (DataRow row in dtNew4.Rows)
-        //{
-        //    if (row != null)
-        //    {
-        //        String Behav = "SELECT Behaviour  from BehaviourDetails where MeasurementId =" + row["MeasurementId"];
-        //        dtNew5 = objData.ReturnDataTable(Behav, false);
-        //        Beh = Convert.ToString(dtNew5.Rows[0]["Behaviour"]);
+        String Beh = "", Evnt = "", concatStrng="";
+            //foreach (DataRow row in dtNew4.Rows)
+            //{
+            //    if (row != null)
+            //    {
+            //        String Behav = "SELECT Behaviour  from BehaviourDetails where MeasurementId =" + row["MeasurementId"];
+            //        dtNew5 = objData.ReturnDataTable(Behav, false);
+            //        Beh = Convert.ToString(dtNew5.Rows[0]["Behaviour"]);
 
-        //        string queryfilter = " SELECT STUFF((select '; ' + CONVERT(VARCHAR(50), outr.EvntTs,101)+','+ outr.eventname from( SELECT * FROM (SELECT * FROM  ((SELECT  SE.MeasurementId, SE.StdtSessEventId,  SE.EventName, " +
-        //      " SE.StdtSessEventType, CONVERT(CHAR(10), SE.EvntTs,101) AS EvntTs, " +
-        //      "  B.Behaviour FROM  [StdtSessEvent] SE LEFT JOIN LessonPlan L ON SE.LessonPlanId = L.LessonPlanId " +
-        //      "LEFT JOIN BehaviourDetails B ON B.MeasurementId=SE.MeasurementId WHERE EventType='EV' AND SE.StudentId=" + sess.StudentId + " AND SE.StdtSessEventType<>'Medication') " +
-        //      //"UNION ALL (SELECT NULL AS MeasurementId, NULL AS StdtSessEventId,  'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" +
-        //      //"+ ( " +
-        //      //"        (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
-        //      //"        FROM   [user] US" +
-        //      //"       WHERE  US.userid = (SELECT" +
-        //      //"             createdby" +
-        //      //"                         FROM" +
-        //      //"           stdtsessionhdr Hdr" +
-        //      //"                       WHERE" +
-        //      //"         Hdr.stdtsessionhdrid = SH.ioasessionhdrid" +
-        //      //"        AND SH.ioaind = 'Y'))" +
-        //      //" + '/'" +
-        //      //" + (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
-        //      //"   FROM   [user] US" +
-        //      //"  WHERE  SH.ioauserid = US.userid) ) AS EventName," +
-        //      //" 'Arrow notes'                         AS" +
-        //      //" StdtSessEventType," +
-        //      //"CONVERT(CHAR(10), SH.endts, 101)      AS EvntTs," +
-        //      //"NULL                                  AS Behaviour" +
-        //      //" FROM   stdtsessionhdr SH" +
-        //      //"       LEFT JOIN lessonplan" +
-        //      //"             ON SH.lessonplanid = lessonplan.lessonplanid" +
-        //      //" WHERE  SH.ioaperc IS NOT NULL" +
-        //      //"      AND SH.ioaind = 'Y'" +
-        //      //"     AND SH.sessionstatuscd = 'S'" +
-        //      //"    AND SH.studentid =" + sess.StudentId + ")" +
-        //      "UNION ALL (SELECT  BIOA.MeasurementId, NULL AS StdtSessEventId,  'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" +
-        //      "+ CASE WHEN BIOA.normalbehaviorid IS NULL THEN ((SELECT" +
-        //      "      TOP 1" +
-        //      "     Rtrim(" +
-        //      "    Ltrim(Upper(" +
-        //      "   US.userinitial))) FROM behaviour BH INNER JOIN [user] US" +
-        //      "  ON" +
-        //      " BH.createdby" +
-        //      " =" +
-        //      " US.userid WHERE BH.createdon BETWEEN" +
-        //        " Dateadd(minute, -5, BIOA.createdon)" +
-        //        " AND" +
-        //        " BIOA.createdon ORDER BY BH.createdon DESC)+'/'+ (SELECT" +
-        //        " TOP 1" +
-        //        " Rtrim(Ltrim(Upper(US.userinitial))) FROM" +
-        //        " behaviorioadetails BI" +
-        //        " INNER" +
-        //        " JOIN [user]" +
-        //        " US ON BI.createdby =" +
-        //        " US.userid WHERE BI.createdon=BIOA.createdon ORDER BY" +
-        //        " BI.createdon DESC)" +
-        //        " )" +
-        //        " ELSE ((" +
-        //        " SELECT" +
-        //        " Rtrim(Ltrim(Upper(US.userinitial))) FROM behaviour BH" +
-        //        " INNER" +
-        //        " JOIN [user]" +
-        //        " US ON" +
-        //        " BH.createdby = US.userid WHERE" +
-        //        " BIOA.normalbehaviorid=BH.behaviourid)+'/'+ (" +
-        //        " SELECT Rtrim(" +
-        //        " Ltrim(Upper(US.userinitial))) FROM behaviorioadetails BI" +
-        //        " INNER" +
-        //        " JOIN" +
-        //        " [user] US ON" +
-        //        " BI.createdby = US.userid INNER JOIN behaviour BH ON" +
-        //        " BH.behaviourid=BI.normalbehaviorid WHERE" +
-        //        " BIOA.normalbehaviorid=BH.behaviourid))" +
-        //        " END " +
-        //      " AS EventName, " +
-        //      "'Arrow notes' AS StdtSessEventType,  CONVERT(CHAR(10), BIOA.CreatedOn,101) AS EvntTs,  " +
-        //      " BHD.Behaviour FROM BehaviorIOADetails BIOA LEFT JOIN BehaviourDetails BHD ON BIOA.MeasurementId=BHD.MeasurementId " +
-        //      "WHERE BIOA.StudentId=" + sess.StudentId + " AND IOAPerc IS NOT NULL AND BIOA.ActiveInd='A') )IOA ) " +
-        //      "  ad " +
-        //      " WHERE  ( ( ad.behaviour IS  NULL " +
-        //      " AND ad.measurementid = 0 )" +
-        //      "OR ad.behaviour = (SELECT TOP 1 behaviour " +
-        //      "FROM   behaviourdetails " +
-        //      "WHERE  measurementid = " + row["MeasurementId"] + ") ) " +
-        //      " AND ad.stdtsesseventtype IN( 'Arrow notes' ) " +
-        //      " AND CONVERT(DATE, ad.evntts) >=  cast('" + dtst.ToString("MM/dd/yyyy") + "' as date)" +
-        //      " AND CONVERT(DATE, ad.evntts) <=  cast('" + dted.ToString("MM/dd/yyyy") + "' as date)" +
-        //      " )outr " +
-        //       " FOR XML PATH('')),1,1,'') eventname ";
-        //        dtNew6 = objData.ReturnDataTable(queryfilter, false);
-        //        if (Convert.ToString(dtNew6.Rows[0]["eventname"]) != "" && Convert.ToString(dtNew6.Rows[0]["eventname"]) != null)
-        //            concatStrng += "<b>" + Beh + " : " + "</b>" + Convert.ToString(dtNew6.Rows[0]["eventname"]) + "<br><br>";
-        //    }
+            //        string queryfilter = " SELECT STUFF((select '; ' + CONVERT(VARCHAR(50), outr.EvntTs,101)+','+ outr.eventname from( SELECT * FROM (SELECT * FROM  ((SELECT  SE.MeasurementId, SE.StdtSessEventId,  SE.EventName, " +
+            //      " SE.StdtSessEventType, CONVERT(CHAR(10), SE.EvntTs,101) AS EvntTs, " +
+            //      "  B.Behaviour FROM  [StdtSessEvent] SE LEFT JOIN LessonPlan L ON SE.LessonPlanId = L.LessonPlanId " +
+            //      "LEFT JOIN BehaviourDetails B ON B.MeasurementId=SE.MeasurementId WHERE EventType='EV' AND SE.StudentId=" + sess.StudentId + " AND SE.StdtSessEventType<>'Medication') " +
+            //      //"UNION ALL (SELECT NULL AS MeasurementId, NULL AS StdtSessEventId,  'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" +
+            //      //"+ ( " +
+            //      //"        (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
+            //      //"        FROM   [user] US" +
+            //      //"       WHERE  US.userid = (SELECT" +
+            //      //"             createdby" +
+            //      //"                         FROM" +
+            //      //"           stdtsessionhdr Hdr" +
+            //      //"                       WHERE" +
+            //      //"         Hdr.stdtsessionhdrid = SH.ioasessionhdrid" +
+            //      //"        AND SH.ioaind = 'Y'))" +
+            //      //" + '/'" +
+            //      //" + (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
+            //      //"   FROM   [user] US" +
+            //      //"  WHERE  SH.ioauserid = US.userid) ) AS EventName," +
+            //      //" 'Arrow notes'                         AS" +
+            //      //" StdtSessEventType," +
+            //      //"CONVERT(CHAR(10), SH.endts, 101)      AS EvntTs," +
+            //      //"NULL                                  AS Behaviour" +
+            //      //" FROM   stdtsessionhdr SH" +
+            //      //"       LEFT JOIN lessonplan" +
+            //      //"             ON SH.lessonplanid = lessonplan.lessonplanid" +
+            //      //" WHERE  SH.ioaperc IS NOT NULL" +
+            //      //"      AND SH.ioaind = 'Y'" +
+            //      //"     AND SH.sessionstatuscd = 'S'" +
+            //      //"    AND SH.studentid =" + sess.StudentId + ")" +
+            //      "UNION ALL (SELECT  BIOA.MeasurementId, NULL AS StdtSessEventId,  'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" +
+            //      "+ CASE WHEN BIOA.normalbehaviorid IS NULL THEN ((SELECT" +
+            //      "      TOP 1" +
+            //      "     Rtrim(" +
+            //      "    Ltrim(Upper(" +
+            //      "   US.userinitial))) FROM behaviour BH INNER JOIN [user] US" +
+            //      "  ON" +
+            //      " BH.createdby" +
+            //      " =" +
+            //      " US.userid WHERE BH.createdon BETWEEN" +
+            //        " Dateadd(minute, -5, BIOA.createdon)" +
+            //        " AND" +
+            //        " BIOA.createdon ORDER BY BH.createdon DESC)+'/'+ (SELECT" +
+            //        " TOP 1" +
+            //        " Rtrim(Ltrim(Upper(US.userinitial))) FROM" +
+            //        " behaviorioadetails BI" +
+            //        " INNER" +
+            //        " JOIN [user]" +
+            //        " US ON BI.createdby =" +
+            //        " US.userid WHERE BI.createdon=BIOA.createdon ORDER BY" +
+            //        " BI.createdon DESC)" +
+            //        " )" +
+            //        " ELSE ((" +
+            //        " SELECT" +
+            //        " Rtrim(Ltrim(Upper(US.userinitial))) FROM behaviour BH" +
+            //        " INNER" +
+            //        " JOIN [user]" +
+            //        " US ON" +
+            //        " BH.createdby = US.userid WHERE" +
+            //        " BIOA.normalbehaviorid=BH.behaviourid)+'/'+ (" +
+            //        " SELECT Rtrim(" +
+            //        " Ltrim(Upper(US.userinitial))) FROM behaviorioadetails BI" +
+            //        " INNER" +
+            //        " JOIN" +
+            //        " [user] US ON" +
+            //        " BI.createdby = US.userid INNER JOIN behaviour BH ON" +
+            //        " BH.behaviourid=BI.normalbehaviorid WHERE" +
+            //        " BIOA.normalbehaviorid=BH.behaviourid))" +
+            //        " END " +
+            //      " AS EventName, " +
+            //      "'Arrow notes' AS StdtSessEventType,  CONVERT(CHAR(10), BIOA.CreatedOn,101) AS EvntTs,  " +
+            //      " BHD.Behaviour FROM BehaviorIOADetails BIOA LEFT JOIN BehaviourDetails BHD ON BIOA.MeasurementId=BHD.MeasurementId " +
+            //      "WHERE BIOA.StudentId=" + sess.StudentId + " AND IOAPerc IS NOT NULL AND BIOA.ActiveInd='A') )IOA ) " +
+            //      "  ad " +
+            //      " WHERE  ( ( ad.behaviour IS  NULL " +
+            //      " AND ad.measurementid = 0 )" +
+            //      "OR ad.behaviour = (SELECT TOP 1 behaviour " +
+            //      "FROM   behaviourdetails " +
+            //      "WHERE  measurementid = " + row["MeasurementId"] + ") ) " +
+            //      " AND ad.stdtsesseventtype IN( 'Arrow notes' ) " +
+            //      " AND CONVERT(DATE, ad.evntts) >=  cast('" + dtst.ToString("MM/dd/yyyy") + "' as date)" +
+            //      " AND CONVERT(DATE, ad.evntts) <=  cast('" + dted.ToString("MM/dd/yyyy") + "' as date)" +
+            //      " )outr " +
+            //       " FOR XML PATH('')),1,1,'') eventname ";
+            //        dtNew6 = objData.ReturnDataTable(queryfilter, false);
+            //        if (Convert.ToString(dtNew6.Rows[0]["eventname"]) != "" && Convert.ToString(dtNew6.Rows[0]["eventname"]) != null)
+            //            concatStrng += "<b>" + Beh + " : " + "</b>" + Convert.ToString(dtNew6.Rows[0]["eventname"]) + "<br><br>";
+            //    }
 
-        //}
+            //}
         DataTable DtResults = new DataTable();
         SqlCommand command;
         SqlDataAdapter adp;
@@ -609,7 +609,7 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
         //System.Data.DataTable dtNew5;
         //System.Data.DataTable dtNew6;
 
-        String Beh = "", Evnt = "", concatStrng = "";
+        String Beh = "", Evnt = "", concatStrng="";
         //foreach (DataRow row in dtNew4.Rows)
         //{
         //    if (row != null)
@@ -738,7 +738,7 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
             }
         }
         catch (Exception ex)
-        {
+        { 
             ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
             ClsErrorLog errlog = new ClsErrorLog();
             errlog.WriteToLog("Page Name: " + clsGeneral.getPageName() + "\n" + ex.ToString());
@@ -1184,14 +1184,14 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
                 if (hdFldCvid.Value != null && hdFldCvid.Value != "")
                 {
                     Flcvid = int.Parse(hdFldCvid.Value);
-                    if (sess.SchoolId == 1)
-                    {
+                    //if (sess.SchoolId == 1)
+                    //{
                         query = "select StudentId,Measurementid,BehIepObj,BehlvlPerf from clvBehsummary where stdtcoversheetid = " + Flcvid + "";
-                    }
-                    else
-                    {
-                        query = "select StudentId,Measurementid,BehIepObj,BehlvlPerf from clvBehsummary where stdtcoversheetid = " + Flcvid + "";
-                    }
+                    //}
+                    //else
+                    //{
+                    //    query = "select StudentId,Measurementid,BehIepObj,BehlvlPerf from clvBehsummary where stdtcoversheetid = " + Flcvid + "";
+                    //}
 
                     dtbehSumr = objData.ReturnDataTable(query, false);
 
@@ -2192,16 +2192,16 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
             }
             
             int pageCount = 0;
-            if (sess.SchoolId == 1)
-            {
+            //if (sess.SchoolId == 1)
+            //{
                 Path = Server.MapPath("~\\StudentBinder\\CsTemplatesTest\\ClinicalCoversheetNE.docx");
                 NewPath = CopyTemplate(Path, pageCount.ToString());
-            }
-            else
-            {
-                Path = Server.MapPath("~\\StudentBinder\\CsTemplatesTest\\ClinicalCoversheetPA.docx");
-                NewPath = CopyTemplate(Path, pageCount.ToString());
-            }
+            //}
+            //else
+            //{
+            //    Path = Server.MapPath("~\\StudentBinder\\CsTemplatesTest\\ClinicalCoversheetPA.docx");
+            //    NewPath = CopyTemplate(Path, pageCount.ToString());
+            //}
 
             string stDate = "";
             string endDate = "";
@@ -2224,14 +2224,14 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
                     if (hdFldCvid.Value != null && hdFldCvid.Value != "")
                     {
                         Flcvid = int.Parse(hdFldCvid.Value);
-                        if (sess.SchoolId == 1)
-                        {
+                        //if (sess.SchoolId == 1)
+                        //{
                             query = "select StudentId,Measurementid,BehIepObj,BehlvlPerf from clvBehsummary where stdtcoversheetid = " + Flcvid + "";
-                        }
-                        else
-                        {
-                            query = "select StudentId,Measurementid,BehIepObj,BehlvlPerf from clvBehsummary where stdtcoversheetid = " + Flcvid + "";
-                        }
+                        //}
+                        //else
+                        //{
+                        //    query = "select StudentId,Measurementid,BehIepObj,BehlvlPerf from clvBehsummary where stdtcoversheetid = " + Flcvid + "";
+                        //}
 
                         dtbehSumr = objData.ReturnDataTable(query, false);
 
@@ -2264,8 +2264,8 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
             }
             AppndTableBehav(NewPath, Dt);
             
-            if (sess.SchoolId == 1)
-            {
+            //if (sess.SchoolId == 1)
+            //{
                 CreateQuery("NE", "XMLCS\\CS2CreationPA.xml");
                 Dt = objExport.SettingEventsandProgramChanges(sess.StudentId, sess.SchoolId, ViewState["CurrentDate"].ToString());
                 if (Dt.Rows.Count > 0)
@@ -2279,24 +2279,24 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
                     }
                 }
 
-            }           
-            else
-            {
-                CreateQuery("NE", "XMLCS\\CS2Creation.xml");
-                Dt = objExport.SettingEventsandProgramChanges(sess.StudentId, sess.SchoolId, ViewState["CurrentDate"].ToString());
-                if (Dt.Rows.Count > 0)
-                {
-                    foreach (DataRow dr in Dt.Rows)
-                    {
-                        for (int i = 0; i < Dt.Columns.Count; i++)
-                        {
-                            //columns[i] = dr[columnsToAdd[i]].ToString();
-                            columns[i] = Server.HtmlDecode(Regex.Replace(dr[columnsToAdd[i]].ToString(), "<(.|\n)*?>", ""));                           
-                        }
+            //}           
+            //else
+            //{
+            //    CreateQuery("NE", "XMLCS\\CS2Creation.xml");
+            //    Dt = objExport.SettingEventsandProgramChanges(sess.StudentId, sess.SchoolId, ViewState["CurrentDate"].ToString());
+            //    if (Dt.Rows.Count > 0)
+            //    {
+            //        foreach (DataRow dr in Dt.Rows)
+            //        {
+            //            for (int i = 0; i < Dt.Columns.Count; i++)
+            //            {
+            //                //columns[i] = dr[columnsToAdd[i]].ToString();
+            //                columns[i] = Server.HtmlDecode(Regex.Replace(dr[columnsToAdd[i]].ToString(), "<(.|\n)*?>", ""));                           
+            //            }
 
-                    }
-                }
-            }
+            //        }
+            //    }
+            //}
             if (NewPath != "")
             {
                 SearchAndReplace(NewPath);
@@ -3678,8 +3678,8 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
 
         
             string query = "";
-           if (sess.SchoolId == 1)
-            {
+           //if (sess.SchoolId == 1)
+           // {
                 if (getLocations != "")
                 {
                     if (studStatus == "DISCHARGED")
@@ -3762,91 +3762,91 @@ public partial class StudentBinder_ClinicalSheetNew : System.Web.UI.Page
                     }
 
                 }
-            }
-            else
-            {
-                if (getLocations != "")
-                {
-                    if (studStatus == "DISCHARGED")
-                    {
-                        query = "select StudentPersonal.StudentPersonalId as StdtId," +
-                                "StudentPersonal.FirstName+' '+StudentPersonal.LastName as StdName," +
-                                "(SELECT ClassName FROM Class WHERE ClassId = " + clsid + ") Location_old," +
-                                "(SELECT (SELECT STUFF(( SELECT ','+ClassName FROM Class WHERE ClassId IN (" + getLocations + ") FOR XML PATH('')), 1, 1, ''))) as Location," +
-                                "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPSDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPSDate IS NOT NULL order by EndDate desc) AS IepStDate," +
-                                "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPEDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPEDate IS NOT NULL order by EndDate desc) AS IepEnDate," +
-                                "(SELECT TOP 1 Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND Location = " + clsid + " AND  EndDate<cast (GETDATE() as DATE) AND STATUS > 0)) Program_old," +
-                                "(SELECT (SELECT STUFF(( SELECT ','+Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND PrevClassId IN(" + getLocations + ") AND EndDate<cast (GETDATE() as DATE) AND STATUS > 0) FOR XML PATH('')), 1, 1, ''))) AS Program," +
-                                "(Select TOP 1 CONVERT(varchar,[EffStartDate],101)+'-'+CONVERT(varchar,[EffEndDate],101) As IEPDATE FROM StdtIEP WHERE StudentId = StudentPersonal.StudentPersonalId and StatusId IN (" +
-                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'In Progress')," +
-                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Approved')," +
-                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Pending Approval')) ORDER BY StdtIEPId DESC) AS IepYear," +
-                                "(SELECT convert(varchar,AsmntYearStartDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdstdate," +
-                                "(SELECT convert(varchar,AsmntYearEndDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdendate " +
-                                "from StudentPersonal " +
-                                "where StudentPersonal.StudentPersonalId = " + stdid + " and StudentPersonal.SchoolId = " + schlid + "";
-                    }
-                    else
-                    {
-                        query = "select StudentPersonal.StudentPersonalId as StdtId," +
-                                "StudentPersonal.FirstName+' '+StudentPersonal.LastName as StdName," +
-                                "(SELECT ClassName FROM Class WHERE ClassId = " + clsid + ") Location_old," +
-                                "(SELECT (SELECT STUFF(( SELECT ','+ClassName FROM Class WHERE ClassId IN (" + getLocations + ") FOR XML PATH('')), 1, 1, ''))) as Location," +
-                                "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPSDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPSDate IS NOT NULL order by EndDate desc) AS IepStDate," +
-                                "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPEDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPEDate IS NOT NULL order by EndDate desc) AS IepEnDate," +
-                                "(SELECT TOP 1 Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND Location = " + clsid + " AND (EndDate IS NULL OR EndDate>=cast (GETDATE() as DATE)) AND STATUS > 0)) Program_old," +
-                                "(SELECT (SELECT STUFF(( SELECT ','+Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND Location IN(" + getLocations + ") AND (EndDate IS NULL OR EndDate>=cast (GETDATE() as DATE)) AND STATUS > 0) FOR XML PATH('')), 1, 1, ''))) AS Program," +
-                                "(Select TOP 1 CONVERT(varchar,[EffStartDate],101)+'-'+CONVERT(varchar,[EffEndDate],101) As IEPDATE FROM StdtIEP WHERE StudentId = StudentPersonal.StudentPersonalId and StatusId IN (" +
-                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'In Progress')," +
-                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Approved')," +
-                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Pending Approval')) ORDER BY StdtIEPId DESC) AS IepYear," +
-                                "(SELECT convert(varchar,AsmntYearStartDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdstdate," +
-                                "(SELECT convert(varchar,AsmntYearEndDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdendate " +
-                                "from StudentPersonal " +
-                                "where StudentPersonal.StudentPersonalId = " + stdid + " and StudentPersonal.SchoolId = " + schlid + "";
-                    }
-                }
-                else{
-                    if (studStatus == "DISCHARGED")
-                    {
-                        query = "select StudentPersonal.StudentPersonalId as StdtId," +
-                                "StudentPersonal.FirstName+' '+StudentPersonal.LastName as StdName," +
-                                "(SELECT ClassName FROM Class WHERE ClassId = " + clsid + ") Location_old," +
-                                "'No location available' as Location," +
-                                "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPSDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPSDate IS NOT NULL order by EndDate desc) AS IepStDate," +
-                                "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPEDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPEDate IS NOT NULL order by EndDate desc) AS IepEnDate," +
-                                "(SELECT TOP 1 Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND Location = " + clsid + " AND  EndDate<cast (GETDATE() as DATE) AND STATUS > 0)) Program_old," +
-                                "'No program available' AS Program," +
-                                "(Select TOP 1 CONVERT(varchar,[EffStartDate],101)+'-'+CONVERT(varchar,[EffEndDate],101) As IEPDATE FROM StdtIEP WHERE StudentId = StudentPersonal.StudentPersonalId and StatusId IN (" +
-                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'In Progress')," +
-                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Approved')," +
-                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Pending Approval')) ORDER BY StdtIEPId DESC) AS IepYear," +
-                                "(SELECT convert(varchar,AsmntYearStartDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdstdate," +
-                                "(SELECT convert(varchar,AsmntYearEndDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdendate " +
-                                "from StudentPersonal " +
-                                "where StudentPersonal.StudentPersonalId = " + stdid + " and StudentPersonal.SchoolId = " + schlid + "";
-                    }
-                    else
-                    {
-                        query = "select StudentPersonal.StudentPersonalId as StdtId," +
-                                "StudentPersonal.FirstName+' '+StudentPersonal.LastName as StdName," +
-                                "(SELECT ClassName FROM Class WHERE ClassId = " + clsid + ") Location_old," +
-                                "'No location available' as Location," +
-                                "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPSDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPSDate IS NOT NULL order by EndDate desc) AS IepStDate," +
-                                "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPEDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPEDate IS NOT NULL order by EndDate desc) AS IepEnDate," +
-                                "(SELECT TOP 1 Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND Location = " + clsid + " AND (EndDate IS NULL OR EndDate>=cast (GETDATE() as DATE)) AND STATUS > 0)) Program_old," +
-                                "'No program available' AS Program," +
-                                "(Select TOP 1 CONVERT(varchar,[EffStartDate],101)+'-'+CONVERT(varchar,[EffEndDate],101) As IEPDATE FROM StdtIEP WHERE StudentId = StudentPersonal.StudentPersonalId and StatusId IN (" +
-                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'In Progress')," +
-                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Approved')," +
-                                "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Pending Approval')) ORDER BY StdtIEPId DESC) AS IepYear," +
-                                "(SELECT convert(varchar,AsmntYearStartDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdstdate," +
-                                "(SELECT convert(varchar,AsmntYearEndDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdendate " +
-                                "from StudentPersonal " +
-                                "where StudentPersonal.StudentPersonalId = " + stdid + " and StudentPersonal.SchoolId = " + schlid + "";
-                    }
-                }
-            }
+            //}
+            //else
+            //{
+            //    if (getLocations != "")
+            //    {
+            //        if (studStatus == "DISCHARGED")
+            //        {
+            //            query = "select StudentPersonal.StudentPersonalId as StdtId," +
+            //                    "StudentPersonal.FirstName+' '+StudentPersonal.LastName as StdName," +
+            //                    "(SELECT ClassName FROM Class WHERE ClassId = " + clsid + ") Location_old," +
+            //                    "(SELECT (SELECT STUFF(( SELECT ','+ClassName FROM Class WHERE ClassId IN (" + getLocations + ") FOR XML PATH('')), 1, 1, ''))) as Location," +
+            //                    "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPSDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPSDate IS NOT NULL order by EndDate desc) AS IepStDate," +
+            //                    "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPEDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPEDate IS NOT NULL order by EndDate desc) AS IepEnDate," +
+            //                    "(SELECT TOP 1 Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND Location = " + clsid + " AND  EndDate<cast (GETDATE() as DATE) AND STATUS > 0)) Program_old," +
+            //                    "(SELECT (SELECT STUFF(( SELECT ','+Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND PrevClassId IN(" + getLocations + ") AND EndDate<cast (GETDATE() as DATE) AND STATUS > 0) FOR XML PATH('')), 1, 1, ''))) AS Program," +
+            //                    "(Select TOP 1 CONVERT(varchar,[EffStartDate],101)+'-'+CONVERT(varchar,[EffEndDate],101) As IEPDATE FROM StdtIEP WHERE StudentId = StudentPersonal.StudentPersonalId and StatusId IN (" +
+            //                    "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'In Progress')," +
+            //                    "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Approved')," +
+            //                    "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Pending Approval')) ORDER BY StdtIEPId DESC) AS IepYear," +
+            //                    "(SELECT convert(varchar,AsmntYearStartDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdstdate," +
+            //                    "(SELECT convert(varchar,AsmntYearEndDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdendate " +
+            //                    "from StudentPersonal " +
+            //                    "where StudentPersonal.StudentPersonalId = " + stdid + " and StudentPersonal.SchoolId = " + schlid + "";
+            //        }
+            //        else
+            //        {
+            //            query = "select StudentPersonal.StudentPersonalId as StdtId," +
+            //                    "StudentPersonal.FirstName+' '+StudentPersonal.LastName as StdName," +
+            //                    "(SELECT ClassName FROM Class WHERE ClassId = " + clsid + ") Location_old," +
+            //                    "(SELECT (SELECT STUFF(( SELECT ','+ClassName FROM Class WHERE ClassId IN (" + getLocations + ") FOR XML PATH('')), 1, 1, ''))) as Location," +
+            //                    "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPSDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPSDate IS NOT NULL order by EndDate desc) AS IepStDate," +
+            //                    "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPEDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPEDate IS NOT NULL order by EndDate desc) AS IepEnDate," +
+            //                    "(SELECT TOP 1 Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND Location = " + clsid + " AND (EndDate IS NULL OR EndDate>=cast (GETDATE() as DATE)) AND STATUS > 0)) Program_old," +
+            //                    "(SELECT (SELECT STUFF(( SELECT ','+Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND Location IN(" + getLocations + ") AND (EndDate IS NULL OR EndDate>=cast (GETDATE() as DATE)) AND STATUS > 0) FOR XML PATH('')), 1, 1, ''))) AS Program," +
+            //                    "(Select TOP 1 CONVERT(varchar,[EffStartDate],101)+'-'+CONVERT(varchar,[EffEndDate],101) As IEPDATE FROM StdtIEP WHERE StudentId = StudentPersonal.StudentPersonalId and StatusId IN (" +
+            //                    "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'In Progress')," +
+            //                    "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Approved')," +
+            //                    "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Pending Approval')) ORDER BY StdtIEPId DESC) AS IepYear," +
+            //                    "(SELECT convert(varchar,AsmntYearStartDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdstdate," +
+            //                    "(SELECT convert(varchar,AsmntYearEndDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdendate " +
+            //                    "from StudentPersonal " +
+            //                    "where StudentPersonal.StudentPersonalId = " + stdid + " and StudentPersonal.SchoolId = " + schlid + "";
+            //        }
+            //    }
+            //    else{
+            //        if (studStatus == "DISCHARGED")
+            //        {
+            //            query = "select StudentPersonal.StudentPersonalId as StdtId," +
+            //                    "StudentPersonal.FirstName+' '+StudentPersonal.LastName as StdName," +
+            //                    "(SELECT ClassName FROM Class WHERE ClassId = " + clsid + ") Location_old," +
+            //                    "'No location available' as Location," +
+            //                    "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPSDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPSDate IS NOT NULL order by EndDate desc) AS IepStDate," +
+            //                    "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPEDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPEDate IS NOT NULL order by EndDate desc) AS IepEnDate," +
+            //                    "(SELECT TOP 1 Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND Location = " + clsid + " AND  EndDate<cast (GETDATE() as DATE) AND STATUS > 0)) Program_old," +
+            //                    "'No program available' AS Program," +
+            //                    "(Select TOP 1 CONVERT(varchar,[EffStartDate],101)+'-'+CONVERT(varchar,[EffEndDate],101) As IEPDATE FROM StdtIEP WHERE StudentId = StudentPersonal.StudentPersonalId and StatusId IN (" +
+            //                    "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'In Progress')," +
+            //                    "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Approved')," +
+            //                    "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Pending Approval')) ORDER BY StdtIEPId DESC) AS IepYear," +
+            //                    "(SELECT convert(varchar,AsmntYearStartDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdstdate," +
+            //                    "(SELECT convert(varchar,AsmntYearEndDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdendate " +
+            //                    "from StudentPersonal " +
+            //                    "where StudentPersonal.StudentPersonalId = " + stdid + " and StudentPersonal.SchoolId = " + schlid + "";
+            //        }
+            //        else
+            //        {
+            //            query = "select StudentPersonal.StudentPersonalId as StdtId," +
+            //                    "StudentPersonal.FirstName+' '+StudentPersonal.LastName as StdName," +
+            //                    "(SELECT ClassName FROM Class WHERE ClassId = " + clsid + ") Location_old," +
+            //                    "'No location available' as Location," +
+            //                    "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPSDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPSDate IS NOT NULL order by EndDate desc) AS IepStDate," +
+            //                    "(SELECT TOP 1 convert(varchar,FORMAT (ClinicalBehIEPEDate,'MM/dd/yyyy'), 1) FROM StdtClinicalCoverSheet WHERE StudentId = StudentPersonal.StudentPersonalId AND ClinicalBehIEPEDate IS NOT NULL order by EndDate desc) AS IepEnDate," +
+            //                    "(SELECT TOP 1 Replace(LookupName, '&', '&amp;') FROM LookUp WHERE LookUpId IN (SELECT Department FROM Placement WHERE StudentPersonalId = StudentPersonal.StudentPersonalId AND Location = " + clsid + " AND (EndDate IS NULL OR EndDate>=cast (GETDATE() as DATE)) AND STATUS > 0)) Program_old," +
+            //                    "'No program available' AS Program," +
+            //                    "(Select TOP 1 CONVERT(varchar,[EffStartDate],101)+'-'+CONVERT(varchar,[EffEndDate],101) As IEPDATE FROM StdtIEP WHERE StudentId = StudentPersonal.StudentPersonalId and StatusId IN (" +
+            //                    "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'In Progress')," +
+            //                    "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Approved')," +
+            //                    "(SELECT LookupId FROM LookUp WHERE LookupType = 'IEP Status' AND LookupName = 'Pending Approval')) ORDER BY StdtIEPId DESC) AS IepYear," +
+            //                    "(SELECT convert(varchar,AsmntYearStartDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdstdate," +
+            //                    "(SELECT convert(varchar,AsmntYearEndDt, 1) FROM AsmntYear WHERE CurrentInd='A' and AsmntYearCode IN (SELECT AsmntYearCode FROM AsmntYear WHERE CurrentInd='A')) as Prdendate " +
+            //                    "from StudentPersonal " +
+            //                    "where StudentPersonal.StudentPersonalId = " + stdid + " and StudentPersonal.SchoolId = " + schlid + "";
+            //        }
+            //    }
+            //}
 
             dtHdr = objData.ReturnDataTable(query, false);
 
