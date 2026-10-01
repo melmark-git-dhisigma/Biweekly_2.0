@@ -1247,18 +1247,44 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                                         }
                                     }
                                     else
+                                    {
                                         RadioButtonListSteps.Items[0].Selected = true;
+                                        Session["iCurrentStep"] = 1;
+                                    }
 
-                                if (RadioButtonListSteps.SelectedValue.ToString() == "")
+                                if (RadioButtonListSteps.SelectedItem == null)
                                 {
                                     RadioButtonListSteps.Items[0].Selected = true;
+                                    Session["iCurrentStep"] = 1;
                                 }
                                 // Approval Popup Issue New Lesson Creation [18 - jun -2020] - Dev 1  r
 
                             }
                             else
                             {
-                                RadioButtonListSteps.Items[0].Selected = true;
+                                if (Session["Selection"] == "1")
+                                {
+                                    for (int i = 0; i < dt.Rows.Count; i++)
+                                    {
+                                        if (dt.Rows[i]["StepCd"].ToString() == Session["PrevStep"].ToString())
+                                        {
+                                            RadioButtonListSteps.Items[i].Selected = true;
+                                            break;
+                                        }
+                                    }
+
+                                    // Fallback
+                                    if (RadioButtonListSteps.SelectedItem == null)
+                                    {
+                                        RadioButtonListSteps.Items[0].Selected = true;
+                                        Session["iCurrentStep"] = 1;
+                                    }
+                                }
+                        else
+                        {
+                                    RadioButtonListSteps.Items[0].Selected = true;
+                                    Session["iCurrentStep"] = 1;
+                                }
                             }
                         }
                         else
