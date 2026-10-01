@@ -29,6 +29,9 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
         {
             ScriptManager.GetCurrent(this.Page).RegisterAsyncPostBackControl(btnRefreshGrid);
         }
+
+        string eventTarget = Request["__EVENTTARGET"] ?? "";
+
         if (!IsPostBack)
         {
             calPast.SelectedDates.Clear();
@@ -36,39 +39,49 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
             //imgBDay.ImageUrl = "~/StudentBinder/img/DayB.png";
             //ImgBRes.ImageUrl = "~/StudentBinder/img/ResG.png";
             hidSetVal.Value = "0";
-            fillStudent("0", false);
-            LoadAttendanceCodesToJS();
+
             BindLocationDropdown();
             BindClientDropdown();
+
+            fillStudent("0", false);
+            LoadAttendanceCodesToJS();
+
             pnlCalendar.Style["display"] = "none";
-            
-            //// optionally prebind student dropdown for initial selection (first class)
-            //if (!String.IsNullOrEmpty(ddlLocation.SelectedValue))
-            //    BindClientDropdown(ddlLocation.SelectedValue);
-            //else
-            //    ddlClient.Items.Clear();
         }
         else
         {
-            string eventTarget = Request["__EVENTTARGET"];
-            if (eventTarget != null && eventTarget.Contains("calPast"))
+            if (eventTarget.Contains("calPast"))
             {
                 return;
             }
 
-            if (hidSearch.Value != "1")
-                fillStudent(hidSetVal.Value.ToString(), false);
-        }
-        var sm = ScriptManager.GetCurrent(this.Page);
-            if (sm != null)
+            bool isLocationEvent = eventTarget == ddlLocation.UniqueID;
+
+            bool isClientEvent = eventTarget == ddlClient.UniqueID;
+
+            bool isRefreshEvent = eventTarget == btnRefreshGrid.UniqueID;
+
+            bool isGridEvent = eventTarget.Contains("grdGroup$ctl");
+
+            if (isLocationEvent || isClientEvent || isRefreshEvent || isGridEvent)
             {
-                // Register calendar so its non-standard events (VisibleMonthChanged) do async postbacks
-                sm.RegisterAsyncPostBackControl(calPast);
+                // Let the actual event handler perform the binding.
             }
-       // else
-       // {
-       //     if (hidSearch.Value != "1") bindDetails();
-       //}
+            else
+            {
+                if (hidSearch.Value != "1")
+                {
+                    fillStudent( hidSetVal != null ? hidSetVal.Value.ToString() : "0", false);
+                }
+            }
+        }
+
+        var sm = ScriptManager.GetCurrent(this.Page);
+
+        if (sm != null)
+        {
+            sm.RegisterAsyncPostBackControl(calPast);
+        }
     }
     //private void bindDetails()           
     //{
@@ -423,7 +436,7 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
             try
             {
                 SaveOrderedPairs(studentId, classId, schoolId, userId, allPairs, deleteExtraDbRows: true, targetDate: effectiveDate);
-                fillStudent(hidSetVal.Value.ToString(), false);
+                RefreshAttendanceGrid();
                 ScriptManager.RegisterStartupScript(
                     this,
                     this.GetType(),
@@ -885,8 +898,7 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
 
         if (hidSearch.Value == "0")
         {
-            fillStudent(hidSetVal.Value.ToString(), false);
-            LoadAttendanceCodesToJS();
+            RefreshAttendanceGrid();
             if (upGrid != null) upGrid.Update();
         }
         else
@@ -1535,6 +1547,9 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
     {
         objData = new clsData();
 
+        // Preserve selected client
+        string selectedClient = ddlClient.SelectedValue;
+
         DateTime targetDate = DateTime.Today;
         DateTime parsedDate;
         if (hidPastDate != null &&
@@ -1554,8 +1569,7 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
             filter = " AND c.ClassId = " + loc;
         }
 
-        string sql = @"
-        SELECT DISTINCT
+        string sql = @"SELECT DISTINCT
             s.StudentId,
             (s.StudentLname + ' ' + s.StudentFname) AS StudentName
         FROM Student s
@@ -1573,8 +1587,7 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
           " + filter + @"
           AND p.StartDate <= '" + dateSql + @"'
           AND (p.EndDate IS NULL OR p.EndDate >= '" + dateSql + @"')
-        ORDER BY StudentName, s.StudentId;
-    ";
+        ORDER BY StudentName, s.StudentId;";
 
         DataTable dt = objData.ReturnDataTable(sql, false);
 
@@ -1595,29 +1608,58 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
                 ));
             }
         }
+
+        // Restore previous client selection
+        if (!string.IsNullOrEmpty(selectedClient) &&
+            ddlClient.Items.FindByValue(selectedClient) != null)
+        {
+            ddlClient.SelectedValue = selectedClient;
+        }
+        else
+        {
+            ddlClient.SelectedIndex = 0;
+        }
     }
 
     protected void ddlLocation_SelectedIndexChanged(object sender, EventArgs e)
     {
+        string eventTarget = Request["__EVENTTARGET"] ?? "";
+
+        if (eventTarget.Contains("grdGroup$ctl"))
+        {
+            return;
+        }
+
         string selectedClass = ddlLocation.SelectedValue;
 
-        ddlClient.ClearSelection();
         BindClientDropdown(selectedClass);
 
-        string param = (hidSetVal != null) ? (hidSetVal.Value ?? "") : "";
+        string param = hidSetVal != null ? hidSetVal.Value ?? "" : "0";
         fillStudent(param, true);
         LoadAttendanceCodesToJS();
+        if (upFilters != null)
+            upFilters.Update();
+
+        if (upModalGrid != null)
+            upModalGrid.Update();
     }
     protected void ddlClient_SelectedIndexChanged(object sender, EventArgs e)
     {
-        string selectedClient = ddlClient.SelectedValue;
-        string selectedClass = ddlLocation.SelectedValue;
-        if(selectedClass=="")
-        BindLocationDropdown(selectedClient);
+        string eventTarget = Request["__EVENTTARGET"] ?? "";
 
-        string param = (hidSetVal != null) ? (hidSetVal.Value ?? "") : "";
+        if (eventTarget.Contains("grdGroup$ctl"))
+        {
+            return;
+        }
+
+        string param = hidSetVal != null ? hidSetVal.Value ?? "" : "0";
         fillStudent(param, true);
         LoadAttendanceCodesToJS();
+        if (upFilters != null)
+            upFilters.Update();
+
+        if (upModalGrid != null)
+            upModalGrid.Update();
     }
 
     protected void btnCloseCalendar_Click(object sender, EventArgs e)
@@ -1781,8 +1823,7 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
                 }
 
                 // existing logic: rebind grid for sel
-                fillStudent(hidSetVal.Value.ToString(), false);
-                LoadAttendanceCodesToJS();
+                RefreshAttendanceGrid();
 
                 // Update the UpdatePanel that contains the grid so client receives refreshed HTML.
                 if (upGrid != null) upGrid.Update();
@@ -2120,15 +2161,51 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
     {
         try
         {
-            //ClearGridThenRebind();
+            // Capture the filter values BEFORE rebuilding dropdowns
+            string selectedLocation = ddlLocation != null ? ddlLocation.SelectedValue : "";
 
-            //// debug token: put current timestamp into hidden field so client can verify server executed
-            //hidPastDate.Value = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-            //System.Diagnostics.Trace.WriteLine("btnRefreshGrid_Click invoked at " + DateTime.Now.ToString("o"));
-            fillStudent("0", false);
-            LoadAttendanceCodesToJS();
+            string selectedClient = ddlClient != null ? ddlClient.SelectedValue : "";
+
+            // Rebuild Location list
             BindLocationDropdown();
-            BindClientDropdown();
+
+            // Restore Location selection
+            if (!string.IsNullOrEmpty(selectedLocation) && ddlLocation.Items.FindByValue(selectedLocation) != null)
+            {
+                ddlLocation.SelectedValue = selectedLocation;
+            }
+            else
+            {
+                ddlLocation.SelectedIndex = 0;
+                selectedLocation = "";
+            }
+
+            // Rebuild Client list according to selected Location
+            BindClientDropdown(selectedLocation);
+
+            // Restore Client selection
+            if (!string.IsNullOrEmpty(selectedClient) && ddlClient.Items.FindByValue(selectedClient) != null)
+            {
+                ddlClient.SelectedValue = selectedClient;
+            }
+            else
+            {
+                ddlClient.SelectedIndex = 0;
+                selectedClient = "";
+            }
+
+            // NOW bind the grid using the final filter state
+            fillStudent(hidSetVal != null ? hidSetVal.Value : "0", false);
+
+            LoadAttendanceCodesToJS();
+
+            // Important because filters are in a different UpdatePanel
+            if (upFilters != null)
+                upFilters.Update();
+
+            if (upModalGrid != null)
+                upModalGrid.Update();
+
             pnlCalendar.Style["display"] = "none";
         }
         catch (Exception ex)
@@ -2514,30 +2591,6 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
         return result;
     }
 
-    private void BindGridWithFilters()
-    {
-        int locationId = 0;
-        int clientId = 0;
-
-        if (ddlLocation.SelectedValue != "")
-            locationId = Convert.ToInt32(ddlLocation.SelectedValue);
-
-        if (ddlClient.SelectedValue != "")
-            clientId = Convert.ToInt32(ddlClient.SelectedValue);
-
-        DateTime? selectedDate = null;
-
-        if (!string.IsNullOrEmpty(hidPastDate.Value))
-        {
-            DateTime temp;
-            if (DateTime.TryParse(hidPastDate.Value, out temp))
-                selectedDate = temp;
-        }
-
-        fillStudent("0", false);
-        LoadAttendanceCodesToJS();
-    }
-
     private DataTable _attendanceLookup = null;
 
     private void LoadAttendanceCodesToJS()
@@ -2569,6 +2622,23 @@ public partial class StudentBinder_Phase2Css_StudentCheckin : System.Web.UI.Page
             "window.__attendanceCodes = " + json + ";",
             true
         );
+    }
+
+    private void RefreshAttendanceGrid()
+    {
+        string type = hidSetVal != null
+            ? hidSetVal.Value ?? "0"
+            : "0";
+
+        fillStudent(type, false);
+
+        LoadAttendanceCodesToJS();
+
+        if (upFilters != null)
+            upFilters.Update();
+
+        if (upModalGrid != null)
+            upModalGrid.Update();
     }
 
 }
