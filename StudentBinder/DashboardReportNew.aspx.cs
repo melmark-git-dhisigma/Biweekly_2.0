@@ -1895,6 +1895,7 @@ public partial class Graph : System.Web.UI.Page
 
     protected void ButtonGo_Click(object sender, EventArgs e)
     {
+        sess = (clsSession)Session["UserSession"];
         Stopwatch sw = Stopwatch.StartNew();
         clsReportExecutionLog csrplog = new clsReportExecutionLog();
         try
