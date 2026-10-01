@@ -2585,28 +2585,55 @@
             };
         };
 
-        window.serializeExtraTimesForRow = function (rowOrBtnOrSelector, studentId,classId) {
-            // Resolve row same as createExtraPairNodes
+        window.serializeExtraTimesForRow = function(rowOrBtnOrSelector, studentId, classId) {
+
             var row = null;
+
             if (rowOrBtnOrSelector && rowOrBtnOrSelector.nodeType) {
-                row = (rowOrBtnOrSelector.tagName && rowOrBtnOrSelector.tagName.toLowerCase() === 'tr')
-                    ? rowOrBtnOrSelector
-                    : (rowOrBtnOrSelector.closest ? (rowOrBtnOrSelector.closest('tr') || rowOrBtnOrSelector.closest('.att-row')) : null);
-            }
-            if (!row && typeof rowOrBtnOrSelector === 'string') {
-                row = document.querySelector(rowOrBtnOrSelector) || document.getElementById(rowOrBtnOrSelector);
-                if (row && !(row.tagName && row.tagName.toLowerCase() === 'tr')) {
-                    row = (row.closest ? (row.closest('tr') || row.closest('.att-row')) : row);
+
+                if (rowOrBtnOrSelector.tagName &&
+                    rowOrBtnOrSelector.tagName.toLowerCase() === 'tr') {
+
+                    row = rowOrBtnOrSelector;
+
+                } else if (rowOrBtnOrSelector.closest) {
+
+                    row = rowOrBtnOrSelector.closest('tr');
                 }
             }
-            if (!row && studentId) {
-                row = document.querySelector('[data-studentid="' + studentId + '"]') ||
-                      document.getElementById('row_' + studentId) ||
-                      (document.getElementById('hidExtraTimes_' + studentId) && document.getElementById('hidExtraTimes_' + studentId).closest ? document.getElementById('hidExtraTimes_' + studentId).closest('tr') : null);
-            }
+
             if (!row) {
-                console.warn('serializeExtraTimesForRow: row not found', rowOrBtnOrSelector, studentId);
+                console.warn('serializeExtraTimesForRow: row not found', rowOrBtnOrSelector, studentId, classId);
                 return '';
+            }
+
+            var rowStudentId = row.getAttribute('data-studentid');
+            var rowClassId = row.getAttribute('data-classid');
+
+            if (rowStudentId) {
+                studentId = rowStudentId;
+            }
+
+            if (rowClassId) {
+                classId = rowClassId;
+            }
+
+            if (!studentId) {
+                var hidGuess = row.querySelector('input[type=hidden][id^="hidExtraTimes_"]');
+
+                if (hidGuess) {
+                    var hidId = hidGuess.id || '';
+
+                    var match = hidId.match(/^hidExtraTimes_(\d+)(?:_(\d+))?$/);
+
+                    if (match) {
+                        studentId = match[1];
+
+                        if (!classId && match[2]) {
+                            classId = match[2];
+                        }
+                    }
+                }
             }
 
             // If studentId not provided, try to read from row attribute or hidden input id
@@ -3662,11 +3689,11 @@
         <div class="controls-left">
           <label class="ctrl-label">Location:</label>
           <asp:DropDownList ID="ddlLocation" runat="server" CssClass="ctrl-select"
-             AutoPostBack="true" OnSelectedIndexChanged="ddlLocation_SelectedIndexChanged" />
+             AutoPostBack="true" OnSelectedIndexChanged="ddlLocation_SelectedIndexChanged" ></asp:DropDownList>
           &nbsp;&nbsp;&nbsp;&nbsp;
           <label class="ctrl-label">Client:</label>
           <asp:DropDownList ID="ddlClient" runat="server" CssClass="ctrl-select"
-             AutoPostBack="true" OnSelectedIndexChanged="ddlClient_SelectedIndexChanged" />
+             AutoPostBack="true" OnSelectedIndexChanged="ddlClient_SelectedIndexChanged" ></asp:DropDownList>
         </div>
       </ContentTemplate>
     </asp:UpdatePanel>
