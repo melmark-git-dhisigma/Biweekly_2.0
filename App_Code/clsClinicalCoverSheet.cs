@@ -154,8 +154,8 @@ public class clsClinicalCoverSheet
             //            " (StdtSessEventType='Major' OR StdtSessEventType='Minor' OR StdtSessEventType='Arrow notes')  AND StudentId=" + StudentId + " AND SchoolId=" + SchoolId + "";
 
             //Dt = objData.ReturnDataTable(strQuery, false);
-            if (SchoolId == 1)
-            {
+            //if (SchoolId == 1)
+            //{
                 //strQuery2 = "SELECT TOP 1" +
                 //" ISNULL((SELECT STUFF((SELECT ', '+ EventName + ' (' + CONVERT(VARCHAR(50), EvntTs,101)+')' FROM StdtSessEvent WHERE CONVERT(DATE, EvntTs) BETWEEN CONVERT(DATE,'" + stDate + "') AND CONVERT(DATE,'" + endDate + "') AND  (StdtSessEventType='Major') AND StudentId=" + StudentId + " AND SchoolId=" + SchoolId + " FOR XML PATH('')),1,1,'')),'-') Phaseline," +
                 //" ISNULL((SELECT STUFF((SELECT ', '+ EventName + ' (' + CONVERT(VARCHAR(50), EvntTs,101)+')' FROM StdtSessEvent WHERE  CONVERT(DATE, EvntTs) BETWEEN CONVERT(DATE,'" + stDate + "') AND CONVERT(DATE,'" + endDate + "') AND (StdtSessEventType='Minor') AND StudentId=" + StudentId + " AND SchoolId=" + SchoolId + " FOR XML PATH('')),1,1,'')),'-') Conditionline," +
@@ -322,188 +322,188 @@ public class clsClinicalCoverSheet
                 Dt.Rows.Add(dr5);
        
 
-            }
-            else
-            {
+            //}
+            //else
+            //{
 
 
-                strQuery2 = "SELECT TOP 1" +                   
-                    " Academic,Clinical,Community,Other FROM StdtSessEvent INNER JOIN StdtClinicalCoverSheet ON StdtSessEvent.StudentId=StdtClinicalCoverSheet.StudentId AND StdtSessEvent.SchoolId=StdtClinicalCoverSheet.SchoolId" +
-                    " WHERE CONVERT(DATE, EvntTs) BETWEEN CONVERT(DATE,'" + stDate + "') AND CONVERT(DATE,'" + endDate + "') AND (StdtSessEventType='Major' OR StdtSessEventType='Minor' OR StdtSessEventType='Arrow notes') AND StdtSessEvent.StudentId=" + StudentId + " AND StdtSessEvent.SchoolId=" + SchoolId + " AND CAST( StdtClinicalCoverSheet.StartDate as date)= cast('" + stDate + "' as date) AND CAST( StdtClinicalCoverSheet.EndDate as date)= cast('" + endDate + "' as date)";
-                System.Data.DataTable dtNew1 = objData.ReturnDataTable(strQuery2, false);
-                Dt.Columns.Add("Academic", typeof(string));
-                Dt.Columns.Add("Clinical", typeof(string));
-                Dt.Columns.Add("Community", typeof(string));
-                Dt.Columns.Add("Other", typeof(string));
-                System.Data.DataRow dr5 = Dt.NewRow();
-                if (dtNew1.Rows.Count > 0) {        
+            //    strQuery2 = "SELECT TOP 1" +                   
+            //        " Academic,Clinical,Community,Other FROM StdtSessEvent INNER JOIN StdtClinicalCoverSheet ON StdtSessEvent.StudentId=StdtClinicalCoverSheet.StudentId AND StdtSessEvent.SchoolId=StdtClinicalCoverSheet.SchoolId" +
+            //        " WHERE CONVERT(DATE, EvntTs) BETWEEN CONVERT(DATE,'" + stDate + "') AND CONVERT(DATE,'" + endDate + "') AND (StdtSessEventType='Major' OR StdtSessEventType='Minor' OR StdtSessEventType='Arrow notes') AND StdtSessEvent.StudentId=" + StudentId + " AND StdtSessEvent.SchoolId=" + SchoolId + " AND CAST( StdtClinicalCoverSheet.StartDate as date)= cast('" + stDate + "' as date) AND CAST( StdtClinicalCoverSheet.EndDate as date)= cast('" + endDate + "' as date)";
+            //    System.Data.DataTable dtNew1 = objData.ReturnDataTable(strQuery2, false);
+            //    Dt.Columns.Add("Academic", typeof(string));
+            //    Dt.Columns.Add("Clinical", typeof(string));
+            //    Dt.Columns.Add("Community", typeof(string));
+            //    Dt.Columns.Add("Other", typeof(string));
+            //    System.Data.DataRow dr5 = Dt.NewRow();
+            //    if (dtNew1.Rows.Count > 0) {        
                     
-                    dr5["Academic"] = Convert.ToString(dtNew1.Rows[0]["Academic"]);
-                    dr5["Clinical"] = Convert.ToString(dtNew1.Rows[0]["Clinical"]);
-                    dr5["Community"] = Convert.ToString(dtNew1.Rows[0]["Community"]);
-                    dr5["Other"] = Convert.ToString(dtNew1.Rows[0]["Other"]);
-                }
-                else
-                {
-                    dr5["Academic"] = "";
-                    dr5["Clinical"] = "";
-                    dr5["Community"] = "";
-                    dr5["Other"] = "";
-                }
+            //        dr5["Academic"] = Convert.ToString(dtNew1.Rows[0]["Academic"]);
+            //        dr5["Clinical"] = Convert.ToString(dtNew1.Rows[0]["Clinical"]);
+            //        dr5["Community"] = Convert.ToString(dtNew1.Rows[0]["Community"]);
+            //        dr5["Other"] = Convert.ToString(dtNew1.Rows[0]["Other"]);
+            //    }
+            //    else
+            //    {
+            //        dr5["Academic"] = "";
+            //        dr5["Clinical"] = "";
+            //        dr5["Community"] = "";
+            //        dr5["Other"] = "";
+            //    }
                 
                
-                String Mesrmntid = "select MeasurementId from BehaviourDetails b where b.StudentId= " + StudentId + " and activeind = 'A' ";
-                System.Data.DataTable dtNew4 = objData.ReturnDataTable(Mesrmntid, false);
-                System.Data.DataRow dr4 = Dt.NewRow();
-                System.Data.DataTable dtNew5;
-                System.Data.DataTable dtNew6;
-                System.Data.DataTable dtNew01;
-                System.Data.DataTable dtNew2;
+            //    String Mesrmntid = "select MeasurementId from BehaviourDetails b where b.StudentId= " + StudentId + " and activeind = 'A' ";
+            //    System.Data.DataTable dtNew4 = objData.ReturnDataTable(Mesrmntid, false);
+            //    System.Data.DataRow dr4 = Dt.NewRow();
+            //    System.Data.DataTable dtNew5;
+            //    System.Data.DataTable dtNew6;
+            //    System.Data.DataTable dtNew01;
+            //    System.Data.DataTable dtNew2;
 
-                String Beh = "", Evnt = "", concatStrng = "", concatStrngMj = "", concatStrngMn = "";
-                foreach (DataRow row in dtNew4.Rows)
-                {
-                    if (row != null)
-                    {
-                        String Behav = "SELECT Behaviour  from BehaviourDetails where MeasurementId =" + row["MeasurementId"];
-                        dtNew5 = objData.ReturnDataTable(Behav, false);
-                        Beh = Convert.ToString(dtNew5.Rows[0]["Behaviour"]);
+            //    String Beh = "", Evnt = "", concatStrng = "", concatStrngMj = "", concatStrngMn = "";
+            //    foreach (DataRow row in dtNew4.Rows)
+            //    {
+            //        if (row != null)
+            //        {
+            //            String Behav = "SELECT Behaviour  from BehaviourDetails where MeasurementId =" + row["MeasurementId"];
+            //            dtNew5 = objData.ReturnDataTable(Behav, false);
+            //            Beh = Convert.ToString(dtNew5.Rows[0]["Behaviour"]);
 
-                        string queryfilter = " SELECT STUFF((select '; ' + CONVERT(VARCHAR(50), outr.EvntTs,101)+','+ outr.eventname from( SELECT * FROM (SELECT * FROM  ((SELECT  SE.MeasurementId, SE.StdtSessEventId,  SE.EventName, " +
-                      " SE.StdtSessEventType, CONVERT(CHAR(10), SE.EvntTs,101) AS EvntTs, " +
-                      "  B.Behaviour FROM  [StdtSessEvent] SE LEFT JOIN LessonPlan L ON SE.LessonPlanId = L.LessonPlanId " +
-                      "LEFT JOIN BehaviourDetails B ON B.MeasurementId=SE.MeasurementId WHERE EventType='EV' AND SE.StudentId=" + StudentId + " AND SE.StdtSessEventType<>'Medication') " +
-                      //"UNION ALL (SELECT NULL AS MeasurementId, NULL AS StdtSessEventId,  'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" +
-                      //"+ ( " +
-                      //"        (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
-                      //"        FROM   [user] US" +
-                      //"       WHERE  US.userid = (SELECT" +
-                      //"             createdby" +
-                      //"                         FROM" +
-                      //"           stdtsessionhdr Hdr" +
-                      //"                       WHERE" +
-                      //"         Hdr.stdtsessionhdrid = SH.ioasessionhdrid" +
-                      //"        AND SH.ioaind = 'Y'))" +
-                      //" + '/'" +
-                      //" + (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
-                      //"   FROM   [user] US" +
-                      //"  WHERE  SH.ioauserid = US.userid) ) AS EventName," +
-                      //" 'Arrow notes'                         AS" +
-                      //" StdtSessEventType," +
-                      //"CONVERT(CHAR(10), SH.endts, 101)      AS EvntTs," +
-                      //"NULL                                  AS Behaviour" +
-                      //" FROM   stdtsessionhdr SH" +
-                      //"       LEFT JOIN lessonplan" +
-                      //"             ON SH.lessonplanid = lessonplan.lessonplanid" +
-                      //" WHERE  SH.ioaperc IS NOT NULL" +
-                      //"      AND SH.ioaind = 'Y'" +
-                      //"     AND SH.sessionstatuscd = 'S'" +
-                      //"    AND SH.studentid =" + StudentId + ")" +
-                      "UNION ALL (SELECT  BIOA.MeasurementId, NULL AS StdtSessEventId,  'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" +
-                      "+ CASE WHEN BIOA.normalbehaviorid IS NULL THEN ((SELECT" +
-                      "      TOP 1" +
-                      "     Rtrim(" +
-                      "    Ltrim(Upper(" +
-                      "   US.userinitial))) FROM behaviour BH INNER JOIN [user] US" +
-                      "  ON" +
-                      " BH.createdby" +
-                      " =" +
-                      " US.userid WHERE BH.createdon BETWEEN" +
-                        " Dateadd(minute, -5, BIOA.createdon)" +
-                        " AND" +
-                        " BIOA.createdon ORDER BY BH.createdon DESC)+'/'+ (SELECT" +
-                        " TOP 1" +
-                        " Rtrim(Ltrim(Upper(US.userinitial))) FROM" +
-                        " behaviorioadetails BI" +
-                        " INNER" +
-                        " JOIN [user]" +
-                        " US ON BI.createdby =" +
-                        " US.userid WHERE BI.createdon=BIOA.createdon ORDER BY" +
-                        " BI.createdon DESC)" +
-                        " )" +
-                        " ELSE ((" +
-                        " SELECT" +
-                        " Rtrim(Ltrim(Upper(US.userinitial))) FROM behaviour BH" +
-                        " INNER" +
-                        " JOIN [user]" +
-                        " US ON" +
-                        " BH.createdby = US.userid WHERE" +
-                        " BIOA.normalbehaviorid=BH.behaviourid)+'/'+ (" +
-                        " SELECT Rtrim(" +
-                        " Ltrim(Upper(US.userinitial))) FROM behaviorioadetails BI" +
-                        " INNER" +
-                        " JOIN" +
-                        " [user] US ON" +
-                        " BI.createdby = US.userid INNER JOIN behaviour BH ON" +
-                        " BH.behaviourid=BI.normalbehaviorid WHERE" +
-                        " BIOA.normalbehaviorid=BH.behaviourid))" +
-                        " END " +
-                      " AS EventName, " +
-                      "'Arrow notes' AS StdtSessEventType,  CONVERT(CHAR(10), BIOA.CreatedOn,101) AS EvntTs,  " +
-                      " BHD.Behaviour FROM BehaviorIOADetails BIOA LEFT JOIN BehaviourDetails BHD ON BIOA.MeasurementId=BHD.MeasurementId " +
-                      "WHERE BIOA.StudentId=" + StudentId + " AND IOAPerc IS NOT NULL AND BIOA.ActiveInd='A') )IOA ) " +
-                      "  ad " +
-                      " WHERE  ( ( ad.behaviour IS  NULL " +
-                      " AND ad.measurementid = 0 )" +
-                      "OR ad.behaviour = (SELECT TOP 1 behaviour " +
-                      "FROM   behaviourdetails " +
-                      "WHERE  measurementid = " + row["MeasurementId"] + ") ) " +
-                      " AND ad.stdtsesseventtype IN( 'Arrow notes' ) " +
-                      " AND CONVERT(DATE, ad.evntts) >=  cast('" + stDate + "' as date) " +
-                      " AND CONVERT(DATE, ad.evntts) <=  cast('" + endDate + "' as date) " +
-                      " )outr " +
-                       " FOR XML PATH('')),1,1,'') eventname ";
-                        dtNew6 = objData.ReturnDataTable(queryfilter, false);
-                        if(Convert.ToString(dtNew6.Rows[0]["eventname"])!="" && Convert.ToString(dtNew6.Rows[0]["eventname"])!=null)
-                         concatStrng += "&lt;b&gt;" + Beh + " : " + "&lt;/b&gt;" + Convert.ToString(dtNew6.Rows[0]["eventname"]) + System.Environment.NewLine;
+            //            string queryfilter = " SELECT STUFF((select '; ' + CONVERT(VARCHAR(50), outr.EvntTs,101)+','+ outr.eventname from( SELECT * FROM (SELECT * FROM  ((SELECT  SE.MeasurementId, SE.StdtSessEventId,  SE.EventName, " +
+            //          " SE.StdtSessEventType, CONVERT(CHAR(10), SE.EvntTs,101) AS EvntTs, " +
+            //          "  B.Behaviour FROM  [StdtSessEvent] SE LEFT JOIN LessonPlan L ON SE.LessonPlanId = L.LessonPlanId " +
+            //          "LEFT JOIN BehaviourDetails B ON B.MeasurementId=SE.MeasurementId WHERE EventType='EV' AND SE.StudentId=" + StudentId + " AND SE.StdtSessEventType<>'Medication') " +
+            //          //"UNION ALL (SELECT NULL AS MeasurementId, NULL AS StdtSessEventId,  'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" +
+            //          //"+ ( " +
+            //          //"        (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
+            //          //"        FROM   [user] US" +
+            //          //"       WHERE  US.userid = (SELECT" +
+            //          //"             createdby" +
+            //          //"                         FROM" +
+            //          //"           stdtsessionhdr Hdr" +
+            //          //"                       WHERE" +
+            //          //"         Hdr.stdtsessionhdrid = SH.ioasessionhdrid" +
+            //          //"        AND SH.ioaind = 'Y'))" +
+            //          //" + '/'" +
+            //          //" + (SELECT Rtrim(Ltrim(Upper(userinitial)))" +
+            //          //"   FROM   [user] US" +
+            //          //"  WHERE  SH.ioauserid = US.userid) ) AS EventName," +
+            //          //" 'Arrow notes'                         AS" +
+            //          //" StdtSessEventType," +
+            //          //"CONVERT(CHAR(10), SH.endts, 101)      AS EvntTs," +
+            //          //"NULL                                  AS Behaviour" +
+            //          //" FROM   stdtsessionhdr SH" +
+            //          //"       LEFT JOIN lessonplan" +
+            //          //"             ON SH.lessonplanid = lessonplan.lessonplanid" +
+            //          //" WHERE  SH.ioaperc IS NOT NULL" +
+            //          //"      AND SH.ioaind = 'Y'" +
+            //          //"     AND SH.sessionstatuscd = 'S'" +
+            //          //"    AND SH.studentid =" + StudentId + ")" +
+            //          "UNION ALL (SELECT  BIOA.MeasurementId, NULL AS StdtSessEventId,  'IOA '+CONVERT(nvarchar,ROUND(IOAPerc,0),0)+'% '+" +
+            //          "+ CASE WHEN BIOA.normalbehaviorid IS NULL THEN ((SELECT" +
+            //          "      TOP 1" +
+            //          "     Rtrim(" +
+            //          "    Ltrim(Upper(" +
+            //          "   US.userinitial))) FROM behaviour BH INNER JOIN [user] US" +
+            //          "  ON" +
+            //          " BH.createdby" +
+            //          " =" +
+            //          " US.userid WHERE BH.createdon BETWEEN" +
+            //            " Dateadd(minute, -5, BIOA.createdon)" +
+            //            " AND" +
+            //            " BIOA.createdon ORDER BY BH.createdon DESC)+'/'+ (SELECT" +
+            //            " TOP 1" +
+            //            " Rtrim(Ltrim(Upper(US.userinitial))) FROM" +
+            //            " behaviorioadetails BI" +
+            //            " INNER" +
+            //            " JOIN [user]" +
+            //            " US ON BI.createdby =" +
+            //            " US.userid WHERE BI.createdon=BIOA.createdon ORDER BY" +
+            //            " BI.createdon DESC)" +
+            //            " )" +
+            //            " ELSE ((" +
+            //            " SELECT" +
+            //            " Rtrim(Ltrim(Upper(US.userinitial))) FROM behaviour BH" +
+            //            " INNER" +
+            //            " JOIN [user]" +
+            //            " US ON" +
+            //            " BH.createdby = US.userid WHERE" +
+            //            " BIOA.normalbehaviorid=BH.behaviourid)+'/'+ (" +
+            //            " SELECT Rtrim(" +
+            //            " Ltrim(Upper(US.userinitial))) FROM behaviorioadetails BI" +
+            //            " INNER" +
+            //            " JOIN" +
+            //            " [user] US ON" +
+            //            " BI.createdby = US.userid INNER JOIN behaviour BH ON" +
+            //            " BH.behaviourid=BI.normalbehaviorid WHERE" +
+            //            " BIOA.normalbehaviorid=BH.behaviourid))" +
+            //            " END " +
+            //          " AS EventName, " +
+            //          "'Arrow notes' AS StdtSessEventType,  CONVERT(CHAR(10), BIOA.CreatedOn,101) AS EvntTs,  " +
+            //          " BHD.Behaviour FROM BehaviorIOADetails BIOA LEFT JOIN BehaviourDetails BHD ON BIOA.MeasurementId=BHD.MeasurementId " +
+            //          "WHERE BIOA.StudentId=" + StudentId + " AND IOAPerc IS NOT NULL AND BIOA.ActiveInd='A') )IOA ) " +
+            //          "  ad " +
+            //          " WHERE  ( ( ad.behaviour IS  NULL " +
+            //          " AND ad.measurementid = 0 )" +
+            //          "OR ad.behaviour = (SELECT TOP 1 behaviour " +
+            //          "FROM   behaviourdetails " +
+            //          "WHERE  measurementid = " + row["MeasurementId"] + ") ) " +
+            //          " AND ad.stdtsesseventtype IN( 'Arrow notes' ) " +
+            //          " AND CONVERT(DATE, ad.evntts) >=  cast('" + stDate + "' as date) " +
+            //          " AND CONVERT(DATE, ad.evntts) <=  cast('" + endDate + "' as date) " +
+            //          " )outr " +
+            //           " FOR XML PATH('')),1,1,'') eventname ";
+            //            dtNew6 = objData.ReturnDataTable(queryfilter, false);
+            //            if(Convert.ToString(dtNew6.Rows[0]["eventname"])!="" && Convert.ToString(dtNew6.Rows[0]["eventname"])!=null)
+            //             concatStrng += "&lt;b&gt;" + Beh + " : " + "&lt;/b&gt;" + Convert.ToString(dtNew6.Rows[0]["eventname"]) + System.Environment.NewLine;
 
-                        string Phaseline = "SELECT 'Major Condition Lines' as Eventname,(SELECT STUFF((SELECT ', '+ EventName + ' (' + CONVERT(VARCHAR(50), EvntTs,101)+')' FROM StdtSessEvent WHERE CONVERT(DATE, EvntTs) BETWEEN CONVERT(DATE,'" + dtst + "') AND CONVERT(DATE,'" + dted + "') AND " +
-                                                       " (StdtSessEventType='Major' AND  MeasurementId IS NOT NULL AND MeasurementId !=-1 AND (MeasurementId=0 OR MeasurementId=" + row["MeasurementId"] + ")) AND StudentId=" + StudentId + " AND SchoolId=" + SchoolId + " FOR XML PATH('')),1,1,'')) Eventdata";
-                        dtNew1 = objData.ReturnDataTable(Phaseline, false);
-                        if (Convert.ToString(dtNew1.Rows[0]["Eventdata"]) != "" && Convert.ToString(dtNew1.Rows[0]["Eventdata"]) != null)
-                            concatStrngMj += "<b>" + Beh + " : " + "</b>" + Convert.ToString(dtNew1.Rows[0]["Eventdata"]) + "<br></br>";
+            //            string Phaseline = "SELECT 'Major Condition Lines' as Eventname,(SELECT STUFF((SELECT ', '+ EventName + ' (' + CONVERT(VARCHAR(50), EvntTs,101)+')' FROM StdtSessEvent WHERE CONVERT(DATE, EvntTs) BETWEEN CONVERT(DATE,'" + dtst + "') AND CONVERT(DATE,'" + dted + "') AND " +
+            //                                           " (StdtSessEventType='Major' AND  MeasurementId IS NOT NULL AND MeasurementId !=-1 AND (MeasurementId=0 OR MeasurementId=" + row["MeasurementId"] + ")) AND StudentId=" + StudentId + " AND SchoolId=" + SchoolId + " FOR XML PATH('')),1,1,'')) Eventdata";
+            //            dtNew1 = objData.ReturnDataTable(Phaseline, false);
+            //            if (Convert.ToString(dtNew1.Rows[0]["Eventdata"]) != "" && Convert.ToString(dtNew1.Rows[0]["Eventdata"]) != null)
+            //                concatStrngMj += "<b>" + Beh + " : " + "</b>" + Convert.ToString(dtNew1.Rows[0]["Eventdata"]) + "<br></br>";
 
-                        string Conditionline = "SELECT 'Minor Condition Lines' as Eventname,(SELECT STUFF((SELECT ', '+ EventName + ' (' + CONVERT(VARCHAR(50), EvntTs,101)+')' FROM StdtSessEvent WHERE CONVERT(DATE, EvntTs) BETWEEN CONVERT(DATE,'" + dtst + "') AND CONVERT(DATE,'" + dted + "') AND " +
-                         " (StdtSessEventType='Minor' AND  MeasurementId IS NOT NULL AND MeasurementId !=-1 AND (MeasurementId=0 OR MeasurementId=" + row["MeasurementId"] + ")) AND StudentId=" + StudentId + " AND SchoolId=" + SchoolId + " FOR XML PATH('')),1,1,'')) Eventdata";
-                        dtNew2 = objData.ReturnDataTable(Conditionline, false);
-                        if (Convert.ToString(dtNew2.Rows[0]["Eventdata"]) != "" && Convert.ToString(dtNew2.Rows[0]["Eventdata"]) != null)
-                            concatStrngMn += "<b>" + Beh + " : " + "</b>" + Convert.ToString(dtNew2.Rows[0]["Eventdata"]) + "<br></br>";
+            //            string Conditionline = "SELECT 'Minor Condition Lines' as Eventname,(SELECT STUFF((SELECT ', '+ EventName + ' (' + CONVERT(VARCHAR(50), EvntTs,101)+')' FROM StdtSessEvent WHERE CONVERT(DATE, EvntTs) BETWEEN CONVERT(DATE,'" + dtst + "') AND CONVERT(DATE,'" + dted + "') AND " +
+            //             " (StdtSessEventType='Minor' AND  MeasurementId IS NOT NULL AND MeasurementId !=-1 AND (MeasurementId=0 OR MeasurementId=" + row["MeasurementId"] + ")) AND StudentId=" + StudentId + " AND SchoolId=" + SchoolId + " FOR XML PATH('')),1,1,'')) Eventdata";
+            //            dtNew2 = objData.ReturnDataTable(Conditionline, false);
+            //            if (Convert.ToString(dtNew2.Rows[0]["Eventdata"]) != "" && Convert.ToString(dtNew2.Rows[0]["Eventdata"]) != null)
+            //                concatStrngMn += "<b>" + Beh + " : " + "</b>" + Convert.ToString(dtNew2.Rows[0]["Eventdata"]) + "<br></br>";
 
-                    }
+            //        }
 
-                }
+            //    }
 
-                Dt.Columns.Add("Phaseline", typeof(string));
-                Dt.Columns.Add("Conditionline", typeof(string));
-                Dt.Columns.Add("Arrownote", typeof(string));
-                //System.Data.DataRow dr5 = Dt.NewRow();
-                if (concatStrngMj == "")
-                {
-                dr5["Phaseline"] = "No Results.";
-                }
-                else
-                {
-                    dr5["Phaseline"] = concatStrngMj;
-                }
-                if (concatStrngMn == "")
-                {
-                dr5["Conditionline"] = "No Results.";
-                }
-                else
-                {
-                    dr5["Conditionline"] = concatStrngMn;
-                }
-                if (concatStrng == "")
-                {
-                    dr5["Arrownote"] = "No Results.";
-                }
-                else
-                {
-                dr5["Arrownote"] = concatStrng;
-                }
-                Dt.Rows.Add(dr5);
+            //    Dt.Columns.Add("Phaseline", typeof(string));
+            //    Dt.Columns.Add("Conditionline", typeof(string));
+            //    Dt.Columns.Add("Arrownote", typeof(string));
+            //    //System.Data.DataRow dr5 = Dt.NewRow();
+            //    if (concatStrngMj == "")
+            //    {
+            //    dr5["Phaseline"] = "No Results.";
+            //    }
+            //    else
+            //    {
+            //        dr5["Phaseline"] = concatStrngMj;
+            //    }
+            //    if (concatStrngMn == "")
+            //    {
+            //    dr5["Conditionline"] = "No Results.";
+            //    }
+            //    else
+            //    {
+            //        dr5["Conditionline"] = concatStrngMn;
+            //    }
+            //    if (concatStrng == "")
+            //    {
+            //        dr5["Arrownote"] = "No Results.";
+            //    }
+            //    else
+            //    {
+            //    dr5["Arrownote"] = concatStrng;
+            //    }
+            //    Dt.Rows.Add(dr5);
        
-            }
+            //}
 
            // Dt = objData.ReturnDataTable(strQuery2, false);
 
