@@ -972,5 +972,237 @@ public class clsAssignLessonPlan
         }
     }
 
+    public int CopyCustomtemplateWithTrans(int templateid, int loginid, int visualLessonId, SqlConnection Con, SqlTransaction Trans, int SLpId = 0)
+    {
+        objData = new clsData();
+        string strQuery = "";
+        int oldSetId = 0;
+        int parentSetId = 0;
+        try
+        {
+            strQuery = "SELECT LessonPlanId,StudentId from DSTempHdr WHERE DSTempHdrId=" + templateid;
+            DataTable dt = new DataTable();
+            dt = objData.ReturnDataTable(strQuery, Con, Trans, false);
+            strQuery = "SELECT MAX(VerNbr) from DSTempHdr WHERE LessonPlanId=" + Convert.ToInt32(dt.Rows[0]["LessonPlanId"]) + " AND StudentId=" + Convert.ToInt32(dt.Rows[0]["StudentId"]) + " AND [StatusId]<>(SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' And LookupName='Deleted')";
+            string version = objData.FetchValueTrans(strQuery, Trans, Con).ToString();
+            version = checkversion(version);
+            strQuery = "select StdtLessonPlanid from DSTempHdr where DSTempHdrId=" + templateid;
+            int stdtLpId = Convert.ToInt32(objData.FetchValueTrans(strQuery, Trans, Con));
+            if (SLpId != 0)
+            {
+                stdtLpId = SLpId;
+            }
+            //strQuery = "Update DSTempHdr set [StatusId]=(SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' And LookupName='Expired')  WHERE DSTempHdrId= " + templateid;
+            //int expiredId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+
+            strQuery = "INSERT INTO DSTempHdr ([SchoolId],[StudentId],[LessonPlanId],[StdtLessonplanId],[TeachingProcId],[DSTemplateName],[NoofTimesTried],[NoofTimesTriedPer]," +
+                       "[DSTemplateDesc],[VerBeginDate],[VerEndDate],[CurrVerInd],[MultiSetsInd],[MultiStepInd],[SkillType],[MatchToSampleType],[NbrOfTrials]," +
+                       "[ChainType],[TotalTaskFormat],[TotalTaskType],[TaskOther],[MatchToSampleRecOrExp],[PromptTypeId],[TotNbrOfSessions],[SessionFreq],[NbrOfSession],[CompCurrInd],[StatusId],[IsVisualTool]," +
+                       "[VTLessonId],[Baseline],[Objective],[GeneralProcedure],[BaselineProc],[BaselineStart],[BaselineEnd],[CorrRespDef]," +
+                       "[CorrectResponse],[StudCorrRespDef],[IncorrRespDef],[StudIncorrRespDef],[CorrectionProc],[ReinforcementProc]," +
+                       "[TeacherRespReadness],[StudentReadCrita],[MajorSetting],[MinorSetting],[LessonDefInst],[Mistrial],[MistrialResponse]," +
+                       "[TeacherPrepare],[StudentPrepare],[StudResponse],[CreatedBy],[CreatedOn],[ModifiedBy],[ModifiedOn]," +
+                       "[FrameandStrand],[LessonPlanGoal],[SpecStandard],[SpecEntryPoint],[PreReq],[Materials],[ApprNoteLessonInfo],[ApprNoteTypeInstruction],[ApprNoteMeasurement],[ApprNoteSet],[ApprNoteStep],[ApprNotePrompt],[ApprNoteLessonProc],[LessonOrder],[deletessn],[LessonSDate],[LessonEDate]) SELECT [SchoolId],[StudentId],[LessonPlanId]," + stdtLpId + "," +
+                       "[TeachingProcId],[DSTemplateName],[NoofTimesTried],[NoofTimesTriedPer],[DSTemplateDesc],[VerBeginDate],[VerEndDate],[CurrVerInd],[MultiSetsInd],[MultiStepInd]," +
+                       "[SkillType],[MatchToSampleType],[NbrOfTrials],[ChainType],[TotalTaskFormat],[TotalTaskType],[TaskOther],[MatchToSampleRecOrExp],[PromptTypeId],[TotNbrOfSessions],[SessionFreq],[NbrOfSession],[CompCurrInd]," +
+                       "(SELECT  LookupId FROM LookUp WHERE LookupType='TemplateStatus' And LookupName='In Progress'),[IsVisualTool]," +
+                       "'" + visualLessonId + "',[Baseline],[Objective],[GeneralProcedure],[BaselineProc],[BaselineStart],[BaselineEnd]," +
+                       "[CorrRespDef],[CorrectResponse],[StudCorrRespDef],[IncorrRespDef],[StudIncorrRespDef],[CorrectionProc],[ReinforcementProc]," +
+                       "[TeacherRespReadness],[StudentReadCrita],[MajorSetting],[MinorSetting],[LessonDefInst],[Mistrial],[MistrialResponse]," +
+                       "[TeacherPrepare],[StudentPrepare],[StudResponse]," + loginid + ",GETDATE()," + loginid + ",GETDATE(),[FrameandStrand],[LessonPlanGoal]" +
+                       ",[SpecStandard],[SpecEntryPoint],[PreReq],[Materials],[ApprNoteLessonInfo],[ApprNoteTypeInstruction],[ApprNoteMeasurement],[ApprNoteSet],[ApprNoteStep],[ApprNotePrompt],[ApprNoteLessonProc],[LessonOrder],[deletessn],[LessonSDate],[LessonEDate] FROM DSTempHdr WHERE DSTempHdrId='" + templateid + "'";
+
+            int TId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+            strQuery = "UPDATE DSTempHdr SET VerNbr='" + version + "' WHERE DSTempHdrId=" + TId;
+            objData.ExecuteWithTrans(strQuery, Con, Trans);
+
+            DataTable dtpromt = new DataTable();
+            dtpromt = objData.ReturnDataTable("SELECT DSTempPromptId FROM DSTempPrompt WHERE DSTempHdrId=" + templateid + "", Con, Trans, false);
+            if (dtpromt != null)
+            {
+                if (dtpromt.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dtpromt.Rows)
+                    {
+                        strQuery = "INSERT INTO DSTempPrompt(DSTempHdrId,PromptId,PromptOrder,ActiveInd,CreatedBy,CreatedOn) ";
+                        strQuery += "SELECT " + TId + ",PromptId,PromptOrder,ActiveInd," + loginid + ",CreatedOn FROM DSTempPrompt WHERE DSTempPromptId=" + Convert.ToInt32(row["DSTempPromptId"]) + "";
+                        int PromptId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+                    }
+                }
+            }
+            DataTable dtset = new DataTable();
+            Hashtable ht = new Hashtable();
+            dtset = objData.ReturnDataTable("SELECT DSTempSetId FROM DSTempSet WHERE DSTempHdrId=" + templateid + "", Con, Trans, false);
+            if (dtset != null)
+            {
+                if (dtset.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dtset.Rows)
+                    {
+                        strQuery = "INSERT INTO DSTempSet(SchoolId,DSTempHdrId,PrevSetId,SetCd,SetName,Samples,SortOrder,ActiveInd,CreatedBy,CreatedOn,DistractorSamples,DistractorSamplesCount) ";
+                        strQuery += "SELECT  SchoolId," + TId + ",PrevSetId,SetCd,SetName,Samples,SortOrder,ActiveInd," + loginid + ",getdate(),DistractorSamples,DistractorSamplesCount FROM DSTempSet WHERE ActiveInd='A' AND DSTempSetId = " + Convert.ToInt32(row["DSTempSetId"]) + " ";
+                        int SetId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+                        if (!ht.ContainsKey(row["DSTempSetId"]))
+                        {
+                            ht.Add(row["DSTempSetId"], SetId);
+                        }
+                    }
+                }
+            }
+            string teachingProc = "";
+            string sqlStr = "";
+            sqlStr = "SELECT DH.LessonPlanId,ISNULL(LU.LookupName,'') AS TeachingProc,ISNULL(LUp.LookupName,'') as PromptProc ,SkillType,ISNULL(NbrOfTrials,0) as NbrOfTrials," +
+                    "LP.LessonPlanName,ISNULL(LP.Materials,'') as Mat,ISNULL(ChainType,'') AS ChainType,DH.IsVisualTool,ISNULL(DH.VTLessonId,0) as VTLessonId,ISNULL(ModificationInd,0) as ModificationInd FROM DSTempHdr DH JOIN LessonPlan LP ON LP.LessonPlanId=DH.LessonPlanId LEFT " +
+                    "JOIN LookUp LU ON TeachingProcId=LU.LookUpId INNER JOIN Lookup LUp ON LUp.LookupId=PromptTypeId WHERE DSTempHdrId=" + templateid;
+            DataTable dtTmpHdrDtls = objData.ReturnDataTable(sqlStr, false);
+            if (dtTmpHdrDtls != null)
+            {
+                if (dtTmpHdrDtls.Rows.Count > 0)
+                {
+                    teachingProc = dtTmpHdrDtls.Rows[0]["TeachingProc"].ToString();
+                }
+            }
+            if (teachingProc == "Match-to-Sample")
+            {
+                DataTable dtstep = new DataTable();
+                dtstep = objData.ReturnDataTable("SELECT DSTempStepId,DSTempSetId FROM DSTempStep WHERE DSTempHdrId=" + templateid + " AND ActiveInd='A' AND IsDynamic=0", Con, Trans, false);
+                if (dtstep.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dtstep.Rows)
+                    {
+                        oldSetId = Convert.ToInt32(row["DSTempSetId"]);
+                        if (oldSetId != 0)
+                        {
+                            parentSetId = SetUpdateCopy(oldSetId, TId, Trans, Con);
+                        }
+                        strQuery =
+                        strQuery = "INSERT INTO DSTempStep(SchoolId,DSTempHdrId,DSTempSetId,PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder,CreatedBy,ActiveInd,CreatedOn) ";
+                        strQuery += "SELECT SchoolId," + TId + "," + parentSetId + ",PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder," + loginid + ",ActiveInd,GETDATE()	FROM DSTempStep WHERE ActiveInd='A' AND DSTempStepId = " + Convert.ToInt32(row["DSTempStepId"]) + " ";
+                        int StepId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+                    }
+                }
+            }
+            else
+            {
+                int oldParentSetId = 0;
+                DataTable dtParentStep = new DataTable();
+                // strQuery = "INSERT INTO DSTempParentStep(SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn) ";
+                strQuery = "SELECT  DSTempParentStepId,SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn"
+                    + " FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + templateid + " AND ActiveInd = 'A')   AND DSTempHdrId = " + templateid;
+                dtParentStep = objData.ReturnDataTable(strQuery, Con, Trans, false);
+                //  int DSTempParentStepId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+                // DataTable dt
+                if (dtParentStep != null)
+                {
+                    if (dtParentStep.Rows.Count > 0)
+                    {
+                        foreach (DataRow row in dtParentStep.Rows)
+                        {
+                            string newsetids = "";
+                            foreach (string setid in row["SetIds"].ToString().Split(','))
+                            {
+                                if (setid != "")
+                                {
+                                    if (ht.ContainsKey(Convert.ToInt32(setid)))
+                                    {
+                                        newsetids += ht[Convert.ToInt32(setid)] + ",";
+                                    }
+                                }
+                            }
+                            oldParentSetId = Convert.ToInt32(row["DSTempParentStepId"]);
+                            strQuery = "INSERT INTO DSTempParentStep(SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn) "
+                                        + "SELECT  SchoolId," + TId + ",StepCd,StepName,DSTempSetId,SortOrder,'" + newsetids + "',SetNames,ActiveInd," + loginid + ",getdate()"
+                                        + " FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempHdrId = " + templateid + " AND DSTempParentStepId=" + oldParentSetId;
+                            parentSetId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+
+                            DataTable dtstep = new DataTable();
+
+                            strQuery = "SELECT  SchoolId,PrevStepId,SortOrder,PreDefinedInd,CustomById,VTStepId,DSTempSetId,StepCd,StepName,ActiveInd,"
+                                    + "DSTempParentStepId FROM DSTempStep WHERE ActiveInd='A' AND DSTempParentStepId=" + oldParentSetId + " AND DSTempHdrId = " + templateid;
+                            dtstep = objData.ReturnDataTable(strQuery, Con, Trans, false);
+                            if (dtstep.Rows.Count > 0)
+                            {
+                                foreach (DataRow rows in dtstep.Rows)
+                                {
+                                    oldSetId = Convert.ToInt32(rows["DSTempSetId"]);
+
+                                    strQuery = "INSERT INTO DSTempStep(SchoolId,DSTempHdrId,DSTempSetId,PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder,CreatedBy,ActiveInd,CreatedOn) ";
+                                    strQuery += "SELECT SchoolId," + TId + ",DSTempSetId,PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder," + loginid + ",ActiveInd,GETDATE()"
+                                        + "	FROM DSTempStep WHERE ActiveInd='A' AND DSTempSetId = " + oldSetId + " AND DSTempParentStepId=" + oldParentSetId;
+                                    int StepId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+                                    strQuery = "SELECT DSTempSetId FROM DSTempStep WHERE ActiveInd='A' AND DSTempStepId=" + StepId;
+                                    int NewSetId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+                                    if (ht.ContainsKey(Convert.ToInt32(NewSetId)))
+                                    {
+                                        newsetids = ht[Convert.ToInt32(NewSetId)].ToString();
+                                        strQuery = "UPDATE DSTempStep SET DSTempSetId=" + Convert.ToInt32(ht[Convert.ToInt32(NewSetId)]) + ",DSTempParentStepId=" + parentSetId + ""
+                                            + " WHERE DSTempStepId=" + StepId;
+                                        int updateId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+                                    }
+
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+
+            DataTable dtsetcol = new DataTable();
+            dtsetcol = objData.ReturnDataTable("SELECT DSTempSetColId FROM DSTempSetCol WHERE DSTempHdrId=" + templateid + "", Con, Trans, false);
+            if (dtsetcol != null)
+            {
+                if (dtsetcol.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dtsetcol.Rows)
+                    {
+                        strQuery = "INSERT INTO DSTempSetCol(SchoolId, DSTempHdrId,ColName,ColTypeCd,CorrRespType,CorrResp,CorrRespDesc	,InCorrRespDesc,CorrStdtResp	,InCorrStdResp,IncMisTrialInd,MisTrialDesc,CalcuType,CalcuData,ActiveInd,CreatedBy,CreatedOn,MoveUpstat) ";
+                        strQuery += "SELECT SchoolId, " + TId + ",ColName,ColTypeCd,CorrRespType,CorrResp,CorrRespDesc	,InCorrRespDesc,CorrStdtResp,InCorrStdResp,IncMisTrialInd,MisTrialDesc,CalcuType,CalcuData,ActiveInd," + loginid + ",CreatedOn,MoveUpstat FROM DSTempSetCol WHERE DSTempSetColId = " + Convert.ToInt32(row["DSTempSetColId"]) + " ";
+                        int setColNewId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+                        DataTable dtsetcolcalc = new DataTable();
+                        dtsetcolcalc = objData.ReturnDataTable("SELECT DSTempSetColCalcId FROM DSTempSetColCalc WHERE DSTempSetColId=" + Convert.ToInt32(row["DSTempSetColId"]) + "", Con, Trans, false);
+                        if (dtsetcolcalc.Rows.Count > 0)
+                        {
+                            foreach (DataRow rowc in dtsetcolcalc.Rows)
+                            {
+                                strQuery = "INSERT INTO DSTempSetColCalc(SchoolId,DSTempSetColId,CalcType,CalcLabel,CalcFormula,CalcRptLabel,ActiveInd,CreatedBy,CreatedOn,IncludeInGraph) " +
+                                            "SELECT SchoolId," + setColNewId + ",CalcType,CalcLabel,CalcFormula,CalcRptLabel,ActiveInd," + loginid + ",getdate(),IncludeInGraph FROM DSTempSetColCalc WHERE DSTempSetColCalcId=" + Convert.ToInt32(rowc["DSTempSetColCalcId"]) + "";
+                                int setColCalId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+
+                                strQuery = "INSERT INTO DSTempRule(DSTempHdrId,SchoolId,DSTempSetColId,DSTempSetColCalcId,RuleType,CriteriaType,ScoreReq,TotalInstance,TotCorrInstance,ConsequetiveInd,ConsequetiveAvgInd,MultiTeacherReqInd,IOAReqInd,LogicalCombType,ActiveInd,IsComment,IsNA,ModificationComment,ModificationRule,CreatedBy,CreatedOn) "; //--- [New Criteria] May 2020 ---//
+                                strQuery += "SELECT  " + TId + ",SchoolId," + setColNewId + "," + setColCalId + ",RuleType,CriteriaType,ScoreReq,TotalInstance,TotCorrInstance,ConsequetiveInd,ISNULL(ConsequetiveAvgInd,0) AS ConsequetiveAvgInd,MultiTeacherReqInd,IOAReqInd,LogicalCombType,ActiveInd,IsComment,IsNA,ModificationComment,ModificationRule,CreatedBy,CreatedOn FROM DSTempRule WHERE DSTempSetColId=" + Convert.ToInt32(row["DSTempSetColId"]) + " And DSTempSetColCalcId=" + Convert.ToInt32(rowc["DSTempSetColCalcId"]) + " "; //--- [New Criteria] May 2020 ---//
+                                int lastId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+                            }
+                        }
+
+                    }
+                    strQuery = "INSERT INTO DSTempRule(DSTempHdrId,SchoolId,DSTempSetColId,DSTempSetColCalcId,RuleType,CriteriaType,ScoreReq,TotalInstance,TotCorrInstance,ConsequetiveInd,ConsequetiveAvgInd,MultiTeacherReqInd,IOAReqInd,LogicalCombType,ActiveInd,IsComment,IsNA,ModificationComment,ModificationRule,CreatedBy,CreatedOn) "; //--- [New Criteria] May 2020 ---//
+                    strQuery += "SELECT  " + TId + ",SchoolId,0,0,RuleType,CriteriaType,ScoreReq,TotalInstance,TotCorrInstance,ConsequetiveInd,ISNULL(ConsequetiveAvgInd,0) AS ConsequetiveAvgInd,MultiTeacherReqInd,IOAReqInd," //--- [New Criteria] May 2020 ---//
+                        + "LogicalCombType,ActiveInd,IsComment,IsNA,ModificationComment,ModificationRule,CreatedBy,CreatedOn FROM DSTempRule WHERE" +
+                        " DSTempSetColId=0 And DSTempSetColCalcId=0 AND DSTempHdrId=" + templateid;
+                    int lastModRuleId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+
+                }
+            }
+
+            string strQry = " SELECT NextSetId FROM StdtDSStat WHERE DSTempHdrId = " + templateid;
+            int prevSetId = Convert.ToInt32(objData.FetchValueTrans(strQry, Trans, con));
+            strQry = " UPDATE S SET S.PrevSetId = " + prevSetId + " FROM DSTempSet S INNER JOIN DSTempSet ref     ON ref.DSTempSetId = " + prevSetId +
+                     " WHERE S.DSTempHdrId = " + TId + " AND S.SetName   = ref.SetName   AND S.SetCd     = ref.SetCd   " +
+                     " AND S.SortOrder = ref.SortOrder AND S.CreatedBy = " + loginid;
+            int prevIdSet = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQry, Con, Trans));
+
+            return TId;
+        }
+        catch (Exception Ex)
+        {
+            ClsErrorLog errlog = new ClsErrorLog();
+            errlog.WriteToLog(
+                "Page Name: " + clsGeneral.getPageName() + "\n" + Ex.ToString());
+
+            throw;
+        }
+    }
+
 
 }

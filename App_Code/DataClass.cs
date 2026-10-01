@@ -1020,6 +1020,18 @@ public class DataClass
         return x;
     }
 
+    public int Execute_SpCopyLessonWithTrans(string procedureName, int lessonId, int isStEdit, int isCcEdit, SqlConnection con, SqlTransaction trans)
+    {
+        using (SqlCommand com = new SqlCommand(procedureName, con, trans))
+        {
+            com.CommandType = CommandType.StoredProcedure;
+            com.Parameters.AddWithValue("@pcopyLessonId", lessonId);
+            com.Parameters.AddWithValue("@pIsStEdit", isStEdit);
+            com.Parameters.AddWithValue("@pIsCCEdit", isCcEdit);
+            return Convert.ToInt32(com.ExecuteScalar());
+        }
+    }
+
     public void Test()
     {
 
