@@ -909,5 +909,61 @@ public class clsDocumentasBinary
     #endregion
 
 
+    public int saveDocumentWithTrans(byte[] contents,string FileName,string Ver,string Type,int DocId,string Module,int SchoolId,int StudentId,int UserId,SqlConnection con,SqlTransaction trans)
+    {
+        try
+        {
+            if (con == null)
+                throw new Exception("saveDocumentWithTrans: con is NULL.");
+
+            if (con.State != ConnectionState.Open)
+                throw new Exception("saveDocumentWithTrans: con is not OPEN. State = " + con.State);
+
+            if (trans == null)
+                throw new Exception("saveDocumentWithTrans: trans is NULL.");
+
+            string contentType = "application/msword";
+
+            string query = @"
+            INSERT INTO BinaryFiles
+            (SchoolId,StudentId,DocId,DocumentName,ContentType,Data,type,ModuleName,VersionNo,Varified,CreatedBy,CreatedOn)
+            VALUES
+            (@SchoolId,@StudentId,@DocId,@DocumentName,@ContentType,@Data,@type,@ModuleName,@VersionNo,@Varified,@CreatedBy,@CreatedOn);
+
+            SELECT SCOPE_IDENTITY();";
+
+            using (SqlCommand cmd = new SqlCommand(query, con, trans))
+            {
+                if (cmd.Connection == null)
+                    throw new Exception("saveDocumentWithTrans: SqlCommand.Connection is NULL.");
+
+                cmd.Parameters.AddWithValue("@SchoolId", SchoolId);
+                cmd.Parameters.AddWithValue("@StudentId", StudentId);
+                cmd.Parameters.AddWithValue("@DocId", DocId);
+                cmd.Parameters.AddWithValue("@DocumentName", FileName);
+                cmd.Parameters.AddWithValue("@ContentType", contentType);
+                cmd.Parameters.AddWithValue("@Data", contents);
+                cmd.Parameters.AddWithValue("@type", Type);
+                cmd.Parameters.AddWithValue("@ModuleName", Module);
+                cmd.Parameters.AddWithValue("@VersionNo", Ver);
+                cmd.Parameters.AddWithValue("@Varified", true);
+                cmd.Parameters.AddWithValue("@CreatedBy", UserId);
+                cmd.Parameters.AddWithValue("@CreatedOn", DateTime.Now);
+
+                object result = cmd.ExecuteScalar();
+
+                if (result == null || result == DBNull.Value)
+                    throw new Exception("BinaryFiles insert returned NULL.");
+
+                return Convert.ToInt32(result);
+            }
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
+
 
 }

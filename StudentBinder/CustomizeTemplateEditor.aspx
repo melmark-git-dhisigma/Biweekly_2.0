@@ -2052,6 +2052,7 @@
         <asp:HiddenField runat="server" ID="hfTotalSetCount" />
         <asp:HiddenField runat="server" ID="hfTotalStepCount" />
         <asp:HiddenField runat="server" ID="hfTotalPromptCount" />
+        <asp:HiddenField ID="hdnContinueCopy" runat="server" Value="" />
         <asp:ScriptManager ID="ScriptManager1" runat="server" AsyncPostBackTimeOut="210000"></asp:ScriptManager>
         <div style="text-align: right">
         </div>

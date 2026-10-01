@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using System.Web.Services;
 using System.Globalization;
 using System.Net.Mail;
+using System.Configuration;
 
 public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 {
@@ -171,6 +172,14 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             }
 
             hideAllOptions();
+        }
+        else
+        {
+            if (Request["__EVENTTARGET"] == "ConfirmCopy")
+            {
+                hdnContinueCopy.Value = "YES";
+                btnCopyTempAdmin_click(sender, e);
+            }
         }
 
         //if (IsPostBack && Request["__EVENTTARGET"] == "ForceDeleteStep")
@@ -16578,7 +16587,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
         LoadData();
         lessonSDate.Text = "";
-        lessonEDate.Text = "";        btndoc.Visible = false;
+        lessonEDate.Text = "";        
+        btndoc.Visible = false;
         btnDelLp.Visible = false;
         btnrejectedNotes.Visible = false;
         btnFromReject.Visible = false;
@@ -17467,13 +17477,25 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                     {
 
                         string filename = System.IO.Path.GetFileName(fupDoc.FileName);
+                        if (filename.Length > 50)
+                        {
+                            divMessage.InnerHtml = clsGeneral.warningMsg("File name is too long. Please use a file name with 50 characters or less.");
+
+                            ScriptManager.RegisterClientScriptBlock(
+                                this,
+                                typeof(Page),
+                                Guid.NewGuid().ToString(),
+                                "$(document).ready(function(){popPrompts();});",
+                                true
+                            );
+
+                            return;
+                        }
                         HttpPostedFile myFile = fupDoc.PostedFile;
                         int nFileLen = myFile.ContentLength;
                             byte[] myData = new byte[nFileLen];
                             myFile.InputStream.Read(myData, 0, nFileLen);
-                            string strquerry = "INSERT INTO LPDoc(SchoolId,DSTempHdrId,DocURL,CreatedBy,CreatedOn) values(" + sess.SchoolId + "," + headerId + ",'" + filename + "'," + sess.LoginId + ",GETDATE())";
-                            int docid = objData.ExecuteWithScope(strquerry);
-                            int binaryid = objBinary.saveDocument(myData, filename, "", "LP_DOC", docid, "LessonPlanDoc", sess.SchoolId, 0, sess.LoginId);
+                        UploadDocument(headerId);
                             FillDocSmall(headerId);
                             ScriptManager.RegisterClientScriptBlock(this, typeof(System.Web.UI.Page), Guid.NewGuid().ToString(), "$(document).ready(function(){popPrompts();});", true);
                        
@@ -17498,8 +17520,17 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception ex)
         {
-            lMsg.ForeColor = System.Drawing.Color.Red;
-            lMsg.Text = "Error:" + ex.Message.ToString();
+            divMessage.InnerHtml = clsGeneral.warningMsg("Document upload failed: " + ex.Message);
+
+            ScriptManager.RegisterClientScriptBlock(
+                this,
+                typeof(Page),
+                Guid.NewGuid().ToString(),
+                "$(document).ready(function(){popPrompts();});",
+                true
+            );
+
+            postBackDetailsLogging(ex, -1, -1);
         }
         drpTasklist_SelectedIndexChanged1(sender, e);
     }
@@ -19019,7 +19050,7 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
 
     }
-    protected int AddLessonPlan(string LpName, DataTable GoalId, string Type, int oldLp, string TypeofLP, int DSTempId, out object objYearId)
+    protected int AddLessonPlan(string LpName, DataTable GoalId, string Type, int oldLp, string TypeofLP, int DSTempId, out object objYearId, SqlConnection con, SqlTransaction trans)
     {
         objData = new clsData();
         sess = (clsSession)Session["UserSession"];
@@ -19044,10 +19075,6 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
         //if (oData.IFExists("select LessonPlanId from LessonPlan where LessonPlanName='" + txtLPname.Text + "'") == false)
         //{
-        SqlConnection con = new SqlConnection();
-        con = objData.Open();
-
-        SqlTransaction trans = con.BeginTransaction();
         int LPid = 0;
         try
         {
@@ -19082,8 +19109,6 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                         objData.ExecuteWithScopeandConnection(insHDR, con, trans);
                     }
 
-                    objData.CommitTransation(trans, con);
-
                 }
 
             }
@@ -19091,10 +19116,8 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         catch (Exception ex)
         {
-            objData.RollBackTransation(trans, con);
-            con.Close();
-            return 0;
             postBackDetailsLogging(ex, -1, -1);throw ex;
+            throw;
         }
 
     }
@@ -19102,6 +19125,9 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
 
     protected void btnCopyTempAdmin_click(object sender, EventArgs e)
     {
+        SqlConnection con = null;
+        SqlTransaction trans = null;
+
         objData = new clsData();
         int apprvdLessonId = 0;
         int visualLessonId = 0;
@@ -19130,28 +19156,63 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
         }
         sess = clsGeneralSchk.sessioncheck(curesesid, preid, ip, preuser, sess, Prevsess, SessStudentid, PreClassid, Sessstname, Pagepath);
 
-        visualLessonId = ReturnNewVLessonId(apprvdLessonId);
-        GoalId = objData.ReturnDataTable("SELECT GoalId FROM StdtLessonPlan WHERE StdtLessonPlanId=(SELECT StdtLessonplanId FROM DSTempHdr WHERE DSTempHdrId='" + apprvdLessonId + "')", false);
-        int OldLpId = Convert.ToInt32(objData.FetchValue("SELECT LessonPlanId FROM DSTempHdr WHERE DSTempHdrId=" + apprvdLessonId));
-
         try
         {
             if (sess != null)
             {
+                List<string> missingDocs = ValidateDocuments(apprvdLessonId);
+
+                if (missingDocs.Count > 0 && hdnContinueCopy.Value != "YES")
+                {
+                    ScriptManager.RegisterStartupScript(
+                        this,
+                        this.GetType(),
+                        "confirmCopy",
+                        "if(confirm('Some documents are missing and cannot be copied. Continue without documents?')) {" +
+                        "__doPostBack('ConfirmCopy','');" +
+                        "}",
+                        true
+                    );
+                    return;
+                }
+                con = new SqlConnection(System.Configuration.ConfigurationManager
+                    .ConnectionStrings["dbConnectionString"].ConnectionString);
+
+                con.Open();
+                trans = con.BeginTransaction();
+
+                visualLessonId = ReturnNewVLessonIdWithTrans(apprvdLessonId, con, trans);
+
+                GoalId = objData.ReturnDataTable("SELECT GoalId FROM StdtLessonPlan WHERE StdtLessonPlanId=" +
+                    "(SELECT StdtLessonplanId FROM DSTempHdr WHERE DSTempHdrId='" + apprvdLessonId + "')", con, trans, false);
+
+                int OldLpId = Convert.ToInt32( objData.FetchValueTrans("SELECT LessonPlanId FROM DSTempHdr WHERE DSTempHdrId=" + apprvdLessonId, trans, con));
+
                 if (chkCpyStdtTemplate.Checked)
                 {
-                    NewLpid = AddLessonPlan(clsGeneral.convertQuotes(hdLessonName.Value), GoalId, "0", OldLpId, "Temp", apprvdLessonId, out AsmntYr);
+                    NewLpid = AddLessonPlan(clsGeneral.convertQuotes(hdLessonName.Value),GoalId,"0",OldLpId,"Temp",apprvdLessonId,out AsmntYr,con,trans);
+
                     if (NewLpid > 0)
                     {
-                        int tempid = CopyCustomtemplate(apprvdLessonId, sess.LoginId, visualLessonId);
+
+                        int tempid = CopyCustomtemplateWithTrans(apprvdLessonId,sess.LoginId,visualLessonId,con,trans);
+
                         if (tempid > 0)
                         {
-                            CreateDocument(apprvdLessonId, tempid);
+                            CreateDocumentWithTrans(apprvdLessonId, tempid, con, trans);
 
-                            string UpdateLessonName = "UPDATE DSTempHdr SET DSTemplateName='" + clsGeneral.convertQuotes(hdLessonName.Value) + "',LessonPlanId='" + NewLpid + "',isDynamic=0 WHERE DSTempHdrId=" + tempid;
-                            objData.Execute(UpdateLessonName);
+                            string UpdateLessonName = "UPDATE DSTempHdr SET " +
+                                "DSTemplateName='" + clsGeneral.convertQuotes(hdLessonName.Value) + "'," +
+                                "LessonPlanId='" + NewLpid + "'," +
+                                "isDynamic=0 " +
+                                "WHERE DSTempHdrId=" + tempid;
 
-                            //ScriptManager.RegisterClientScriptBlock(UpdatePanel4, UpdatePanel4.GetType(), "", "closePOP();", true);
+                            objData.ExecuteWithScopeandConnection(UpdateLessonName, con, trans);
+
+                            trans.Commit();
+
+                            FillDoc(tempid);
+
                             string NewName = "";
                             if (hdLessonName.Value != "")
                             {
@@ -19169,317 +19230,213 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
                 }
                 else
                 {
-
-                    if (hfSelectedStudent.Value != "")
+                    if (hfSelectedStudent.Value == "")
                     {
-                        string strQuery = "SELECT LessonPlanId,StdtLessonPlanId from DSTempHdr WHERE DSTempHdrId=" + apprvdLessonId;
-                        DataTable dt = new DataTable();
-                        dt = objData.ReturnDataTable(strQuery, false);
-                        if (dt != null)
+                        throw new Exception("Please select a student.");
+                    }
+
+                    int StudentId = Convert.ToInt32(hfSelectedStudent.Value);
+
+                    if (GoalId == null || GoalId.Rows.Count == 0)
+                    {
+                        throw new Exception("Goal information was not found for this lesson plan.");
+                                }
+
+                    int GoalIdValue = Convert.ToInt32(GoalId.Rows[0]["GoalId"]);
+
+                    string checkStudentGoal = "SELECT COUNT(*) FROM StdtGoal " +
+                        "WHERE StudentId=" + StudentId +
+                        " AND GoalId=" + GoalIdValue;
+
+                    int stdtGoalCount = Convert.ToInt32(objData.FetchValueTrans(checkStudentGoal, trans, con));
+
+                    if (stdtGoalCount == 0)
+                                {
+                        object objYearId = objData.FetchValueTrans("SELECT AsmntYearId " +
+                                "FROM AsmntYear " +
+                                "WHERE CurrentInd='A'", trans, con);
+
+                        object objStat =objData.FetchValueTrans("SELECT LookupId " +
+                                "FROM LookUp " +
+                                "WHERE LookupType='Goal Status' " +
+                                "AND LookupName='In Progress'", trans, con);
+
+                        if (objYearId == null || objYearId == DBNull.Value)
+                                    {
+                            throw new Exception("Current assessment year was not found.");
+                                    }
+
+                        if (objStat == null || objStat == DBNull.Value)
+                                    {
+                            throw new Exception("Goal Status 'In Progress' was not found.");
+                                    }
+
+                        string insertStudentGoal = "INSERT INTO StdtGoal " +
+                            "(SchoolId,StudentId,GoalId,AsmntYearId," +
+                            "IncludeIEP,StatusId,ActiveInd,IEPGoalNo," +
+                            "CreatedBy,CreatedOn) VALUES (" +
+                            sess.SchoolId + "," +
+                            StudentId + "," +
+                            GoalIdValue + "," +
+                            objYearId + "," +
+                            "0," +
+                            objStat + "," +
+                            "'A'," +
+                            "(SELECT ISNULL(MAX(IEPGoalNo),0)+1 " +
+                            " FROM StdtGoal " +
+                            " WHERE StudentId=" + StudentId +
+                            " AND SchoolId=" + sess.SchoolId +
+                            " AND ActiveInd='A')," +
+                            sess.LoginId + "," +
+                            "GETDATE())";
+
+                        int studentGoalId = objData.ExecuteWithScopeandConnection(insertStudentGoal, con, trans);
+                        if (studentGoalId <= 0)
                         {
-                            if (dt.Rows.Count > 0)
-                            {
-                                string strQryGoal = "SELECT Goalid from StdtLessonPlan WHERE StdtLessonPlanId=" + Convert.ToInt32(dt.Rows[0]["StdtLessonPlanId"]);
-                                string goalid = objData.FetchValue(strQryGoal).ToString();
-                                string strStdtGoal = "select count(*) from stdtgoal where studentid=" + Convert.ToInt32(hfSelectedStudent.Value) + " and GoalId=" + goalid + "";
-                                int stdtGoal = Convert.ToInt32(objData.FetchValue(strStdtGoal));
-                                if (stdtGoal == 0)
-                                {
-                                    object objYearId = objData.FetchValue("SELECT AsmntYearId FROM AsmntYear WHERE CurrentInd='A'");
-                                    object objStat = objData.FetchValue("SELECT LookupId FROM LookUp WHERE LookupType='Goal Status' AND LookupName='In Progress'");
-                                    string nsGoal = "INSERT INTO StdtGoal(SchoolId,StudentId,GoalId,AsmntYearId,IncludeIEP,StatusId,ActiveInd,IEPGoalNo," +
-                                            "CreatedBy,CreatedOn) VALUES(" + sess.SchoolId + "," + Convert.ToInt32(hfSelectedStudent.Value) + "," + goalid + "," + objYearId.ToString() + ",0," +
-                                            "" + objStat.ToString() + ",'A',(SELECT ISNULL(MAX(IEPGoalNo),0)+1 FROM StdtGoal WHERE StudentId=" + Convert.ToInt32(hfSelectedStudent.Value) + " AND SchoolId=" + sess.SchoolId + " AND ActiveInd='A')," + sess.LoginId + ",(SELECT convert(varchar, getdate(), 100)))";
-                                    objData.Execute(nsGoal);
-                                }
-                                //string rtnStdt = SaveLessons(dt.Rows[0]["LessonPlanId"].ToString(), goalid, hfSelectedStudent.Value);
-
-                                //if (rtnStdt != null)
-                                //{
-                                //if (rtnStdt == "exists")
-                                //{
-                                //ScriptManager.RegisterClientScriptBlock(UpdatePanel4, UpdatePanel4.GetType(), "", "closePOP();", true);
-
-
-                                //tdMsgExprt.InnerHtml = clsGeneral.failedMsg("Lesson Plan already exists for the student ");
-                                //txtSname.Text = "";
-                                //return;
-
-                                NewLpid = AddLessonPlan(clsGeneral.convertQuotes(hdLessonName.Value), GoalId, "1", OldLpId, "LP", apprvdLessonId, out AsmntYr);
-                                if (NewLpid > 0)
-                                {
-                                    int StdtLpid = objData.ExecuteWithScope("INSERT INTO StdtLessonPlan(SchoolId,StudentId,LessonPlanId,GoalId,AsmntYearId,IncludeIEP,ActiveInd,StatusId,LessonPlanTypeDay,LessonPlanTypeResi,CreatedBy,CreatedOn,isDynamic) " +
-                                                   " VALUES('" + sess.SchoolId + "','" + Convert.ToInt32(hfSelectedStudent.Value) + "'," + NewLpid + ",'" + GoalId.Rows[0]["GoalId"].ToString() + "','" + AsmntYr + "','false','A',(SELECT LookupId FROM LookUp WHERE LookupType='LP Status' AND LookupName='In Progress'),(SELECT LessonPlanTypeDay FROM StdtLessonPlan WHERE StdtLessonPlanId=(SELECT StdtLessonPlanId FROM DSTempHdr WHERE DSTempHdrId='" + apprvdLessonId + "')),(SELECT LessonPlanTypeResi FROM StdtLessonPlan WHERE StdtLessonPlanId=(SELECT StdtLessonPlanId FROM DSTempHdr WHERE DSTempHdrId='" + apprvdLessonId + "')),'" + sess.LoginId + "',GETDATE(),1)");
-                                    //Convert.ToInt32(objData.FetchValue("SELECT StdtLessonPlanId FROM DSTempHdr WHERE DSTempHdrId='" + apprvdLessonId + "'"));
-                                    int tempid = CopyCustomtemplate(apprvdLessonId, sess.LoginId, visualLessonId, Convert.ToInt32(hfSelectedStudent.Value), Convert.ToInt32(StdtLpid));
-                                    if (tempid > 0)
-                                    {
-                                        CreateDocument(apprvdLessonId, tempid);
-                                    }
-                                    if (tempid > 0)
-                                    {
-                                        string UpdateLessonName = "UPDATE DSTempHdr SET DSTemplateName='" + clsGeneral.convertQuotes(hdLessonName.Value) + "',LessonPlanId='" + NewLpid + "',isDynamic=1 WHERE DSTempHdrId=" + tempid;
-                                        objData.Execute(UpdateLessonName);
-                                    }
-                                    FillData();
-                                }
-                                //}
-                                //else
-                                //{
-                                //    NewLpid = AddLessonPlan(hdLessonName.Value, GoalId, out AsmntYr);
-                                //    if (NewLpid > 0)
-                                //    {
-                                //        int StdtLpid = objData.ExecuteWithScope("INSERT INTO StdtLessonPlan(SchoolId,StudentId,LessonPlanId,GoalId,AsmntYearId,IncludeIEP,ActiveInd,StatusId,LessonPlanTypeDay,LessonPlanTypeResi,CreatedBy,CreatedOn) " +
-                                //                       " VALUES('" + sess.SchoolId + "','" + Convert.ToInt32(hfSelectedStudent.Value) + "'," + NewLpid + ",'" + GoalId + "','" + AsmntYr + "','false','A',(SELECT LookupId FROM LookUp WHERE LookupType='LP Status' AND LookupName='In Progress'),(SELECT LessonPlanTypeDay FROM StdtLessonPlan WHERE StdtLessonPlanId=(SELECT StdtLessonPlanId FROM DSTempHdr WHERE DSTempHdrId='" + apprvdLessonId + "')),(SELECT LessonPlanTypeResi FROM StdtLessonPlan WHERE StdtLessonPlanId=(SELECT StdtLessonPlanId FROM DSTempHdr WHERE DSTempHdrId='" + apprvdLessonId + "')),'" + sess.LoginId + "',GETDATE())");
-                                //        Convert.ToInt32(objData.FetchValue("SELECT StdtLessonPlanId FROM DSTempHdr WHERE DSTempHdrId='" + apprvdLessonId + "'"));
-                                //        int tempid = CopyCustomtemplate(apprvdLessonId, sess.LoginId, visualLessonId, Convert.ToInt32(hfSelectedStudent.Value), Convert.ToInt32(StdtLpid));
-                                //        if (tempid > 0)
-                                //        {
-                                //            CreateDocument(apprvdLessonId, tempid);
-                                //        }
-                                //    }
-                                //}
-                                //}
-
+                            throw new Exception("StdtGoal insert failed.");
                             }
                         }
-                        txtSname.Text = "";
-                        string NewName = "";
-                        if (hdLessonName.Value != "")
-                        {
-                            NewName = "to <h3>" + hdLessonName.Value + "</h3>";
-                        }
-                        tdMsgExprt.InnerHtml = clsGeneral.sucessMsg("Template Successfully Copied " + NewName);
-                        tdReadMsg.InnerHtml = clsGeneral.sucessMsg("Template Successfully Copied " + NewName);
-                        // ScriptManager.RegisterClientScriptBlock(UpdatePanel4, UpdatePanel4.GetType(), "", "closePOP();", true);
-                    }
-                    else
-                    {
-                        txtSname.Text = "";
-                        tdMsgExprt.InnerHtml = clsGeneral.warningMsg("Please select a student......");
-                        tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please select a student......");
-                        //ScriptManager.RegisterClientScriptBlock(UpdatePanel4, UpdatePanel4.GetType(), "", "AlertCopySelectMsg();", true);
-                    }
-                    hfSelectedStudent.Value = "";
 
+                    NewLpid = AddLessonPlan( clsGeneral.convertQuotes(hdLessonName.Value), GoalId, "1", OldLpId, "LP", apprvdLessonId, out AsmntYr, con, trans);
+
+                    if (NewLpid <= 0)
+                        {
+                        throw new Exception("AddLessonPlan failed.");
+                        }
+
+                    string insertStdtLessonPlan = "INSERT INTO StdtLessonPlan " +
+                        "(SchoolId,StudentId,LessonPlanId,GoalId,AsmntYearId," +
+                        "IncludeIEP,ActiveInd,StatusId,LessonPlanTypeDay,LessonPlanTypeResi,CreatedBy,CreatedOn,isDynamic) " +
+                        "VALUES (" +
+                        "'" + sess.SchoolId + "'," +
+                        "'" + Convert.ToInt32(hfSelectedStudent.Value) + "'," +
+                        NewLpid + "," +
+                        "'" + GoalId.Rows[0]["GoalId"].ToString() + "'," +
+                        "'" + AsmntYr + "'," +
+                        "'false','A'," +
+                        "(SELECT LookupId FROM LookUp WHERE LookupType='LP Status' " +
+                        "AND LookupName='In Progress')," +
+                        "(SELECT LessonPlanTypeDay " +
+                        "FROM StdtLessonPlan " +
+                        "WHERE StdtLessonPlanId = " +
+                        "(SELECT StdtLessonPlanId FROM DSTempHdr " +
+                        "WHERE DSTempHdrId='" + apprvdLessonId + "'))," +
+
+                        "(SELECT LessonPlanTypeResi " +
+                        "FROM StdtLessonPlan " +
+                        "WHERE StdtLessonPlanId = " +
+                        "(SELECT StdtLessonPlanId FROM DSTempHdr " +
+                        "WHERE DSTempHdrId='" + apprvdLessonId + "'))," +
+                        "'" + sess.LoginId + "'," +
+                        "GETDATE(),1)";
+
+                    int StdtLpid = objData.ExecuteWithScopeandConnection(insertStdtLessonPlan, con, trans);
+
+                    if (StdtLpid <= 0)
+                    {
+                        throw new Exception( "StdtLessonPlan insert failed.");
+                    }
+
+                    int tempid = CopyCustomtemplateWithTrans(apprvdLessonId,sess.LoginId,visualLessonId, con, trans,Convert.ToInt32(hfSelectedStudent.Value),Convert.ToInt32(StdtLpid));
+
+                    if (tempid <= 0)
+                    {
+                        throw new Exception("CopyCustomtemplate failed.");
+                    }
+
+                    CreateDocumentWithTrans( apprvdLessonId, tempid, con, trans );
+
+                    string updateLessonName ="UPDATE DSTempHdr SET " +
+                        "DSTemplateName='" + clsGeneral.convertQuotes(hdLessonName.Value) + "', " +
+                        "LessonPlanId='" + NewLpid + "', " +
+                        "isDynamic=1 " +
+                        "WHERE DSTempHdrId=" + tempid;
+
+                    objData.ExecuteWithScopeandConnection(updateLessonName, con, trans);
+                    trans.Commit();
+
+                    tdReadMsg.InnerHtml = clsGeneral.sucessMsg("Template Successfully Copied");
+
+                    // Refresh lesson grids/lists
+                    RefreshLessonLists();
                 }
             }
             ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
         }
         catch (Exception Ex)
         {
+            if (trans != null)
+            {
+                try
+                {
+                    trans.Rollback();
+                }
+                catch
+                {
+                }
+            }
+
             ScriptManager.RegisterStartupScript(this, GetType(), "enableButtonScript", "enableButton();", true);
-            postBackDetailsLogging(Ex, -1, -1);throw Ex;
+            postBackDetailsLogging(Ex, -1, -1);
+            throw;
         }
-
-        //objData = new clsData();
-        //int apprvdLessonId = 0;
-        //int visualLessonId = 0;
-        //string NewLessonName = "";
-        //int NewLpid = 0;
-        //string GoalId = "";
-        //object AsmntYr;
-        //if (ViewState["HeaderId"] != null)
-        //{
-        //    apprvdLessonId = Convert.ToInt32(ViewState["HeaderId"]);
-        //}
-        //tdReadMsg.InnerHtml = "";
-        //sess = (clsSession)Session["UserSession"];
-        //visualLessonId = ReturnNewVLessonId(apprvdLessonId);
-        //try
-        //{
-        //    if (sess != null)
-        //    {
-        //        if (chkCpyStdtTemplate.Checked)
-        //        {
-        //string strQuery = "SELECT LessonPlanId from DSTempHdr WHERE DSTempHdrId=" + apprvdLessonId;
-        //string lpId = objData.FetchValue(strQuery).ToString();
-        //if (lpId != null && lpId != "")
-        //{
-        //    string strQryHdr = "SELECT DSTempHdrId from DSTempHdr WHERE LessonPlanId=" + Convert.ToInt32(lpId) + " and studentId is NULL";
-        //    string hdrId = objData.FetchValue(strQryHdr).ToString();
-        //if (hdrId != null && hdrId != "")
-        //{
-        //    string deleteTemp = "DELETE from DSTempHdr where LessonPlanId=" + Convert.ToInt32(lpId) + " and studentId is NULL";
-        //    int index = objData.Execute(deleteTemp);
-        //}
-        //}
-
-        //GetGoalAndLessonName(apprvdLessonId, "0", out NewLessonName, out NewLpid, out GoalId, out AsmntYr);
-        //    if (NewLpid > 0)
-        //    {
-        //        int tempid = CopyCustomtemplate(apprvdLessonId, sess.LoginId, visualLessonId);
-        //        if (tempid > 0)
-        //        {
-        //            CreateDocument(apprvdLessonId, tempid);
-
-        //            string UpdateLessonName = "UPDATE DSTempHdr SET DSTemplateName='" + NewLessonName + "',LessonPlanId='" + NewLpid + "' WHERE DSTempHdrId=" + tempid;
-        //            objData.Execute(UpdateLessonName);
-
-        //            //ScriptManager.RegisterClientScriptBlock(UpdatePanel4, UpdatePanel4.GetType(), "", "closePOP();", true);
-        //            string NewName = "";
-        //            if (NewLessonName != "")
-        //            {
-        //                NewName = "to <h3>" + NewLessonName + "</h3>";
-        //            }
-        //            tdMsgExprt.InnerHtml = clsGeneral.sucessMsg("Template Successfully Copied " + NewName);
-        //            tdReadMsg.InnerHtml = clsGeneral.sucessMsg("Template Successfully Copied " + NewName);
-        //            txtSname.Text = "";
-        //            chkCpyStdtTemplate.Checked = false;
-        //            txtSname.Enabled = true;
-        //            imgsearch.Enabled = true;
-        //            //chkCpyStdtTemplate_CheckedChanged(sender, e);
-        //        }
-        //    }
-        //}
-        //else
-        //{
-        //    try
-        //    {
-        //        if (hfSelectedStudent.Value != "")
-        //        {
-        //            string strQuery = "SELECT LessonPlanId,StdtLessonPlanId from DSTempHdr WHERE DSTempHdrId=" + apprvdLessonId;
-        //            DataTable dt = new DataTable();
-        //            dt = objData.ReturnDataTable(strQuery, false);
-        //            if (dt != null)
-        //            {
-        //                if (dt.Rows.Count > 0)
-        //                {
-        //                    string strQryGoal = "SELECT Goalid from StdtLessonPlan WHERE StdtLessonPlanId=" + Convert.ToInt32(dt.Rows[0]["StdtLessonPlanId"]);
-        //                    string goalid = objData.FetchValue(strQryGoal).ToString();
-        //                    string strStdtGoal = "select count(*) from stdtgoal where studentid=" + Convert.ToInt32(hfSelectedStudent.Value) + " and GoalId=" + goalid + "";
-        //                    int stdtGoal = Convert.ToInt32(objData.FetchValue(strStdtGoal));
-        //                    if (stdtGoal == 0)
-        //                    {
-        //                        object objYearId = objData.FetchValue("SELECT AsmntYearId FROM AsmntYear WHERE CurrentInd='A'");
-        //                        object objStat = objData.FetchValue("SELECT LookupId FROM LookUp WHERE LookupType='Goal Status' AND LookupName='In Progress'");
-        //                        string nsGoal = "INSERT INTO StdtGoal(SchoolId,StudentId,GoalId,AsmntYearId,IncludeIEP,StatusId,ActiveInd,IEPGoalNo," +
-        //                                "CreatedBy,CreatedOn) VALUES(" + sess.SchoolId + "," + Convert.ToInt32(hfSelectedStudent.Value) + "," + goalid + "," + objYearId.ToString() + ",0," +
-        //                                "" + objStat.ToString() + ",'A',(SELECT ISNULL(MAX(IEPGoalNo),0)+1 FROM StdtGoal WHERE StudentId=" + Convert.ToInt32(hfSelectedStudent.Value) + " AND SchoolId=" + sess.SchoolId + " AND ActiveInd='A')," + sess.LoginId + ",(SELECT convert(varchar, getdate(), 100)))";
-        //                        objData.Execute(nsGoal);
-        //                    }
-        //                    string rtnStdt = SaveLessons(dt.Rows[0]["LessonPlanId"].ToString(), goalid, hfSelectedStudent.Value);
-
-        //                    if (rtnStdt != null)
-        //                    {
-        //                        if (rtnStdt == "exists")
-        //                        {
-        //                            //ScriptManager.RegisterClientScriptBlock(UpdatePanel4, UpdatePanel4.GetType(), "", "closePOP();", true);
-
-
-        //                            //tdMsgExprt.InnerHtml = clsGeneral.failedMsg("Lesson Plan already exists for the student ");
-        //                            //txtSname.Text = "";
-        //                            //return;
-
-        //                            GetGoalAndLessonName(apprvdLessonId, hfSelectedStudent.Value, out NewLessonName, out NewLpid, out GoalId, out AsmntYr);
-        //                            if (NewLpid > 0)
-        //                            {
-        //                                int StdtLpid = objData.ExecuteWithScope("INSERT INTO StdtLessonPlan(SchoolId,StudentId,LessonPlanId,GoalId,AsmntYearId,IncludeIEP,ActiveInd,StatusId,LessonPlanTypeDay,LessonPlanTypeResi,CreatedBy,CreatedOn) " +
-        //                                               " VALUES('" + sess.SchoolId + "','" + Convert.ToInt32(hfSelectedStudent.Value) + "'," + NewLpid + ",'" + GoalId + "','" + AsmntYr + "','false','A',(SELECT LookupId FROM LookUp WHERE LookupType='LP Status' AND LookupName='In Progress'),(SELECT LessonPlanTypeDay FROM StdtLessonPlan WHERE StdtLessonPlanId=(SELECT StdtLessonPlanId FROM DSTempHdr WHERE DSTempHdrId='" + apprvdLessonId + "')),(SELECT LessonPlanTypeResi FROM StdtLessonPlan WHERE StdtLessonPlanId=(SELECT StdtLessonPlanId FROM DSTempHdr WHERE DSTempHdrId='" + apprvdLessonId + "')),'" + sess.LoginId + "',GETDATE())");
-        //                                Convert.ToInt32(objData.FetchValue("SELECT StdtLessonPlanId FROM DSTempHdr WHERE DSTempHdrId='" + apprvdLessonId + "'"));
-        //                                int tempid = CopyCustomtemplate(apprvdLessonId, sess.LoginId, visualLessonId, Convert.ToInt32(hfSelectedStudent.Value), Convert.ToInt32(StdtLpid));
-        //                                if (tempid > 0)
-        //                                {
-        //                                    CreateDocument(apprvdLessonId, tempid);
-        //                                }
-        //                                if (tempid > 0)
-        //                                {
-        //                                    string UpdateLessonName = "UPDATE DSTempHdr SET DSTemplateName='" + NewLessonName + "',LessonPlanId='" + NewLpid + "' WHERE DSTempHdrId=" + tempid;
-        //                                    objData.Execute(UpdateLessonName);
-        //                                }
-        //                                FillData();
-        //                            }
-        //                        }
-        //                        else
-        //                        {
-        //                            int tempid = CopyCustomtemplate(apprvdLessonId, sess.LoginId, visualLessonId, Convert.ToInt32(hfSelectedStudent.Value), Convert.ToInt32(rtnStdt));
-        //                            if (tempid > 0)
-        //                            {
-        //                                CreateDocument(apprvdLessonId, tempid);
-        //                            }
-        //                        }
-        //                    }
-
-        //                }
-        //            }
-        //            txtSname.Text = "";
-        //            string NewName = "";
-        //            if (NewLessonName != "")
-        //            {
-        //                NewName = "to <h3>" + NewLessonName + "</h3>";
-        //            }
-        //            tdMsgExprt.InnerHtml = clsGeneral.sucessMsg("Template Successfully Copied " + NewName);
-        //            tdReadMsg.InnerHtml = clsGeneral.sucessMsg("Template Successfully Copied " + NewName);
-        //            // ScriptManager.RegisterClientScriptBlock(UpdatePanel4, UpdatePanel4.GetType(), "", "closePOP();", true);
-        //        }
-        //        else
-        //        {
-        //            txtSname.Text = "";
-        //            tdMsgExprt.InnerHtml = clsGeneral.warningMsg("Please select a student......");
-        //            tdReadMsg.InnerHtml = clsGeneral.warningMsg("Please select a student......");
-        //            //ScriptManager.RegisterClientScriptBlock(UpdatePanel4, UpdatePanel4.GetType(), "", "AlertCopySelectMsg();", true);
-        //        }
-        //        hfSelectedStudent.Value = "";
-        //    }
-        //    catch (Exception ex)
-        //    {
-
-        //    }
-        //}
-        //    }
-        //}
-        //catch (Exception ex)
-        //{
-
-        //}
-
-    }
-
-    private void GetGoalAndLessonName(int apprvdLessonId, string Studentid, out string NewLessonName, out int NewLpid, out DataTable GoalId, out object AsmntYr)
-    {
-        //NewLessonName = Convert.ToString(objData.FetchValue("SELECT  CASE WHEN  CHARINDEX('Copy of - ',DSTemplateName)>0 THEN DSTemplateName+'('+CONVERT(VARCHAR,(SELECT COUNT(*) FROM DSTempHdr WHERE "+
-        //                " DSTemplateName LIKE 'Copy of - '+(SELECT DSTemplateName FROM DSTempHdr WHERE DSTempHdrId=" + apprvdLessonId + ")+'%'))+')' ELSE CASE WHEN (SELECT COUNT(*) FROM DSTempHdr WHERE " +
-        //                " DSTemplateName LIKE 'Copy of - '+ (SELECT DSTemplateName FROM DSTempHdr WHERE DSTempHdrId=" + apprvdLessonId + ")+'%')>0 THEN ('Copy of - '+DSTemplateName+'('+CONVERT(VARCHAR,(SELECT COUNT(*) FROM DSTempHdr WHERE " +
-        //                " DSTemplateName LIKE 'Copy of - '+(SELECT DSTemplateName FROM DSTempHdr WHERE DSTempHdrId='" + apprvdLessonId + "')+'%'))+')') ELSE 'Copy of - '+DSTemplateName END END TemplateName  " +
-        //                " FROM DSTempHdr WHERE DSTempHdrId='" + apprvdLessonId + "'"));
-        string LessonName = Convert.ToString(objData.FetchValue("SELECT DSTemplateName FROM DSTempHdr WHERE DSTempHdrId=" + apprvdLessonId + ""));
-        string Condition = "";
-        if (Studentid != "0")
+        finally
         {
-            Condition = "(StudentId IS NULL OR StudentId='" + Studentid + "') AND isDynamic=0 AND ";
-        }
-
-        if (LessonName.Contains("_"))
-        {
-            DataTable dtName = objData.ReturnDataTable("SELECT DSTemplateName FROM DSTempHdr WHERE " + Condition + " DSTemplateName LIKE '" + LessonName.Split(new string[] { "_" }, StringSplitOptions.None)[0] + "'+'%'", false);
-            string NewName = "";
-            NewName = GetNewName(LessonName, dtName, NewName);
-
-            NewLessonName = NewName;
-        }
-        else
-        {
-            if (Studentid != "0")
+            if (con != null)
             {
-                NewLessonName = Convert.ToString(objData.FetchValue("SELECT CASE WHEN (SELECT COUNT(*) FROM DSTempHdr WHERE  DSTemplateName LIKE (SELECT DSTemplateName FROM DSTempHdr WHERE " +
-                          " DSTempHdrId=" + apprvdLessonId + ")+'%')>0 THEN (DSTemplateName+'_'+CONVERT(VARCHAR,((SELECT COUNT(*) FROM DSTempHdr WHERE  StudentId IS NOT NULL AND " +
-                          " DSTemplateName LIKE (SELECT DSTemplateName FROM DSTempHdr WHERE DSTempHdrId=" + apprvdLessonId + ")+'%')))) END TemplateName  " +
-                          " FROM DSTempHdr WHERE DSTempHdrId=" + apprvdLessonId));
-            }
-            else
-            {
-                NewLessonName = Convert.ToString(objData.FetchValue("SELECT CASE WHEN (SELECT COUNT(*) FROM DSTempHdr WHERE  DSTemplateName LIKE (SELECT DSTemplateName FROM DSTempHdr WHERE " +
-                          " DSTempHdrId=" + apprvdLessonId + ")+'%')>0 THEN (DSTemplateName+'_'+CONVERT(VARCHAR,((SELECT COUNT(*) FROM DSTempHdr WHERE  " +
-                          " DSTemplateName LIKE (SELECT DSTemplateName FROM DSTempHdr WHERE DSTempHdrId=" + apprvdLessonId + ")+'%')))) END TemplateName  " +
-                          " FROM DSTempHdr WHERE DSTempHdrId=" + apprvdLessonId));
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+
+                con.Dispose();
             }
         }
-
-
-        GoalId = objData.ReturnDataTable("SELECT GoalId FROM StdtLessonPlan WHERE StdtLessonPlanId=(SELECT StdtLessonplanId FROM DSTempHdr WHERE DSTempHdrId='" + apprvdLessonId + "')", false);
-
-        NewLpid = AddLessonPlan(NewLessonName, GoalId, "", 0, "0", 1, out AsmntYr);
     }
+
+    //private void GetGoalAndLessonName(int apprvdLessonId, string Studentid, out string NewLessonName, out int NewLpid, out DataTable GoalId, out object AsmntYr)
+        //{
+    //    //NewLessonName = Convert.ToString(objData.FetchValue("SELECT  CASE WHEN  CHARINDEX('Copy of - ',DSTemplateName)>0 THEN DSTemplateName+'('+CONVERT(VARCHAR,(SELECT COUNT(*) FROM DSTempHdr WHERE "+
+    //    //                " DSTemplateName LIKE 'Copy of - '+(SELECT DSTemplateName FROM DSTempHdr WHERE DSTempHdrId=" + apprvdLessonId + ")+'%'))+')' ELSE CASE WHEN (SELECT COUNT(*) FROM DSTempHdr WHERE " +
+    //    //                " DSTemplateName LIKE 'Copy of - '+ (SELECT DSTemplateName FROM DSTempHdr WHERE DSTempHdrId=" + apprvdLessonId + ")+'%')>0 THEN ('Copy of - '+DSTemplateName+'('+CONVERT(VARCHAR,(SELECT COUNT(*) FROM DSTempHdr WHERE " +
+    //    //                " DSTemplateName LIKE 'Copy of - '+(SELECT DSTemplateName FROM DSTempHdr WHERE DSTempHdrId='" + apprvdLessonId + "')+'%'))+')') ELSE 'Copy of - '+DSTemplateName END END TemplateName  " +
+    //    //                " FROM DSTempHdr WHERE DSTempHdrId='" + apprvdLessonId + "'"));
+    //    string LessonName = Convert.ToString(objData.FetchValue("SELECT DSTemplateName FROM DSTempHdr WHERE DSTempHdrId=" + apprvdLessonId + ""));
+    //    string Condition = "";
+    //    if (Studentid != "0")
+    //    {
+    //        Condition = "(StudentId IS NULL OR StudentId='" + Studentid + "') AND isDynamic=0 AND ";
+    //    }
+
+    //    if (LessonName.Contains("_"))
+    //    {
+    //        DataTable dtName = objData.ReturnDataTable("SELECT DSTemplateName FROM DSTempHdr WHERE " + Condition + " DSTemplateName LIKE '" + LessonName.Split(new string[] { "_" }, StringSplitOptions.None)[0] + "'+'%'", false);
+    //        string NewName = "";
+    //        NewName = GetNewName(LessonName, dtName, NewName);
+
+    //        NewLessonName = NewName;
+    //    }
+    //    else
+    //    {
+    //        if (Studentid != "0")
+    //        {
+    //            NewLessonName = Convert.ToString(objData.FetchValue("SELECT CASE WHEN (SELECT COUNT(*) FROM DSTempHdr WHERE  DSTemplateName LIKE (SELECT DSTemplateName FROM DSTempHdr WHERE " +
+    //                      " DSTempHdrId=" + apprvdLessonId + ")+'%')>0 THEN (DSTemplateName+'_'+CONVERT(VARCHAR,((SELECT COUNT(*) FROM DSTempHdr WHERE  StudentId IS NOT NULL AND " +
+    //                      " DSTemplateName LIKE (SELECT DSTemplateName FROM DSTempHdr WHERE DSTempHdrId=" + apprvdLessonId + ")+'%')))) END TemplateName  " +
+    //                      " FROM DSTempHdr WHERE DSTempHdrId=" + apprvdLessonId));
+    //        }
+    //        else
+    //        {
+    //            NewLessonName = Convert.ToString(objData.FetchValue("SELECT CASE WHEN (SELECT COUNT(*) FROM DSTempHdr WHERE  DSTemplateName LIKE (SELECT DSTemplateName FROM DSTempHdr WHERE " +
+    //                      " DSTempHdrId=" + apprvdLessonId + ")+'%')>0 THEN (DSTemplateName+'_'+CONVERT(VARCHAR,((SELECT COUNT(*) FROM DSTempHdr WHERE  " +
+    //                      " DSTemplateName LIKE (SELECT DSTemplateName FROM DSTempHdr WHERE DSTempHdrId=" + apprvdLessonId + ")+'%')))) END TemplateName  " +
+    //                      " FROM DSTempHdr WHERE DSTempHdrId=" + apprvdLessonId));
+    //        }
+    //    }
+
+
+    //    GoalId = objData.ReturnDataTable("SELECT GoalId FROM StdtLessonPlan WHERE StdtLessonPlanId=(SELECT StdtLessonplanId FROM DSTempHdr WHERE DSTempHdrId='" + apprvdLessonId + "')", false);
+
+    //    NewLpid = AddLessonPlan(NewLessonName, GoalId, "", 0, "0", 1, out AsmntYr);
+    //}
 
     private static string GetNewName(string LessonName, DataTable dtName, string NewName)
     {
@@ -23323,6 +23280,556 @@ public partial class StudentBinder_CustomizeTemplateEditor : System.Web.UI.Page
             string errorLogMessage = string.Format("[{0}]\nError: {1}\n{2}\n{3}\n{4}",
             DateTime.Now, ex.Message, "StudentId = " + sess.StudentId, "DSTempHdrId = " + hdrId, "LessonPlanId = " + LPId, Environment.NewLine);
             File.AppendAllText(errorLogFilePath, errorLogMessage);
+        }
+    }
+
+    protected List<string> ValidateDocuments(int tempid)
+    {
+        List<string> missingDocs = new List<string>();
+
+        using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+        {
+            con.Open();
+            string query = @"
+            SELECT L.LPDoc
+            FROM LPDoc L
+            LEFT JOIN BinaryFiles B
+                ON B.DocId = L.LPDoc
+                AND B.Type = 'LP_DOC'
+            WHERE L.DSTempHdrId = @TempId
+            AND B.DocId IS NULL";
+
+            using (SqlCommand cmd = new SqlCommand(query, con))
+            {
+                cmd.Parameters.AddWithValue("@TempId", tempid);
+
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (!reader.IsDBNull(0))
+                        {
+                            missingDocs.Add(reader[0].ToString());
+                        }
+                    }
+                }
+            }
+        }
+        return missingDocs;
+    }
+
+    private void RefreshLessonLists()
+    {
+        FillData();
+        FillApprovedLessonData();
+        FillCompltdLessonPlans();
+        FillRejectedLessons();
+        FillMaintenanceLessonData();
+        FillInactiveLessonData();
+        FillYears();
+        LoadLPforSorting();
+        LoadEmailforSorting();
+    }
+
+    protected void UploadDocument(int headerId)
+    {
+        SqlConnection con = null;
+        SqlTransaction trans = null;
+
+        try
+        {
+            objData = new clsData();
+            clsDocumentasBinary objBinary = new clsDocumentasBinary();
+
+            con = objData.Open();
+
+            if (con == null)
+                throw new Exception("UploadDocument: objData.Open() returned NULL.");
+
+            if (con.State != System.Data.ConnectionState.Open)
+                throw new Exception("UploadDocument: Connection is not OPEN. State = " + con.State);
+
+            trans = con.BeginTransaction();
+
+            string filename = System.IO.Path.GetFileName(fupDoc.FileName);
+
+            if (filename.Length > 50)
+            {
+                throw new Exception("File name is too long. Please use a file name with 50 characters or less.");
+            }
+
+            HttpPostedFile myFile = fupDoc.PostedFile;
+            int nFileLen = myFile.ContentLength;
+
+            byte[] myData = new byte[nFileLen];
+            myFile.InputStream.Read(myData, 0, nFileLen);
+
+            // STEP 1
+            string strquerry = @"INSERT INTO LPDoc
+            (SchoolId,DSTempHdrId,DocURL,CreatedBy,CreatedOn)
+            VALUES
+            (@SchoolId,@HeaderId,@FileName,@CreatedBy,GETDATE());
+
+            SELECT SCOPE_IDENTITY();";
+
+            int docid;
+
+            try
+            {
+                using (SqlCommand cmd = new SqlCommand(strquerry, con, trans))
+                {
+                    cmd.Parameters.AddWithValue("@SchoolId", sess.SchoolId);
+                    cmd.Parameters.AddWithValue("@HeaderId", headerId);
+                    cmd.Parameters.AddWithValue("@FileName", filename);
+                    cmd.Parameters.AddWithValue("@CreatedBy", sess.LoginId);
+
+                    object result = cmd.ExecuteScalar();
+
+                    if (result == null || result == DBNull.Value)
+                        throw new Exception("LPDoc insert returned NULL.");
+
+                    docid = Convert.ToInt32(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("UPLOAD STEP 1 - LPDoc INSERT FAILED: " + ex.Message,ex);
+            }
+
+            int binaryid;
+
+            try
+            {
+                binaryid = objBinary.saveDocumentWithTrans(myData,filename,"","LP_DOC",docid,"LessonPlanDoc",sess.SchoolId,0,sess.LoginId,con,trans);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("UPLOAD STEP 2 - BinaryFiles INSERT FAILED: " + ex.Message,ex);
+            }
+
+            if (binaryid <= 0)
+            {
+                throw new Exception("BinaryFiles insert returned invalid ID.");
+            }
+
+            try
+            {
+                objData.CommitTransation(trans, con);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("UPLOAD STEP 3 - COMMIT FAILED: " + ex.Message,ex);
+            }
+        }
+        catch (Exception ex)
+        {
+            if (trans != null)
+            {
+                try
+                {
+                    objData.RollBackTransation(trans, con);
+                }
+                catch
+                {
+                }
+            }
+
+            throw;
+        }
+        finally
+        {
+            if (con != null)
+            {
+                con.Close();
+                con.Dispose();
+            }
+        }
+    }
+
+    protected int ReturnNewVLessonIdWithTrans(int templateId, SqlConnection con, SqlTransaction trans)
+    {
+        objData = new clsData();
+        oData = new DataClass();
+        int studId = sess.StudentId;
+        int newVisualLessonId = 0;
+        try
+        {
+            string selectQuery = "SELECT VTLessonId FROM DSTempHdr WHERE DSTempHdrId = " + templateId;
+            object objVt = objData.FetchValueTrans(selectQuery, trans, con);
+            if (objVt == null || objVt == DBNull.Value || string.IsNullOrEmpty(objVt.ToString()))
+            {
+                return 0;
+            }
+
+            int vtId = Convert.ToInt32(objVt);
+
+            if (vtId <= 0)
+                return 0;
+
+            int isStEdit = 1;
+            int isCcEdit = 0;
+            newVisualLessonId = oData.Execute_SpCopyLessonWithTrans("sp_copyLessonPlan", vtId, isStEdit, isCcEdit, con, trans);
+            return newVisualLessonId;
+        }
+        catch (Exception Ex)
+        {
+            postBackDetailsLogging(Ex, -1, -1);
+            throw;
+        }
+    }
+
+    protected void CreateDocumentWithTrans(int tempid, int newtempId, SqlConnection con, SqlTransaction trans)
+    {
+        try
+        {
+            objData = new clsData();
+            sess = (clsSession)Session["UserSession"];
+            clsDocumentasBinary objBinary = new clsDocumentasBinary();
+
+            DataTable dtdoc = objData.ReturnDataTable(
+                "SELECT LPDoc FROM LPDoc WHERE DSTempHdrId=" + tempid,
+                false
+            );
+
+            if (dtdoc != null && dtdoc.Rows.Count > 0)
+            {
+
+                foreach (DataRow row in dtdoc.Rows)
+                {
+                    string oldDocId = row["LPDoc"].ToString();
+
+                    // STEP 1: Validate BinaryFiles exists FIRST
+                    string binaryQuery = @"
+                        SELECT Data, DocumentName
+                        FROM BinaryFiles
+                        WHERE DocId = @DocId
+                        AND Type = 'LP_DOC'
+                    ";
+
+                    DataTable dtbinary = new DataTable();
+
+                    using (SqlCommand cmdBinary = new SqlCommand(binaryQuery, con, trans))
+                    {
+                        cmdBinary.Parameters.AddWithValue("@DocId", oldDocId);
+
+                        using (SqlDataAdapter da = new SqlDataAdapter(cmdBinary))
+                        {
+                            da.Fill(dtbinary);
+                        }
+                    }
+
+                    if (dtbinary == null || dtbinary.Rows.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    byte[] myData = (byte[])dtbinary.Rows[0]["Data"];
+                    string filename = Convert.ToString(dtbinary.Rows[0]["DocumentName"]);
+
+                    // STEP 2: Insert LPDoc only AFTER binary validation
+                    string insertQuery = @"
+                    INSERT INTO LPDoc
+                    (
+                        SchoolId,
+                        DSTempHdrId,
+                        DocURL,
+                        CreatedBy,
+                        CreatedOn
+                    )
+                    SELECT
+                        SchoolId,
+                        @NewTempId,
+                        DocURL,
+                        @CreatedBy,
+                        GETDATE()
+                    FROM LPDoc
+                    WHERE LPDoc = @OldDocId;
+
+                    SELECT SCOPE_IDENTITY();
+                ";
+
+                    SqlCommand cmdInsert = new SqlCommand(insertQuery, con, trans);
+                    cmdInsert.Parameters.AddWithValue("@NewTempId", newtempId);
+                    cmdInsert.Parameters.AddWithValue("@CreatedBy", sess.LoginId);
+                    cmdInsert.Parameters.AddWithValue("@OldDocId", oldDocId);
+
+                    int docid = Convert.ToInt32(cmdInsert.ExecuteScalar());
+
+                    int binaryid = objBinary.saveDocumentWithTrans(myData, filename, "", "LP_DOC", docid, "LessonPlanDoc", sess.SchoolId, 0, sess.LoginId, con, trans);
+
+                    if (binaryid <= 0)
+                    {
+                        throw new Exception("BinaryFiles insert failed.");
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            postBackDetailsLogging(ex, -1, -1);
+            throw;
+        }
+    }
+
+    public int CopyCustomtemplateWithTrans(int templateid, int loginid, int visualLessonId, SqlConnection con, SqlTransaction trans, int studentid = 0, int stdtLpId = 0)
+    {
+        SqlTransaction Trans = trans;
+        SqlConnection Con = con;
+        objData = new clsData();
+        string strQuery = "";
+        int oldSetId = 0;
+        int parentSetId = 0;
+        clsAssignLessonPlan AssignLP = new clsAssignLessonPlan();
+        try
+        {
+            strQuery = "SELECT LessonPlanId,StudentId,SchoolId from DSTempHdr WHERE DSTempHdrId=" + templateid;
+            DataTable dt = new DataTable();
+            dt = objData.ReturnDataTable(strQuery, Con, Trans, false);
+            //strQuery = "select goalid from goalLpRel where  LessonPlanId = " + dt.Rows[0]["LessonPlanId"].ToString() + "";
+            //int glId=Convert.ToInt32(objData.FetchValueTrans(strQuery, Trans, Con));
+
+            //strQuery = "SELECT MAX(VerNbr) from DSTempHdr WHERE LessonPlanId=" + Convert.ToInt32(dt.Rows[0]["LessonPlanId"]) + " AND StudentId=" + Convert.ToInt32(dt.Rows[0]["StudentId"]) + " AND [StatusId]<>(SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' And LookupName='Deleted')";
+            //string version = objData.FetchValueTrans(strQuery, Trans, Con).ToString();
+            //version = checkversion(version);
+            //strQuery = "select StdtLessonPlanid from DSTempHdr where DSTempHdrId=" + templateid;
+            //int stdtLpId = Convert.ToInt32(objData.FetchValueTrans(strQuery, Trans, Con));
+            //strQuery = "Update DSTempHdr set [StatusId]=(SELECT LookupId FROM LookUp WHERE LookupType='TemplateStatus' And LookupName='Expired')  WHERE DSTempHdrId= " + templateid;
+            //int expiredId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+            string stid = "", stval = "";
+
+            int schoolid = Convert.ToInt32(dt.Rows[0]["SchoolId"]);
+            if (studentid == 0 && stdtLpId == 0)
+            {
+                stid = ",";
+                stval = ",";
+            }
+            else
+            {
+                stid = ",[StudentId],[StdtLessonplanId],";
+                stval = ",'" + studentid + "','" + stdtLpId + "',";
+            }
+            if (schoolid == 1)
+                strQuery = "INSERT INTO DSTempHdr ([SchoolId]" + stid + "[LessonPlanId],[TeachingProcId],[DSTemplateName]," +
+               "[DSTemplateDesc],[VerBeginDate],[NoofTimesTried],[NoofTimesTriedPer],[VerEndDate],[CurrVerInd],[MultiSetsInd],[MultiStepInd],[SkillType],[MatchToSampleType],[NbrOfTrials]," +
+               "[ChainType],[TotalTaskFormat],[TotalTaskType],[TaskOther],[MatchToSampleRecOrExp],[PromptTypeId],[TotNbrOfSessions],[SessionFreq],[NbrOfSession],[CompCurrInd],[StatusId],[IsVisualTool]," +
+               "[VTLessonId],[Baseline],[Objective],[GeneralProcedure],[BaselineProc],[BaselineStart],[BaselineEnd],[CorrRespDef]," +
+               "[CorrectResponse],[StudCorrRespDef],[IncorrRespDef],[StudIncorrRespDef],[CorrectionProc],[ReinforcementProc]," +
+               "[TeacherRespReadness],[StudentReadCrita],[MajorSetting],[MinorSetting],[LessonDefInst],[Mistrial],[MistrialResponse]," +
+               "[TeacherPrepare],[StudentPrepare],[StudResponse],[DSMode],[CreatedBy],[CreatedOn],[ModifiedBy],[ModifiedOn]," +
+               "[FrameandStrand],[LessonPlanGoal],[SpecStandard],[SpecEntryPoint],[PreReq],[Materials],[ApprNoteLessonInfo],[ApprNoteTypeInstruction],[ApprNoteMeasurement],[ApprNoteSet],[ApprNoteStep],[ApprNotePrompt],[ApprNoteLessonProc],[deletessn],[LessonOrder],[LessonSDate],[LessonEDate]) SELECT [SchoolId]" + stval + "[LessonPlanId]," +
+               "[TeachingProcId],[DSTemplateName],[DSTemplateDesc],[VerBeginDate],[NoofTimesTried],[NoofTimesTriedPer],[VerEndDate],[CurrVerInd],[MultiSetsInd],[MultiStepInd]," +
+               "[SkillType],[MatchToSampleType],[NbrOfTrials],[ChainType],[TotalTaskFormat],[TotalTaskType],[TaskOther],[MatchToSampleRecOrExp],[PromptTypeId],[TotNbrOfSessions],[SessionFreq],[NbrOfSession],[CompCurrInd]," +
+               "(SELECT  LookupId FROM LookUp WHERE LookupType='TemplateStatus' And LookupName='In Progress'),[IsVisualTool]," +
+               "'" + visualLessonId + "',[Baseline],[Objective],[GeneralProcedure],[BaselineProc],[BaselineStart],[BaselineEnd]," +
+               "[CorrRespDef],[CorrectResponse],[StudCorrRespDef],[IncorrRespDef],[StudIncorrRespDef],[CorrectionProc],[ReinforcementProc]," +
+               "[TeacherRespReadness],[StudentReadCrita],[MajorSetting],[MinorSetting],[LessonDefInst],[Mistrial],[MistrialResponse]," +
+               "[TeacherPrepare],[StudentPrepare],[StudResponse],NULL," + loginid + ",GETDATE()," + loginid + ",GETDATE(),[FrameandStrand],[LessonPlanGoal]," +
+               "[SpecStandard],[SpecEntryPoint],[PreReq],[Materials],[ApprNoteLessonInfo],[ApprNoteTypeInstruction],[ApprNoteMeasurement],[ApprNoteSet],[ApprNoteStep],[ApprNotePrompt],[ApprNoteLessonProc],[deletessn],(select isnull( max(LessonOrder)+1,1) from dstemphdr where studentid=" + studentid + ")," +
+               "(Select DISTINCT EffStartDate  from StDtLessonPlan inner join StDtIEP on StDtLessonPlan.StDtIEPId=StDtIEP.StDtIEPId where StDtLessonPlan.StudentId = " + studentid + " AND StdtIEP.StatusId=65) ," +
+                "(Select DISTINCT EffEndDate  from StDtLessonPlan inner join StDtIEP on StDtLessonPlan.StDtIEPId=StDtIEP.StDtIEPId where StDtLessonPlan.StudentId = " + studentid + " AND StdtIEP.StatusId=65) FROM DSTempHdr WHERE DSTempHdrId='" + templateid + "'";
+            if (schoolid == 2)
+                strQuery = "INSERT INTO DSTempHdr ([SchoolId]" + stid + "[LessonPlanId],[TeachingProcId],[DSTemplateName]," +
+                  "[DSTemplateDesc],[VerBeginDate],[NoofTimesTried],[NoofTimesTriedPer],[VerEndDate],[CurrVerInd],[MultiSetsInd],[MultiStepInd],[SkillType],[MatchToSampleType],[NbrOfTrials]," +
+                  "[ChainType],[TotalTaskFormat],[TotalTaskType],[TaskOther],[MatchToSampleRecOrExp],[PromptTypeId],[TotNbrOfSessions],[SessionFreq],[NbrOfSession],[CompCurrInd],[StatusId],[IsVisualTool]," +
+                  "[VTLessonId],[Baseline],[Objective],[GeneralProcedure],[BaselineProc],[BaselineStart],[BaselineEnd],[CorrRespDef]," +
+                  "[CorrectResponse],[StudCorrRespDef],[IncorrRespDef],[StudIncorrRespDef],[CorrectionProc],[ReinforcementProc]," +
+                  "[TeacherRespReadness],[StudentReadCrita],[MajorSetting],[MinorSetting],[LessonDefInst],[Mistrial],[MistrialResponse]," +
+                  "[TeacherPrepare],[StudentPrepare],[StudResponse],[DSMode],[CreatedBy],[CreatedOn],[ModifiedBy],[ModifiedOn]," +
+                  "[FrameandStrand],[LessonPlanGoal],[SpecStandard],[SpecEntryPoint],[PreReq],[Materials],[ApprNoteLessonInfo],[ApprNoteTypeInstruction],[ApprNoteMeasurement],[ApprNoteSet],[ApprNoteStep],[ApprNotePrompt],[ApprNoteLessonProc],[deletessn],[LessonOrder],[LessonSDate],[LessonEDate]) SELECT [SchoolId]" + stval + "[LessonPlanId]," +
+                  "[TeachingProcId],[DSTemplateName],[DSTemplateDesc],[VerBeginDate],[NoofTimesTried],[NoofTimesTriedPer],[VerEndDate],[CurrVerInd],[MultiSetsInd],[MultiStepInd]," +
+                  "[SkillType],[MatchToSampleType],[NbrOfTrials],[ChainType],[TotalTaskFormat],[TotalTaskType],[TaskOther],[MatchToSampleRecOrExp],[PromptTypeId],[TotNbrOfSessions],[SessionFreq],[NbrOfSession],[CompCurrInd]," +
+                  "(SELECT  LookupId FROM LookUp WHERE LookupType='TemplateStatus' And LookupName='In Progress'),[IsVisualTool]," +
+                  "'" + visualLessonId + "',[Baseline],[Objective],[GeneralProcedure],[BaselineProc],[BaselineStart],[BaselineEnd]," +
+                  "[CorrRespDef],[CorrectResponse],[StudCorrRespDef],[IncorrRespDef],[StudIncorrRespDef],[CorrectionProc],[ReinforcementProc]," +
+                  "[TeacherRespReadness],[StudentReadCrita],[MajorSetting],[MinorSetting],[LessonDefInst],[Mistrial],[MistrialResponse]," +
+                  "[TeacherPrepare],[StudentPrepare],[StudResponse],NULL," + loginid + ",GETDATE()," + loginid + ",GETDATE(),[FrameandStrand],[LessonPlanGoal]," +
+                  "[SpecStandard],[SpecEntryPoint],[PreReq],[Materials],[ApprNoteLessonInfo],[ApprNoteTypeInstruction],[ApprNoteMeasurement],[ApprNoteSet],[ApprNoteStep],[ApprNotePrompt],[ApprNoteLessonProc],[deletessn],(select isnull( max(LessonOrder)+1,1) from dstemphdr where studentid=" + studentid + ")," +
+                  "(Select DISTINCT EffStartDate  from StDtLessonPlan inner join StDtIEP_PE on StDtLessonPlan.StDtIEPId=StDtIEP_PE.StDtIEP_PEId where StDtLessonPlan.StudentId = " + studentid + " AND StdtIEP_PE.StatusId=65) ," +
+                   "(Select DISTINCT EffEndDate  from StDtLessonPlan inner join StDtIEP_PE on StDtLessonPlan.StDtIEPId=StDtIEP_PE.StDtIEP_PEId where StDtLessonPlan.StudentId = " + studentid + " AND StdtIEP_PE.StatusId=65) FROM DSTempHdr WHERE DSTempHdrId='" + templateid + "'";
+            int TId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+            //strQuery = "UPDATE DSTempHdr SET VerNbr='" + version + "' WHERE DSTempHdrId=" + TId;
+            //objData.ExecuteWithTrans(strQuery, Con, Trans);
+
+            DataTable dtpromt = new DataTable();
+            dtpromt = objData.ReturnDataTable("SELECT DSTempPromptId FROM DSTempPrompt WHERE DSTempHdrId=" + templateid + "", Con, Trans, false);
+            if (dtpromt != null)
+            {
+                if (dtpromt.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dtpromt.Rows)
+                    {
+                        strQuery = "INSERT INTO DSTempPrompt(DSTempHdrId,PromptId,PromptOrder,ActiveInd,CreatedBy,CreatedOn) ";
+                        strQuery += "SELECT " + TId + ",PromptId,PromptOrder,ActiveInd," + loginid + ",CreatedOn FROM DSTempPrompt WHERE DSTempPromptId=" + Convert.ToInt32(row["DSTempPromptId"]) + "";
+                        int PromptId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+                    }
+                }
+            }
+            DataTable dtset = new DataTable();
+            Hashtable ht = new Hashtable();
+            dtset = objData.ReturnDataTable("SELECT DSTempSetId FROM DSTempSet WHERE ActiveInd='A' and  DSTempHdrId=" + templateid + "", Con, Trans, false);
+            if (dtset != null)
+            {
+                if (dtset.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dtset.Rows)
+                    {
+                        strQuery = "INSERT INTO DSTempSet(SchoolId,DSTempHdrId,PrevSetId,SetCd,SetName,Samples,SortOrder,ActiveInd,CreatedBy,CreatedOn,DistractorSamples,DistractorSamplesCount) ";
+                        strQuery += "SELECT  SchoolId," + TId + ",PrevSetId,SetCd,SetName,Samples,SortOrder,ActiveInd," + loginid + ",getdate(),DistractorSamples,DistractorSamplesCount FROM DSTempSet WHERE ActiveInd='A' AND DSTempSetId = " + Convert.ToInt32(row["DSTempSetId"]) + " ";
+                        int SetId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+                        if (!ht.ContainsKey(row["DSTempSetId"]))
+                        {
+                            ht.Add(row["DSTempSetId"], SetId);
+                        }
+                    }
+                }
+            }
+            string teachingProc = "";
+            string sqlStr = "";
+            sqlStr = "SELECT DH.LessonPlanId,ISNULL(LU.LookupName,'') AS TeachingProc,ISNULL(LU.LookupDesc,'') AS TeachProc,ISNULL(LUp.LookupName,'') as PromptProc ,SkillType,ISNULL(NbrOfTrials,0) as NbrOfTrials," +
+                    "LP.LessonPlanName,ISNULL(LP.Materials,'') as Mat,ISNULL(ChainType,'') AS ChainType,DH.IsVisualTool,ISNULL(DH.VTLessonId,0) as VTLessonId,ISNULL(ModificationInd,0) as ModificationInd FROM DSTempHdr DH JOIN LessonPlan LP ON LP.LessonPlanId=DH.LessonPlanId LEFT " +
+                    "JOIN LookUp LU ON TeachingProcId=LU.LookUpId INNER JOIN Lookup LUp ON LUp.LookupId=PromptTypeId WHERE DSTempHdrId=" + templateid;
+            DataTable dtTmpHdrDtls = objData.ReturnDataTable(sqlStr, con, trans, false);
+            if (dtTmpHdrDtls != null)
+            {
+                if (dtTmpHdrDtls.Rows.Count > 0)
+                {
+                    //teachingProc = dtTmpHdrDtls.Rows[0]["TeachingProc"].ToString();
+                    teachingProc = dtTmpHdrDtls.Rows[0]["TeachProc"].ToString();
+                }
+            }
+            if (teachingProc == "Match-to-Sample")
+            {
+                DataTable dtstep = new DataTable();
+                dtstep = objData.ReturnDataTable("SELECT DSTempStepId,DSTempSetId FROM DSTempStep WHERE DSTempHdrId=" + templateid + " AND IsDynamic=0 AND ActiveInd='A' ", Con, Trans, false);
+                if (dtstep.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dtstep.Rows)
+                    {
+                        oldSetId = Convert.ToInt32(row["DSTempSetId"]);
+                        if (oldSetId != 0)
+                        {
+                            parentSetId = AssignLP.SetUpdateCopy(oldSetId, TId, Trans, Con);
+                        }
+                        strQuery =
+                        strQuery = "INSERT INTO DSTempStep(SchoolId,DSTempHdrId,DSTempSetId,PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder,CreatedBy,ActiveInd,CreatedOn) ";
+                        strQuery += "SELECT SchoolId," + TId + "," + parentSetId + ",PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder," + loginid + ",ActiveInd,GETDATE()	FROM DSTempStep WHERE ActiveInd='A' AND DSTempStepId = " + Convert.ToInt32(row["DSTempStepId"]) + " AND IsDynamic=0 ";
+                        int StepId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+                    }
+                }
+            }
+            else
+            {
+                int oldParentSetId = 0;
+                DataTable dtParentStep = new DataTable();
+                // strQuery = "INSERT INTO DSTempParentStep(SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn) ";
+                strQuery = "SELECT  DSTempParentStepId,SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn"
+                    + " FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempParentStepId IN (SELECT DSTempParentStepId FROM DSTempStep WHERE DSTempHdrId = " + templateid + " AND ActiveInd = 'A') and DSTempHdrId = " + templateid;
+                dtParentStep = objData.ReturnDataTable(strQuery, Con, Trans, false);
+                //  int DSTempParentStepId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+                // DataTable dt
+                if (dtParentStep != null)
+                {
+                    if (dtParentStep.Rows.Count > 0)
+                    {
+                        foreach (DataRow row in dtParentStep.Rows)
+                        {
+                            string newsetids = "";
+                            foreach (string setid in row["SetIds"].ToString().Split(','))
+                            {
+                                if (setid != "")
+                                {
+                                    if (ht.ContainsKey(Convert.ToInt32(setid)))
+                                    {
+                                        newsetids += ht[Convert.ToInt32(setid)] + ",";
+                                    }
+                                }
+                            }
+                            oldParentSetId = Convert.ToInt32(row["DSTempParentStepId"]);
+                            strQuery = "INSERT INTO DSTempParentStep(SchoolId,DSTempHdrId,StepCd,StepName,DSTempSetId,SortOrder,SetIds,SetNames,ActiveInd,CreatedBy,CreatedOn) "
+                                        + "SELECT  SchoolId," + TId + ",StepCd,StepName,DSTempSetId,SortOrder,'" + newsetids + "',SetNames,ActiveInd," + loginid + ",getdate()"
+                                        + " FROM DSTempParentStep WHERE ActiveInd='A' AND DSTempHdrId = " + templateid + " AND DSTempParentStepId=" + oldParentSetId;
+                            parentSetId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+
+                            DataTable dtstep = new DataTable();
+
+                            strQuery = "SELECT  SchoolId,PrevStepId,SortOrder,PreDefinedInd,CustomById,VTStepId,DSTempSetId,StepCd,StepName,ActiveInd,"
+                                    + "DSTempParentStepId FROM DSTempStep WHERE DSTempParentStepId=" + oldParentSetId + " AND ActiveInd='A' and IsDynamic=0 AND DSTempHdrId = " + templateid;
+                            dtstep = objData.ReturnDataTable(strQuery, Con, Trans, false);
+                            if (dtstep.Rows.Count > 0)
+                            {
+                                foreach (DataRow rows in dtstep.Rows)
+                                {
+                                    oldSetId = Convert.ToInt32(rows["DSTempSetId"]);
+
+                                    strQuery = "INSERT INTO DSTempStep(SchoolId,DSTempHdrId,DSTempSetId,PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder,CreatedBy,ActiveInd,CreatedOn) ";
+                                    strQuery += "SELECT SchoolId," + TId + ",DSTempSetId,PrevStepId,DSTempParentStepId,StepCd,StepName,SortOrder," + loginid + ",ActiveInd,GETDATE()"
+                                        + "	FROM DSTempStep WHERE ActiveInd='A' AND DSTempSetId = " + oldSetId + " AND IsDynamic=0 AND DSTempParentStepId=" + oldParentSetId + " AND DSTempHdrId = " + templateid;
+                                    int StepId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+                                    strQuery = "SELECT DSTempSetId FROM DSTempStep WHERE DSTempStepId=" + StepId + " AND ActiveInd='A' AND IsDynamic=0";
+                                    int NewSetId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+                                    if (ht.ContainsKey(Convert.ToInt32(NewSetId)))
+                                    {
+                                        newsetids = ht[Convert.ToInt32(NewSetId)].ToString();
+                                        strQuery = "UPDATE DSTempStep SET DSTempSetId=" + Convert.ToInt32(ht[Convert.ToInt32(NewSetId)]) + ",DSTempParentStepId=" + parentSetId + " "
+                                            + " WHERE ActiveInd='A' AND DSTempStepId=" + StepId + " AND IsDynamic=0";
+                                        int updateId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+                                    }
+
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+
+            DataTable dtsetcol = new DataTable();
+            dtsetcol = objData.ReturnDataTable("SELECT DSTempSetColId FROM DSTempSetCol WHERE DSTempHdrId=" + templateid + "", Con, Trans, false);
+            if (dtsetcol != null)
+            {
+                if (dtsetcol.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dtsetcol.Rows)
+                    {
+                        strQuery = "INSERT INTO DSTempSetCol(SchoolId, DSTempHdrId,ColName,ColTypeCd,CorrRespType,CorrResp,CorrRespDesc	,InCorrRespDesc,CorrStdtResp	,InCorrStdResp,IncMisTrialInd,MisTrialDesc,CalcuType,CalcuData,ActiveInd,CreatedBy,CreatedOn,MoveUpstat) ";
+                        strQuery += "SELECT SchoolId, " + TId + ",ColName,ColTypeCd,CorrRespType,CorrResp,CorrRespDesc	,InCorrRespDesc,CorrStdtResp,InCorrStdResp,IncMisTrialInd,MisTrialDesc,CalcuType,CalcuData,ActiveInd," + loginid + ",CreatedOn,MoveUpstat FROM DSTempSetCol WHERE DSTempSetColId = " + Convert.ToInt32(row["DSTempSetColId"]) + " ";
+                        int setColNewId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+                        DataTable dtsetcolcalc = new DataTable();
+                        dtsetcolcalc = objData.ReturnDataTable("SELECT DSTempSetColCalcId FROM DSTempSetColCalc WHERE DSTempSetColId=" + Convert.ToInt32(row["DSTempSetColId"]) + "", Con, Trans, false);
+                        if (dtsetcolcalc.Rows.Count > 0)
+                        {
+                            foreach (DataRow rowc in dtsetcolcalc.Rows)
+                            {
+                                strQuery = "INSERT INTO DSTempSetColCalc(SchoolId,DSTempSetColId,CalcType,CalcLabel,CalcFormula,CalcRptLabel,ActiveInd,CreatedBy,CreatedOn,IncludeInGraph) " +
+                                            "SELECT SchoolId," + setColNewId + ",CalcType,CalcLabel,CalcFormula,CalcRptLabel,ActiveInd," + loginid + ",getdate(),IncludeInGraph FROM DSTempSetColCalc WHERE DSTempSetColCalcId=" + Convert.ToInt32(rowc["DSTempSetColCalcId"]) + "";
+                                int setColCalId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+
+                                strQuery = "INSERT INTO DSTempRule(DSTempHdrId,SchoolId,DSTempSetColId,DSTempSetColCalcId,RuleType,CriteriaType,ScoreReq,TotalInstance,TotCorrInstance,ConsequetiveInd,ConsequetiveAvgInd,MultiTeacherReqInd,IOAReqInd,LogicalCombType,ActiveInd,IsComment,IsNA,ModificationComment,ModificationRule,CreatedBy,CreatedOn) "; //--- [New Criteria] May 2020 ---//
+                                strQuery += "SELECT  " + TId + ",SchoolId," + setColNewId + "," + setColCalId + ",RuleType,CriteriaType,ScoreReq,TotalInstance,TotCorrInstance,ConsequetiveInd,ISNULL(ConsequetiveAvgInd,0) AS ConsequetiveAvgInd,MultiTeacherReqInd,IOAReqInd,LogicalCombType,ActiveInd,IsComment,IsNA,ModificationComment,ModificationRule,CreatedBy,CreatedOn FROM DSTempRule WHERE DSTempSetColId=" + Convert.ToInt32(row["DSTempSetColId"]) + " And DSTempSetColCalcId=" + Convert.ToInt32(rowc["DSTempSetColCalcId"]) + " "; //--- [New Criteria] May 2020 ---//
+                                int lastId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+                            }
+                        }
+
+                    }
+                    strQuery = "INSERT INTO DSTempRule(DSTempHdrId,SchoolId,DSTempSetColId,DSTempSetColCalcId,RuleType,CriteriaType,ScoreReq,TotalInstance,TotCorrInstance,ConsequetiveInd,ConsequetiveAvgInd,MultiTeacherReqInd,IOAReqInd,LogicalCombType,ActiveInd,IsComment,IsNA,ModificationComment,ModificationRule,CreatedBy,CreatedOn) "; //--- [New Criteria] May 2020 ---//
+                    strQuery += "SELECT  " + TId + ",SchoolId,0,0,RuleType,CriteriaType,ScoreReq,TotalInstance,TotCorrInstance,ConsequetiveInd,ISNULL(ConsequetiveAvgInd,0) AS ConsequetiveAvgInd,MultiTeacherReqInd,IOAReqInd," //--- [New Criteria] May 2020 ---//
+                        + "LogicalCombType,ActiveInd,IsComment,IsNA,ModificationComment,ModificationRule,CreatedBy,CreatedOn FROM DSTempRule WHERE" +
+                        " DSTempSetColId=0 And DSTempSetColCalcId=0 AND DSTempHdrId=" + templateid;
+                    int lastModRuleId = Convert.ToInt32(objData.ExecuteWithScopeandConnection(strQuery, Con, Trans));
+
+                }
+            }
+            return TId;
+        }
+        catch (Exception Ex)
+        {
+            ClsErrorLog errlog = new ClsErrorLog();
+
+            errlog.WriteToLog(
+                "Page Name: " + clsGeneral.getPageName() +
+                "\n" + Ex.ToString());
+
+            throw;
         }
     }
 
