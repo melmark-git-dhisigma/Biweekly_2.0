@@ -15635,13 +15635,12 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 getMaxSet = Convert.ToInt32(oData.FetchValueTrans(qrygetMaxSet, trans, con));
 
                 string qrygetMaxStp = "";
-                qrygetMaxStp = "SELECT DISTINCT TOP 1 DSSTP.SortOrder AS MaxStepID " +
+                qrygetMaxStp = "SELECT COUNT( DISTINCT DSSTP.DSTempStepId) AS MaxStepID " +
                                 "FROM DSTempHdr DSH " +
                                 "INNER JOIN DSTempSet DSST ON DSH.DSTempHdrId = DSST.DSTempHdrId " +
                                 "INNER JOIN DSTempStep DSSTP ON DSST.DSTempSetId = DSSTP.DSTempSetId " +
                                 "INNER JOIN DSTempPrompt DSPRMP ON DSST.DSTempHdrId = DSPRMP.DSTempHdrId " +
-                                "WHERE DSH.DSTempHdrId = " + oTemp.TemplateId + " AND DSST.DSTempSetId = " + iCurrentSetId + " AND DSST.ActiveInd = 'A' AND DSSTP.ActiveInd = 'A' AND DSPRMP.ActiveInd = 'A'" +
-                                "ORDER BY DSSTP.SortOrder DESC";
+                                "WHERE DSH.DSTempHdrId = " + oTemp.TemplateId + " AND DSST.DSTempSetId = " + iCurrentSetId + " AND DSST.ActiveInd = 'A' AND DSSTP.ActiveInd = 'A' AND DSPRMP.ActiveInd = 'A'";
                 getMaxStp = Convert.ToInt32(oData.FetchValueTrans(qrygetMaxStp, trans, con));
 
                 string qrygetMaxPmt = "";
@@ -15650,7 +15649,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 "INNER JOIN DSTempSet DSST ON DSH.DSTempHdrId = DSST.DSTempHdrId " +
                                 "INNER JOIN DSTempStep DSSTP ON DSST.DSTempSetId = DSSTP.DSTempSetId " +
                                 "INNER JOIN DSTempPrompt DSPRMP ON DSST.DSTempHdrId = DSPRMP.DSTempHdrId " +
-                                "WHERE DSH.DSTempHdrId = " + oTemp.TemplateId + " AND DSST.DSTempSetId = " + iCurrentSetId + " AND DSSTP.SortOrder = " + iCurrentStep + " AND DSST.ActiveInd = 'A' AND DSSTP.ActiveInd = 'A' AND DSPRMP.ActiveInd = 'A'" +
+                                "WHERE DSH.DSTempHdrId = " + oTemp.TemplateId + " AND DSST.DSTempSetId = " + iCurrentSetId + " AND DSST.ActiveInd = 'A' AND DSSTP.ActiveInd = 'A' AND DSPRMP.ActiveInd = 'A'" +
                                 "ORDER BY DSPRMP.PromptOrder";
                 getMaxPmt = Convert.ToInt32(oData.FetchValueTrans(qrygetMaxPmt, trans, con));
 
@@ -15668,13 +15667,13 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                 getMinSet = Convert.ToInt32(oData.FetchValueTrans(qrygetMinSet, trans, con));
 
                 string qrygetMinStp = "";
-                qrygetMinStp = "SELECT DISTINCT TOP 1 DSSTP.SortOrder AS MinStepID " +
+                qrygetMinStp = "SELECT CASE WHEN COUNT( DISTINCT DSSTP.DSTempStepId) > 0 THEN 1 " + 
+                                "ELSE 0 END AS MinStepID " +
                                 "FROM DSTempHdr DSH " +
                                 "INNER JOIN DSTempSet DSST ON DSH.DSTempHdrId = DSST.DSTempHdrId " +
                                 "INNER JOIN DSTempStep DSSTP ON DSST.DSTempSetId = DSSTP.DSTempSetId " +
                                 "INNER JOIN DSTempPrompt DSPRMP ON DSST.DSTempHdrId = DSPRMP.DSTempHdrId " +
-                                "WHERE DSH.DSTempHdrId = " + oTemp.TemplateId + " AND DSST.DSTempSetId = " + iCurrentSetId + " AND DSST.ActiveInd = 'A' AND DSSTP.ActiveInd = 'A' AND DSPRMP.ActiveInd = 'A'" +
-                                "ORDER BY DSSTP.SortOrder";
+                                "WHERE DSH.DSTempHdrId = " + oTemp.TemplateId + " AND DSST.DSTempSetId = " + iCurrentSetId + " AND DSST.ActiveInd = 'A' AND DSSTP.ActiveInd = 'A' AND DSPRMP.ActiveInd = 'A'";
                 getMinStp = Convert.ToInt32(oData.FetchValueTrans(qrygetMinStp, trans, con));
 
                 string qrygetMinPmt = "";
@@ -15683,7 +15682,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
                                 "INNER JOIN DSTempSet DSST ON DSH.DSTempHdrId = DSST.DSTempHdrId " +
                                 "INNER JOIN DSTempStep DSSTP ON DSST.DSTempSetId = DSSTP.DSTempSetId " +
                                 "INNER JOIN DSTempPrompt DSPRMP ON DSST.DSTempHdrId = DSPRMP.DSTempHdrId " +
-                                "WHERE DSH.DSTempHdrId = " + oTemp.TemplateId + " AND DSST.DSTempSetId = " + iCurrentSetId + " AND DSSTP.SortOrder = " + iCurrentStep + " AND DSST.ActiveInd = 'A' AND DSSTP.ActiveInd = 'A' AND DSPRMP.ActiveInd = 'A'" +
+                                "WHERE DSH.DSTempHdrId = " + oTemp.TemplateId + " AND DSST.DSTempSetId = " + iCurrentSetId + " AND DSST.ActiveInd = 'A' AND DSSTP.ActiveInd = 'A' AND DSPRMP.ActiveInd = 'A'" +
                                 "ORDER BY DSPRMP.PromptOrder DESC";
                 getMinPmt = Convert.ToInt32(oData.FetchValueTrans(qrygetMinPmt, trans, con));
 
