@@ -24,7 +24,7 @@ using System.Text.RegularExpressions;
 public partial class StudentBinder_ProgressReport : System.Web.UI.Page
 {
     public static clsData objData = null;
-    public static clsSession sess = null;
+    public clsSession sess = null;
     static string[] columns;
 
     protected void Page_Load(object sender, EventArgs e)
@@ -280,7 +280,7 @@ public partial class StudentBinder_ProgressReport : System.Web.UI.Page
         string Result = "";
         try
         {
-            sess = (clsSession)HttpContext.Current.Session["UserSession"];
+            clsSession sess = (clsSession)HttpContext.Current.Session["UserSession"];
             objData = new clsData();
             string dataArray = Data2.ToString();
             //string[] arrayval = dataArray.Split(',');

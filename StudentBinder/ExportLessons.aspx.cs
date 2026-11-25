@@ -49,7 +49,7 @@ public partial class StudentBinder_ExportLessons : System.Web.UI.Page
     public static string frequencycnt;
     public static bool status;
     public static clsData objData = null;
-    public static clsSession sess = null;
+    public clsSession sess = null;
     public static clsRoles role = null;
     public static DataClass objdataClass = null;
     public static ClsTemplateSession ObjTempSess = null;

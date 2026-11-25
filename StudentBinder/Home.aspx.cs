@@ -16,13 +16,13 @@ using System.IO;
 
 public partial class Home : System.Web.UI.Page
 {
-    static string _studID = "";
+    //static string _studID = "";
     public static bool frequency;
     public static string frequencycnt;
     public static bool status;
     public static clsData objData = null;
-    public static clsSession sess = null;
-    public static clsSession Prevsess = null;
+    public clsSession sess = null;
+    public clsSession Prevsess = null;
     public static clsRoles role = null;
     public static DataClass objdataClass = null;
     public static ClsTemplateSession ObjTempSess = null;
@@ -71,7 +71,6 @@ public partial class Home : System.Web.UI.Page
 
             if (!IsPostBack)
             {
-                sess = (clsSession)Session["UserSession"];
                 Prevsess = sess;
                 Session["PreSession"] = Prevsess;
                 Session["Spreid"] = Prevsess.LoginId;
@@ -112,7 +111,7 @@ public partial class Home : System.Web.UI.Page
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('There is an issue related to the session Data Please logout and Sign in Again...');", true);
                    
                 }
-                _studID = "";
+                Session["SelectedStudentID"] = "";
                 sess.AdminView = 2;
                 setTitle();
                 Loadfillclass();
@@ -291,9 +290,11 @@ public partial class Home : System.Web.UI.Page
     private void TemplateSession()
     {
         ObjTempSess = new ClsTemplateSession();
-        if (_studID.ToString() != "")
+        string studID = Session["SelectedStudentID"].ToString();
+
+        if (!string.IsNullOrWhiteSpace(studID))
         {
-            setTemplateSess(_studID);
+            setTemplateSess(studID);
             Session["BiweeklySession"] = ObjTempSess;
         }
 
@@ -446,8 +447,11 @@ public partial class Home : System.Web.UI.Page
         int studentId = Convert.ToInt32(StudentId);
         clsData oData = new clsData();
         clsSession oSession = (clsSession)HttpContext.Current.Session["UserSession"];
+        clsSession Prevsess = (clsSession)HttpContext.Current.Session["UserSession"];
 
-        HttpContext.Current.Session["Sprestid"] = Convert.ToInt32(_studID);
+        string studID = HttpContext.Current.Session["SelectedStudentID"].ToString();
+
+        HttpContext.Current.Session["Sprestid"] = Convert.ToInt32(studID);
         string HostName = Dns.GetHostName();
         string userAgent = HttpContext.Current.Request.UserAgent.ToString();
         string curesesid = HttpContext.Current.Session.SessionID.ToString();
@@ -487,18 +491,18 @@ public partial class Home : System.Web.UI.Page
         int insertresult = 0;
         foreach (DataRow Behaviour in DTBehaviorFrequency.Rows)
         {
-            InsertQuery = "Insert into Behaviour(MeasurementId,StudentId,FrequencyCount,ActiveInd,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,TimeOfEvent,ObserverId) Values('" + Behaviour["MeasurementId"] + "','" + studentId + "','" + 0 + "','A','" + sess.LoginId + "',getdate(),'" + sess.LoginId + "',getdate(),getdate(),'"+ sess.LoginId + "')";
+            InsertQuery = "Insert into Behaviour(MeasurementId,StudentId,FrequencyCount,ActiveInd,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,TimeOfEvent,ObserverId) Values('" + Behaviour["MeasurementId"] + "','" + studentId + "','" + 0 + "','A','" + oSession.LoginId + "',getdate(),'" + oSession.LoginId + "',getdate(),getdate(),'"+ oSession.LoginId + "')";
             insertresult = objData.Execute(InsertQuery);
         }
         foreach (DataRow Behaviour in DTBehaviorDuration.Rows)
         {
-            InsertQuery = "Insert into Behaviour(MeasurementId,StudentId,ActiveInd,Duration,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,TimeOfEvent,ObserverId) Values('" + Behaviour["MeasurementId"] + "','" + studentId + "','A','" + 0 + "','" + sess.LoginId + "',getdate(),'" + sess.LoginId + "',getdate(),getdate(),'" + sess.LoginId + "')";
+            InsertQuery = "Insert into Behaviour(MeasurementId,StudentId,ActiveInd,Duration,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,TimeOfEvent,ObserverId) Values('" + Behaviour["MeasurementId"] + "','" + studentId + "','A','" + 0 + "','" + oSession.LoginId + "',getdate(),'" + oSession.LoginId + "',getdate(),getdate(),'" + oSession.LoginId + "')";
             insertresult = objData.Execute(InsertQuery);
         }
 
         foreach (DataRow Behaviour in DTBehaviorYesNo.Rows)
         {
-            InsertQuery = "Insert into Behaviour(MeasurementId,StudentId,FrequencyCount,ActiveInd,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,TimeOfEvent,ObserverId,YesOrNo) Values('" + Behaviour["MeasurementId"] + "','" + studentId + "','" + 0 + "','A','" + sess.LoginId + "',getdate(),'" + sess.LoginId + "',getdate(),getdate(),'" + sess.LoginId + "',0)";
+            InsertQuery = "Insert into Behaviour(MeasurementId,StudentId,FrequencyCount,ActiveInd,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,TimeOfEvent,ObserverId,YesOrNo) Values('" + Behaviour["MeasurementId"] + "','" + studentId + "','" + 0 + "','A','" + oSession.LoginId + "',getdate(),'" + oSession.LoginId + "',getdate(),getdate(),'" + oSession.LoginId + "',0)";
             insertresult = objData.Execute(InsertQuery);
         }
     }
@@ -528,7 +532,7 @@ public partial class Home : System.Web.UI.Page
     protected void lbname_Click(object sender, EventArgs e)
     {
         LinkButton lbStud = (LinkButton)sender;
-        _studID = lbStud.CommandArgument;
+        HttpContext.Current.Session["SelectedStudentID"] = lbStud.CommandArgument;
         DataListItem dli = (DataListItem)lbStud.NamingContainer;
     }
 
@@ -538,6 +542,7 @@ public partial class Home : System.Web.UI.Page
     public static string SetStudentID(string stdID)
     {
         clsSession oSession = (clsSession)HttpContext.Current.Session["UserSession"];
+        clsSession Prevsess = (clsSession)HttpContext.Current.Session["UserSession"];
         if (oSession == null)
         {
             HttpContext.Current.Response.Redirect("~/Administration/Error.aspx?Error=Your session has expired. Please log-in again");
@@ -547,12 +552,11 @@ public partial class Home : System.Web.UI.Page
             string[] ar = stdID.Split('-');
             stdID = ar[1];
         }
-        _studID = stdID;
-
-        if (_studID != "")
+        HttpContext.Current.Session["SelectedStudentID"] = stdID;
+        if (!string.IsNullOrWhiteSpace(stdID))
         {
-            oSession.StudentId = Convert.ToInt32(_studID);
-            Prevsess.StudentId = Convert.ToInt32(_studID);
+            oSession.StudentId = Convert.ToInt32(stdID);
+            Prevsess.StudentId = Convert.ToInt32(stdID);
         }
         else
         {
@@ -560,9 +564,9 @@ public partial class Home : System.Web.UI.Page
         }
         try
         {
-            if (_studID != "")
+            if (stdID != "")
             {
-                HttpContext.Current.Session["Sprestid"] = Convert.ToInt32(_studID);
+                HttpContext.Current.Session["Sprestid"] = Convert.ToInt32(stdID);
                 string HostName = Dns.GetHostName();
                 string userAgent = HttpContext.Current.Request.UserAgent.ToString();
                 string curesesid = HttpContext.Current.Session.SessionID.ToString();
@@ -667,6 +671,9 @@ public partial class Home : System.Web.UI.Page
     {
         clsData oData = new clsData();
         clsSession oSession = (clsSession)HttpContext.Current.Session["UserSession"];
+        clsSession Prevsess = (clsSession)HttpContext.Current.Session["UserSession"];
+
+
         clsSubmenu oSubmenu = new clsSubmenu();
         List<clsSubmenu> list = new List<clsSubmenu>();
         bool IsChecked = false;
@@ -693,12 +700,15 @@ public partial class Home : System.Web.UI.Page
         }
         oSession = clsGeneral.sessionchecks(curesesid, preid, ip, preuser, oSession, Prevsess, SessStudentid, PreClassid, Sessstname, Pagepath);
 
-         if (_studID == "")
-        {           
-            _studID = oSession.StudentId.ToString();
+        string studID = HttpContext.Current.Session["SelectedStudentID"].ToString();
+
+        if (string.IsNullOrWhiteSpace(studID))
+        {
+            studID = oSession.StudentId.ToString();
+            HttpContext.Current.Session["SelectedStudentID"] = studID;
         }
 
-        if (_studID != "")
+        if (studID != "")
         {
 
             bool blExist = oData.IFExists("SELECT StudentId FROM StdtSessEvent WHERE StudentId=" + oSession.StudentId + " and ClassId=" + oSession.Classid + "and EventType='CH' AND SchoolId=" + oSession.SchoolId + " AND CONVERT(DATE,CreatedOn)=CONVERT(DATE,GETDATE())");
@@ -742,7 +752,8 @@ public partial class Home : System.Web.UI.Page
     {
         clsData oData = new clsData();
         List<clsSubmenu> list = new List<clsSubmenu>();
-        sess = (clsSession)HttpContext.Current.Session["UserSession"];
+        clsSession sess = (clsSession)HttpContext.Current.Session["UserSession"];
+        clsSession Prevsess = (clsSession)HttpContext.Current.Session["UserSession"];
         if (sess != null)
         {
             string selQry = "SELECT distinct StudentId as Id,(StudentLname+' - '+StudentNbr) as Name,ImageURL FROM StdtClass stdtcls left Join Student stdt ON stdt.StudentId=stdtcls.StdtId WHERE stdtcls.ClassId='" + sess.Classid + "' AND stdt.ActiveInd='A' And stdtcls.ActiveInd='A'";
@@ -827,7 +838,7 @@ public partial class Home : System.Web.UI.Page
     public static void getResultFrequency(string MeasurementId, string StudentId)
     {
         objData = new clsData();
-        sess = (clsSession)HttpContext.Current.Session["UserSession"];
+        clsSession sess = (clsSession)HttpContext.Current.Session["UserSession"];
 
         //string a = "Select FrequencyCount from Behaviour where MeasurementId='" + Convert.ToInt32(MeasurementId) + "' and StudentId='" + sess.StudentId + "' and Convert(date,CreatedOn)=convert(date,GETDATE())";
         //string b = "Select FrequencyCount from Behaviour where MeasurementId='" + Convert.ToInt32(MeasurementId) + "' and StudentId='" + sess.StudentId + "' and Convert(date,CreatedOn)=convert(date,GETDATE())";
@@ -852,15 +863,17 @@ public partial class Home : System.Web.UI.Page
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public static void selectDischargedStudent(int stdId)
     {
-        sess = (clsSession)HttpContext.Current.Session["UserSession"];
+        clsSession sess = (clsSession)HttpContext.Current.Session["UserSession"];
         sess.StudentId = stdId;
     }
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public static void ChangeClassId(int ClassId)
     {
-        sess = (clsSession)HttpContext.Current.Session["UserSession"];
+        clsSession sess = (clsSession)HttpContext.Current.Session["UserSession"];
+        clsSession Prevsess = (clsSession)HttpContext.Current.Session["UserSession"];
         sess.Classid = ClassId;
+        HttpContext.Current.Session["SelectedStudentID"] = "";
         sess.StudentId = -9;
         int preid = Convert.ToInt16(HttpContext.Current.Session["Spreid"]);
         string preuser = HttpContext.Current.Session["Spreuser"].ToString();
@@ -890,7 +903,7 @@ public partial class Home : System.Web.UI.Page
     {
         string DlClass = "";
         clsData objData = new clsData();
-        sess = (clsSession)HttpContext.Current.Session["uSEERsESSION"];
+        clsSession sess = (clsSession)HttpContext.Current.Session["UserSession"];
         if (sess == null) return "Failed";
         if (objData.IFExists("SELECT ClassId from UserClass where UserId='" + sess.LoginId + "'") == true)
         {
@@ -930,7 +943,7 @@ public partial class Home : System.Web.UI.Page
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public static string getResultDuration(string BehaviourId, string Durationid, string DurationTime)
     {
-        sess = (clsSession)HttpContext.Current.Session["UserSession"];
+        clsSession sess = (clsSession)HttpContext.Current.Session["UserSession"];
         int DurationId = Convert.ToInt32(Durationid);
         int durTime = Convert.ToInt32(DurationTime);
         //THIS CODE IS TO CONVERT SECONDS TO HH:MM:SS FORMAT //UNCOMMENT IF NEEDED.
@@ -956,7 +969,7 @@ public partial class Home : System.Web.UI.Page
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public static string saveDurationStartTime(string MeasurementId, string StudentId)
     {
-        sess = (clsSession)HttpContext.Current.Session["UserSession"];
+        clsSession sess = (clsSession)HttpContext.Current.Session["UserSession"];
         string InsertQuery = "Insert into Behaviour(MeasurementId,StudentId,StartTime,ActiveInd,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn,ObserverId) Values('" + MeasurementId + "','" + StudentId + "',CONVERT (time, GETDATE()),'A','" + sess.LoginId + "',getdate(),'" + sess.LoginId + "',getdate(),'" + sess.LoginId + "')";
         int insertresult = objData.ExecuteWithScope(InsertQuery);
 
@@ -983,7 +996,9 @@ public partial class Home : System.Web.UI.Page
 
             try
             {
-                sess = (clsSession)HttpContext.Current.Session["UserSession"];
+            clsSession sess = (clsSession)HttpContext.Current.Session["UserSession"];
+            clsSession Prevsess = (clsSession)HttpContext.Current.Session["UserSession"];
+
                 if (sess == null) return;
                 sess.StudentId = StudID;
                 StudID = 0;
@@ -1066,7 +1081,7 @@ public partial class Home : System.Web.UI.Page
         string opt = "";
         objData = new clsData();
         clsLessons oLessons = new clsLessons();
-        sess = (clsSession)HttpContext.Current.Session["UserSession"];
+        clsSession sess = (clsSession)HttpContext.Current.Session["UserSession"];
         DataTable dtSubmenu = new DataTable();
         dtSubmenu.Columns.Add("Name", typeof(string));
         dtSubmenu.Columns.Add("ID", typeof(string));
@@ -1652,7 +1667,7 @@ public partial class Home : System.Web.UI.Page
         string opt = "";
         objData = new clsData();
         clsLessons oLessons = new clsLessons();
-        sess = (clsSession)HttpContext.Current.Session["UserSession"];
+        clsSession sess = (clsSession)HttpContext.Current.Session["UserSession"];
         DataTable dtSubmenu = new DataTable();
         dtSubmenu.Columns.Add("Name", typeof(string));
         dtSubmenu.Columns.Add("ID", typeof(string));
@@ -2807,7 +2822,7 @@ public partial class Home : System.Web.UI.Page
     public static bool setActiveStudents(int ID)
     {
         objData = new clsData();
-        sess = (clsSession)HttpContext.Current.Session["UserSession"];
+        clsSession sess = (clsSession)HttpContext.Current.Session["UserSession"];
         if (sess == null) return false;
         string strSql = "";
         bool retVal = false;
@@ -2834,7 +2849,7 @@ public partial class Home : System.Web.UI.Page
 
         status = false;
         objData = new clsData();
-        sess = (clsSession)HttpContext.Current.Session["UserSession"];
+        clsSession sess = (clsSession)HttpContext.Current.Session["UserSession"];
         if (sess == null) return false;
         ObjTempSess = (ClsTemplateSession)HttpContext.Current.Session["BiweeklySession"];
         if (ObjTempSess == null) return false;
@@ -3012,7 +3027,7 @@ public partial class Home : System.Web.UI.Page
         try
         {
             //HttpContext.Current.Session
-            sess = (clsSession)HttpContext.Current.Session["UserSession"];
+            clsSession sess = (clsSession)HttpContext.Current.Session["UserSession"];
             if (sess != null)
             {
 
@@ -3479,7 +3494,7 @@ public partial class Home : System.Web.UI.Page
     public static string enableAllAlert()
     {
         clsData oData = new clsData();
-        sess = (clsSession)HttpContext.Current.Session["UserSession"];
+        clsSession sess = (clsSession)HttpContext.Current.Session["UserSession"];
         int studId = sess.StudentId;
         DataTable DTable = new DataTable();
         if (!studId.Equals(0))
