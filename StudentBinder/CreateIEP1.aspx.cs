@@ -16,7 +16,7 @@ using System.Xml.Linq;
 public partial class StudentBinder_CreateIEP1 : System.Web.UI.Page
 {
     public static clsData objData = null;
-    public static clsSession sess = null;
+    public clsSession sess = null;
     string strQuery = "";
     DataTable Dt = null;
     static int intIEPId = 0;
@@ -127,7 +127,7 @@ public partial class StudentBinder_CreateIEP1 : System.Web.UI.Page
     public static string submitIEP1(string txtConcerns,string txtStrengths,string txtVision)
     {
         string result = "";
-        sess = (clsSession)HttpContext.Current.Session["UserSession"];
+        clsSession sess = (clsSession)HttpContext.Current.Session["UserSession"];
         int ddd = sess.IEPId;
         int ssffs = sess.IEPStatus;
         if (sess == null)
@@ -214,7 +214,7 @@ public partial class StudentBinder_CreateIEP1 : System.Web.UI.Page
     public static string submitIEP1_hdn(string txtConcerns, string txtStrengths, string txtVision)
     {
         string result = "";
-        sess = (clsSession)HttpContext.Current.Session["UserSession"];
+        clsSession sess = (clsSession)HttpContext.Current.Session["UserSession"];
         int ddd = sess.IEPId;
         int ssffs = sess.IEPStatus;
         if (sess == null)

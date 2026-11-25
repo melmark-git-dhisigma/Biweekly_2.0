@@ -8,7 +8,7 @@ using System.Web.UI.WebControls;
 
 public partial class StudentBinder_CreateIEP9 : System.Web.UI.Page
 {
-    public static clsSession sess = null;
+    public clsSession sess = null;
     public clsData objData = null;
     string strQuery = "";
     static int IEPId = 0;
