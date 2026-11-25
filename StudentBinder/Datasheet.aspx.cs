@@ -26250,7 +26250,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         string sqlstr = "SELECT Score FROM StdtSessColScore SC INNER JOIN StdtSessionHdr SH on SC.StdtSessionHdrId = sh.StdtSessionHdrId " +
                         "WHERE SH.StdtSessionHdrId IN (select StdtSessionHdrId from ( select hdr.StdtSessionHdrId, RANK()" +
                         "OVER (ORDER BY (CASE(IOAInd) WHEN 'N' THEN 1 WHEN 'Y' THEN 2 END), EndTs DESC) as RNK  FROM StdtSessionHdr hdr " +
-                        "WHERE StudentId = " + iStudentId + " AND SC.DSTempSetColCalcId=" + colCalId + " ) as Rk WHERE RNK <= " + iSessonNumber + ") AND SH.IOAInd<>'Y' AND StartTs > " +
+                        "WHERE StudentId = " + iStudentId + " ) as Rk WHERE RNK <= " + iSessonNumber + ") AND SH.IOAInd<>'Y' AND SC.DSTempSetColCalcId = " + colCalId + " AND StartTs > " +
                         "(SELECT ISNULL(MAX(EvntTs),'1900-01-01') FROM StdtSessEvent " +
                         "WHERE  StudentId =" + iStudentId + " ) ORDER BY SH.StdtSessionHdrId";
 
@@ -26316,7 +26316,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         string sqlstr = "SELECT Score FROM StdtSessColScore SC INNER JOIN StdtSessionHdr SH on SC.StdtSessionHdrId = sh.StdtSessionHdrId " +
                         "WHERE SH.StdtSessionHdrId IN (select StdtSessionHdrId from ( select hdr.StdtSessionHdrId, RANK()" +
                         "OVER (ORDER BY (CASE(IOAInd) WHEN 'N' THEN 1 WHEN 'Y' THEN 2 END), EndTs DESC) as RNK  FROM StdtSessionHdr hdr " +
-                        "WHERE StudentId = " + iStudentId + " AND SC.DSTempSetColCalcId=" + colCalId + " ) as Rk WHERE RNK <= " + iSessonNumber + ") AND SH.IOAInd<>'Y' AND StartTs > " +
+                        "WHERE StudentId = " + iStudentId + " ) as Rk WHERE RNK <= " + iSessonNumber + ") AND SH.IOAInd<>'Y' AND SC.DSTempSetColCalcId = " + colCalId + " AND StartTs > " +
                         "(SELECT ISNULL(MAX(EvntTs),'1900-01-01') FROM StdtSessEvent " +
                         "WHERE  StudentId =" + iStudentId + " ) ORDER BY SH.StdtSessionHdrId";
 
@@ -26375,7 +26375,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         string sqlstr = "SELECT Score FROM StdtSessColScore SC INNER JOIN StdtSessionHdr SH on SC.StdtSessionHdrId = sh.StdtSessionHdrId " +
                         "WHERE SH.StdtSessionHdrId IN (select StdtSessionHdrId from ( select hdr.StdtSessionHdrId, RANK()" +
                         "OVER (ORDER BY (CASE(IOAInd) WHEN 'N' THEN 1 WHEN 'Y' THEN 2 END), EndTs DESC) as RNK  FROM StdtSessionHdr hdr " +
-                        "WHERE StudentId = " + iStudentId + " AND SC.DSTempSetColCalcId=" + colCalId + " ) as Rk WHERE RNK <= " + iSessonNumber + ") AND SH.IOAInd<>'Y' AND StartTs > " +
+                        "WHERE StudentId = " + iStudentId + " ) as Rk WHERE RNK <= " + iSessonNumber + ") AND SH.IOAInd<>'Y' AND SC.DSTempSetColCalcId = " + colCalId + " AND StartTs > " +
                         "(SELECT ISNULL(MAX(EvntTs),'1900-01-01') FROM StdtSessEvent " +
                         "WHERE  StudentId =" + iStudentId + " ) ORDER BY SH.StdtSessionHdrId";
 
@@ -26435,7 +26435,7 @@ public partial class StudentBinder_Datasheet : System.Web.UI.Page
         string sqlstr = "SELECT Score FROM StdtSessColScore SC INNER JOIN StdtSessionHdr SH on SC.StdtSessionHdrId = sh.StdtSessionHdrId " +
                         "WHERE SH.StdtSessionHdrId IN (select StdtSessionHdrId from ( select hdr.StdtSessionHdrId, RANK()" +
                         "OVER (ORDER BY (CASE(IOAInd) WHEN 'N' THEN 1 WHEN 'Y' THEN 2 END), EndTs DESC) as RNK  FROM StdtSessionHdr hdr " +
-                        "WHERE StudentId = " + iStudentId + " AND SC.DSTempSetColCalcId=" + colCalId + " ) as Rk WHERE RNK <= " + iSessonNumber + ") AND SH.IOAInd<>'Y' AND StartTs > " +
+                        "WHERE StudentId = " + iStudentId + " ) as Rk WHERE RNK <= " + iSessonNumber + ") AND SH.IOAInd<>'Y' AND SC.DSTempSetColCalcId = " + colCalId + " AND StartTs > " +
                         "(SELECT ISNULL(MAX(EvntTs),'1900-01-01') FROM StdtSessEvent " +
                         "WHERE  StudentId =" + iStudentId + " ) ORDER BY SH.StdtSessionHdrId";
 
