@@ -2213,7 +2213,13 @@
                         iname = "divICCIEP" + Id + "" + MenuIds + "";
                     }
                     else if (x.value == ("AcademicSessionReport.aspx" + Ids).toString()) {
-                        dname = "divBSRG" + Id + "" + MenuIds + ""
+
+                        if (Id == 0)
+                            $('#tdTitle').html('Session-Based Graph');
+                        else
+                            $('#tdTitle').html('Maintenance Graph');
+
+                        dname = "divBSRG" + Id + "" + MenuIds + "";
                         iname = "divIBSRG" + Id + "" + MenuIds + "";
                     }
                     else if (x.value == ("DSTempHistory.aspx" + Ids).toString()) {
@@ -2253,7 +2259,7 @@
                         iname = "divIBHRDET" + Id + "" + MenuIds + "";
                     }
 
-                    setName(dname);
+                    setName(dname,Id);
 
                     var searchEles = document.getElementById("divContentPages").children;
 
@@ -2336,7 +2342,7 @@
                         //getNotifier();
                     }
 
-                    setName(dname);
+                    setName(dname,Id);
                 }
                 else {
 
@@ -2745,7 +2751,7 @@
                 //      $('#ulsubmenu').find('span').filter(function () { return ($(this).text().indexOf(menucontent.trim()) > -1) }).eq(1).parents('.alpha').attr('id', 'submenu_active');
                 //-- setting submenu active --//
 
-                setName(dname); // set the title of the page.
+                setName(dname,ID); // set the title of the page.
                 if (x.value == ("Datasheet.aspx" + Ids).toString()) {
                     addDatasheetFrame(dname, iname, x.value, Id, noOfLessons);
 
@@ -2818,7 +2824,7 @@
                 $('#slider').css("top", '326%');
             }
         }
-        function setName(dname) {
+        function setName(dname, pageId) {
 
             var top = $("#submenu").offset().top;
             $(".slideImg").remove();
@@ -2933,7 +2939,10 @@
                 title = "Customize Goals And Lessons";
             }
             if (dname.indexOf('divBSRG') >= 0) {
+                if (pageId == 0)
                 title = "Session-Based Graph";
+                else
+                    title = "Maintenance Graph";
             }
             if (dname.indexOf('divDSTEMP') >= 0) {
                 title = "Prior Sessions";
@@ -3160,7 +3169,7 @@
             //getDashBoardReport();
             // $('#divContentPages').find('#divTFGraph').show();
 
-            setName("");
+            setName("", sheetId);
 
 
             $('.alpha').removeAttr('id');
@@ -3220,7 +3229,7 @@
              //getDashBoardReport();
              // $('#divContentPages').find('#divTFGraph').show();
 
-        setName("");
+        setName("", sheetId);
 
 
         $('.alpha').removeAttr('id');
@@ -3544,7 +3553,7 @@
             showandHideMenu();
 
             divName.style.display = "block";
-            setName(divName.id);
+            setName(divName.id, id);
             document.getElementById('hidCureentStudent').value = stud;
 
             var actSessId = $(divName).attr('id');
@@ -3571,7 +3580,7 @@
         }
         function setBehVisible(ID) {
             $('#divContentPages').find('#divTFBEH' + ID + '0').show();
-            setName('divTFBEH');
+            setName('divTFBEH',ID);
         }
         function setDatasheetVisible(ID, sheetCount) {
             $('#divTF' + ID).show();
@@ -3583,7 +3592,7 @@
             var newName = "sheetDiv-" + ID + "-" + sheetCount.toString();
 
             $('#' + newName).show();
-            setName('divTF');
+            setName('divTF',ID);
         }
         function selSidemenu(divName, stud, id, sheetCount) {
             var ID = stud;
