@@ -197,13 +197,13 @@ public partial class StudentBinder_TextBased : System.Web.UI.Page
                         }
                     }
                 }
-
-                DataTable DTLesson = ObjData.ReturnDataTable("SELECT *," + APqry + ap_end +
-
+                DataTable DTLesson = new DataTable();
+                if (StatusCheck != "")
+                {
+                    DTLesson = ObjData.ReturnDataTable("SELECT *," + APqry + ap_end +
     " AS LessonPlanName " +
- "FROM (SELECT DISTINCT hdr.LessonPlanId,hdr.LessonOrder,hdr.studentId FROM DSTempHdr hdr INNER JOIN LookUp ON hdr.StatusId=LookUp.LookupId WHERE StudentId=" + sess.StudentId + "  AND ( " + StatusCheck + "  )) LSN ORDER BY lsn.LessonOrder", false);
-
-              
+                        " FROM (SELECT DISTINCT hdr.LessonPlanId,hdr.LessonOrder,hdr.studentId FROM DSTempHdr hdr INNER JOIN LookUp ON hdr.StatusId=LookUp.LookupId WHERE StudentId=" + sess.StudentId + "  AND ( " + StatusCheck + "  )) LSN ORDER BY lsn.LessonOrder", false);
+                }
                 if (DTLesson != null)
                 {
                     if (DTLesson.Rows.Count > 0)
@@ -216,6 +216,11 @@ public partial class StudentBinder_TextBased : System.Web.UI.Page
                             dtLP.Rows.Add(drr);
                         }
                     }
+                    else
+                    {
+                        td1.Visible = true;
+                        td1.InnerHtml = clsGeneral.failedMsg("No Lesson Found."); 
+                }
                 }
                 else
                 {
