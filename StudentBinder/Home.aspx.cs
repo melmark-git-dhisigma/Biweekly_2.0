@@ -57,16 +57,18 @@ public partial class Home : System.Web.UI.Page
             sess = (clsSession)Session["UserSession"];
             if (sess == null)
             {
-                Response.Redirect("~/Administration/Error.aspx?Error=Your session has expired. Please log-in again");
+                ClsErrorLog clError = new ClsErrorLog();
+                clError.WriteToLog("Null Reference Log:Home_Page_Load   Your session has expired. Please log-in again");
+                Response.Redirect(ResolveUrl("~/Administration/Error.aspx?Error=Session%20expired"),false);
+                Context.ApplicationInstance.CompleteRequest();
+                return;
             }
-            else
-            {
+
                 bool flag = clsGeneral.PageIdentification(sess.perPage);
                 if (flag == false)
                 {
                     Response.Redirect("~/Administration/Error.aspx?Error=You are not authorized to access this Page.Contact Program Administrator");
                 }
-            }
 
 
             if (!IsPostBack)
@@ -79,6 +81,14 @@ public partial class Home : System.Web.UI.Page
                 Session["Sprestname"] = Prevsess.StudentName;
                 Session["SpreClsid"] = Prevsess.Classid;
                 Prevsess = (clsSession)Session["PreSession"];
+                if (Session["Spreid"] == null || Session["Spreuser"] == null || Session["Sprestid"] == null || Session["Sprestname"] == null)
+                {
+                    ClsErrorLog clError = new ClsErrorLog();
+                    clError.WriteToLog("Null Reference Log:Home_Page_Load   Required session values are missing");
+                    Response.Redirect(ResolveUrl("~/Administration/Error.aspx?Error=Session%20expired"),false);
+                    Context.ApplicationInstance.CompleteRequest();
+                    return;
+                }
                 preid = Convert.ToInt16(Session["Spreid"]);
                 preuser=Session["Spreuser"].ToString();
                 SessStudentid = Convert.ToInt16(Session["Sprestid"]);
