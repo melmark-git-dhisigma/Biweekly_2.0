@@ -104,9 +104,9 @@ public class DiscreteSession
                          " WHERE SH.StdtSessionHdrId IN (select StdtSessionHdrId from ( select hdr.StdtSessionHdrId, RANK()" +
                          " OVER (ORDER BY (CASE(IOAInd) WHEN 'N' THEN 1 WHEN 'Y' THEN 2 END),EndTs DESC) as RNK  FROM StdtSessionHdr hdr" +
                          " WHERE SessMissTrailStus!='Y' AND StudentId = " + studentId + " AND DSTempHdrId = " + templateID + " AND CurrentSetId=" + iCrntSet +
-                         ") as Rk WHERE RNK <= " + nmbrOfSession + ") AND SH.IOAInd<>'Y' AND REPLACE(dcol.colname,'''','^') = '" + colName.Replace("'", "^") + "'AND StartTs >= " +
+                         ") as Rk WHERE RNK <= " + nmbrOfSession + ") AND SH.IOAInd<>'Y' AND ( SH.ismaintanace = 0 OR SH.ismaintanace = NULL ) AND REPLACE(dcol.colname,'''','^') = '" + colName.Replace("'", "^") + "'AND StartTs >= " +
                          " (SELECT ISNULL(MAX(EvntTs),'1900-01-01') FROM StdtSessEvent" +
-                         " WHERE SessMissTrailStus!='Y' AND DSTempHdrId =" + templateID + "AND StudentId = " + studentId + " AND (IsMaintanace=0 OR IsMaintanace=NULL) AND StdtSessEventType!='Minor' AND EventName!='ProbeMode' ) " +
+                         " WHERE SessMissTrailStus!='Y' AND DSTempHdrId =" + templateID + "AND StudentId = " + studentId + " AND StdtSessEventType!='Minor' AND EventName!='ProbeMode' ) " +
                          " AND SH.SessionNbr>=ISNULL((SELECT MAX(SessionNbr) FROM StdtSessEvent " +
                          "WHERE DSTempHdrId=" + templateID + " AND StudentId=" + studentId + "),0)" + cond + " ORDER BY SS.StdtSessionHdrId " + cond2;
         }
@@ -126,9 +126,9 @@ public class DiscreteSession
                                     " WHERE SH.StdtSessionHdrId IN (select StdtSessionHdrId from ( select hdr.StdtSessionHdrId, RANK()" +
                                     " OVER (ORDER BY (CASE(IOAInd) WHEN 'N' THEN 1 WHEN 'Y' THEN 2 END),EndTs DESC) as RNK  FROM StdtSessionHdr hdr" +
                                     " WHERE SessMissTrailStus!='Y' AND StudentId = " + studentId + " AND DSTempHdrId = " + templateID + " AND CurrentSetId=" + iCrntSet +
-                                    ") as Rk WHERE RNK <= " + nmbrOfSession + ") AND SH.IOAInd<>'Y' AND REPLACE(dcol.colname,'''','^') = '" + colName.Replace("'", "^") + "'AND StartTs >" +
+                                    ") as Rk WHERE RNK <= " + nmbrOfSession + ") AND SH.IOAInd<>'Y' AND ( SH.ismaintanace = 0 OR SH.ismaintanace = NULL ) AND REPLACE(dcol.colname,'''','^') = '" + colName.Replace("'", "^") + "'AND StartTs >" +
                                     " (SELECT ISNULL(MAX(EvntTs),'1900-01-01') FROM StdtSessEvent" +
-                                    " WHERE SessMissTrailStus!='Y' AND DSTempHdrId =" + templateID + "AND StudentId = " + studentId + " AND (IsMaintanace=0 OR IsMaintanace=NULL) AND StdtSessEventType!='Minor' AND EventName!='ProbeMode' ) " +
+                                    " WHERE SessMissTrailStus!='Y' AND DSTempHdrId =" + templateID + "AND StudentId = " + studentId + " AND StdtSessEventType!='Minor' AND EventName!='ProbeMode' ) " +
                                     " AND SH.SessionNbr>ISNULL((SELECT MAX(SessionNbr) FROM StdtSessEvent " +
                                     "WHERE DSTempHdrId=" + templateID + " AND StudentId=" + studentId + "),0)" + cond + " ORDER BY SS.StdtSessionHdrId " + cond2;
         }
